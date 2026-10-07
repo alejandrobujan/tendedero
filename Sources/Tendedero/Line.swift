@@ -49,7 +49,6 @@ final class Line: ObservableObject {
     private let storeKey = "pegged"
 
     init() {
-        restore()
         scheduleGust()
     }
 
@@ -87,6 +86,7 @@ final class Line: ObservableObject {
         items[i].falling = true
         hitRects[id] = nil
         save()
+        trashIfCopied(items[i].url)
         if !quietly { play("Pop", volume: 0.25) }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
             self?.items.removeAll { $0.id == id }
@@ -151,12 +151,25 @@ final class Line: ObservableObject {
         contentsOfFile: "/System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/dock/drag to trash.aif",
         byReference: true)
 
-    /// Whether the file lives in Tendedero's own folder. Those are discarded
-    /// to the Trash, or the folder would fill up with forgotten screenshots.
-    /// Files anywhere else, like the Desktop, stay where they are.
+    /// Whether the file lives in one of Tendedero's own folders, for
+    /// screenshots or for copied images. Those are discarded to the Trash, or
+    /// the folders would fill up with forgotten pictures. Files anywhere else,
+    /// like the Desktop, stay where they are.
     func isInInbox(_ id: UUID) -> Bool {
         guard let item = items.first(where: { $0.id == id }) else { return false }
-        return item.url.standardizedFileURL.path.hasPrefix(Inbox.folder.standardizedFileURL.path + "/")
+        return item.url.isInside(Inbox.folder) || item.url.isInside(ClipboardWatcher.folder)
+    }
+
+    /// A copied image exists only for the line, so when it leaves the line,
+    /// however it leaves, its file goes to the Trash. One that was moved out,
+    /// to the Desktop or to a folder, is already gone from here.
+    private func trashIfCopied(_ url: URL) {
+        guard url.isInside(ClipboardWatcher.folder), FileManager.default.fileExists(atPath: url.path) else { return }
+        do {
+            try FileManager.default.trashItem(at: url, resultingItemURL: nil)
+        } catch {
+            log.error("Could not trash \(url.path, privacy: .public): \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     /// The corner cross and "Take down" both end up here.
@@ -176,18 +189,6 @@ final class Line: ObservableObject {
             log.error("Could not save to Desktop: \(error.localizedDescription, privacy: .public)")
             NSSound.beep()
         }
-    }
-
-    private func uniqueURL(in folder: URL, for name: String) -> URL {
-        let base = (name as NSString).deletingPathExtension
-        let ext = (name as NSString).pathExtension
-        var candidate = folder.appendingPathComponent(name)
-        var n = 2
-        while FileManager.default.fileExists(atPath: candidate.path) {
-            candidate = folder.appendingPathComponent("\(base) \(n)").appendingPathExtension(ext)
-            n += 1
-        }
-        return candidate
     }
 
     /// Long press: open the photo in the system Markup editor.
@@ -227,10 +228,18 @@ final class Line: ObservableObject {
         UserDefaults.standard.set(paths, forKey: storeKey)
     }
 
-    private func restore() {
+    /// Called once the line knows how many photos fit, so none fall off
+    /// just because the line was not measured yet.
+    func restore() {
         let paths = UserDefaults.standard.stringArray(forKey: storeKey) ?? []
         for path in paths where FileManager.default.fileExists(atPath: path) {
             hang(URL(fileURLWithPath: path), quietly: true)
+        }
+        // Copied images left behind by a crash or a failed hang.
+        let copied = (try? FileManager.default.contentsOfDirectory(
+            at: ClipboardWatcher.folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])) ?? []
+        for url in copied where !items.contains(where: { $0.url.standardizedFileURL == url.standardizedFileURL }) {
+            trashIfCopied(url)
         }
     }
 
@@ -259,4 +268,23 @@ func makeThumbnail(_ url: URL, maxPixels: Int = 480) -> NSImage? {
     ]
     guard let cg = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else { return nil }
     return NSImage(cgImage: cg, size: NSSize(width: cg.width, height: cg.height))
+}
+
+extension URL {
+    func isInside(_ folder: URL) -> Bool {
+        standardizedFileURL.path.hasPrefix(folder.standardizedFileURL.path + "/")
+    }
+}
+
+/// A free name in a folder: "name.png", then "name 2.png", and so on.
+func uniqueURL(in folder: URL, for name: String) -> URL {
+    let base = (name as NSString).deletingPathExtension
+    let ext = (name as NSString).pathExtension
+    var candidate = folder.appendingPathComponent(name)
+    var n = 2
+    while FileManager.default.fileExists(atPath: candidate.path) {
+        candidate = folder.appendingPathComponent("\(base) \(n)").appendingPathExtension(ext)
+        n += 1
+    }
+    return candidate
 }

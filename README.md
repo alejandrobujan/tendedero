@@ -116,6 +116,7 @@ so macOS asks again for access to the Desktop after each rebuild.
 | `PeggedView.swift` | One photo: glass frame, clip, swing and breeze |
 | `GrabArea.swift` | Click, long press, drag and drop |
 | `ScreenshotWatcher.swift` | Notices new screenshots |
+| `ClipboardWatcher.swift` | Notices images copied to the clipboard, when turned on |
 | `Inbox.swift` | Takes over screenshot settings and puts them back |
 | `Markup.swift` | Opens the system Markup editor and saves the result |
 | `FullScreen.swift` | Knows when to stay hidden |

@@ -14,6 +14,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// ignores the screenshot settings (macOS 27 renamed one), captures keep
     /// landing on the Desktop, and they still hang on the line.
     private var safetyWatcher: ScreenshotWatcher?
+    private var clipboardWatcher: ClipboardWatcher?
     private var signalSources: [DispatchSourceSignal] = []
     private var hotKey: HotKey?
     private var cancellables = Set<AnyCancellable>()
@@ -50,10 +51,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         panel = LinePanel(content: host)
         panel.placeOnScreen()
         updateCapacity()
+        line.restore()
 
         if Inbox.isEnabled { Inbox.apply() }
         restoreSettingsOnTermination()
         startWatcher()
+        startClipboardWatcher()
 
         hotKey = HotKey(keyCode: kVK_ANSI_T, modifiers: controlKey | optionKey) { [weak self] in
             self?.toggle()
@@ -172,6 +175,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             source.resume()
             signalSources.append(source)
         }
+    }
+
+    // MARK: Copied images
+
+    private func startClipboardWatcher() {
+        clipboardWatcher?.stop()
+        clipboardWatcher = nil
+        guard ClipboardWatcher.isEnabled else { return }
+        let watcher = ClipboardWatcher { [weak self] url in self?.hangCapture(url) }
+        watcher.start()
+        clipboardWatcher = watcher
+    }
+
+    private func setClipboard(_ on: Bool) {
+        ClipboardWatcher.isEnabled = on
+        startClipboardWatcher()
     }
 
     // MARK: Showing and hiding
@@ -481,6 +500,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         inbox.toolTip = L("Screenshots hang instantly and skip the Desktop",
                           "Las capturas se cuelgan al instante y no pasan por el Escritorio")
         menu.addItem(inbox)
+
+        let clipboard = ClosureMenuItem(L("Hang copied images", "Colgar imágenes copiadas")) { [weak self] in
+            self?.setClipboard(!ClipboardWatcher.isEnabled)
+        }
+        clipboard.state = ClipboardWatcher.isEnabled ? .on : .off
+        clipboard.toolTip = L("Images you copy, like screenshots taken with Control held down, hang on the line too",
+                              "Las imágenes que copias, como las capturas hechas con Control pulsado, también se cuelgan")
+        menu.addItem(clipboard)
 
         menu.addItem(ClosureMenuItem(L("Open screenshots folder", "Abrir carpeta de capturas")) { [weak self] in
             guard let self else { return }
