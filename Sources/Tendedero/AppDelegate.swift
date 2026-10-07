@@ -35,8 +35,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var menuBarSuppressed = false
     private var clickMonitors: [Any] = []
     private var awaySince: Date?
-    /// Whether the line should be up, if nothing prevents it. A full screen
-    /// app on that screen does: the line waits until you leave full screen.
+    /// Whether the line should be up.
     private var wanted = false
     /// Set when you open the line on purpose, so it stays up while empty.
     private var keepOpen = false
@@ -252,12 +251,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                       width: size.width, height: size.height)
     }
 
-    /// Decides whether the panel is ordered in at all: something to show,
-    /// and no full screen app on that screen.
+    /// Decides whether the panel is ordered in at all: something to show.
     private func refresh() {
-        let blocked = panel.screen.map(FullScreen.isActive(on:))
-            ?? LinePanel.screenUnderPointer().map(FullScreen.isActive(on:)) ?? false
-        if wanted && !blocked {
+        if wanted {
             present()
         } else {
             dismiss()
@@ -349,13 +345,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return NSRect(x: screen.frame.minX, y: screen.frame.maxY - h, width: screen.frame.width, height: h)
     }
 
+    /// Like NSMouseInRect, but the top edge is inside.
+    static func contains(_ rect: NSRect, _ p: NSPoint) -> Bool {
+        p.x >= rect.minX && p.x < rect.maxX && p.y >= rect.minY && p.y <= rect.maxY
+    }
+
     /// A click anywhere in the top bar of any screen, a menu or an icon, puts the line away.
     private func watchMenuBarClicks() {
         let handler: (NSEvent?) -> Void = { [weak self] _ in
             MainActor.assumeIsolated {
                 guard let self else { return }
                 let p = NSEvent.mouseLocation
-                guard NSScreen.screens.contains(where: { Self.menuBarBand(of: $0).contains(p) }) else { return }
+                guard NSScreen.screens.contains(where: { Self.contains(Self.menuBarBand(of: $0), p) }) else { return }
                 self.menuBarSuppressed = true
                 self.hotZoneSince = nil
                 if self.isRevealed {
@@ -378,16 +379,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let mouse = NSEvent.mouseLocation
         let now = Date()
 
-        let screenUnderPointer = NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) }
-        let inMenuBar = screenUnderPointer.map { Self.menuBarBand(of: $0).contains(mouse) } ?? false
+        // Pushed against the top edge, the pointer sits exactly on the screen's
+        // maxY, which a plain rect test leaves out, so the top row counts too.
+        let screenUnderPointer = NSScreen.screens.first { Self.contains($0.frame, mouse) }
+        let inMenuBar = screenUnderPointer.map { Self.contains(Self.menuBarBand(of: $0), mouse) } ?? false
         if !inMenuBar { menuBarSuppressed = false }
 
         guard isRevealed else {
             // Resting in the menu bar brings the line down on that screen.
             // Pushing against the top edge is part of it, and it also works
             // when another display sits above and the pointer never stops.
-            if let screen = screenUnderPointer, inMenuBar, !menuBarSuppressed,
-               !FullScreen.isActive(on: screen) {
+            if let screen = screenUnderPointer, inMenuBar, !menuBarSuppressed {
                 let since = hotZoneSince ?? now
                 hotZoneSince = since
                 if now.timeIntervalSince(since) >= Self.revealDelay {
