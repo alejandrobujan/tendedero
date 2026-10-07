@@ -47,6 +47,7 @@ Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 | Rest the pointer in the menu bar | Bring the line down on that screen. |
 | Click anything in the menu bar | Put it away. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Show or hide the line. |
+| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd>, or the tag at the start of the line | Search every screenshot. |
 
 <br>
 
@@ -57,6 +58,17 @@ entirely. No floating thumbnail. No five-second wait. Each capture hangs
 the instant you take it, and only what you drag out is kept.
 
 Same shortcuts. Same muscle memory. Just less mess.
+
+<br>
+
+## Find any screenshot.
+
+Search reads the text on every screenshot, on the line, on the Desktop and
+wherever you saved them before, and knows what each one shows. Type
+"cloudflare invoice" or "purple website". Results work like the line: click to
+copy, drag to send, Return to copy and get back to work.
+
+It all happens on your Mac, with Vision and, when bundled, Apple's MobileCLIP.
 
 <br>
 
@@ -72,7 +84,7 @@ Tendedero runs entirely on your Mac, and your screenshots never leave it.
 | | |
 |:--|:--|
 | **Compatibility** | macOS 14 Sonoma or later, on Apple silicon and Intel. Designed for macOS 27. |
-| **Size** | 1.7 MB |
+| **Size** | 1.7 MB, or about 200 MB with MobileCLIP bundled |
 | **Languages** | English, Spanish |
 | **Built with** | Swift, AppKit and SwiftUI |
 | **Network access** | None |
@@ -100,6 +112,11 @@ cd tendedero
 scripts/build-app.sh
 open build/Tendedero.app
 ```
+
+To search by what screenshots show, run `scripts/download-clip.sh` first. It
+fetches Apple's MobileCLIP-S2 (about 200 MB, under Apple's
+[weights license](https://github.com/apple/ml-mobileclip/blob/main/LICENSE_weights_data))
+and the build bundles it. Without it, search works by text.
 
 Requires the Swift toolchain. Xcode is optional. With the Command Line Tools for macOS 27, the script falls back to the macOS 26 SDK they install alongside, because the new SDK needs a SwiftUI macro plugin only Xcode includes. Local builds are signed ad hoc,
 so macOS asks again for access to the Desktop after each rebuild.

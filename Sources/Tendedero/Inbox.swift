@@ -39,6 +39,13 @@ enum Inbox {
         set { UserDefaults.standard.set(newValue, forKey: offeredKey) }
     }
 
+    /// Where screenshots went before Tendedero took over, if it has.
+    static var previousFolder: URL? {
+        let saved = UserDefaults.standard.dictionary(forKey: savedKey) ?? [:]
+        guard let raw = (saved["locationScreenshot"] ?? saved["location"]) as? String, !raw.isEmpty else { return nil }
+        return URL(fileURLWithPath: (raw as NSString).expandingTildeInPath, isDirectory: true)
+    }
+
     /// Whether macOS is currently sending screenshots to our folder.
     static var isApplied: Bool {
         guard let current = CFPreferencesCopyAppValue(locationKey, domain) as? String else { return false }

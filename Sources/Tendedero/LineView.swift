@@ -31,6 +31,9 @@ struct LineView: View {
             ZStack(alignment: .topLeading) {
                 Rope(width: width)
 
+                SearchTag(line: line)
+                    .position(x: SearchTag.x, y: Layout.ropeY(x: SearchTag.x, width: width) - Layout.pinAbove + SearchTag.height / 2)
+
                 if line.items.isEmpty {
                     Hint()
                         .position(x: width / 2, y: Layout.ropeY(x: width / 2, width: width) + 34)
@@ -55,6 +58,65 @@ struct LineView: View {
         }
         .onPreferenceChange(HitRectsKey.self) { rects in
             line.hitRects = rects
+        }
+    }
+}
+
+/// A small glass tag pegged at the start of the line. Clicking it opens
+/// search, the same as Control Option F.
+struct SearchTag: View {
+    @ObservedObject var line: Line
+    @State private var hovering = false
+
+    static let x: CGFloat = 96
+    static let height: CGFloat = 26 - 12 + 36
+    /// Its place among the hit rects, so the panel catches clicks on it.
+    static let id = UUID()
+
+    var body: some View {
+        VStack(spacing: -12) {
+            Clothespin()
+                .zIndex(1)
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(.primary)
+                .frame(width: 36, height: 36)
+                .glassFrame(circle: true)
+                .shadow(color: .black.opacity(hovering ? 0.26 : 0.18), radius: hovering ? 10 : 7, y: hovering ? 6 : 4)
+                .scaleEffect(hovering ? 1.08 : 1, anchor: .top)
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: hovering)
+                .overlay(ClickArea { line.onSearch?() })
+                .onHover { hovering = $0 }
+                .help(L("Search screenshots (⌃⌥F)", "Buscar capturas (⌃⌥F)"))
+                .background(
+                    GeometryReader { g in
+                        Color.clear.preference(key: HitRectsKey.self, value: [Self.id: g.frame(in: .global)])
+                    }
+                )
+        }
+    }
+}
+
+/// Takes the first click even though the line's panel never becomes key.
+struct ClickArea: NSViewRepresentable {
+    let action: () -> Void
+
+    func makeNSView(context: Context) -> ClickView {
+        let view = ClickView()
+        view.action = action
+        return view
+    }
+
+    func updateNSView(_ view: ClickView, context: Context) {
+        view.action = action
+    }
+
+    final class ClickView: NSView {
+        var action: () -> Void = {}
+        override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+        override func mouseDown(with event: NSEvent) {}
+        override func mouseUp(with event: NSEvent) {
+            if bounds.contains(convert(event.locationInWindow, from: nil)) { action() }
         }
     }
 }

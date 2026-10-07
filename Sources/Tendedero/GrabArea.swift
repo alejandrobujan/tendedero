@@ -77,6 +77,8 @@ final class GrabView: NSView, NSDraggingSource {
     var onLongPress: () -> Void = {}
     var onPressChange: (Bool) -> Void = { _ in }
     var menuProvider: () -> NSMenu = { NSMenu() }
+    /// Whether the top left corner is a discard cross, as on the line.
+    var hasCross = true
 
     private var downPoint: NSPoint?
     private var startedDrag = false
@@ -101,7 +103,7 @@ final class GrabView: NSView, NSDraggingSource {
     }
 
     override func mouseDown(with event: NSEvent) {
-        if isInCross(event) {
+        if hasCross && isInCross(event) {
             downPoint = nil
             onDiscard()
             return

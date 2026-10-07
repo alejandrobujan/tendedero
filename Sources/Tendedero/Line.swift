@@ -38,6 +38,9 @@ final class Line: ObservableObject {
 
     var maxItems = 8
 
+    /// The search tag on the line was clicked.
+    var onSearch: (() -> Void)?
+
 
     var soundOn: Bool {
         get { !UserDefaults.standard.bool(forKey: "soundOff") }
@@ -113,13 +116,7 @@ final class Line: ObservableObject {
 
     func copy(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
-        let entry = NSPasteboardItem()
-        if let png = pngData(item.url) { entry.setData(png, forType: .png) }
-        entry.setString(item.url.absoluteString, forType: .fileURL)
-        let pb = NSPasteboard.general
-        pb.clearContents()
-        pb.writeObjects([entry])
-
+        Line.copyToPasteboard(item.url)
         copiedID = id
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
             if self?.copiedID == id { self?.copiedID = nil }
@@ -242,7 +239,17 @@ final class Line: ObservableObject {
         sound.play()
     }
 
-    private func pngData(_ url: URL) -> Data? {
+    /// Puts the image on the clipboard, both as pixels and as the file.
+    static func copyToPasteboard(_ url: URL) {
+        let entry = NSPasteboardItem()
+        if let png = pngData(url) { entry.setData(png, forType: .png) }
+        entry.setString(url.absoluteString, forType: .fileURL)
+        let pb = NSPasteboard.general
+        pb.clearContents()
+        pb.writeObjects([entry])
+    }
+
+    private static func pngData(_ url: URL) -> Data? {
         if url.pathExtension.lowercased() == "png" { return try? Data(contentsOf: url) }
         guard let tiff = NSImage(contentsOf: url)?.tiffRepresentation,
               let rep = NSBitmapImageRep(data: tiff) else { return nil }
@@ -251,12 +258,16 @@ final class Line: ObservableObject {
 }
 
 func makeThumbnail(_ url: URL, maxPixels: Int = 480) -> NSImage? {
+    guard let cg = makeThumbnailImage(url, maxPixels: maxPixels) else { return nil }
+    return NSImage(cgImage: cg, size: NSSize(width: cg.width, height: cg.height))
+}
+
+func makeThumbnailImage(_ url: URL, maxPixels: Int) -> CGImage? {
     guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
     let options: [CFString: Any] = [
         kCGImageSourceCreateThumbnailFromImageAlways: true,
         kCGImageSourceCreateThumbnailWithTransform: true,
         kCGImageSourceThumbnailMaxPixelSize: maxPixels,
     ]
-    guard let cg = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else { return nil }
-    return NSImage(cgImage: cg, size: NSSize(width: cg.width, height: cg.height))
+    return CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
 }

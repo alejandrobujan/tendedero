@@ -16,6 +16,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var safetyWatcher: ScreenshotWatcher?
     private var signalSources: [DispatchSourceSignal] = []
     private var hotKey: HotKey?
+    private var searchHotKey: HotKey?
+    private let index = ScreenshotIndex(
+        store: Inbox.folder.deletingLastPathComponent().appendingPathComponent("SearchIndex.plist"),
+        loadClip: { Clip.bundled() })
+    private var search: SearchController!
     private var cancellables = Set<AnyCancellable>()
     private var mouseTimer: Timer?
 
@@ -57,6 +62,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         hotKey = HotKey(keyCode: kVK_ANSI_T, modifiers: controlKey | optionKey) { [weak self] in
             self?.toggle()
         }
+
+        search = SearchController(index: index, line: line) { [weak self] in self?.searchFolders() ?? [] }
+        line.onSearch = { [weak self] in self?.search.show() }
+        searchHotKey = HotKey(keyCode: kVK_ANSI_F, modifiers: controlKey | optionKey) { [weak self] in
+            self?.search.toggle()
+        }
+        // Catch up on screenshots taken while Tendedero was not running,
+        // once launch has settled.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in self?.search.model.refreshIndex() }
 
         setUpStatusItem()
         watchMenuBarClicks()
@@ -111,6 +125,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         if Inbox.isEnabled { Inbox.restore() }
+    }
+
+    // MARK: Search
+
+    /// Every folder screenshots may be in: Tendedero's own, the Desktop, the
+    /// current save location and the one used before Tendedero took over.
+    /// Outside its own folder only real screenshots are indexed.
+    private func searchFolders() -> [(url: URL, onlyScreenshots: Bool)] {
+        var folders: [(url: URL, onlyScreenshots: Bool)] = [(Inbox.folder, false), (ScreenshotWatcher.desktop, true)]
+        if let watcher { folders.append((watcher.folder, true)) }
+        if let previous = Inbox.previousFolder { folders.append((previous, true)) }
+        return folders
     }
 
     // MARK: Inbox mode
@@ -199,6 +225,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// A new screenshot lifts off from where it was taken and flies to its
     /// place on the line. Without a known capture area it simply drops in.
     private func hangCapture(_ url: URL) {
+        index.add(url)
         let from = captureRect(of: url)
         if let from {
             let center = CGPoint(x: from.midX, y: from.midY)
@@ -443,7 +470,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     private func updateCapacity() {
-        let usable = panel.frame.width - 200
+        // Room at the start of the line for the search tag.
+        let usable = panel.frame.width - 2 * (SearchTag.x + 60)
         line.maxItems = max(3, min(12, Int(usable / Layout.spacing)))
     }
 
@@ -469,6 +497,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         toggleItem.keyEquivalent = "t"
         toggleItem.keyEquivalentModifierMask = [.control, .option]
         menu.addItem(toggleItem)
+
+        let searchItem = ClosureMenuItem(L("Search screenshots…", "Buscar capturas…")) { [weak self] in
+            self?.search.show()
+        }
+        searchItem.keyEquivalent = "f"
+        searchItem.keyEquivalentModifierMask = [.control, .option]
+        menu.addItem(searchItem)
 
         let clearItem = ClosureMenuItem(L("Take everything down", "Descolgar todo")) { [weak self] in
             self?.line.clear()
