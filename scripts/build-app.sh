@@ -48,6 +48,17 @@ done
 iconutil -c icns "$ICONSET" -o "$APP/Contents/Resources/Tendedero.icns"
 rm -rf "$WORK"
 
+# MobileCLIP for searching by what a screenshot shows, when it has been
+# downloaded with scripts/download-clip.sh. Without it, search uses text only.
+if [ -d Models/mobileclip_s2_image.mlpackage ] && [ -d Models/mobileclip_s2_text.mlpackage ]; then
+  mkdir -p "$APP/Contents/Resources/CLIP"
+  for m in mobileclip_s2_image mobileclip_s2_text; do
+    [ -d "Models/$m.mlmodelc" ] || xcrun coremlcompiler compile "Models/$m.mlpackage" Models >/dev/null
+    cp -R "Models/$m.mlmodelc" "$APP/Contents/Resources/CLIP/"
+  done
+  cp Models/clip-vocab.json Models/clip-merges.txt "$APP/Contents/Resources/CLIP/"
+fi
+
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -66,6 +77,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>NSHighResolutionCapable</key><true/>
   <key>NSDesktopFolderUsageDescription</key>
   <string>Tendedero watches the folder where macOS saves your screenshots so it can hang them on the line.</string>
+  <key>NSDocumentsFolderUsageDescription</key>
+  <string>Tendedero reads screenshots saved in Documents so you can search them. They never leave your Mac.</string>
 </dict>
 </plist>
 PLIST

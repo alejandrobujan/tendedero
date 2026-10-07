@@ -16,6 +16,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var safetyWatcher: ScreenshotWatcher?
     private var signalSources: [DispatchSourceSignal] = []
     private var hotKey: HotKey?
+    private var searchHotKey: HotKey?
+    private let index = ScreenshotIndex(
+        store: Inbox.folder.deletingLastPathComponent().appendingPathComponent("SearchIndex.plist"),
+        loadClip: { Clip.bundled() })
+    private var search: SearchController!
     private var cancellables = Set<AnyCancellable>()
     private var mouseTimer: Timer?
 
@@ -35,8 +40,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var menuBarSuppressed = false
     private var clickMonitors: [Any] = []
     private var awaySince: Date?
-    /// Whether the line should be up, if nothing prevents it. A full screen
-    /// app on that screen does: the line waits until you leave full screen.
+    /// Whether the line should be up.
     private var wanted = false
     /// Set when you open the line on purpose, so it stays up while empty.
     private var keepOpen = false
@@ -58,6 +62,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         hotKey = HotKey(keyCode: kVK_ANSI_T, modifiers: controlKey | optionKey) { [weak self] in
             self?.toggle()
         }
+
+        search = SearchController(index: index, line: line) { [weak self] in self?.searchFolders() ?? [] }
+        line.onSearch = { [weak self] in self?.search.show() }
+        line.menu = { [weak self] in
+            let menu = NSMenu()
+            self?.menuNeedsUpdate(menu)
+            return menu
+        }
+        searchHotKey = HotKey(keyCode: kVK_ANSI_F, modifiers: controlKey | optionKey) { [weak self] in
+            self?.search.toggle()
+        }
+        // Catch up on screenshots taken while Tendedero was not running,
+        // once launch has settled.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in self?.search.model.refreshIndex() }
 
         setUpStatusItem()
         watchMenuBarClicks()
@@ -112,6 +130,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         if Inbox.isEnabled { Inbox.restore() }
+    }
+
+    // MARK: Search
+
+    /// Every folder screenshots may be in: Tendedero's own, the Desktop, the
+    /// current save location and the one used before Tendedero took over.
+    /// Outside its own folder only real screenshots are indexed.
+    private func searchFolders() -> [(url: URL, onlyScreenshots: Bool)] {
+        var folders: [(url: URL, onlyScreenshots: Bool)] = [(Inbox.folder, false), (ScreenshotWatcher.desktop, true)]
+        if let watcher { folders.append((watcher.folder, true)) }
+        if let previous = Inbox.previousFolder { folders.append((previous, true)) }
+        return folders
     }
 
     // MARK: Inbox mode
@@ -200,6 +230,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// A new screenshot lifts off from where it was taken and flies to its
     /// place on the line. Without a known capture area it simply drops in.
     private func hangCapture(_ url: URL) {
+        index.add(url)
         let from = captureRect(of: url)
         if let from {
             let center = CGPoint(x: from.midX, y: from.midY)
@@ -252,12 +283,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                       width: size.width, height: size.height)
     }
 
-    /// Decides whether the panel is ordered in at all: something to show,
-    /// and no full screen app on that screen.
+    /// Decides whether the panel is ordered in at all: something to show.
     private func refresh() {
-        let blocked = panel.screen.map(FullScreen.isActive(on:))
-            ?? LinePanel.screenUnderPointer().map(FullScreen.isActive(on:)) ?? false
-        if wanted && !blocked {
+        if wanted {
             present()
         } else {
             dismiss()
@@ -336,10 +364,53 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         panel.ignoresMouseEvents = true
     }
 
-    /// How long the cursor rests against the top edge before the line comes
-    /// down. Short enough to feel instant, long enough that a quick trip to
-    /// the menu bar does not trigger it.
-    private static let revealDelay: TimeInterval = 0.25
+    /// How long the cursor rests in the reveal zone before the line comes
+    /// down. Short enough to feel instant, long enough that sweeping across
+    /// the notch on the way to a menu does not trigger it.
+    private static let revealDelay: TimeInterval = 0.35
+
+    /// Where resting the pointer brings the line down. The menu bar is full
+    /// of things you point at, like the battery or the clock, so by default
+    /// only the notch counts: nothing there can be clicked. Screens without
+    /// a notch use the same width at the top centre.
+    enum RevealZone: String, CaseIterable {
+        case notch, menuBar, never
+
+        static let key = "revealZone"
+
+        static var current: RevealZone {
+            get { UserDefaults.standard.string(forKey: key).flatMap(RevealZone.init) ?? .notch }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: key) }
+        }
+
+        var title: String {
+            switch self {
+            case .notch: L("At the notch, or top centre", "En el notch, o arriba en el centro")
+            case .menuBar: L("Anywhere in the menu bar", "En cualquier parte de la barra de menús")
+            case .never: L("Never, use ⌃⌥T", "Nunca, usar ⌃⌥T")
+            }
+        }
+    }
+
+    static func revealZone(of screen: NSScreen) -> NSRect? {
+        let band = menuBarBand(of: screen)
+        switch RevealZone.current {
+        case .never:
+            return nil
+        case .menuBar:
+            return band
+        case .notch:
+            var minX = screen.frame.midX - 100, maxX = screen.frame.midX + 100
+            if let left = screen.auxiliaryTopLeftArea, let right = screen.auxiliaryTopRightArea {
+                // The left area starts at the screen's left edge, whichever
+                // coordinates it comes in.
+                let offset = screen.frame.minX - left.minX
+                minX = left.maxX + offset
+                maxX = right.minX + offset
+            }
+            return NSRect(x: minX, y: band.minY, width: maxX - minX, height: band.height)
+        }
+    }
 
     /// The menu bar strip at the top of a screen. With an auto-hiding menu
     /// bar the visible frame reaches the top, so the system thickness is used.
@@ -349,13 +420,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return NSRect(x: screen.frame.minX, y: screen.frame.maxY - h, width: screen.frame.width, height: h)
     }
 
+    /// Like NSMouseInRect, but the top edge is inside.
+    static func contains(_ rect: NSRect, _ p: NSPoint) -> Bool {
+        p.x >= rect.minX && p.x < rect.maxX && p.y >= rect.minY && p.y <= rect.maxY
+    }
+
     /// A click anywhere in the top bar of any screen, a menu or an icon, puts the line away.
     private func watchMenuBarClicks() {
         let handler: (NSEvent?) -> Void = { [weak self] _ in
             MainActor.assumeIsolated {
                 guard let self else { return }
                 let p = NSEvent.mouseLocation
-                guard NSScreen.screens.contains(where: { Self.menuBarBand(of: $0).contains(p) }) else { return }
+                guard NSScreen.screens.contains(where: { Self.contains(Self.menuBarBand(of: $0), p) }) else { return }
                 self.menuBarSuppressed = true
                 self.hotZoneSince = nil
                 if self.isRevealed {
@@ -378,16 +454,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let mouse = NSEvent.mouseLocation
         let now = Date()
 
-        let screenUnderPointer = NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) }
-        let inMenuBar = screenUnderPointer.map { Self.menuBarBand(of: $0).contains(mouse) } ?? false
+        // Pushed against the top edge, the pointer sits exactly on the screen's
+        // maxY, which a plain rect test leaves out, so the top row counts too.
+        let screenUnderPointer = NSScreen.screens.first { Self.contains($0.frame, mouse) }
+        let inMenuBar = screenUnderPointer.map { Self.contains(Self.menuBarBand(of: $0), mouse) } ?? false
         if !inMenuBar { menuBarSuppressed = false }
+        let inRevealZone = screenUnderPointer.flatMap(Self.revealZone(of:)).map { Self.contains($0, mouse) } ?? false
 
         guard isRevealed else {
-            // Resting in the menu bar brings the line down on that screen.
+            // Resting in the reveal zone brings the line down on that screen.
             // Pushing against the top edge is part of it, and it also works
             // when another display sits above and the pointer never stops.
-            if let screen = screenUnderPointer, inMenuBar, !menuBarSuppressed,
-               !FullScreen.isActive(on: screen) {
+            if let screen = screenUnderPointer, inRevealZone, !menuBarSuppressed {
                 let since = hotZoneSince ?? now
                 hotZoneSince = since
                 if now.timeIntervalSince(since) >= Self.revealDelay {
@@ -441,7 +519,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     private func updateCapacity() {
-        let usable = panel.frame.width - 200
+        // Room at the start of the line for the search tag.
+        let usable = panel.frame.width - 2 * (SearchTag.x + 60)
         line.maxItems = max(3, min(12, Int(usable / Layout.spacing)))
     }
 
@@ -467,6 +546,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         toggleItem.keyEquivalent = "t"
         toggleItem.keyEquivalentModifierMask = [.control, .option]
         menu.addItem(toggleItem)
+
+        let searchItem = ClosureMenuItem(L("Search screenshots…", "Buscar capturas…")) { [weak self] in
+            self?.search.show()
+        }
+        searchItem.keyEquivalent = "f"
+        searchItem.keyEquivalentModifierMask = [.control, .option]
+        menu.addItem(searchItem)
+
+        let zoneItem = NSMenuItem(title: L("Open when the pointer rests", "Abrir al dejar el puntero"), action: nil, keyEquivalent: "")
+        let zoneMenu = NSMenu()
+        for zone in RevealZone.allCases {
+            let item = ClosureMenuItem(zone.title) { RevealZone.current = zone }
+            item.state = RevealZone.current == zone ? .on : .off
+            zoneMenu.addItem(item)
+        }
+        zoneItem.submenu = zoneMenu
+        menu.addItem(zoneItem)
 
         let clearItem = ClosureMenuItem(L("Take everything down", "Descolgar todo")) { [weak self] in
             self?.line.clear()
