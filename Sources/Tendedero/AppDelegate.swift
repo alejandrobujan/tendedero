@@ -191,6 +191,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func setClipboard(_ on: Bool) {
         ClipboardWatcher.isEnabled = on
         startClipboardWatcher()
+        updateStatusIcon()
     }
 
     // MARK: Showing and hiding
@@ -468,12 +469,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func setUpStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        let image = NSImage(systemSymbolName: "tshirt", accessibilityDescription: "Tendedero")
-        image?.isTemplate = true
-        statusItem.button?.image = image
+        updateStatusIcon()
         let menu = NSMenu()
         menu.delegate = self
         statusItem.menu = menu
+    }
+
+    /// The shirt fills in while copied images are hung, so it shows at a
+    /// glance that the clipboard is being watched.
+    private func updateStatusIcon() {
+        let on = ClipboardWatcher.isEnabled
+        let description = on ? L("Tendedero, hanging copied images", "Tendedero, colgando imágenes copiadas")
+                             : "Tendedero"
+        let image = NSImage(systemSymbolName: on ? "tshirt.fill" : "tshirt", accessibilityDescription: description)
+        image?.isTemplate = true
+        statusItem.button?.image = image
+        statusItem.button?.toolTip = description
     }
 
     func menuNeedsUpdate(_ menu: NSMenu) {
