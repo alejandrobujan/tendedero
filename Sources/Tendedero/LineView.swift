@@ -63,7 +63,8 @@ struct LineView: View {
 }
 
 /// A small glass tag pegged at the start of the line. Clicking it opens
-/// search, the same as Control Option F.
+/// search, the same as Control Option F. Right clicking it shows the menu
+/// bar menu, which a crowded menu bar can hide behind the notch.
 struct SearchTag: View {
     @ObservedObject var line: Line
     @State private var hovering = false
@@ -85,7 +86,7 @@ struct SearchTag: View {
                 .shadow(color: .black.opacity(hovering ? 0.26 : 0.18), radius: hovering ? 10 : 7, y: hovering ? 6 : 4)
                 .scaleEffect(hovering ? 1.08 : 1, anchor: .top)
                 .animation(.spring(response: 0.3, dampingFraction: 0.6), value: hovering)
-                .overlay(ClickArea { line.onSearch?() })
+                .overlay(ClickArea(action: { line.onSearch?() }, menu: { line.menu?() }))
                 .onHover { hovering = $0 }
                 .help(L("Search screenshots (⌃⌥F)", "Buscar capturas (⌃⌥F)"))
                 .background(
@@ -100,19 +101,25 @@ struct SearchTag: View {
 /// Takes the first click even though the line's panel never becomes key.
 struct ClickArea: NSViewRepresentable {
     let action: () -> Void
+    var menu: () -> NSMenu? = { nil }
 
     func makeNSView(context: Context) -> ClickView {
         let view = ClickView()
-        view.action = action
+        updateNSView(view, context: context)
         return view
     }
 
     func updateNSView(_ view: ClickView, context: Context) {
         view.action = action
+        view.menuProvider = menu
     }
 
     final class ClickView: NSView {
         var action: () -> Void = {}
+        var menuProvider: () -> NSMenu? = { nil }
+        override func rightMouseDown(with event: NSEvent) {
+            if let menu = menuProvider() { NSMenu.popUpContextMenu(menu, with: event, for: self) }
+        }
         override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
         override func mouseDown(with event: NSEvent) {}
         override func mouseUp(with event: NSEvent) {

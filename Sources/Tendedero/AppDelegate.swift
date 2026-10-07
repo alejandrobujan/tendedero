@@ -65,6 +65,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         search = SearchController(index: index, line: line) { [weak self] in self?.searchFolders() ?? [] }
         line.onSearch = { [weak self] in self?.search.show() }
+        line.menu = { [weak self] in
+            let menu = NSMenu()
+            self?.menuNeedsUpdate(menu)
+            return menu
+        }
         searchHotKey = HotKey(keyCode: kVK_ANSI_F, modifiers: controlKey | optionKey) { [weak self] in
             self?.search.toggle()
         }
@@ -359,10 +364,53 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         panel.ignoresMouseEvents = true
     }
 
-    /// How long the cursor rests against the top edge before the line comes
-    /// down. Short enough to feel instant, long enough that a quick trip to
-    /// the menu bar does not trigger it.
-    private static let revealDelay: TimeInterval = 0.25
+    /// How long the cursor rests in the reveal zone before the line comes
+    /// down. Short enough to feel instant, long enough that sweeping across
+    /// the notch on the way to a menu does not trigger it.
+    private static let revealDelay: TimeInterval = 0.35
+
+    /// Where resting the pointer brings the line down. The menu bar is full
+    /// of things you point at, like the battery or the clock, so by default
+    /// only the notch counts: nothing there can be clicked. Screens without
+    /// a notch use the same width at the top centre.
+    enum RevealZone: String, CaseIterable {
+        case notch, menuBar, never
+
+        static let key = "revealZone"
+
+        static var current: RevealZone {
+            get { UserDefaults.standard.string(forKey: key).flatMap(RevealZone.init) ?? .notch }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: key) }
+        }
+
+        var title: String {
+            switch self {
+            case .notch: L("At the notch, or top centre", "En el notch, o arriba en el centro")
+            case .menuBar: L("Anywhere in the menu bar", "En cualquier parte de la barra de menús")
+            case .never: L("Never, use ⌃⌥T", "Nunca, usar ⌃⌥T")
+            }
+        }
+    }
+
+    static func revealZone(of screen: NSScreen) -> NSRect? {
+        let band = menuBarBand(of: screen)
+        switch RevealZone.current {
+        case .never:
+            return nil
+        case .menuBar:
+            return band
+        case .notch:
+            var minX = screen.frame.midX - 100, maxX = screen.frame.midX + 100
+            if let left = screen.auxiliaryTopLeftArea, let right = screen.auxiliaryTopRightArea {
+                // The left area starts at the screen's left edge, whichever
+                // coordinates it comes in.
+                let offset = screen.frame.minX - left.minX
+                minX = left.maxX + offset
+                maxX = right.minX + offset
+            }
+            return NSRect(x: minX, y: band.minY, width: maxX - minX, height: band.height)
+        }
+    }
 
     /// The menu bar strip at the top of a screen. With an auto-hiding menu
     /// bar the visible frame reaches the top, so the system thickness is used.
@@ -411,12 +459,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let screenUnderPointer = NSScreen.screens.first { Self.contains($0.frame, mouse) }
         let inMenuBar = screenUnderPointer.map { Self.contains(Self.menuBarBand(of: $0), mouse) } ?? false
         if !inMenuBar { menuBarSuppressed = false }
+        let inRevealZone = screenUnderPointer.flatMap(Self.revealZone(of:)).map { Self.contains($0, mouse) } ?? false
 
         guard isRevealed else {
-            // Resting in the menu bar brings the line down on that screen.
+            // Resting in the reveal zone brings the line down on that screen.
             // Pushing against the top edge is part of it, and it also works
             // when another display sits above and the pointer never stops.
-            if let screen = screenUnderPointer, inMenuBar, !menuBarSuppressed {
+            if let screen = screenUnderPointer, inRevealZone, !menuBarSuppressed {
                 let since = hotZoneSince ?? now
                 hotZoneSince = since
                 if now.timeIntervalSince(since) >= Self.revealDelay {
@@ -504,6 +553,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         searchItem.keyEquivalent = "f"
         searchItem.keyEquivalentModifierMask = [.control, .option]
         menu.addItem(searchItem)
+
+        let zoneItem = NSMenuItem(title: L("Open when the pointer rests", "Abrir al dejar el puntero"), action: nil, keyEquivalent: "")
+        let zoneMenu = NSMenu()
+        for zone in RevealZone.allCases {
+            let item = ClosureMenuItem(zone.title) { RevealZone.current = zone }
+            item.state = RevealZone.current == zone ? .on : .off
+            zoneMenu.addItem(item)
+        }
+        zoneItem.submenu = zoneMenu
+        menu.addItem(zoneItem)
 
         let clearItem = ClosureMenuItem(L("Take everything down", "Descolgar todo")) { [weak self] in
             self?.line.clear()

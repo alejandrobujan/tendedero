@@ -40,6 +40,8 @@ final class Line: ObservableObject {
 
     /// The search tag on the line was clicked.
     var onSearch: (() -> Void)?
+    /// The menu bar menu, for right clicking the tag.
+    var menu: (() -> NSMenu)?
 
 
     var soundOn: Bool {
