@@ -83,7 +83,12 @@ Tendedero runs entirely on your Mac, and your screenshots never leave it.
 
 ## Install
 
-Download the disk image from the [latest release](../../releases/latest),
+Quick install Homebrew Cask:
+```sh
+brew install --cask alejandrobujan/tap/tendedero
+```
+
+Or download the disk image from the [latest release](../../releases/latest),
 open it and drag Tendedero to Applications.
 
 Tendedero is not notarized by Apple yet, so the first time macOS will say it
