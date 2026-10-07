@@ -369,6 +369,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return NSRect(x: screen.frame.minX, y: screen.frame.maxY - h, width: screen.frame.width, height: h)
     }
 
+    /// The part of the menu bar that brings the line down: from the notch,
+    /// or the middle of a screen without one, to the first menu bar icon.
+    /// App menus sit to its left and icons to its right, so reaching for
+    /// either never pulls the line over them.
+    static func hotZone(of screen: NSScreen) -> Range<CGFloat> {
+        let start = screen.frame.minX + (screen.auxiliaryTopLeftArea?.width ?? screen.frame.width / 2)
+        let end = firstIconX(on: screen) ?? screen.frame.maxX
+        return start..<max(start, end)
+    }
+
+    /// Menu bar icons, from every app, are windows at status bar level, and
+    /// their frames can be read without any permission.
+    private static func firstIconX(on screen: NSScreen) -> CGFloat? {
+        guard let main = NSScreen.screens.first,
+              let windows = CGWindowListCopyWindowInfo(.optionOnScreenOnly, kCGNullWindowID) as? [[String: Any]]
+        else { return nil }
+        let level = Int(CGWindowLevelForKey(.statusWindow))
+        let band = menuBarBand(of: screen)
+        return windows.compactMap { info -> CGFloat? in
+            guard info[kCGWindowLayer as String] as? Int == level,
+                  let bounds = info[kCGWindowBounds as String] as? NSDictionary,
+                  let cg = CGRect(dictionaryRepresentation: bounds) else { return nil }
+            // Window frames count down from the top of the main screen.
+            let frame = CGRect(x: cg.minX, y: main.frame.maxY - cg.maxY, width: cg.width, height: cg.height)
+            return band.contains(CGPoint(x: frame.midX, y: frame.midY)) ? frame.minX : nil
+        }.min()
+    }
+
     /// A click anywhere in the top bar of any screen, a menu or an icon, puts the line away.
     private func watchMenuBarClicks() {
         let handler: (NSEvent?) -> Void = { [weak self] _ in
@@ -394,20 +422,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// How long the cursor is away before the line tucks back up.
     private static let retractDelay: TimeInterval = 0.5
 
+    /// Measured when the pointer enters the menu bar, not on every tick:
+    /// the icons stay put while it is there.
+    private var measuredHotZone: (screen: NSScreen, range: Range<CGFloat>)?
+
+    private func hotZone(on screen: NSScreen) -> Range<CGFloat> {
+        if let measured = measuredHotZone, measured.screen == screen { return measured.range }
+        let range = Self.hotZone(of: screen)
+        measuredHotZone = (screen, range)
+        return range
+    }
+
     private func tick() {
         let mouse = NSEvent.mouseLocation
         let now = Date()
 
         let screenUnderPointer = NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) }
         let inMenuBar = screenUnderPointer.map { Self.menuBarBand(of: $0).contains(mouse) } ?? false
-        if !inMenuBar { menuBarSuppressed = false }
+        if !inMenuBar {
+            menuBarSuppressed = false
+            measuredHotZone = nil
+        }
 
         guard isRevealed else {
-            // Resting in the menu bar brings the line down on that screen.
-            // Pushing against the top edge is part of it, and it also works
-            // when another display sits above and the pointer never stops.
+            // Resting in the empty part of the menu bar brings the line down
+            // on that screen. Pushing against the top edge is part of it, and
+            // it also works when another display sits above and the pointer
+            // never stops.
             if let screen = screenUnderPointer, inMenuBar, !menuBarSuppressed,
-               !FullScreen.isActive(on: screen) {
+               !FullScreen.isActive(on: screen), hotZone(on: screen).contains(mouse.x) {
                 let since = hotZoneSince ?? now
                 hotZoneSince = since
                 if now.timeIntervalSince(since) >= Self.revealDelay {
