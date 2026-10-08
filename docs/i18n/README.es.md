@@ -1,6 +1,6 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/hero-dark.png">
-  <img src="../images/hero-light.png" alt="Tendedero. Tus capturas, tendidas. Tres capturas en marcos de cristal cuelgan de una cuerda fina bajo la barra de menús de macOS.">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/es/hero-dark.png">
+  <img src="../images/es/hero-light.png" alt="Tendedero. Tus capturas, tendidas. Tres capturas en marcos de cristal cuelgan de una cuerda fina bajo la barra de menús de macOS.">
 </picture>
 
 <p align="center">
@@ -23,8 +23,8 @@ Cada captura que haces queda colgada en una cuerda justo encima de la pantalla.
 Lleva el puntero a la barra de menús y la cuerda baja. Apártalo y desaparece.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/demo-dark.gif">
-  <img src="../images/demo-light.gif" alt="El puntero toca el borde superior, la cuerda baja con tres capturas que se balancean, un clic copia una y la cuerda se recoge cuando el puntero se aparta.">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/es/demo-dark.gif">
+  <img src="../images/es/demo-light.gif" alt="El puntero toca el borde superior, la cuerda baja con tres capturas que se balancean, un clic copia una y la cuerda se recoge cuando el puntero se aparta.">
 </picture>
 
 <br>
@@ -33,8 +33,8 @@ Lleva el puntero a la barra de menús y la cuerda baja. Apártalo y desaparece.
 ## Un gesto para cada cosa.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/bento-dark.png">
-  <img src="../images/bento-light.png" alt="Clic para copiar. Mantén pulsado para anotar. Arrastra para compartir. Y olvídate.">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/es/bento-dark.png">
+  <img src="../images/es/bento-light.png" alt="Clic para copiar. Mantén para anotar. Arrastra para compartir. Y olvídate.">
 </picture>
 
 <br>
