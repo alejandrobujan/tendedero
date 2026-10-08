@@ -20,7 +20,7 @@
 ## Fuera de la vista. Siempre a mano.
 
 Cada captura que haces queda colgada en una cuerda justo encima de la pantalla.
-Lleva el puntero a la barra de menús y la cuerda baja. Apártalo y desaparece.
+Lleva el puntero hasta el borde superior y la cuerda baja. Apártalo y desaparece.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/es/demo-dark.gif">
@@ -48,7 +48,7 @@ Lleva el puntero a la barra de menús y la cuerda baja. Apártalo y desaparece.
 | Arrastrar a una app | Envía una copia, y la captura sigue colgada. |
 | Arrastrar a una carpeta | Se queda ahí y sale de la cuerda. |
 | Arrastrar a la Papelera o hacer clic en la cruz | Te deshaces de ella. |
-| Dejar el puntero en la barra de menús | Baja la cuerda en esa pantalla. |
+| Dejar el puntero contra el borde superior | Baja la cuerda en esa pantalla. |
 | Hacer clic en cualquier sitio de la barra de menús | Recoge la cuerda. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Muestra u oculta la cuerda. |
 

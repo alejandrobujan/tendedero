@@ -339,12 +339,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// the menu bar does not trigger it.
     private static let revealDelay: TimeInterval = 0.25
 
+    /// How far below the top edge the pointer still counts as against it.
+    /// A pointer pushed to the top stops in the topmost row of points. The
+    /// second row is slack, for a pointer that lands just short of it.
+    private static let topEdgeThickness: CGFloat = 2
+
     /// The menu bar strip at the top of a screen. With an auto-hiding menu
     /// bar the visible frame reaches the top, so the system thickness is used.
     static func menuBarBand(of screen: NSScreen) -> NSRect {
         var h = screen.frame.maxY - screen.visibleFrame.maxY
         if h < 1 { h = max(NSStatusBar.system.thickness, screen.safeAreaInsets.top) }
         return NSRect(x: screen.frame.minX, y: screen.frame.maxY - h, width: screen.frame.width, height: h)
+    }
+
+    /// Where resting the pointer brings the line down: only the very top
+    /// edge, so heading into the menu bar to click something does not. Where
+    /// another display sits above, the pointer crosses that edge without
+    /// stopping, so there the whole menu bar counts instead.
+    static func revealZone(of screen: NSScreen, at x: CGFloat) -> NSRect {
+        let band = menuBarBand(of: screen)
+        let displayAbove = NSScreen.screens.contains { other in
+            other != screen && abs(other.frame.minY - screen.frame.maxY) < 1
+                && other.frame.minX <= x && x < other.frame.maxX
+        }
+        if displayAbove { return band }
+        return NSRect(x: band.minX, y: screen.frame.maxY - topEdgeThickness, width: band.width, height: topEdgeThickness)
     }
 
     /// A click anywhere in the top bar of any screen, a menu or an icon, puts the line away.
@@ -381,10 +400,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if !inMenuBar { menuBarSuppressed = false }
 
         guard isRevealed else {
-            // Resting in the menu bar brings the line down on that screen.
-            // Pushing against the top edge is part of it, and it also works
-            // when another display sits above and the pointer never stops.
-            if let screen = screenUnderPointer, inMenuBar, !menuBarSuppressed,
+            // Resting against the top edge brings the line down on that
+            // screen. Merely visiting the menu bar does not.
+            if let screen = screenUnderPointer, !menuBarSuppressed,
+               NSMouseInRect(mouse, Self.revealZone(of: screen, at: mouse.x), false),
                !FullScreen.isActive(on: screen) {
                 let since = hotZoneSince ?? now
                 hotZoneSince = since
