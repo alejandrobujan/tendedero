@@ -17,6 +17,9 @@ enum Inbox {
     private static let locationKey = "location" as CFString
     private static let screenshotLocationKey = "location-screenshot" as CFString
     private static let thumbnailKey = "show-thumbnail" as CFString
+    /// "Save to" Clipboard or Preview in Cmd+Shift+5 writes no file at all,
+    /// so inbox mode switches it back to a file.
+    private static let targetKey = "target" as CFString
 
     private static let enabledKey = "inboxEnabled"
     private static let offeredKey = "inboxOffered"
@@ -55,12 +58,14 @@ enum Inbox {
                 "location": CFPreferencesCopyAppValue(locationKey, domain) as? String ?? NSNull(),
                 "locationScreenshot": CFPreferencesCopyAppValue(screenshotLocationKey, domain) as? String ?? NSNull(),
                 "thumbnail": CFPreferencesCopyAppValue(thumbnailKey, domain) as? Bool ?? NSNull(),
+                "target": CFPreferencesCopyAppValue(targetKey, domain) as? String ?? NSNull(),
             ]
             UserDefaults.standard.set(saved.compactMapValues { $0 is NSNull ? nil : $0 }, forKey: savedKey)
         }
         set(locationKey, folder.path)
         set(screenshotLocationKey, folder.path)
         set(thumbnailKey, false)
+        set(targetKey, "file")
     }
 
     static func restore() {
@@ -69,6 +74,7 @@ enum Inbox {
         set(locationKey, saved["location"])
         set(screenshotLocationKey, saved["locationScreenshot"])
         set(thumbnailKey, saved["thumbnail"])
+        set(targetKey, saved["target"])
         UserDefaults.standard.removeObject(forKey: savedKey)
     }
 
