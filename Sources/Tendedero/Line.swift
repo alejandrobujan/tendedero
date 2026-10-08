@@ -44,6 +44,13 @@ final class Line: ObservableObject {
         set { UserDefaults.standard.set(!newValue, forKey: "soundOff") }
     }
 
+    /// Discarded files are deleted for good instead of going to the Trash. Off
+    /// by default, so nothing is lost without the user asking for it.
+    var deletesPermanently: Bool {
+        get { UserDefaults.standard.bool(forKey: "deletePermanently") }
+        set { UserDefaults.standard.set(newValue, forKey: "deletePermanently") }
+    }
+
     var liveCount: Int { items.filter { !$0.falling }.count }
 
     private let storeKey = "pegged"
@@ -137,8 +144,12 @@ final class Line: ObservableObject {
     func trash(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
         do {
-            try FileManager.default.trashItem(at: item.url, resultingItemURL: nil)
-            log.notice("Trashed \(item.url.lastPathComponent, privacy: .public)")
+            if deletesPermanently {
+                try FileManager.default.removeItem(at: item.url)
+            } else {
+                try FileManager.default.trashItem(at: item.url, resultingItemURL: nil)
+            }
+            log.notice("Removed \(item.url.lastPathComponent, privacy: .public)")
             if soundOn { Line.trashSound?.play() }
             drop(id, quietly: true)
         } catch {

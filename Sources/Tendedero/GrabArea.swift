@@ -56,7 +56,7 @@ struct GrabArea: NSViewRepresentable {
                 menu.addItem(ClosureMenuItem(L("Discard")) { line.discard(id) })
             } else {
                 menu.addItem(ClosureMenuItem(L("Take down")) { line.discard(id) })
-                menu.addItem(ClosureMenuItem(L("Move to Trash")) { line.trash(id) })
+                menu.addItem(ClosureMenuItem(line.deletesPermanently ? L("Delete") : L("Move to Trash")) { line.trash(id) })
             }
             return menu
         }

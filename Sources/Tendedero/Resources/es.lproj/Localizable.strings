@@ -16,6 +16,8 @@
 "Quit Tendedero" = "Salir de Tendedero";
 "Could not change the login setting" = "No se pudo cambiar el inicio de sesión";
 "Move Tendedero to the Applications folder and try again." = "Mueve Tendedero a la carpeta Aplicaciones y vuelve a intentarlo.";
+"Delete permanently" = "Eliminar definitivamente";
+"Discarded screenshots skip the Trash" = "Las capturas descartadas no pasan por la Papelera";
 
 /* GrabArea */
 "Copy" = "Copiar";
@@ -26,6 +28,7 @@
 "Discard" = "Descartar";
 "Take down" = "Descolgar";
 "Move to Trash" = "Mover a la Papelera";
+"Delete" = "Eliminar";
 
 /* LineView */
 "Take a screenshot and it will hang here" = "Haz una captura y se quedará colgada aquí";

@@ -492,6 +492,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         sound.state = line.soundOn ? .on : .off
         menu.addItem(sound)
 
+        let permanent = ClosureMenuItem(L("Delete permanently")) { [weak self] in
+            self?.line.deletesPermanently.toggle()
+        }
+        permanent.state = line.deletesPermanently ? .on : .off
+        permanent.toolTip = L("Discarded screenshots skip the Trash")
+        menu.addItem(permanent)
+
         let login = ClosureMenuItem(L("Open at login")) {
             AppDelegate.toggleLaunchAtLogin()
         }
