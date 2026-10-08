@@ -1,7 +1,6 @@
 import AppKit
 import Carbon
 import Combine
-import ServiceManagement
 import SwiftUI
 
 @MainActor
@@ -45,8 +44,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var pendingScreen: NSScreen?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        let host = NSHostingView(rootView: LineView(line: line))
-        host.sizingOptions = []
+        let host = FixedHostingView(rootView: LineView(line: line))
+        if #available(macOS 13.0, *) { host.sizingOptions = [] }
         panel = LinePanel(content: host)
         panel.placeOnScreen()
         updateCapacity()
@@ -75,9 +74,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let workspace = NSWorkspace.shared.notificationCenter
         for name in [NSWorkspace.activeSpaceDidChangeNotification, NSWorkspace.didActivateApplicationNotification] {
             workspace.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
-                MainActor.assumeIsolated {
+                onMainThread {
                     self?.refresh()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { self?.refresh() }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in self?.refresh() }
                 }
             }
         }
@@ -85,7 +84,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NotificationCenter.default.addObserver(
             forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main
         ) { [weak self] _ in
-            MainActor.assumeIsolated {
+            onMainThread {
                 self?.panel.placeOnScreen()
                 self?.updateCapacity()
             }
@@ -322,7 +321,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func startMouseTracking() {
         guard mouseTimer == nil else { return }
         let timer = Timer(timeInterval: 1.0 / 30.0, repeats: true) { [weak self] _ in
-            MainActor.assumeIsolated { self?.tick() }
+            onMainThread { self?.tick() }
         }
         RunLoop.main.add(timer, forMode: .common)
         mouseTimer = timer
@@ -350,7 +349,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// A click anywhere in the top bar of any screen, a menu or an icon, puts the line away.
     private func watchMenuBarClicks() {
         let handler: (NSEvent?) -> Void = { [weak self] _ in
-            MainActor.assumeIsolated {
+            onMainThread {
                 guard let self else { return }
                 let p = NSEvent.mouseLocation
                 guard NSScreen.screens.contains(where: { NSMouseInRect(p, Self.menuBarBand(of: $0), false) }) else { return }
@@ -495,7 +494,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let login = ClosureMenuItem(L("Open at login")) {
             AppDelegate.toggleLaunchAtLogin()
         }
-        login.state = SMAppService.mainApp.status == .enabled ? .on : .off
+        login.state = LaunchAtLogin.isEnabled ? .on : .off
         menu.addItem(login)
 
         menu.addItem(.separator())
@@ -506,11 +505,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private static func toggleLaunchAtLogin() {
         do {
-            if SMAppService.mainApp.status == .enabled {
-                try SMAppService.mainApp.unregister()
-            } else {
-                try SMAppService.mainApp.register()
-            }
+            try LaunchAtLogin.setEnabled(!LaunchAtLogin.isEnabled)
         } catch {
             let alert = NSAlert()
             alert.messageText = L("Could not change the login setting")

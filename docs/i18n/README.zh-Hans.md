@@ -4,7 +4,7 @@
 </picture>
 
 <p align="center">
-  免费开源。适用于 macOS 14 及以上。
+  免费开源。适用于 macOS 12 及以上。
   <br>
   <a href="../../../../releases/latest">下载&nbsp;&rsaquo;</a>
   &nbsp;&nbsp;
@@ -74,7 +74,7 @@ Tendedero 完全在你的 Mac 上运行，截图不会离开这台电脑。
 
 | | |
 |:--|:--|
-| **兼容性** | macOS 14 Sonoma 及以上，Apple 芯片与 Intel 均支持。已针对 macOS 27 设计。 |
+| **兼容性** | macOS 12 Monterey 及以上，Apple 芯片与 Intel 均支持。已针对 macOS 27 设计。 |
 | **体积** | 1.7 MB |
 | **语言** | 英语、西班牙语、简体中文 |
 | **技术栈** | Swift、AppKit 与 SwiftUI |
@@ -105,7 +105,7 @@ scripts/build-app.sh
 open build/Tendedero.app
 ```
 
-需要 Swift 工具链，Xcode 可选。若使用 macOS 27 的命令行工具，脚本会回退到随其一同安装的 macOS 26 SDK，因为新版 SDK 需要只有 Xcode 才带的 SwiftUI 宏插件。本地构建采用 ad-hoc 签名，所以每次重新构建后 macOS 都会再次询问桌面访问权限。
+需要 Swift 5.7 或更新版本，Xcode 可选。若使用 macOS 27 的命令行工具，脚本会回退到随其一同安装的 macOS 26 SDK，因为新版 SDK 需要只有 Xcode 才带的 SwiftUI 宏插件。本地构建采用 ad-hoc 签名，所以每次重新构建后 macOS 都会再次询问桌面访问权限。
 
 <details>
 <summary>应用内部</summary>

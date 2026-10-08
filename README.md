@@ -4,7 +4,7 @@
 </picture>
 
 <p align="center">
-  Free and open source. For macOS 14 and later.
+  Free and open source. For macOS 12 and later.
   <br>
   <a href="../../releases/latest">Download&nbsp;&rsaquo;</a>
   &nbsp;&nbsp;
@@ -73,7 +73,7 @@ Tendedero runs entirely on your Mac, and your screenshots never leave it.
 
 | | |
 |:--|:--|
-| **Compatibility** | macOS 14 Sonoma or later, on Apple silicon and Intel. Designed for macOS 27. |
+| **Compatibility** | macOS 12 Monterey or later, on Apple silicon and Intel. Designed for macOS 27. |
 | **Size** | 1.7 MB |
 | **Languages** | English, Spanish, Chinese (Simplified) |
 | **Built with** | Swift, AppKit and SwiftUI |
@@ -106,7 +106,7 @@ scripts/build-app.sh
 open build/Tendedero.app
 ```
 
-Requires the Swift toolchain. Xcode is optional. With the Command Line Tools for macOS 27, the script falls back to the macOS 26 SDK they install alongside, because the new SDK needs a SwiftUI macro plugin only Xcode includes. Local builds are signed ad hoc,
+Requires Swift 5.7 or later. Xcode is optional. With the Command Line Tools for macOS 27, the script falls back to the macOS 26 SDK they install alongside, because the new SDK needs a SwiftUI macro plugin only Xcode includes. Local builds are signed ad hoc,
 so macOS asks again for access to the Desktop after each rebuild.
 
 <details>

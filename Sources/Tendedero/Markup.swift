@@ -32,7 +32,7 @@ final class Markup: NSObject, NSSharingServiceDelegate {
     /// Done was pressed. The extension hands back the edited image and the
     /// host app is the one that writes it over the original file.
     nonisolated func sharingService(_ sharingService: NSSharingService, didShareItems items: [Any]) {
-        MainActor.assumeIsolated { self.save(items) }
+        DispatchQueue.main.async { self.save(items) }
     }
 
     nonisolated func sharingService(_ sharingService: NSSharingService,

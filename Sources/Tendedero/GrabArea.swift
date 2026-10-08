@@ -10,6 +10,7 @@ import SwiftUI
 /// - Nowhere that accepts it: the photo flies back to the line.
 ///
 /// Click copies, press and hold opens Markup, the corner cross discards.
+@MainActor
 struct GrabArea: NSViewRepresentable {
     let item: Pegged
     let line: Line
@@ -117,7 +118,7 @@ final class GrabView: NSView, NSDraggingSource {
         onPressChange(true)
         holdTimer?.invalidate()
         holdTimer = Timer.scheduledTimer(withTimeInterval: Self.holdDuration, repeats: false) { [weak self] _ in
-            MainActor.assumeIsolated {
+            onMainThread {
                 guard let self, self.downPoint != nil, !self.startedDrag else { return }
                 self.didLongPress = true
                 self.onPressChange(false)

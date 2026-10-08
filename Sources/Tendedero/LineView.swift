@@ -22,6 +22,7 @@ enum Layout {
     }
 }
 
+@MainActor
 struct LineView: View {
     @ObservedObject var line: Line
 

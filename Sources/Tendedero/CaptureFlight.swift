@@ -136,7 +136,7 @@ final class CaptureFlight {
         window.orderFrontRegardless()
         start = CACurrentMediaTime()
         let timer = Timer(timeInterval: 1.0 / 120.0, repeats: true) { [weak self] _ in
-            MainActor.assumeIsolated { self?.tick() }
+            onMainThread { self?.tick() }
         }
         RunLoop.main.add(timer, forMode: .common)
         self.timer = timer
@@ -158,7 +158,7 @@ final class CaptureFlight {
             ctx.duration = 0.16
             window.animator().alphaValue = 0
         }, completionHandler: { [window] in
-            MainActor.assumeIsolated { window.orderOut(nil) }
+            onMainThread { window.orderOut(nil) }
         })
     }
 
