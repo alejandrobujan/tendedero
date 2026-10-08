@@ -66,6 +66,24 @@ hdiutil convert -quiet "$RW" -format UDZO -imagekey zlib-level=9 -o "$DMG"
 rm -rf "$WORK"
 echo "Built $DMG"
 
+# Sign the disk image, send it to Apple for notarization and staple the
+# ticket, so it opens without warnings even offline. Needs a Developer ID and
+# notary credentials stored with:
+#   xcrun notarytool store-credentials tendedero-notary --apple-id ... --team-id ...
+IDENTITY="${SIGN_IDENTITY:-$(security find-identity -v -p codesigning 2>/dev/null | awk -F'"' '/Developer ID Application/{print $2; exit}')}"
+PROFILE="${NOTARY_PROFILE:-tendedero-notary}"
+if [ -n "$IDENTITY" ]; then
+  codesign --force --timestamp --sign "$IDENTITY" "$DMG"
+  if xcrun notarytool history --keychain-profile "$PROFILE" >/dev/null 2>&1; then
+    echo "Notarizing, this usually takes a few minutes..."
+    xcrun notarytool submit "$DMG" --keychain-profile "$PROFILE" --wait
+    xcrun stapler staple "$DMG"
+    spctl --assess --type open --context context:primary-signature --verbose=2 "$DMG"
+  else
+    echo "No notary credentials in profile $PROFILE: the image is signed but not notarized."
+  fi
+fi
+
 # Keep the Homebrew cask in step: new version and the checksum of this image.
 # Set TAP_DIR to the tap checkout; nothing is committed or pushed here, so the
 # cask never points at a release that is not on GitHub yet.

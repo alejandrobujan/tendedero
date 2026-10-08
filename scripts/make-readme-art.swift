@@ -3,12 +3,12 @@
 //   demo-*.gif   the reveal: pointer to the top edge, line slides down, a
 //                click copies, the pointer leaves and the line tucks away
 //   bento-*.png  four gestures as tiles with SF Symbols
-// Usage: swift scripts/make-readme-art.swift docs/
+// Usage: swift scripts/make-readme-art.swift docs/images/
 import AppKit
 import ImageIO
 import UniformTypeIdentifiers
 
-let outDir = CommandLine.arguments.dropFirst().first ?? "docs"
+let outDir = CommandLine.arguments.dropFirst().first ?? "docs/images"
 
 func color(_ r: CGFloat, _ g: CGFloat, _ b: CGFloat, _ a: CGFloat = 1) -> NSColor {
     NSColor(srgbRed: r / 255, green: g / 255, blue: b / 255, alpha: a)

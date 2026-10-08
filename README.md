@@ -1,6 +1,6 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/hero-dark.png">
-  <img src="docs/hero-light.png" alt="Tendedero. Screenshots, hung out to dry. Three screenshots in glass frames hang from a thin line under the macOS menu bar.">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/hero-dark.png">
+  <img src="docs/images/hero-light.png" alt="Tendedero. Screenshots, hung out to dry. Three screenshots in glass frames hang from a thin line under the macOS menu bar.">
 </picture>
 
 <p align="center">
@@ -10,7 +10,7 @@
   &nbsp;&nbsp;
   <a href="#build-from-source">Build from source&nbsp;&rsaquo;</a>
   <br><br>
-  English&nbsp;·&nbsp;<a href="README.zh-CN.md">简体中文</a>
+  English&nbsp;·&nbsp;<a href="docs/i18n/README.es.md">Español</a>
 </p>
 
 <br>
@@ -21,8 +21,8 @@ Every screenshot you take hangs on a line just above your screen.
 Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/demo-dark.gif">
-  <img src="docs/demo-light.gif" alt="The pointer rests against the top edge, the line slides down with three screenshots swinging gently, a click copies one, and the line tucks away when the pointer leaves.">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/demo-dark.gif">
+  <img src="docs/images/demo-light.gif" alt="The pointer rests against the top edge, the line slides down with three screenshots swinging gently, a click copies one, and the line tucks away when the pointer leaves.">
 </picture>
 
 <br>
@@ -31,8 +31,8 @@ Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 ## A gesture for everything.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/bento-dark.png">
-  <img src="docs/bento-light.png" alt="Click to copy. Hold to mark up. Drag to share. Let it go.">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/bento-dark.png">
+  <img src="docs/images/bento-light.png" alt="Click to copy. Hold to mark up. Drag to share. Let it go.">
 </picture>
 
 <br>
@@ -75,7 +75,7 @@ Tendedero runs entirely on your Mac, and your screenshots never leave it.
 |:--|:--|
 | **Compatibility** | macOS 14 Sonoma or later, on Apple silicon and Intel. Designed for macOS 27. |
 | **Size** | 1.7 MB |
-| **Languages** | English, Spanish, Chinese |
+| **Languages** | English, Spanish |
 | **Built with** | Swift, AppKit and SwiftUI |
 | **Network access** | None |
 | **Price** | Free |
@@ -86,11 +86,14 @@ Tendedero runs entirely on your Mac, and your screenshots never leave it.
 ## Install
 
 Download the disk image from the [latest release](../../releases/latest),
-open it and drag Tendedero to Applications.
+open it and drag Tendedero to Applications. Or install it with Homebrew:
 
-Tendedero is not notarized by Apple yet, so the first time macOS will say it
-cannot verify it. Open System Settings, go to Privacy & Security, and click
-Open Anyway next to the message about Tendedero. You only need to do this once.
+```sh
+brew install --cask alejandrobujan/tap/tendedero
+```
+
+Tendedero is signed with a Developer ID and notarized by Apple, so it opens
+like any other app.
 
 <br>
 
@@ -127,6 +130,9 @@ Every image here, the icon included, is drawn in code by
 `scripts/make-icon.swift` and `scripts/make-readme-art.swift`.
 `scripts/make-dmg.sh` builds the disk image for releases.
 
+Translations live in `Sources/Tendedero/Resources`, one `.lproj` folder per
+language. `swift scripts/check-strings.swift` checks that none is missing.
+
 </details>
 
 <br>
@@ -141,7 +147,7 @@ Every image here, the icon included, is drawn in code by
 <br>
 
 <p align="center">
-  <img src="docs/icon.png" width="64" height="64" alt="">
+  <img src="docs/images/icon.png" width="64" height="64" alt="">
   <br>
   <sub>The code is MIT licensed. The Tendedero name and icon are not, so forks need their own. See <a href="LICENSE">LICENSE</a>.</sub>
   <br>

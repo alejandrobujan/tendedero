@@ -48,6 +48,14 @@ done
 iconutil -c icns "$ICONSET" -o "$APP/Contents/Resources/Tendedero.icns"
 rm -rf "$WORK"
 
+# Translations: one folder per language, listed in Info.plist so macOS knows
+# which languages the app speaks.
+LANGUAGES=""
+for dir in Sources/Tendedero/Resources/*.lproj; do
+  cp -R "$dir" "$APP/Contents/Resources/"
+  LANGUAGES="$LANGUAGES<string>$(basename "$dir" .lproj)</string>"
+done
+
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -61,6 +69,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>${VERSION}</string>
   <key>CFBundleVersion</key><string>1</string>
+  <key>CFBundleDevelopmentRegion</key><string>en</string>
+  <key>CFBundleLocalizations</key><array>${LANGUAGES}</array>
   <key>LSMinimumSystemVersion</key><string>14.0</string>
   <key>LSUIElement</key><true/>
   <key>NSHighResolutionCapable</key><true/>
@@ -70,6 +80,15 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 </plist>
 PLIST
 
-# Ad-hoc signature so it runs locally. Releases should use a Developer ID.
-codesign --force --deep --sign - "$APP" >/dev/null
+# Sign with a Developer ID when one is in the keychain (or SIGN_IDENTITY is
+# set), with the hardened runtime and a secure timestamp that notarization
+# requires. Without one, sign ad hoc so the app still runs locally.
+IDENTITY="${SIGN_IDENTITY:-$(security find-identity -v -p codesigning 2>/dev/null | awk -F'"' '/Developer ID Application/{print $2; exit}')}"
+if [ -n "$IDENTITY" ]; then
+  codesign --force --options runtime --timestamp --sign "$IDENTITY" "$APP"
+  echo "Signed with $IDENTITY"
+else
+  codesign --force --deep --sign - "$APP" >/dev/null
+  echo "Signed ad hoc (no Developer ID found)"
+fi
 echo "Built $APP"
