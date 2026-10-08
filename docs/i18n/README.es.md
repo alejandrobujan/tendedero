@@ -10,7 +10,7 @@
   &nbsp;&nbsp;
   <a href="#compilar-desde-el-código">Compilar desde el código&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;Español
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;Español&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>
   <br>
   <sub>Traducción del README en inglés. Si algo no coincide, manda el inglés.</sub>
 </p>
@@ -77,7 +77,7 @@ Tendedero funciona solo en tu Mac, y tus capturas nunca salen de él.
 |:--|:--|
 | **Compatibilidad** | macOS 14 Sonoma o posterior, en Mac con Apple silicon o Intel. Pensado para macOS 27. |
 | **Tamaño** | 1,7 MB |
-| **Idiomas** | Inglés y español |
+| **Idiomas** | Inglés, español y chino simplificado |
 | **Hecho con** | Swift, AppKit y SwiftUI |
 | **Conexión a internet** | No la usa |
 | **Precio** | Gratis |
