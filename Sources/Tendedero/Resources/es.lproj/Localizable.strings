@@ -16,6 +16,12 @@
 "Quit Tendedero" = "Salir de Tendedero";
 "Could not change the login setting" = "No se pudo cambiar el inicio de sesión";
 "Move Tendedero to the Applications folder and try again." = "Mueve Tendedero a la carpeta Aplicaciones y vuelve a intentarlo.";
+"Hang images you copy too?" = "¿Colgar también las imágenes que copias?";
+"Images you copy, like a screenshot taken with Control held or Copy Image in a browser, will hang on the line as well. Tendedero only keeps images, never text, and skips anything a password manager marks as private. You can change this from the menu bar." = "Las imágenes que copias, como una captura hecha con Control o Copiar imagen en un navegador, también se colgarán. Tendedero solo guarda imágenes, nunca texto, y omite lo que un gestor de contraseñas marca como privado. Puedes cambiarlo desde la barra de menús.";
+"Hang copied images" = "Colgar imágenes copiadas";
+"Images you copy hang on the line too" = "Las imágenes que copias también se cuelgan";
+"Hang copied text" = "Colgar texto copiado";
+"Text you copy hangs as a note card" = "El texto que copias se cuelga como una nota";
 
 /* GrabArea */
 "Copy" = "Copiar";

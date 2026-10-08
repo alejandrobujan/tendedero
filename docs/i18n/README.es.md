@@ -64,6 +64,19 @@ Los mismos atajos y las mismas costumbres. Pero sin desorden.
 
 <br>
 
+## También las imágenes que copias.
+
+Haz una captura con <kbd>⌃</kbd> pulsado, o Copiar imagen en un navegador, y
+se cuelga como cualquier otra. Tendedero lo pregunta una vez al abrirse por
+primera vez, y puedes cambiarlo cuando quieras desde la barra de menús. Lo que
+un gestor de contraseñas marca como privado se deja tal cual.
+
+Activa **Colgar texto copiado** y el texto que copias también se cuelga, como
+una pequeña nota con el texto ajustado. Haz clic para volver a copiarlo, o
+mantén pulsado para abrirlo en tu editor de texto. Viene desactivado.
+
+<br>
+
 ## Privacidad de serie.
 
 Sin cuentas, sin conexión a internet, sin analíticas.
@@ -126,6 +139,7 @@ vuelve a pedir acceso al Escritorio cada vez que recompilas.
 | `PeggedView.swift` | Cada foto: marco de cristal, pinza, balanceo y brisa |
 | `GrabArea.swift` | Clic, pulsación larga, y arrastrar y soltar |
 | `ScreenshotWatcher.swift` | Se da cuenta de las capturas nuevas |
+| `ClipboardWatcher.swift` | Se da cuenta de las imágenes y el texto copiados |
 | `Inbox.swift` | Toma el control de los ajustes de captura y luego los devuelve |
 | `Markup.swift` | Abre el editor de Marcación del sistema y guarda el resultado |
 | `FullScreen.swift` | Sabe cuándo tiene que quedarse oculto |

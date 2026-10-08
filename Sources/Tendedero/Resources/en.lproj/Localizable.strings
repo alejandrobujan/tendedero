@@ -18,6 +18,12 @@
 "Quit Tendedero" = "Quit Tendedero";
 "Could not change the login setting" = "Could not change the login setting";
 "Move Tendedero to the Applications folder and try again." = "Move Tendedero to the Applications folder and try again.";
+"Hang images you copy too?" = "Hang images you copy too?";
+"Images you copy, like a screenshot taken with Control held or Copy Image in a browser, will hang on the line as well. Tendedero only keeps images, never text, and skips anything a password manager marks as private. You can change this from the menu bar." = "Images you copy, like a screenshot taken with Control held or Copy Image in a browser, will hang on the line as well. Tendedero only keeps images, never text, and skips anything a password manager marks as private. You can change this from the menu bar.";
+"Hang copied images" = "Hang copied images";
+"Images you copy hang on the line too" = "Images you copy hang on the line too";
+"Hang copied text" = "Hang copied text";
+"Text you copy hangs as a note card" = "Text you copy hangs as a note card";
 
 /* GrabArea */
 "Copy" = "Copy";

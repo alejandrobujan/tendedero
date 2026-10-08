@@ -14,6 +14,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// ignores the screenshot settings (macOS 27 renamed one), captures keep
     /// landing on the Desktop, and they still hang on the line.
     private var safetyWatcher: ScreenshotWatcher?
+    private var clipboardWatcher: ClipboardWatcher!
     private var signalSources: [DispatchSourceSignal] = []
     private var hotKey: HotKey?
     private var cancellables = Set<AnyCancellable>()
@@ -54,6 +55,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if Inbox.isEnabled { Inbox.apply() }
         restoreSettingsOnTermination()
         startWatcher()
+        clipboardWatcher = ClipboardWatcher { [weak self] url in self?.hangCapture(url) }
+        if ClipboardWatcher.isEnabled || ClipboardWatcher.textEnabled { clipboardWatcher.start() }
 
         hotKey = HotKey(keyCode: kVK_ANSI_T, modifiers: controlKey | optionKey) { [weak self] in
             self?.toggle()
@@ -91,8 +94,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
         }
 
-        if !Inbox.wasOffered {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in self?.offerInbox() }
+        if !Inbox.wasOffered || !ClipboardWatcher.wasOffered {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
+                guard let self else { return }
+                if !Inbox.wasOffered { self.offerInbox() }
+                if !ClipboardWatcher.wasOffered { self.offerClipboard() }
+            }
         }
 
         if !UserDefaults.standard.bool(forKey: "welcomed") {
@@ -155,6 +162,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
         NSApp.activate(ignoringOtherApps: true)
         if alert.runModal() == .alertFirstButtonReturn { setInbox(true) }
+    }
+
+    private func updateClipboardWatcher() {
+        if ClipboardWatcher.isEnabled || ClipboardWatcher.textEnabled { clipboardWatcher.start() } else { clipboardWatcher.stop() }
+    }
+
+    /// Asked once, after the screenshot offer. Watching the clipboard is opt in.
+    private func offerClipboard() {
+        ClipboardWatcher.wasOffered = true
+        let alert = NSAlert()
+        alert.messageText = L("Hang images you copy too?")
+        alert.informativeText = L("Images you copy, like a screenshot taken with Control held or Copy Image in a browser, will hang on the line as well. Tendedero only keeps images, never text, and skips anything a password manager marks as private. You can change this from the menu bar.")
+        alert.addButton(withTitle: L("Turn on"))
+        alert.addButton(withTitle: L("Not now"))
+        if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
+        NSApp.activate(ignoringOtherApps: true)
+        if alert.runModal() == .alertFirstButtonReturn {
+            ClipboardWatcher.isEnabled = true
+            clipboardWatcher.start()
+        }
     }
 
     /// Quitting from the menu or logging out runs applicationWillTerminate.
@@ -477,6 +504,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         inbox.state = Inbox.isEnabled ? .on : .off
         inbox.toolTip = L("Screenshots hang instantly and skip the Desktop")
         menu.addItem(inbox)
+
+        let clipboard = ClosureMenuItem(L("Hang copied images")) { [weak self] in
+            ClipboardWatcher.isEnabled.toggle()
+            self?.updateClipboardWatcher()
+        }
+        clipboard.state = ClipboardWatcher.isEnabled ? .on : .off
+        clipboard.toolTip = L("Images you copy hang on the line too")
+        menu.addItem(clipboard)
+
+        let clipText = ClosureMenuItem(L("Hang copied text")) { [weak self] in
+            ClipboardWatcher.textEnabled.toggle()
+            self?.updateClipboardWatcher()
+        }
+        clipText.state = ClipboardWatcher.textEnabled ? .on : .off
+        clipText.toolTip = L("Text you copy hangs as a note card")
+        menu.addItem(clipText)
 
         menu.addItem(ClosureMenuItem(L("Open screenshots folder")) { [weak self] in
             guard let self else { return }
