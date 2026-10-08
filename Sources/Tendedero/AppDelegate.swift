@@ -384,7 +384,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             // Resting in the menu bar brings the line down on that screen.
             // Pushing against the top edge is part of it, and it also works
             // when another display sits above and the pointer never stops.
-            if let screen = screenUnderPointer, inMenuBar, !menuBarSuppressed,
+            // An empty line stays up there: there is nothing to reach for.
+            // The shortcut still brings it down on purpose.
+            if let screen = screenUnderPointer, line.liveCount > 0, inMenuBar, !menuBarSuppressed,
                !FullScreen.isActive(on: screen) {
                 let since = hotZoneSince ?? now
                 hotZoneSince = since
