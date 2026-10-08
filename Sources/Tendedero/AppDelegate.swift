@@ -253,8 +253,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// Decides whether the panel is ordered in at all: something to show,
     /// and no full screen app on that screen.
     private func refresh() {
-        let blocked = panel.screen.map(FullScreen.isActive(on:))
-            ?? LinePanel.screenUnderPointer().map(FullScreen.isActive(on:)) ?? false
+        let blocked = panel.screen.map(FullScreen.blocksLine(on:))
+            ?? LinePanel.screenUnderPointer().map(FullScreen.blocksLine(on:)) ?? false
         if wanted && !blocked {
             present()
         } else {
@@ -385,7 +385,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             // Pushing against the top edge is part of it, and it also works
             // when another display sits above and the pointer never stops.
             if let screen = screenUnderPointer, inMenuBar, !menuBarSuppressed,
-               !FullScreen.isActive(on: screen) {
+               !FullScreen.blocksLine(on: screen) {
                 let since = hotZoneSince ?? now
                 hotZoneSince = since
                 if now.timeIntervalSince(since) >= Self.revealDelay {
@@ -477,6 +477,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         inbox.state = Inbox.isEnabled ? .on : .off
         inbox.toolTip = L("Screenshots hang instantly and skip the Desktop")
         menu.addItem(inbox)
+
+        let fullScreen = ClosureMenuItem(L("Show over full screen apps")) { [weak self] in
+            FullScreen.showLineOver.toggle()
+            self?.refresh()
+        }
+        fullScreen.state = FullScreen.showLineOver ? .on : .off
+        menu.addItem(fullScreen)
 
         menu.addItem(ClosureMenuItem(L("Open screenshots folder")) { [weak self] in
             guard let self else { return }

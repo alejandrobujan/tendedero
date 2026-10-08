@@ -11,9 +11,9 @@ final class LinePanel: NSPanel {
         backgroundColor = .clear
         hasShadow = false
         level = .floating
-        // Every Space except full screen ones: a video or a presentation in full
-        // screen should never get a clothesline across the top.
-        collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
+        // Every Space, full screen ones included. Whether the line comes down
+        // over a full screen app is a setting, see FullScreen.showLineOver.
+        collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenAuxiliary]
         hidesOnDeactivate = false
         isMovable = false
         becomesKeyOnlyIfNeeded = true

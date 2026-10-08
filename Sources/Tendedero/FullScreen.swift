@@ -11,6 +11,19 @@ private func CGSCopyManagedDisplaySpaces(_ connection: Int32) -> CFArray
 
 enum FullScreen {
     private static let fullScreenSpaceType = 4
+    private static let showOverKey = "showOverFullScreen"
+
+    /// Whether the line also comes down over full screen apps, so screenshots
+    /// stay within reach while you work in one. On unless turned off.
+    static var showLineOver: Bool {
+        get { UserDefaults.standard.object(forKey: showOverKey) as? Bool ?? true }
+        set { UserDefaults.standard.set(newValue, forKey: showOverKey) }
+    }
+
+    /// True when the line should keep away from the given screen.
+    static func blocksLine(on screen: NSScreen) -> Bool {
+        !showLineOver && isActive(on: screen)
+    }
 
     /// True when the given screen is currently showing a full screen app,
     /// like a video or a presentation.
