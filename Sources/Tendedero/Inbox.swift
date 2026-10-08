@@ -72,6 +72,14 @@ enum Inbox {
         UserDefaults.standard.removeObject(forKey: savedKey)
     }
 
+    /// Where captures went before inbox mode. Screen recordings are sent
+    /// back there, since the line only hangs images.
+    static var previousFolder: URL {
+        guard let raw = UserDefaults.standard.dictionary(forKey: savedKey)?["location"] as? String, !raw.isEmpty
+        else { return ScreenshotWatcher.desktop }
+        return URL(fileURLWithPath: (raw as NSString).expandingTildeInPath, isDirectory: true)
+    }
+
     /// Writes through cfprefsd, so the screenshot service sees it at once.
     /// A nil value removes the key and returns it to the macOS default.
     private static func set(_ key: CFString, _ value: Any?) {

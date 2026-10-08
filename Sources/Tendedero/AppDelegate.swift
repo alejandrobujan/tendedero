@@ -122,7 +122,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         safetyWatcher = nil
         watcher = ScreenshotWatcher(
             onNew: { [weak self] url in self?.hangCapture(url) },
-            onChange: { [weak self] in self?.line.prune() })
+            onChange: { [weak self] in self?.line.prune() },
+            onVideo: Inbox.isEnabled ? AppDelegate.moveOutOfInbox : nil)
         watcher.start()
         if Inbox.isEnabled, watcher.folder.standardizedFileURL != ScreenshotWatcher.desktop.standardizedFileURL {
             let safety = ScreenshotWatcher(
@@ -134,6 +135,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 onChange: { [weak self] in self?.line.prune() })
             safety.start()
             safetyWatcher = safety
+        }
+    }
+
+    /// Inbox mode points every capture at our folder, screen recordings
+    /// included, and the line only hangs images. Recordings go back to
+    /// where they landed before, so they are not lost in a hidden folder.
+    /// Moving within a volume is a rename, safe even mid-write.
+    nonisolated private static func moveOutOfInbox(_ url: URL) {
+        guard url.deletingLastPathComponent().standardizedFileURL == Inbox.folder.standardizedFileURL else { return }
+        let fm = FileManager.default
+        for folder in [Inbox.previousFolder, ScreenshotWatcher.desktop] {
+            do {
+                try fm.moveItem(at: url, to: folder.appendingPathComponent(url.lastPathComponent))
+                return
+            } catch {
+                log.error("Could not move recording to \(folder.path, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            }
         }
     }
 

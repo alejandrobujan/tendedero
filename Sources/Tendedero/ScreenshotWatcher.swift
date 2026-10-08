@@ -13,15 +13,20 @@ final class ScreenshotWatcher {
     private var pending: DispatchWorkItem?
     private let onNew: (URL) -> Void
     private let onChange: () -> Void
+    /// Screen recordings: not hung, but reported so they can be moved out.
+    private let onVideo: ((URL) -> Void)?
 
     private static let imageExtensions: Set<String> = ["png", "jpg", "jpeg", "heic", "tif", "tiff", "gif", "webp"]
+    private static let videoExtensions: Set<String> = ["mov", "mp4"]
 
     static let desktop = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
 
     /// Watches the folder macOS saves screenshots to, or a given folder.
-    init(folder: URL? = nil, onNew: @escaping (URL) -> Void, onChange: @escaping () -> Void) {
+    init(folder: URL? = nil, onNew: @escaping (URL) -> Void, onChange: @escaping () -> Void,
+         onVideo: ((URL) -> Void)? = nil) {
         self.onNew = onNew
         self.onChange = onChange
+        self.onVideo = onVideo
         self.folder = folder ?? Self.screenshotFolder()
         onlyTaggedScreenshots = self.folder.standardizedFileURL.path == Self.desktop.standardizedFileURL.path
     }
@@ -50,9 +55,7 @@ final class ScreenshotWatcher {
     func start() {
         let files = listing()
         known = Set(files.filter { creationDate($0) < launchDate }.map(\.path))
-        for url in files where !known.contains(url.path) && isCandidate(url) {
-            onNew(url)
-        }
+        for url in files where !known.contains(url.path) { report(url) }
         known = Set(files.map(\.path))
         let fd = open(folder.path, O_EVTONLY)
         guard fd >= 0 else {
@@ -83,11 +86,17 @@ final class ScreenshotWatcher {
 
     private func scan() {
         let files = listing()
-        for url in files where !known.contains(url.path) && isCandidate(url) {
-            onNew(url)
-        }
+        for url in files where !known.contains(url.path) { report(url) }
         known = Set(files.map(\.path))
         onChange()
+    }
+
+    private func report(_ url: URL) {
+        if isCandidate(url) {
+            onNew(url)
+        } else if Self.videoExtensions.contains(url.pathExtension.lowercased()) {
+            onVideo?(url)
+        }
     }
 
     private func listing() -> [URL] {
