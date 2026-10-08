@@ -1,6 +1,6 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/hero-dark.png">
-  <img src="../images/hero-light.png" alt="Tendedero。截图挂起来晾着。三张截图装在玻璃相框里，挂在 macOS 菜单栏下方的一根细绳上。">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/zh-Hans/hero-dark.png">
+  <img src="../images/zh-Hans/hero-light.png" alt="Tendedero。截图挂起来晾着。三张截图装在玻璃相框里，挂在 macOS 菜单栏下方的一根细绳上。">
 </picture>
 
 <p align="center">
@@ -23,8 +23,8 @@
 把指针停在菜单栏，绳子就滑下来；移开，它就收起。
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/demo-dark.gif">
-  <img src="../images/demo-light.gif" alt="指针停在上边缘，绳子带着三张截图轻轻摇晃着滑下来，单击复制其中一张，指针离开后绳子收起。">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/zh-Hans/demo-dark.gif">
+  <img src="../images/zh-Hans/demo-light.gif" alt="指针停在上边缘，绳子带着三张截图轻轻摇晃着滑下来，单击复制其中一张，指针离开后绳子收起。">
 </picture>
 
 <br>
@@ -33,8 +33,8 @@
 ## 每个动作都有手势
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/bento-dark.png">
-  <img src="../images/bento-light.png" alt="单击复制。长按标记。拖拽分享。松手放下。">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/zh-Hans/bento-dark.png">
+  <img src="../images/zh-Hans/bento-light.png" alt="单击复制。长按标记。拖拽分享。松手放下。">
 </picture>
 
 <br>

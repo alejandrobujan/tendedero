@@ -29,6 +29,18 @@ let translations: [String: [String: String]] = [
         "Let it go.": "Y olvídate.",
         "The cross or the Trash. That\u{2019}s it.": "La cruz o la Papelera. Nada más.",
     ],
+    "zh-Hans": [
+        "Screenshots, hung out to dry.": "截图，挂起来晾着。",
+        "Copied": "已复制",
+        "Click to copy.": "单击复制。",
+        "Paste it anywhere, instantly.": "随处粘贴，即刻可用。",
+        "Hold to mark up.": "长按标记。",
+        "Annotate, crop or sign in place.": "就地标注、裁剪或签名。",
+        "Drag to share.": "拖拽分享。",
+        "Apps get a copy. Folders keep it.": "App 得到副本，文件夹留下原图。",
+        "Let it go.": "松手放下。",
+        "The cross or the Trash. That\u{2019}s it.": "点叉或拖到废纸篓，就这样。",
+    ],
 ]
 
 func T(_ english: String) -> String {
