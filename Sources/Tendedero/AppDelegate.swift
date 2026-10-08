@@ -345,8 +345,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// bar the visible frame reaches the top, so the system thickness is used.
     static func menuBarBand(of screen: NSScreen) -> NSRect {
         var h = screen.frame.maxY - screen.visibleFrame.maxY
-         if h < 1 { h = max(NSStatusBar.system.thickness, screen.safeAreaInsets.top) }
-         return NSRect(x: screen.frame.minX, y: screen.frame.maxY - h, width: screen.frame.width, height: h)
+        if h < 1 { h = max(NSStatusBar.system.thickness, screen.safeAreaInsets.top) }
+        return NSRect(x: screen.frame.minX, y: screen.frame.maxY - h, width: screen.frame.width, height: h)
     }
 
     /// A click anywhere in the top bar of any screen, a menu or an icon, puts the line away.
