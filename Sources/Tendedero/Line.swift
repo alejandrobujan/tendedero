@@ -164,6 +164,26 @@ final class Line: ObservableObject {
         if isInInbox(id) { trash(id) } else { drop(id) }
     }
 
+    /// The "Clear all" button: every photo comes down at once, discarded
+    /// as the corner cross would, with a single sound.
+    func discardAll() {
+        let live = items.filter { !$0.falling }
+        guard !live.isEmpty else { return }
+        for item in live {
+            if isInInbox(item.id) {
+                do {
+                    try FileManager.default.trashItem(at: item.url, resultingItemURL: nil)
+                } catch {
+                    // Left hanging, so nothing is lost without a trace.
+                    log.error("Could not trash \(item.url.path, privacy: .public): \(error.localizedDescription, privacy: .public)")
+                    continue
+                }
+            }
+            drop(item.id, quietly: true)
+        }
+        if soundOn { Line.trashSound?.play() }
+    }
+
     /// Inbox mode: keep a screenshot by moving it to the Desktop.
     func saveToDesktop(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
