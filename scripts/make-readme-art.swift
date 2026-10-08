@@ -35,11 +35,11 @@ let translations: [String: [String: String]] = [
         "Click to copy.": "单击复制。",
         "Paste it anywhere, instantly.": "随处粘贴，即刻可用。",
         "Hold to mark up.": "长按标记。",
-        "Annotate, crop or sign in place.": "就地标注、裁剪或签名。",
+        "Annotate, crop or sign in place.": "直接标注、裁剪或签名。",
         "Drag to share.": "拖拽分享。",
-        "Apps get a copy. Folders keep it.": "App 得到副本，文件夹留下原图。",
+        "Apps get a copy. Folders keep it.": "拖进 App 是副本，拖进文件夹就存下来。",
         "Let it go.": "松手放下。",
-        "The cross or the Trash. That\u{2019}s it.": "点叉或拖到废纸篓，就这样。",
+        "The cross or the Trash. That\u{2019}s it.": "点叉或拖进废纸篓，就这么简单。",
     ],
 ]
 
