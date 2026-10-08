@@ -345,9 +345,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// bar the visible frame reaches the top, so the system thickness is used.
     static func menuBarBand(of screen: NSScreen) -> NSRect {
         var h = screen.frame.maxY - screen.visibleFrame.maxY
-        if h < 1 { h = max(NSStatusBar.system.thickness, screen.safeAreaInsets.top) } 
-
-        return NSRect(x: screen.frame.minX,y: screen.frame.maxY - h,width: screen.frame.width,height: h + 1)
+         if h < 1 { h = max(NSStatusBar.system.thickness, screen.safeAreaInsets.top) }
+         return NSRect(x: screen.frame.minX, y: screen.frame.maxY - h, width: screen.frame.width, height: h)
     }
 
     /// A click anywhere in the top bar of any screen, a menu or an icon, puts the line away.
@@ -356,7 +355,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             MainActor.assumeIsolated {
                 guard let self else { return }
                 let p = NSEvent.mouseLocation
-                guard NSScreen.screens.contains(where: { Self.menuBarBand(of: $0).contains(p) }) else { return }
+                guard NSScreen.screens.contains(where: { NSMouseInRect(p, Self.menuBarBand(of: $0), false) }) else { return }
                 self.menuBarSuppressed = true
                 self.hotZoneSince = nil
                 if self.isRevealed {
@@ -380,7 +379,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let now = Date()
 
         let screenUnderPointer = NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) }
-        let inMenuBar = screenUnderPointer.map { Self.menuBarBand(of: $0).contains(mouse) } ?? false
+        let inMenuBar = screenUnderPointer.map { NSMouseInRect(mouse, Self.menuBarBand(of: $0), false) } ?? false
         if !inMenuBar { menuBarSuppressed = false }
 
         guard isRevealed else {
