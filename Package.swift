@@ -5,6 +5,7 @@ let package = Package(
     name: "Tendedero",
     platforms: [.macOS(.v14)],
     targets: [
-        .executableTarget(name: "Tendedero", path: "Sources/Tendedero")
+        .executableTarget(name: "Tendedero", path: "Sources/Tendedero"),
+        .testTarget(name: "TendederoTests", dependencies: ["Tendedero"])
     ]
 )

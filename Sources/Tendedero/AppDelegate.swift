@@ -88,6 +88,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             MainActor.assumeIsolated {
                 self?.panel.placeOnScreen()
                 self?.updateCapacity()
+                // A newly connected Retina display needs sharper thumbnails;
+                // disconnecting one lets their pixel buffers shrink again.
+                if let self {
+                    for item in self.line.items where !item.falling {
+                        self.line.reloadThumbnail(for: item.url)
+                    }
+                }
             }
         }
 
@@ -111,6 +118,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        ClipboardImage.materializeForExit()
         if Inbox.isEnabled { Inbox.restore() }
     }
 
@@ -166,6 +174,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             signal(sig, SIG_IGN)
             let source = DispatchSource.makeSignalSource(signal: sig, queue: .main)
             source.setEventHandler {
+                ClipboardImage.materializeForExit()
                 if Inbox.isEnabled { Inbox.restore() }
                 exit(0)
             }
@@ -215,12 +224,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func fly(_ id: UUID, from: CGRect) {
         guard isPresent, isRevealed, let screen = panel.screen,
               let to = cardFrame(for: id),
-              let item = line.items.first(where: { $0.id == id }) else {
+              let item = line.items.first(where: { $0.id == id }), !item.falling else {
+            line.land(id)
+            return
+        }
+        guard CaptureFlight.canFly else {
             line.land(id)
             return
         }
         let pixels = Int(max(from.width, from.height) * screen.backingScaleFactor)
-        guard let image = makeThumbnail(item.url, maxPixels: min(3000, max(400, pixels)))?
+        guard let image = makeThumbnail(item.url, maxPixels: min(CaptureFlight.maxImagePixels, max(1, pixels)))?
             .cgImage(forProposedRect: nil, context: nil, hints: nil) else {
             line.land(id)
             return

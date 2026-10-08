@@ -32,7 +32,7 @@ final class CaptureFlight {
     /// How high the gentle arc rises halfway, in points.
     private static let arc: CGFloat = 30
 
-    private let window: NSWindow
+    private weak var overlay: Overlay?
     private let container = CALayer()
     private let glass = CALayer()
     private let edge = CAGradientLayer()
@@ -46,55 +46,49 @@ final class CaptureFlight {
     private var falling = false
     private var duration: CFTimeInterval = CaptureFlight.duration
     private var start: CFTimeInterval = 0
-    private var timer: Timer?
+    private var completed = false
     private var completion: () -> Void = {}
 
-    private static var current: [CaptureFlight] = []
+    /// Keep burst captures from multiplying large decoded images. Further
+    /// captures land directly using the small thumbnail already on the line.
+    static let maxImagePixels = 1500
+    static var canFly: Bool {
+        overlays.values.reduce(0) { count, overlay in
+            count + overlay.flights.filter { !$0.falling }.count
+        } < 2
+    }
 
-    /// - Parameters:
-    ///   - from: the captured area, in screen coordinates.
-    ///   - to: the card's frame on the line, in screen coordinates, unrotated.
-    ///   - tilt: the card's resting tilt in degrees, clockwise, as SwiftUI uses.
+    private static var overlays: [CGDirectDisplayID: Overlay] = [:]
+
     static func fly(image: CGImage, from: CGRect, to: CGRect, tilt: CGFloat, on screen: NSScreen,
                     completion: @escaping () -> Void) {
-        let flight = CaptureFlight(image: image, from: from, to: to, tilt: tilt, screen: screen)
-        current.append(flight)
-        flight.completion = { [weak flight] in
-            completion()
-            current.removeAll { $0 === flight }
-        }
-        flight.run()
+        guard canFly else { completion(); return }
+        let flight = CaptureFlight(image: image, from: from, to: to, tilt: tilt, scale: screen.backingScaleFactor)
+        flight.completion = completion
+        add(flight, on: screen)
     }
 
-    /// A discarded card falling off the line, drawn over the whole screen so
-    /// it is never cut by the line's strip. Same motion as the app always had:
-    /// 520 points down, tilting further, fading, 0.55 s ease in.
     static func fall(image: CGImage, card: CGRect, tilt: CGFloat, on screen: NSScreen) {
-        let flight = CaptureFlight(image: image, from: card, to: card, tilt: tilt, screen: screen)
+        let flight = CaptureFlight(image: image, from: card, to: card, tilt: tilt, scale: screen.backingScaleFactor)
         flight.falling = true
         flight.duration = 0.55
-        current.append(flight)
-        flight.completion = { [weak flight] in current.removeAll { $0 === flight } }
-        flight.run()
+        add(flight, on: screen)
     }
 
-    private init(image: CGImage, from: CGRect, to: CGRect, tilt: CGFloat, screen: NSScreen) {
+    private static func add(_ flight: CaptureFlight, on screen: NSScreen) {
+        guard let display = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID else {
+            flight.completion()
+            return
+        }
+        let overlay = overlays[display] ?? Overlay(display: display, screen: screen)
+        overlays[display] = overlay
+        overlay.add(flight)
+    }
+
+    private init(image: CGImage, from: CGRect, to: CGRect, tilt: CGFloat, scale: CGFloat) {
         self.from = from
         self.to = to
         self.tilt = tilt
-        window = NSPanel(contentRect: screen.frame, styleMask: [.borderless, .nonactivatingPanel],
-                         backing: .buffered, defer: false)
-        window.isOpaque = false
-        window.backgroundColor = .clear
-        window.hasShadow = false
-        window.ignoresMouseEvents = true
-        window.level = NSWindow.Level(rawValue: NSWindow.Level.floating.rawValue + 1)
-        window.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
-
-        let host = NSView(frame: NSRect(origin: .zero, size: screen.frame.size))
-        host.wantsLayer = true
-        window.contentView = host
-        let scale = screen.backingScaleFactor
 
         container.anchorPoint = CGPoint(x: 0.5, y: 1)   // the card's top center
         container.shadowColor = NSColor.black.cgColor
@@ -128,43 +122,131 @@ final class CaptureFlight {
         container.addSublayer(photo)
         container.addSublayer(edge)
         container.addSublayer(clip)
-        host.layer?.addSublayer(container)
     }
 
-    private func run() {
-        if falling { update(1); updateFall(0) } else { update(0) }
-        window.orderFrontRegardless()
-        start = CACurrentMediaTime()
-        let timer = Timer(timeInterval: 1.0 / 120.0, repeats: true) { [weak self] _ in
-            MainActor.assumeIsolated { self?.tick() }
-        }
-        RunLoop.main.add(timer, forMode: .common)
-        self.timer = timer
+    /// The top-center follows an arc (or falls 520 points). The diagonal
+    /// encloses the card at every rotation; the margin includes clip/shadow.
+    private var motionBounds: CGRect {
+        let radius = max(hypot(from.width / 2, from.height), hypot(to.width / 2, to.height)) + 40
+        let left = min(from.midX, to.midX) - radius
+        let right = max(from.midX, to.midX) + radius
+        let bottom = min(from.maxY, to.maxY) - radius - (falling ? 520 : 0)
+        let top = max(from.maxY, to.maxY) + radius + (falling ? 0 : Self.arc)
+        return CGRect(x: left, y: bottom, width: right - left, height: top - bottom)
     }
 
-    private func tick() {
-        let k = min(1, (CACurrentMediaTime() - start) / duration)
+    /// Returns true once the layer, including its landing fade, is finished.
+    private func tick(at now: CFTimeInterval) -> Bool {
+        let elapsed = now - start
+        let k = min(1, elapsed / duration)
         if falling { updateFall(k) } else { update(k) }
-        guard k >= 1 else { return }
-        timer?.invalidate()
-        timer = nil
-        completion()
-        if falling {
-            window.orderOut(nil)
-            return
+        if k >= 1, !completed {
+            completed = true
+            let done = completion
+            completion = {}
+            done()
         }
-        // The real card fades in underneath; this one fades out over it.
-        NSAnimationContext.runAnimationGroup({ ctx in
-            ctx.duration = 0.16
-            window.animator().alphaValue = 0
-        }, completionHandler: { [window] in
-            MainActor.assumeIsolated { window.orderOut(nil) }
-        })
+        guard completed else { return false }
+        if falling { return true }
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        container.opacity = Float(max(0, 1 - (elapsed - duration) / 0.16))
+        CATransaction.commit()
+        return elapsed >= duration + 0.16
+    }
+
+    /// A display owns one cropped window and one timer for all of its cards.
+    /// Nothing is cached once the last card is gone, including AppKit's window.
+    @MainActor
+    private final class Overlay {
+        let display: CGDirectDisplayID
+        let screenFrame: CGRect
+        let window: NSPanel
+        let root = CALayer()
+        var flights: [CaptureFlight] = []
+        private var timer: Timer?
+
+        init(display: CGDirectDisplayID, screen: NSScreen) {
+            self.display = display
+            screenFrame = screen.frame
+            window = NSPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel],
+                             backing: .buffered, defer: true)
+            window.isReleasedWhenClosed = false
+            window.isOpaque = false
+            window.backgroundColor = .clear
+            window.hasShadow = false
+            window.ignoresMouseEvents = true
+            window.level = NSWindow.Level(rawValue: NSWindow.Level.floating.rawValue + 1)
+            window.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
+            let host = NSView()
+            host.wantsLayer = true
+            host.layer = root
+            root.contentsScale = screen.backingScaleFactor
+            window.contentView = host
+        }
+
+        func add(_ flight: CaptureFlight) {
+            flight.overlay = self
+            flight.start = CACurrentMediaTime()
+            flights.append(flight)
+            root.addSublayer(flight.container)
+            resize()
+            redraw(at: flight.start)
+            window.orderFrontRegardless()
+            if timer == nil {
+                let timer = Timer(timeInterval: 1.0 / 120.0, repeats: true) { [weak self] _ in
+                    MainActor.assumeIsolated { self?.tick() }
+                }
+                RunLoop.main.add(timer, forMode: .common)
+                self.timer = timer
+            }
+        }
+
+        private func resize() {
+            let bounds = flights.reduce(CGRect.null) { $0.union($1.motionBounds) }.intersection(screenFrame).integral
+            guard !bounds.isNull, !bounds.isEmpty else { return }
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            window.setFrame(bounds, display: false)
+            root.frame = CGRect(origin: .zero, size: bounds.size)
+            CATransaction.commit()
+        }
+
+        private func redraw(at now: CFTimeInterval) {
+            for flight in flights {
+                if flight.falling { flight.update(1) }
+                _ = flight.tick(at: now)
+            }
+        }
+
+        private func tick() {
+            let now = CACurrentMediaTime()
+            // A completion may add another flight; iterate a snapshot and only
+            // remove the finished cards so reentrant additions survive.
+            let finished = flights.filter { $0.tick(at: now) }
+            guard !finished.isEmpty else { return }
+            for flight in finished {
+                flight.photo.contents = nil
+                flight.container.removeFromSuperlayer()
+                flight.overlay = nil
+            }
+            flights.removeAll { flight in finished.contains { $0 === flight } }
+            if flights.isEmpty {
+                timer?.invalidate()
+                timer = nil
+                window.contentView = nil
+                window.close()
+                overlays[display] = nil
+            } else {
+                resize()
+                redraw(at: now)
+            }
+        }
     }
 
     private func updateFall(_ raw: Double) {
         let e = CGFloat(raw * raw * raw)
-        let origin = window.frame.origin
+        let origin = overlay?.window.frame.origin ?? .zero
         let angle = tilt + (tilt * 7 + 20) * e
         CATransaction.begin()
         CATransaction.setDisableActions(true)
@@ -186,7 +268,7 @@ final class CaptureFlight {
     private func update(_ raw: Double) {
         let k = CGFloat(Self.easeInOutCubic(raw))
         let chrome = Float(Self.smooth(Double(k), 0.35, 1))
-        let origin = window.frame.origin
+        let origin = overlay?.window.frame.origin ?? .zero
         func lerp(_ a: CGFloat, _ b: CGFloat) -> CGFloat { a + (b - a) * k }
 
         let w = lerp(from.width, to.width), h = lerp(from.height, to.height)

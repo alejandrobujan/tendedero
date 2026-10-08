@@ -113,12 +113,7 @@ final class Line: ObservableObject {
 
     func copy(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
-        let entry = NSPasteboardItem()
-        if let png = pngData(item.url) { entry.setData(png, forType: .png) }
-        entry.setString(item.url.absoluteString, forType: .fileURL)
-        let pb = NSPasteboard.general
-        pb.clearContents()
-        pb.writeObjects([entry])
+        ClipboardImage.copy(item.url)
 
         copiedID = id
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
@@ -242,21 +237,4 @@ final class Line: ObservableObject {
         sound.play()
     }
 
-    private func pngData(_ url: URL) -> Data? {
-        if url.pathExtension.lowercased() == "png" { return try? Data(contentsOf: url) }
-        guard let tiff = NSImage(contentsOf: url)?.tiffRepresentation,
-              let rep = NSBitmapImageRep(data: tiff) else { return nil }
-        return rep.representation(using: .png, properties: [:])
-    }
-}
-
-func makeThumbnail(_ url: URL, maxPixels: Int = 480) -> NSImage? {
-    guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
-    let options: [CFString: Any] = [
-        kCGImageSourceCreateThumbnailFromImageAlways: true,
-        kCGImageSourceCreateThumbnailWithTransform: true,
-        kCGImageSourceThumbnailMaxPixelSize: maxPixels,
-    ]
-    guard let cg = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else { return nil }
-    return NSImage(cgImage: cg, size: NSSize(width: cg.width, height: cg.height))
 }

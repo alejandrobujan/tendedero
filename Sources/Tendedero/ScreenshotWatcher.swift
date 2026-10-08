@@ -50,7 +50,7 @@ final class ScreenshotWatcher {
     func start() {
         let files = listing()
         known = Set(files.filter { creationDate($0) < launchDate }.map(\.path))
-        for url in files where !known.contains(url.path) && isCandidate(url) {
+        for url in newCandidates(in: files) {
             onNew(url)
         }
         known = Set(files.map(\.path))
@@ -83,17 +83,31 @@ final class ScreenshotWatcher {
 
     private func scan() {
         let files = listing()
-        for url in files where !known.contains(url.path) && isCandidate(url) {
+        for url in newCandidates(in: files) {
             onNew(url)
         }
         known = Set(files.map(\.path))
         onChange()
     }
 
+    private func newCandidates(in files: [URL]) -> [URL] {
+        // Only new images need metadata checks and ordering. A busy Desktop
+        // can contain thousands of unrelated files; don't retain their paths.
+        files.filter { !known.contains($0.path) && isCandidate($0) }
+            .sorted { creationDate($0) < creationDate($1) }
+    }
+
     private func listing() -> [URL] {
-        let urls = (try? FileManager.default.contentsOfDirectory(
-            at: folder, includingPropertiesForKeys: [.creationDateKey], options: [.skipsHiddenFiles])) ?? []
-        return urls.sorted { creationDate($0) < creationDate($1) }
+        guard let entries = FileManager.default.enumerator(at: folder,
+            includingPropertiesForKeys: [],
+            options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants]) else { return [] }
+        var images: [URL] = []
+        while let url = autoreleasepool(invoking: { entries.nextObject() as? URL }) {
+            autoreleasepool {
+                if Self.imageExtensions.contains(url.pathExtension.lowercased()) { images.append(url) }
+            }
+        }
+        return images
     }
 
     private func creationDate(_ url: URL) -> Date {
