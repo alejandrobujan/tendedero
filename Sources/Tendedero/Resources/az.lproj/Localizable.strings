@@ -1,0 +1,36 @@
+/* Azerbaijani. Each key is the English text exactly as written in L("...")
+   in the code. Every language has the same keys; run
+   swift scripts/check-strings.swift to check. */
+
+/* AppDelegate */
+"Let Tendedero handle your screenshots?" = "Ekran şəkillərinizi Tendedero idarə etsin?";
+"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "Ekran şəkilləri üzən miniatür olmadan, çəkdiyiniz an ipdən asılacaq və İş masanızda yığılıb qalmayacaq. Saxlamaq istədiyinizi qovluğa sürükləyin, istəmədiyinizi çarpazla atın. Bunu menyu panelindən söndürə bilərsiniz, Tendedero bağlananda isə ayarlarınız əvvəlki halına qayıdır.";
+"Turn on" = "Aktiv et";
+"Not now" = "İndi yox";
+"Hide line" = "İpi gizlət";
+"Show line" = "İpi göstər";
+"Take everything down" = "Hamısını ipdən yığ";
+"Handle screenshots" = "Ekran şəkillərini idarə et";
+"Screenshots hang instantly and skip the Desktop" = "Ekran şəkilləri dərhal asılır və İş masasına düşmür";
+"Open screenshots folder" = "Ekran şəkilləri qovluğunu aç";
+"Sounds" = "Səslər";
+"Open at login" = "Sistemə girişdə aç";
+"Quit Tendedero" = "Tendedero-dan çıx";
+"Could not change the login setting" = "Giriş ayarını dəyişmək alınmadı";
+"Move Tendedero to the Applications folder and try again." = "Tendedero-nu Applications (Proqramlar) qovluğuna köçürün və yenidən cəhd edin.";
+
+/* GrabArea */
+"Copy" = "Kopyala";
+"Open" = "Aç";
+"Markup" = "İşarələmə";
+"Show in Finder" = "Finder-də göstər";
+"Save to Desktop" = "İş masasında saxla";
+"Discard" = "At";
+"Take down" = "İpdən götür";
+"Move to Trash" = "Zibil qutusuna at";
+
+/* LineView */
+"Take a screenshot and it will hang here" = "Ekran şəkli çəkin, burada asılacaq";
+
+/* PeggedView */
+"Copied" = "Kopyalandı";

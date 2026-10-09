@@ -41,6 +41,18 @@ let translations: [String: [String: String]] = [
         "Let it go.": "松手放下。",
         "The cross or the Trash. That\u{2019}s it.": "点叉或拖进废纸篓，就这么简单。",
     ],
+    "az": [
+        "Screenshots, hung out to dry.": "Ekran şəkilləri, ipə sərilib.",
+        "Copied": "Kopyalandı",
+        "Click to copy.": "Klikləyin, kopyalayın.",
+        "Paste it anywhere, instantly.": "İstədiyiniz yerə dərhal yapışdırın.",
+        "Hold to mark up.": "Basıb saxlayın, işarələyin.",
+        "Annotate, crop or sign in place.": "Elə oradaca qeyd edin, kəsin, imzalayın.",
+        "Drag to share.": "Sürükləyin, paylaşın.",
+        "Apps get a copy. Folders keep it.": "Proqram surətini alır. Qovluq özünü saxlayır.",
+        "Let it go.": "Burax getsin.",
+        "The cross or the Trash. That\u{2019}s it.": "Çarpaz və ya Zibil qutusu. Vəssalam.",
+    ],
 ]
 
 func T(_ english: String) -> String {
