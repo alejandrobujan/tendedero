@@ -88,7 +88,7 @@ struct PeggedView: View {
             .overlay(GrabArea(item: item, line: line))
             .overlay(alignment: .bottom) {
                 if copied {
-                    Label(L("Copied", "Copiado"), systemImage: "checkmark")
+                    Label(L("Copied"), systemImage: "checkmark")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(.primary)
                         .padding(.horizontal, 10)

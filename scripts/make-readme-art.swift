@@ -3,12 +3,52 @@
 //   demo-*.gif   the reveal: pointer to the top edge, line slides down, a
 //                click copies, the pointer leaves and the line tucks away
 //   bento-*.png  four gestures as tiles with SF Symbols
-// Usage: swift scripts/make-readme-art.swift docs/
+// Usage: swift scripts/make-readme-art.swift [language] [folder]
+// English goes to docs/images, any other language to docs/images/<language>.
 import AppKit
 import ImageIO
 import UniformTypeIdentifiers
 
-let outDir = CommandLine.arguments.dropFirst().first ?? "docs"
+let language = CommandLine.arguments.dropFirst().first ?? "en"
+let outDir = CommandLine.arguments.dropFirst(2).first ?? (language == "en" ? "docs/images" : "docs/images/\(language)")
+try! FileManager.default.createDirectory(atPath: outDir, withIntermediateDirectories: true)
+
+// MARK: Words
+
+// The words drawn into the images, keyed by the English text.
+let translations: [String: [String: String]] = [
+    "es": [
+        "Screenshots, hung out to dry.": "Tus capturas, tendidas.",
+        "Copied": "Copiado",
+        "Click to copy.": "Clic para copiar.",
+        "Paste it anywhere, instantly.": "Pégala donde quieras, al momento.",
+        "Hold to mark up.": "Mantén para anotar.",
+        "Annotate, crop or sign in place.": "Anota, recorta o firma ahí mismo.",
+        "Drag to share.": "Arrastra para compartir.",
+        "Apps get a copy. Folders keep it.": "Las apps reciben una copia. Las carpetas, el original.",
+        "Let it go.": "Y olvídate.",
+        "The cross or the Trash. That\u{2019}s it.": "La cruz o la Papelera. Nada más.",
+    ],
+    "zh-Hans": [
+        "Screenshots, hung out to dry.": "截图，挂起来晾着。",
+        "Copied": "已复制",
+        "Click to copy.": "单击复制。",
+        "Paste it anywhere, instantly.": "随处粘贴，即刻可用。",
+        "Hold to mark up.": "长按标记。",
+        "Annotate, crop or sign in place.": "直接标注、裁剪或签名。",
+        "Drag to share.": "拖拽分享。",
+        "Apps get a copy. Folders keep it.": "拖进 App 是副本，拖进文件夹就存下来。",
+        "Let it go.": "松手放下。",
+        "The cross or the Trash. That\u{2019}s it.": "点叉或拖进废纸篓，就这么简单。",
+    ],
+]
+
+func T(_ english: String) -> String {
+    if language == "en" { return english }
+    guard let words = translations[language] else { fatalError("No words for \(language)") }
+    guard let word = words[english] else { fatalError("No \(language) for \"\(english)\"") }
+    return word
+}
 
 func color(_ r: CGFloat, _ g: CGFloat, _ b: CGFloat, _ a: CGFloat = 1) -> NSColor {
     NSColor(srgbRed: r / 255, green: g / 255, blue: b / 255, alpha: a)
@@ -96,10 +136,15 @@ func text(_ string: String, size: CGFloat, weight: NSFont.Weight, color: NSColor
 }
 
 func leftText(_ string: String, size: CGFloat, weight: NSFont.Weight, color: NSColor,
-              tracking: CGFloat = 0, x: CGFloat, baselineY: CGFloat) {
+              tracking: CGFloat = 0, x: CGFloat, baselineY: CGFloat, maxWidth: CGFloat = .infinity) {
     let font = NSFont.systemFont(ofSize: size, weight: weight)
     let s = NSAttributedString(string: string, attributes: [.font: font, .foregroundColor: color, .kern: tracking])
+    if s.size().width > maxWidth { fatalError("\"\(string)\" is too long: \(Int(s.size().width)) of \(Int(maxWidth)) points") }
     s.draw(at: NSPoint(x: x, y: baselineY + font.descender))
+}
+
+func textWidth(_ string: String, size: CGFloat, weight: NSFont.Weight) -> CGFloat {
+    NSAttributedString(string: string, attributes: [.font: NSFont.systemFont(ofSize: size, weight: weight)]).size().width
 }
 
 // MARK: The scene
@@ -258,7 +303,9 @@ func drawContent(_ kind: Int, _ r: NSRect) {
 }
 
 func drawCopied(_ ctx: CGContext, _ t: Theme, y: CGFloat, alpha: CGFloat) {
-    let w: CGFloat = 84, h: CGFloat = 24
+    let label = "\u{2713}  " + T("Copied")
+    // Wide enough for the English label; longer words widen the pill.
+    let w = max(84, (textWidth(label, size: 11.5, weight: .semibold) + 26).rounded(.up)), h: CGFloat = 24
     let r = NSRect(x: -w / 2, y: y - h / 2 + (1 - alpha) * 4, width: w, height: h)
     let p = NSBezierPath(roundedRect: r, xRadius: h / 2, yRadius: h / 2)
     ctx.saveGState()
@@ -266,7 +313,7 @@ func drawCopied(_ ctx: CGContext, _ t: Theme, y: CGFloat, alpha: CGFloat) {
     ctx.saveGState(); shadow(t, 0.8, blur: 10, y: -4)
     (t.name == "light" ? color(255, 255, 255, 0.92) : color(50, 50, 60, 0.92)).setFill(); p.fill()
     ctx.restoreGState()
-    text("\u{2713}  Copied", size: 11.5, weight: .semibold, color: t.ink, centerX: 0, baselineY: r.midY - 4)
+    text(label, size: 11.5, weight: .semibold, color: t.ink, centerX: 0, baselineY: r.midY - 4)
     ctx.restoreGState()
 }
 
@@ -294,7 +341,7 @@ func hero(_ t: Theme) {
     draw(rep, scale: s) { ctx in
         t.page.setFill(); NSRect(x: 0, y: 0, width: W, height: H).fill()
         text("Tendedero", size: 84, weight: .semibold, color: t.ink, tracking: -2.4, centerX: W / 2, baselineY: H - 128)
-        text("Screenshots, hung out to dry.", size: 30, weight: .regular, color: t.secondaryInk,
+        text(T("Screenshots, hung out to dry."), size: 30, weight: .regular, color: t.secondaryInk,
              tracking: -0.4, centerX: W / 2, baselineY: H - 182)
         let frames = [Frame(x: 290, w: 250, h: 172, tilt: 2.5, kind: 0),
                       Frame(x: 560, w: 270, h: 186, tilt: -1.2, kind: 1),
@@ -376,10 +423,10 @@ func demo(_ t: Theme) {
 func bento(_ t: Theme) {
     let W: CGFloat = 1200, H: CGFloat = 700, s: CGFloat = 2, gap: CGFloat = 20
     let tiles: [(String, String, String)] = [
-        ("doc.on.doc", "Click to copy.", "Paste it anywhere, instantly."),
-        ("pencil.tip.crop.circle", "Hold to mark up.", "Annotate, crop or sign in place."),
-        ("arrow.up.forward.app", "Drag to share.", "Apps get a copy. Folders keep it."),
-        ("xmark.circle", "Let it go.", "The cross or the Trash. That\u{2019}s it."),
+        ("doc.on.doc", T("Click to copy."), T("Paste it anywhere, instantly.")),
+        ("pencil.tip.crop.circle", T("Hold to mark up."), T("Annotate, crop or sign in place.")),
+        ("arrow.up.forward.app", T("Drag to share."), T("Apps get a copy. Folders keep it.")),
+        ("xmark.circle", T("Let it go."), T("The cross or the Trash. That\u{2019}s it.")),
     ]
     let rep = makeBitmap(W, H, scale: s)
     draw(rep, scale: s) { ctx in
@@ -397,8 +444,8 @@ func bento(_ t: Theme) {
                 let sz = symbol.size
                 symbol.draw(in: NSRect(x: r.minX + 44, y: r.maxY - 52 - sz.height, width: sz.width, height: sz.height))
             }
-            leftText(tile.1, size: 36, weight: .semibold, color: t.tileInk, tracking: -0.8, x: r.minX + 44, baselineY: r.minY + 92)
-            leftText(tile.2, size: 21, weight: .regular, color: t.secondaryInk, tracking: -0.2, x: r.minX + 44, baselineY: r.minY + 52)
+            leftText(tile.1, size: 36, weight: .semibold, color: t.tileInk, tracking: -0.8, x: r.minX + 44, baselineY: r.minY + 92, maxWidth: r.width - 88)
+            leftText(tile.2, size: 21, weight: .regular, color: t.secondaryInk, tracking: -0.2, x: r.minX + 44, baselineY: r.minY + 52, maxWidth: r.width - 88)
         }
     }
     savePNG(rep, "\(outDir)/bento-\(t.name).png")

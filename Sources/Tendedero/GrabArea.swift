@@ -43,20 +43,20 @@ struct GrabArea: NSViewRepresentable {
         view.onPressChange = { pressed in line.pressedID = pressed ? id : nil }
         view.menuProvider = {
             let menu = NSMenu()
-            menu.addItem(ClosureMenuItem(L("Copy", "Copiar")) { line.copy(id) })
-            menu.addItem(ClosureMenuItem(L("Open", "Abrir")) { line.open(id) })
-            menu.addItem(ClosureMenuItem(L("Markup", "Marcación")) { line.markup(id) })
-            menu.addItem(ClosureMenuItem(L("Show in Finder", "Mostrar en Finder")) { line.reveal(id) })
+            menu.addItem(ClosureMenuItem(L("Copy")) { line.copy(id) })
+            menu.addItem(ClosureMenuItem(L("Open")) { line.open(id) })
+            menu.addItem(ClosureMenuItem(L("Markup")) { line.markup(id) })
+            menu.addItem(ClosureMenuItem(L("Show in Finder")) { line.reveal(id) })
             let inInbox = line.isInInbox(id)
             if inInbox {
-                menu.addItem(ClosureMenuItem(L("Save to Desktop", "Guardar en el Escritorio")) { line.saveToDesktop(id) })
+                menu.addItem(ClosureMenuItem(L("Save to Desktop")) { line.saveToDesktop(id) })
             }
             menu.addItem(.separator())
             if inInbox {
-                menu.addItem(ClosureMenuItem(L("Discard", "Descartar")) { line.discard(id) })
+                menu.addItem(ClosureMenuItem(L("Discard")) { line.discard(id) })
             } else {
-                menu.addItem(ClosureMenuItem(L("Take down", "Descolgar")) { line.discard(id) })
-                menu.addItem(ClosureMenuItem(L("Move to Trash", "Mover a la Papelera")) { line.trash(id) })
+                menu.addItem(ClosureMenuItem(L("Take down")) { line.discard(id) })
+                menu.addItem(ClosureMenuItem(L("Move to Trash")) { line.trash(id) })
             }
             return menu
         }
