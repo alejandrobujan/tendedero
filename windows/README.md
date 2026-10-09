@@ -17,7 +17,7 @@ Download one of these from the Releases page, or build them yourself with
   from *Settings → Apps*.
 - **`Tendedero-1.0.0-portable.exe`**: no install. Put it anywhere and run it.
 
-Requires Windows 10 or Windows 11, 64-bit.
+Requires Windows 10 or Windows 11, 64-bit. Fully verified on Windows 11 x64.
 
 Both files are not code-signed, so Windows SmartScreen may warn you the first
 time. Choose **More info → Run anyway**.
