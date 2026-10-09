@@ -294,6 +294,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard on != isRevealed else { return }
         isRevealed = on
         line.revealed = on
+        if on && isPresent { panel.orderFrontRegardless() }
         if !on {
             pinned = false
             peekUntil = .distantPast
