@@ -10,6 +10,8 @@
 "Take everything down" = "Descolgar todo";
 "Handle screenshots" = "Encargarse de las capturas";
 "Screenshots hang instantly and skip the Desktop" = "Las capturas se cuelgan al instante y no pasan por el Escritorio";
+"Hang copied images" = "Colgar imágenes copiadas";
+"Copied PNG and TIFF images stay on the line and on the clipboard" = "Las imágenes PNG y TIFF copiadas se quedan en el tendedero y en el portapapeles";
 "Open screenshots folder" = "Abrir carpeta de capturas";
 "Sounds" = "Sonidos";
 "Open at login" = "Abrir al iniciar sesión";

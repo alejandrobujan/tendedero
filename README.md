@@ -64,6 +64,16 @@ Same shortcuts. Same muscle memory. Just less mess.
 
 ## Private by design.
 
+**Hang copied images** in the menu bar also hangs clipboard screenshots taken
+with Control held, including Control–Shift–Command–4. It is off by default.
+After enabling it, only newly copied PNG or TIFF images are saved locally to
+the inbox and hung within about half a second. The clipboard stays unchanged,
+so you can paste the same screenshot immediately. Copies made by clicking a
+photo on the line and content marked concealed, transient or auto-generated
+are skipped. File URLs, text and other image formats are ignored.
+
+See [clipboard support and synthetic tests](docs/clipboard-support.md).
+
 No account. No network. No analytics.
 Tendedero runs entirely on your Mac, and your screenshots never leave it.
 
@@ -121,6 +131,7 @@ so macOS asks again for access to the Desktop after each rebuild.
 | `PeggedView.swift` | One photo: glass frame, clip, swing and breeze |
 | `GrabArea.swift` | Click, long press, drag and drop |
 | `ScreenshotWatcher.swift` | Notices new screenshots |
+| `ClipboardWatcher.swift` | Optionally hangs newly copied PNG/TIFF images |
 | `Inbox.swift` | Takes over screenshot settings and puts them back |
 | `Markup.swift` | Opens the system Markup editor and saves the result |
 | `FullScreen.swift` | Knows when to stay hidden |

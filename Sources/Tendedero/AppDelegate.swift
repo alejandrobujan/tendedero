@@ -14,6 +14,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// ignores the screenshot settings (macOS 27 renamed one), captures keep
     /// landing on the Desktop, and they still hang on the line.
     private var safetyWatcher: ScreenshotWatcher?
+    private lazy var clipboardWatcher = ClipboardWatcher { [weak self] url in self?.hangCapture(url) }
     private var signalSources: [DispatchSourceSignal] = []
     private var hotKey: HotKey?
     private var cancellables = Set<AnyCancellable>()
@@ -54,6 +55,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if Inbox.isEnabled { Inbox.apply() }
         restoreSettingsOnTermination()
         startWatcher()
+
+        if ClipboardWatcher.isEnabled { clipboardWatcher.start() }
 
         hotKey = HotKey(keyCode: kVK_ANSI_T, modifiers: controlKey | optionKey) { [weak self] in
             self?.toggle()
@@ -111,6 +114,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        clipboardWatcher.stop()
         if Inbox.isEnabled { Inbox.restore() }
     }
 
@@ -477,6 +481,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         inbox.state = Inbox.isEnabled ? .on : .off
         inbox.toolTip = L("Screenshots hang instantly and skip the Desktop")
         menu.addItem(inbox)
+
+        let clipboard = ClosureMenuItem(L("Hang copied images")) { [weak self] in
+            ClipboardWatcher.isEnabled.toggle()
+            if ClipboardWatcher.isEnabled { self?.clipboardWatcher.start() } else { self?.clipboardWatcher.stop() }
+        }
+        clipboard.state = ClipboardWatcher.isEnabled ? .on : .off
+        clipboard.toolTip = L("Copied PNG and TIFF images stay on the line and on the clipboard")
+        menu.addItem(clipboard)
 
         menu.addItem(ClosureMenuItem(L("Open screenshots folder")) { [weak self] in
             guard let self else { return }

@@ -12,6 +12,8 @@
 "Take everything down" = "Take everything down";
 "Handle screenshots" = "Handle screenshots";
 "Screenshots hang instantly and skip the Desktop" = "Screenshots hang instantly and skip the Desktop";
+"Hang copied images" = "Hang copied images";
+"Copied PNG and TIFF images stay on the line and on the clipboard" = "Copied PNG and TIFF images stay on the line and on the clipboard";
 "Open screenshots folder" = "Open screenshots folder";
 "Sounds" = "Sounds";
 "Open at login" = "Open at login";

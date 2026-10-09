@@ -119,6 +119,7 @@ final class Line: ObservableObject {
         let pb = NSPasteboard.general
         pb.clearContents()
         pb.writeObjects([entry])
+        ClipboardWatcher.recordOwnCopy(changeCount: pb.changeCount)
 
         copiedID = id
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
