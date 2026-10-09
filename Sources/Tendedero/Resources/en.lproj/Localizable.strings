@@ -34,3 +34,13 @@
 
 /* PeggedView */
 "Copied" = "Copied";
+
+/* Image history */
+"Keep image history" = "Keep image history";
+"Expired clipboard copies are deleted; original screenshot files are kept" = "Expired clipboard copies are deleted; original screenshot files are kept";
+"1 day" = "1 day";
+"3 days" = "3 days";
+"7 days" = "7 days";
+"15 days" = "15 days";
+"30 days" = "30 days";
+"Scroll image history" = "Scroll image history";

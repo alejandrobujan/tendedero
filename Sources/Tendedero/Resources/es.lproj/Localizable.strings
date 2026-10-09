@@ -32,3 +32,13 @@
 
 /* PeggedView */
 "Copied" = "Copiado";
+
+/* Image history */
+"Keep image history" = "Conservar el historial de imágenes";
+"Expired clipboard copies are deleted; original screenshot files are kept" = "Se eliminan las copias del portapapeles caducadas; se conservan los archivos de captura originales";
+"1 day" = "1 día";
+"3 days" = "3 días";
+"7 days" = "7 días";
+"15 days" = "15 días";
+"30 days" = "30 días";
+"Scroll image history" = "Desplazar el historial de imágenes";

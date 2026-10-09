@@ -1,29 +1,8 @@
 import SwiftUI
 
-enum Layout {
-    static let panelHeight: CGFloat = 210
-    static let ropeTop: CGFloat = 10
-    static let spacing: CGFloat = 174
-    static let cardWidth: CGFloat = 150
-    static let pinAbove: CGFloat = 9.5
-
-    /// The rope hangs as a parabola from edge to edge of the screen.
-    static func sag(width: CGFloat) -> CGFloat { min(30, width * 0.018) }
-
-    static func ropeY(x: CGFloat, width: CGFloat) -> CGFloat {
-        guard width > 0 else { return ropeTop }
-        let f = x / width
-        return ropeTop + 4 * sag(width: width) * f * (1 - f)
-    }
-
-    static func x(index: Int, count: Int, width: CGFloat) -> CGFloat {
-        let total = CGFloat(max(count - 1, 0)) * spacing
-        return width / 2 - total / 2 + CGFloat(index) * spacing
-    }
-}
-
 struct LineView: View {
     @ObservedObject var line: Line
+    private static let scrollControlID = UUID()
 
     var body: some View {
         GeometryReader { geo in
@@ -37,14 +16,32 @@ struct LineView: View {
                         .transition(.opacity)
                 }
 
-                ForEach(Array(line.items.enumerated()), id: \.element.id) { index, item in
-                    let x = Layout.x(index: index, count: line.items.count, width: width)
+                ForEach(Array(line.items.enumerated()).filter { line.visibleRange.contains($0.offset) }, id: \.element.id) { index, item in
+                    let x = Layout.x(index: index, scrollOffset: line.scrollOffset)
                     let ropeY = Layout.ropeY(x: x, width: width)
                     PeggedView(item: item, line: line)
                         .frame(width: Layout.cardWidth, height: Layout.panelHeight - ropeY, alignment: .top)
                         .position(x: x, y: ropeY - Layout.pinAbove + (Layout.panelHeight - ropeY) / 2)
                 }
             }
+            .frame(width: width, height: Layout.panelHeight, alignment: .topLeading)
+            .overlay(alignment: .bottom) {
+                if line.maximumScrollOffset > 0 {
+                    Slider(value: Binding(get: { Double(line.scrollOffset) },
+                                          set: { line.setScrollOffset(CGFloat($0)) }),
+                           in: 0...Double(line.maximumScrollOffset))
+                        .accessibilityLabel(L("Scroll image history"))
+                        .frame(width: min(280, max(1, width - 48)))
+                        .padding(.bottom, 10)
+                        .background(GeometryReader { g in
+                            Color.clear.preference(key: HitRectsKey.self,
+                                value: [Self.scrollControlID: g.frame(in: .global)])
+                        })
+                }
+            }
+            .clipped()
+            .onAppear { line.setViewportWidth(width) }
+            .onChange(of: width) { _, value in line.setViewportWidth(value) }
             .animation(.spring(response: 0.55, dampingFraction: 0.78), value: line.items.map(\.id))
             .animation(.easeInOut(duration: 0.3), value: line.items.isEmpty)
             // Tucked away, the whole line waits above the top edge and slides

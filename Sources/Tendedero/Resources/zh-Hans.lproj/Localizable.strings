@@ -32,3 +32,13 @@
 
 /* PeggedView */
 "Copied" = "已复制";
+
+/* Image history */
+"Keep image history" = "保留图像历史记录";
+"Expired clipboard copies are deleted; original screenshot files are kept" = "过期的剪贴板副本会被删除；原始截图文件会被保留";
+"1 day" = "1 天";
+"3 days" = "3 天";
+"7 days" = "7 天";
+"15 days" = "15 天";
+"30 days" = "30 天";
+"Scroll image history" = "滚动图像历史记录";

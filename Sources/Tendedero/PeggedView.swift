@@ -51,10 +51,10 @@ struct PeggedView: View {
     /// Distance from the top of the hanging view (the clip) to the card.
     static let cardOffsetBelowTop: CGFloat = 26 - 12
 
-    private var photoSize: CGSize { Self.photoSize(for: item.thumb.size) }
+    private var photoSize: CGSize { Self.photoSize(for: item.thumb?.size ?? CGSize(width: 136, height: 104)) }
 
     private var card: some View {
-        Image(nsImage: item.thumb)
+        Image(nsImage: item.thumb ?? NSImage())
             .resizable()
             .interpolation(.high)
             .frame(width: photoSize.width, height: photoSize.height)

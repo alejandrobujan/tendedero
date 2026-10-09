@@ -4,6 +4,16 @@ import AppKit
 /// app and every Space except full screen ones, never takes focus, and lets clicks pass through
 /// everywhere except over the photos.
 final class LinePanel: NSPanel {
+    var onScroll: ((CGFloat, CGFloat, Bool) -> Void)?
+
+    override func sendEvent(_ event: NSEvent) {
+        if event.type == .scrollWheel, let onScroll {
+            onScroll(event.scrollingDeltaX, event.scrollingDeltaY, event.hasPreciseScrollingDeltas)
+            return
+        }
+        super.sendEvent(event)
+    }
+
     init(content: NSView) {
         super.init(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel],
                    backing: .buffered, defer: false)

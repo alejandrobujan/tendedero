@@ -8,7 +8,7 @@ let log = Logger(subsystem: "app.tendedero.Tendedero", category: "line")
 struct Pegged: Identifiable, Equatable {
     let id = UUID()
     let url: URL
-    var thumb: NSImage
+    var thumb: NSImage?
     /// Every photo hangs a little crooked, like on a real line.
     let tilt = Double.random(in: -2.5...2.5)
     var falling = false
@@ -21,7 +21,7 @@ struct Pegged: Identifiable, Equatable {
 }
 
 /// The line itself: what hangs on it and what you can do with each item.
-/// The files never move. The line is only a view onto them.
+/// External originals stay in place; private clipboard copies expire.
 @MainActor
 final class Line: ObservableObject {
     @Published private(set) var items: [Pegged] = []
@@ -36,21 +36,51 @@ final class Line: ObservableObject {
     /// uses them to only catch clicks over photos and let the rest through.
     var hitRects: [UUID: CGRect] = [:]
 
-    var maxItems = 8
+    @Published private(set) var scrollOffset: CGFloat = 0
+    private(set) var viewportWidth: CGFloat = 1024
+    private let history: ImageHistory
+    private let defaults: UserDefaults
+
+    var retentionDays: Int { history.retentionDays }
+    var maximumScrollOffset: CGFloat { Layout.maximumOffset(count: items.count, width: viewportWidth) }
+    var visibleRange: Range<Int> { Layout.visibleRange(count: items.count, width: viewportWidth, offset: scrollOffset) }
+
+    func setViewportWidth(_ width: CGFloat) {
+        viewportWidth = width.isFinite ? max(1, width) : 1
+        setScrollOffset(scrollOffset)
+    }
+
+    func setScrollOffset(_ offset: CGFloat) {
+        guard offset.isFinite else { return }
+        scrollOffset = max(0, min(maximumScrollOffset, offset))
+        refreshThumbnails()
+    }
+
+    func scroll(horizontal: CGFloat, vertical: CGFloat, precise: Bool) {
+        let delta = abs(horizontal) > abs(vertical) ? horizontal : vertical
+        setScrollOffset(scrollOffset - delta * (precise ? 1 : 24))
+    }
+
+    func setRetentionDays(_ days: Int) {
+        history.setRetentionDays(days)
+        syncHistory()
+    }
 
 
     var soundOn: Bool {
-        get { !UserDefaults.standard.bool(forKey: "soundOff") }
-        set { UserDefaults.standard.set(!newValue, forKey: "soundOff") }
+        get { !defaults.bool(forKey: "soundOff") }
+        set { defaults.set(!newValue, forKey: "soundOff") }
     }
 
     var liveCount: Int { items.filter { !$0.falling }.count }
 
-    private let storeKey = "pegged"
-
-    init() {
-        restore()
-        scheduleGust()
+    init(defaults: UserDefaults = .standard, inbox: URL = Inbox.folder,
+         now: @escaping () -> Date = Date.init, breeze: Bool = true) {
+        self.defaults = defaults
+        history = ImageHistory(defaults: defaults, inbox: inbox, now: now)
+        items = history.entries.map { Pegged(url: $0.url, thumb: nil) }
+        refreshThumbnails()
+        if breeze { scheduleGust() }
     }
 
     // MARK: Hanging and dropping
@@ -61,12 +91,9 @@ final class Line: ObservableObject {
               let thumb = makeThumbnail(url) else { return nil }
         var item = Pegged(url: url, thumb: thumb)
         item.flying = flying
-        items.append(item)
-        // A full line lets the oldest photo fall off the far end.
-        while liveCount > maxItems, let oldest = items.first(where: { !$0.falling }) {
-            drop(oldest.id, quietly: true)
-        }
-        save()
+        items.insert(item, at: 0)
+        history.add(url)
+        setScrollOffset(0)
         if !quietly { play("Tink", volume: 0.35) }
         return item.id
     }
@@ -86,27 +113,30 @@ final class Line: ObservableObject {
         onFall?(items[i])
         items[i].falling = true
         hitRects[id] = nil
-        save()
+        history.remove(items[i].url)
         if !quietly { play("Pop", volume: 0.25) }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
-            self?.items.removeAll { $0.id == id }
+            guard let self else { return }
+            self.items.removeAll { $0.id == id }
+            self.setScrollOffset(self.scrollOffset)
         }
     }
 
     func clear() {
-        let live = items.filter { !$0.falling }
-        for (n, item) in live.enumerated() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.06 * Double(n)) { [weak self] in
-                self?.drop(item.id, quietly: n > 0)
-            }
-        }
+        // A month of cards must clear in one persisted update. Only cards
+        // currently on screen need the fall animation.
+        for index in visibleRange where !items[index].falling { onFall?(items[index]) }
+        history.clear()
+        items.removeAll()
+        hitRects.removeAll()
+        scrollOffset = 0
+        play("Pop", volume: 0.25)
     }
 
     /// Photos whose file was deleted or moved away fall off by themselves.
     func prune() {
-        for item in items where !item.falling && !FileManager.default.fileExists(atPath: item.url.path) {
-            drop(item.id, quietly: true)
-        }
+        history.prune()
+        syncHistory()
     }
 
     // MARK: Actions on one photo
@@ -222,16 +252,28 @@ final class Line: ObservableObject {
 
     // MARK: Persistence
 
-    private func save() {
-        let paths = items.filter { !$0.falling }.map(\.url.path)
-        UserDefaults.standard.set(paths, forKey: storeKey)
+    private func syncHistory() {
+        let paths = Set(history.entries.map(\.path))
+        items.removeAll { !paths.contains($0.url.standardizedFileURL.path) && !$0.falling }
+        setScrollOffset(scrollOffset)
     }
 
-    private func restore() {
-        let paths = UserDefaults.standard.stringArray(forKey: storeKey) ?? []
-        for path in paths where FileManager.default.fileExists(atPath: path) {
-            hang(URL(fileURLWithPath: path), quietly: true)
+    private func refreshThumbnails() {
+        let range = visibleRange
+        var updated = items
+        var changed = false
+        for index in updated.indices {
+            if range.contains(index) {
+                if updated[index].thumb == nil {
+                    updated[index].thumb = makeThumbnail(updated[index].url)
+                    changed = updated[index].thumb != nil || changed
+                }
+            } else if updated[index].thumb != nil {
+                updated[index].thumb = nil
+                changed = true
+            }
         }
+        if changed { items = updated }
     }
 
     // MARK: Helpers

@@ -6,7 +6,17 @@ import SwiftUI
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
-    private let line = Line()
+    private let line: Line
+
+    override init() {
+        line = Line()
+        super.init()
+    }
+
+    init(line: Line) {
+        self.line = line
+        super.init()
+    }
     private var panel: LinePanel!
     private var statusItem: NSStatusItem!
     private var watcher: ScreenshotWatcher!
@@ -18,6 +28,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var hotKey: HotKey?
     private var cancellables = Set<AnyCancellable>()
     private var mouseTimer: Timer?
+    private var historyTimer: Timer?
 
     /// Whether the panel is ordered in. It can be in and still tucked away
     /// above the top edge, like an auto-hiding Dock.
@@ -48,6 +59,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let host = NSHostingView(rootView: LineView(line: line))
         host.sizingOptions = []
         panel = LinePanel(content: host)
+        panel.onScroll = { [weak self] x, y, precise in
+            self?.line.scroll(horizontal: x, vertical: y, precise: precise)
+        }
+        let historyTimer = Timer(timeInterval: 3600, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated { self?.line.prune() }
+        }
+        RunLoop.main.add(historyTimer, forMode: .common)
+        self.historyTimer = historyTimer
         panel.placeOnScreen()
         updateCapacity()
 
@@ -111,6 +130,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        historyTimer?.invalidate()
         if Inbox.isEnabled { Inbox.restore() }
     }
 
@@ -232,7 +252,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func fall(_ item: Pegged) {
         guard isPresent, isRevealed, !item.flying, let screen = panel.screen,
               let card = cardFrame(for: item.id),
-              let image = item.thumb.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return }
+              let image = item.thumb?.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return }
         CaptureFlight.fall(image: image, card: card, tilt: CGFloat(item.tilt), on: screen)
     }
 
@@ -241,10 +261,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func cardFrame(for id: UUID) -> CGRect? {
         guard let index = line.items.firstIndex(where: { $0.id == id }) else { return nil }
         let width = panel.frame.width
-        let x = Layout.x(index: index, count: line.items.count, width: width)
+        let x = Layout.x(index: index, scrollOffset: line.scrollOffset)
         let viewTop = Layout.ropeY(x: x, width: width) - Layout.pinAbove
         let cardTop = viewTop + PeggedView.cardOffsetBelowTop
-        let size = PeggedView.cardSize(for: line.items[index].thumb.size)
+        let size = PeggedView.cardSize(for: line.items[index].thumb?.size ?? CGSize(width: 136, height: 104))
         return CGRect(x: panel.frame.minX + x - size.width / 2,
                       y: panel.frame.maxY - cardTop - size.height,
                       width: size.width, height: size.height)
@@ -439,8 +459,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     private func updateCapacity() {
-        let usable = panel.frame.width - 200
-        line.maxItems = max(3, min(12, Int(usable / Layout.spacing)))
+        line.setViewportWidth(panel.frame.width)
     }
 
     // MARK: Menu bar
@@ -477,6 +496,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         inbox.state = Inbox.isEnabled ? .on : .off
         inbox.toolTip = L("Screenshots hang instantly and skip the Desktop")
         menu.addItem(inbox)
+
+        let historyItem = NSMenuItem(title: L("Keep image history"), action: nil, keyEquivalent: "")
+        historyItem.toolTip = L("Expired clipboard copies are deleted; original screenshot files are kept")
+        let historyMenu = NSMenu()
+        let labels = [L("1 day"), L("3 days"), L("7 days"), L("15 days"), L("30 days")]
+        for (days, label) in zip(ImageHistory.dayChoices, labels) {
+            let option = ClosureMenuItem(label) { [weak self] in self?.line.setRetentionDays(days) }
+            option.state = line.retentionDays == days ? .on : .off
+            historyMenu.addItem(option)
+        }
+        historyItem.submenu = historyMenu
+        menu.addItem(historyItem)
 
         menu.addItem(ClosureMenuItem(L("Open screenshots folder")) { [weak self] in
             guard let self else { return }

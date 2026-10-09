@@ -83,6 +83,24 @@ Tendedero runs entirely on your Mac, and your screenshots never leave it.
 
 <br>
 
+## Image history
+
+New captures hang at the left, with older images to their right. When the line
+fills the screen, scroll over a card with the mouse wheel or trackpad, or use
+its horizontal slider. New captures bring the line back to the newest image.
+
+The menu's **Keep image history** option defaults to **30 days**, with choices
+of **1, 3, 7, 15 or 30 days**. Expired entries leave the line. Expired clipboard
+copies created inside the app's screenshots folder are deleted; original
+screenshots on the Desktop or in other folders are kept. Reducing the period
+applies immediately; cleanup also runs at launch and hourly while running.
+Only visible cards and a small buffer keep decoded thumbnails in memory.
+
+Synthetic history/layout tests: `bash scripts/test-history.sh`.
+See [history behavior and test coverage](docs/image-history.md).
+
+<br>
+
 ## Install
 
 Download the disk image from the [latest release](../../releases/latest),
