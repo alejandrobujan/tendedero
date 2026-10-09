@@ -28,6 +28,7 @@
 "Discard" = "Discard";
 "Take down" = "Take down";
 "Move to Trash" = "Move to Trash";
+"Move everything to the right to the Trash" = "Move everything to the right to the Trash";
 
 /* LineView */
 "Take a screenshot and it will hang here" = "Take a screenshot and it will hang here";

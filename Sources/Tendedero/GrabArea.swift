@@ -58,6 +58,11 @@ struct GrabArea: NSViewRepresentable {
                 menu.addItem(ClosureMenuItem(L("Take down")) { line.discard(id) })
                 menu.addItem(ClosureMenuItem(L("Move to Trash")) { line.trash(id) })
             }
+            let right = ClosureMenuItem(L("Move everything to the right to the Trash")) { line.trashRight(of: id) }
+            right.isEnabled = line.hasItemsRight(of: id)
+            menu.addItem(right)
+            // isEnabled only counts when the menu does not enable items itself.
+            menu.autoenablesItems = false
             return menu
         }
     }

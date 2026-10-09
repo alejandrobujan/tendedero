@@ -134,16 +134,16 @@ final class Line: ObservableObject {
     /// Moves the file to the Trash and takes the photo off the line. When a
     /// drag ends on the Dock's Trash, macOS only reports it: deleting the file
     /// is the source app's job, as Finder does.
-    func trash(_ id: UUID) {
+    func trash(_ id: UUID, quietly: Bool = false) {
         guard let item = items.first(where: { $0.id == id }) else { return }
         do {
             try FileManager.default.trashItem(at: item.url, resultingItemURL: nil)
             log.notice("Trashed \(item.url.lastPathComponent, privacy: .public)")
-            if soundOn { Line.trashSound?.play() }
+            if soundOn && !quietly { Line.trashSound?.play() }
             drop(id, quietly: true)
         } catch {
             log.error("Could not trash \(item.url.path, privacy: .public): \(error.localizedDescription, privacy: .public)")
-            NSSound.beep()
+            if !quietly { NSSound.beep() }
         }
     }
 
@@ -162,6 +162,24 @@ final class Line: ObservableObject {
     /// The corner cross and "Take down" both end up here.
     func discard(_ id: UUID) {
         if isInInbox(id) { trash(id) } else { drop(id) }
+    }
+
+    /// "Move everything to the right to the Trash", like closing a browser's
+    /// tabs to the right of one. New photos hang at the right end, so these
+    /// are the ones taken after it. A file the Trash refuses stays up.
+    func trashRight(of id: UUID) {
+        for (n, item) in itemsRight(of: id).enumerated() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.06 * Double(n)) { [weak self] in
+                self?.trash(item.id, quietly: n > 0)
+            }
+        }
+    }
+
+    func hasItemsRight(of id: UUID) -> Bool { !itemsRight(of: id).isEmpty }
+
+    private func itemsRight(of id: UUID) -> [Pegged] {
+        guard let i = items.firstIndex(where: { $0.id == id }) else { return [] }
+        return items[(i + 1)...].filter { !$0.falling }
     }
 
     /// Inbox mode: keep a screenshot by moving it to the Desktop.

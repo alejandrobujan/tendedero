@@ -26,6 +26,7 @@
 "Discard" = "丢弃";
 "Take down" = "取下";
 "Move to Trash" = "移到废纸篓";
+"Move everything to the right to the Trash" = "将右侧全部移到废纸篓";
 
 /* LineView */
 "Take a screenshot and it will hang here" = "截个图，它就会挂在这里";
