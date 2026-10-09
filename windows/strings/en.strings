@@ -1,0 +1,4 @@
+/* Windows overrides. Loaded after the macOS strings, so these keys win. */
+"Show in Finder" = "Show in File Explorer";
+"Move to Trash" = "Move to Recycle Bin";
+"Move Tendedero to the Applications folder and try again." = "Try again, or start Tendedero from its folder.";

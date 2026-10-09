@@ -1,0 +1,4 @@
+/* Windows 覆盖项。在 macOS 字符串之后加载，以这里为准。 */
+"Show in Finder" = "在文件资源管理器中显示";
+"Move to Trash" = "移到回收站";
+"Move Tendedero to the Applications folder and try again." = "请重试，或从 Tendedero 所在文件夹启动。";
