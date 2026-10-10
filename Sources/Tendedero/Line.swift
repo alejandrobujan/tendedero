@@ -62,8 +62,10 @@ final class Line: ObservableObject {
         var item = Pegged(url: url, thumb: thumb)
         item.flying = flying
         items.append(item)
-        // A full line lets the oldest photo fall off the far end.
-        while liveCount > maxItems, let oldest = items.first(where: { !$0.falling }) {
+        // A full line lets the oldest photo fall off the far end. Only one: a
+        // line hung on a wider screen keeps its length here instead of losing
+        // several photos to a single capture.
+        if liveCount > maxItems, let oldest = items.first(where: { !$0.falling }) {
             letGo(oldest.id)
         }
         save()
