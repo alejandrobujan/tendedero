@@ -3,6 +3,8 @@
   <img src="../images/zh-Hans/hero-light.png" alt="Tendedero。截图挂起来晾着。三张截图装在玻璃相框里，挂在 macOS 菜单栏下方的一根细绳上。">
 </picture>
 
+<h3 align="center"><a href="https://tendedero.app">在 tendedero.app 上直接用浏览器试用&nbsp;&rsaquo;</a></h3>
+
 <p align="center">
   免费开源。适用于 macOS 14 及以上。
   <br>

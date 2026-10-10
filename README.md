@@ -3,6 +3,8 @@
   <img src="docs/images/hero-light.png" alt="Tendedero. Screenshots, hung out to dry. Three screenshots in glass frames hang from a thin line under the macOS menu bar.">
 </picture>
 
+<h3 align="center"><a href="https://tendedero.app">Try it in your browser at tendedero.app&nbsp;&rsaquo;</a></h3>
+
 <p align="center">
   Free and open source. For macOS 14 and later.
   <br>
