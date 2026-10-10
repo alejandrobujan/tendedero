@@ -78,6 +78,8 @@ struct GrabArea: NSViewRepresentable {
 
 final class GrabView: NSView, NSDraggingSource {
     static var isDragging = false
+    /// A photo's menu is open. It reaches past the line, so the line waits.
+    static var isShowingMenu = false
 
     var url: URL?
     var dragImage: NSImage?
@@ -179,7 +181,10 @@ final class GrabView: NSView, NSDraggingSource {
     }
 
     override func rightMouseDown(with event: NSEvent) {
+        // The menu runs until it closes, and the line stays down meanwhile.
+        GrabView.isShowingMenu = true
         NSMenu.popUpContextMenu(menuProvider(), with: event, for: self)
+        GrabView.isShowingMenu = false
     }
 
     // MARK: NSDraggingSource

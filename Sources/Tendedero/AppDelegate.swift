@@ -517,7 +517,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let inside = NSMouseInRect(mouse, zone, false)
         if inside && pinned { pinned = false }
 
-        let busy = pinned || GrabView.isDragging || line.pressedID != nil || now < peekUntil
+        let busy = pinned || GrabView.isDragging || GrabView.isShowingMenu
+            || line.pressedID != nil || now < peekUntil
         if inside || busy {
             awaySince = nil
         } else {
