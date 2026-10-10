@@ -3,7 +3,7 @@
   <img src="../images/es/hero-light.png" alt="Tendedero. Tus capturas, tendidas. Tres capturas en marcos de cristal cuelgan de una cuerda fina bajo la barra de menús de macOS.">
 </picture>
 
-<h3 align="center"><a href="https://tendedero.app">Pruébala desde el navegador en tendedero.app&nbsp;&rsaquo;</a></h3>
+<h3 align="center"><a href="https://tendedero.app/?lang=es">Pruébala desde el navegador en tendedero.app&nbsp;&rsaquo;</a></h3>
 
 <p align="center">
   Gratis y de código abierto. Para macOS 14 o posterior.
