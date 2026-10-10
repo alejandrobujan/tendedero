@@ -10,7 +10,7 @@
   &nbsp;&nbsp;
   <a href="#从源码构建">从源码构建&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;简体中文&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;简体中文
   <br>
   <sub>本文译自英文 README。如有出入，以英文版为准。</sub>
 </p>
@@ -76,7 +76,7 @@ Tendedero 完全在你的 Mac 上运行，截图不会离开这台电脑。
 |:--|:--|
 | **兼容性** | macOS 14 Sonoma 及以上，Apple 芯片与 Intel 均支持。已针对 macOS 27 设计。 |
 | **体积** | 1.7 MB |
-| **语言** | 英语、西班牙语、简体中文、阿塞拜疆语 |
+| **语言** | 英语、西班牙语、简体中文、土耳其语、阿塞拜疆语 |
 | **技术栈** | Swift、AppKit 与 SwiftUI |
 | **网络访问** | 无 |
 | **价格** | 免费 |
