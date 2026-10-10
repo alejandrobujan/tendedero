@@ -760,15 +760,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(login)
 
         // The app never connects to anything, so it cannot tell when a new
-        // version is out; this opens the releases page instead.
+        // version is out. The website can: it is opened with this version
+        // and language, and says whether there is a newer one.
         menu.addItem(ClosureMenuItem(L("Check for Updates…")) {
-            NSWorkspace.shared.open(URL(string: "https://github.com/alejandrobujan/tendedero/releases/latest")!)
+            NSWorkspace.shared.open(AppDelegate.updatesURL)
         })
 
         menu.addItem(.separator())
         menu.addItem(ClosureMenuItem(L("Quit Tendedero"), key: "q") {
             NSApp.terminate(nil)
         })
+    }
+
+    /// tendedero.app with the running version, and the menus' language when
+    /// the website has it too, so the page answers in the same words.
+    private static var updatesURL: URL {
+        var components = URLComponents(string: "https://tendedero.app/")!
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+        var query = [URLQueryItem(name: "update", value: version)]
+        if let language = Bundle.main.preferredLocalizations.first, ["en", "es", "zh-Hans"].contains(language) {
+            query.append(URLQueryItem(name: "lang", value: language))
+        }
+        components.queryItems = query
+        return components.url!
     }
 
     private static func toggleLaunchAtLogin() {
