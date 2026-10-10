@@ -27,6 +27,7 @@ struct GrabArea: NSViewRepresentable {
     private func configure(_ view: GrabView) {
         let id = item.id
         let line = line
+        let isRecording = item.isRecording
         view.url = item.url
         view.dragImage = item.thumb
         view.onClick = { line.copy(id) }
@@ -40,12 +41,18 @@ struct GrabArea: NSViewRepresentable {
         view.onTrash = { line.trash(id) }
         view.onDiscard = { line.discard(id) }
         view.onLongPress = { line.markup(id) }
+        view.onForceClick = { line.quickLook(id) }
         view.onPressChange = { pressed in line.pressedID = pressed ? id : nil }
         view.menuProvider = {
             let menu = NSMenu()
+            // Items say themselves whether they can be used.
+            menu.autoenablesItems = false
             menu.addItem(ClosureMenuItem(L("Copy")) { line.copy(id) })
             menu.addItem(ClosureMenuItem(L("Open")) { line.open(id) })
-            menu.addItem(ClosureMenuItem(L("Markup")) { line.markup(id) })
+            menu.addItem(ClosureMenuItem(L("Quick Look")) { line.quickLook(id) })
+            if !isRecording {
+                menu.addItem(ClosureMenuItem(L("Markup")) { line.markup(id) })
+            }
             menu.addItem(ClosureMenuItem(L("Show in Finder")) { line.reveal(id) })
             let inInbox = line.isInInbox(id)
             if inInbox {
@@ -58,11 +65,12 @@ struct GrabArea: NSViewRepresentable {
                 menu.addItem(ClosureMenuItem(L("Take down")) { line.discard(id) })
                 menu.addItem(ClosureMenuItem(L("Move to Trash")) { line.trash(id) })
             }
-            let right = ClosureMenuItem(L("Move everything to the right to the Trash")) { line.trashRight(of: id) }
-            right.isEnabled = line.hasItemsRight(of: id)
+            let left = ClosureMenuItem(L("Take down everything to the left")) { line.takeDown(id, toTheLeft: true) }
+            left.isEnabled = !line.neighbours(of: id, toTheLeft: true).isEmpty
+            menu.addItem(left)
+            let right = ClosureMenuItem(L("Take down everything to the right")) { line.takeDown(id, toTheLeft: false) }
+            right.isEnabled = !line.neighbours(of: id, toTheLeft: false).isEmpty
             menu.addItem(right)
-            // isEnabled only counts when the menu does not enable items itself.
-            menu.autoenablesItems = false
             return menu
         }
     }
@@ -80,6 +88,7 @@ final class GrabView: NSView, NSDraggingSource {
     var onTrash: () -> Void = {}
     var onDiscard: () -> Void = {}
     var onLongPress: () -> Void = {}
+    var onForceClick: () -> Void = {}
     var onPressChange: (Bool) -> Void = { _ in }
     var menuProvider: () -> NSMenu = { NSMenu() }
 
@@ -129,6 +138,15 @@ final class GrabView: NSView, NSDraggingSource {
                 self.onLongPress()
             }
         }
+    }
+
+    /// A force click on a trackpad opens Quick Look, as it does in Finder.
+    /// It counts instead of the click and of a long press.
+    override func pressureChange(with event: NSEvent) {
+        guard event.stage == 2, downPoint != nil, !startedDrag, !didLongPress else { return }
+        didLongPress = true
+        endPress()
+        onForceClick()
     }
 
     private func endPress() {

@@ -1,0 +1,64 @@
+/* Turkish. */
+
+/* AppDelegate */
+"Let Tendedero handle your screenshots?" = "Ekran görüntülerini Tendedero yönetsin mi?";
+"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "Ekran görüntüleri, kayan küçük resim olmadan anında ipin üzerine asılacak ve Masaüstünüzde birikmeyecek. Saklamak için bir klasöre sürükleyin ya da çarpı ile silin. Bunu menü çubuğundan kapatabilirsiniz; Tendedero kapandığında ayarlarınız geri gelir.";
+"Turn on" = "Etkinleştir";
+"Not now" = "Şimdi değil";
+"Hide line" = "İpi gizle";
+"Show line" = "İpi göster";
+"Take everything down" = "Hepsini indir";
+"Handle screenshots" = "Ekran görüntülerini yönet";
+"Screenshots hang instantly and skip the Desktop" = "Ekran görüntüleri anında asılır ve Masaüstünü atlar";
+"Open screenshots folder" = "Ekran görüntüleri klasörünü aç";
+"Sounds" = "Sesler";
+"Open at login" = "Başlangıçta aç";
+"Check for Updates…" = "Güncellemeleri denetle…";
+"Quit Tendedero" = "Tendedero'yu kapat";
+"Could not change the login setting" = "Giriş ayarı değiştirilemedi";
+"Move Tendedero to the Applications folder and try again." = "Tendedero'yu Uygulamalar klasörüne taşıyın ve tekrar deneyin.";
+"Keep on line" = "İpte tut";
+"As many as fit" = "Sığdığı kadar";
+"%d photos" = "%d fotoğraf";
+"Also watch folders" = "Klasörleri de izle";
+"Add Folder…" = "Klasör ekle…";
+"Stop Watching" = "İzlemeyi durdur";
+"Watch" = "İzle";
+"New images saved to this folder will hang on the line." = "Bu klasöre kaydedilen yeni görseller ipe asılır.";
+"Shortcut" = "Kısayol";
+"Change Shortcut…" = "Kısayolu değiştir…";
+"Change Shortcut" = "Kısayolu değiştir";
+"None" = "Yok";
+"Space" = "Boşluk";
+"Press the new shortcut" = "Yeni kısayolu basın";
+"Escape cancels. Delete removes the shortcut." = "Escape iptal eder. Sil kısayolu kaldırır.";
+"Size" = "Boyut";
+"Small" = "Küçük";
+"Medium" = "Orta";
+"Large" = "Büyük";
+"Bring the line down" = "İpi indir";
+"When the pointer rests in the menu bar" = "İşaretçi menü çubuğunda durduğunda";
+"When something new hangs" = "Yeni bir şey asıldığında";
+"Over full screen apps" = "Tam ekran uygulamaların üzerinde";
+"Hang copied images" = "Kopyalanan görselleri as";
+"Images you copy hang on the line too" = "Kopyaladığınız görseller de ipe asılır";
+"Tendedero, hanging copied images" = "Tendedero, kopyalanan görselleri asıyor";
+
+/* GrabArea */
+"Copy" = "Kopyala";
+"Open" = "Aç";
+"Quick Look" = "Hızlı Bakış";
+"Markup" = "İşaretle";
+"Show in Finder" = "Finder'da göster";
+"Save to Desktop" = "Masaüstüne kaydet";
+"Discard" = "Sil";
+"Take down" = "İndir";
+"Move to Trash" = "Çöp Kutusu'na taşı";
+"Take down everything to the left" = "Soldakilerin hepsini indir";
+"Take down everything to the right" = "Sağdakilerin hepsini indir";
+
+/* LineView */
+"Take a screenshot and it will hang here" = "Bir ekran görüntüsü al, buraya asılacak";
+
+/* PeggedView */
+"Copied" = "Kopyalandı";

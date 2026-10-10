@@ -43,12 +43,13 @@ Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 | Click | Copy the image. |
 | Press and hold | Open it in Markup. |
 | Double click | Open it in Preview. |
+| Force click | Take a quick look. |
 | Drag into an app | Send a copy. It stays on the line. |
 | Drag into a folder | Keep it there. It leaves the line. |
 | Drag to the Trash, or click the cross | Let it go. |
 | Rest the pointer in the menu bar | Bring the line down on that screen. |
 | Click anything in the menu bar | Put it away. |
-| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Show or hide the line. |
+| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Show or hide the line. Change it under Shortcut in the menu bar. |
 
 <br>
 
@@ -58,7 +59,20 @@ Hand Tendedero your screenshots<sup>1</sup> and they skip the Desktop
 entirely. No floating thumbnail. No five-second wait. Each capture hangs
 the instant you take it, and only what you drag out is kept.
 
+Screen recordings hang there too, with a play button over them.
+Press and hold one to trim it.
+
 Same shortcuts. Same muscle memory. Just less mess.
+
+<br>
+
+## Copied images too.
+
+Take a screenshot with <kbd>⌃</kbd> held, or copy an image in Preview, and it
+hangs on the line like any other. Turn on Hang copied images in the menu bar
+and the shirt fills in while it is on. Only images: anything copied along
+with text or a file, and anything a password manager marks as private, is
+left alone.
 
 <br>
 
@@ -75,7 +89,7 @@ Tendedero runs entirely on your Mac, and your screenshots never leave it.
 |:--|:--|
 | **Compatibility** | macOS 14 Sonoma or later, on Apple silicon and Intel. Designed for macOS 27. |
 | **Size** | 1.7 MB |
-| **Languages** | English, Spanish, Chinese (Simplified) |
+| **Languages** | English, Spanish, Chinese (Simplified), Turkish, Azerbaijani |
 | **Built with** | Swift, AppKit and SwiftUI |
 | **Network access** | None |
 | **Price** | Free |
@@ -121,8 +135,10 @@ so macOS asks again for access to the Desktop after each rebuild.
 | `PeggedView.swift` | One photo: glass frame, clip, swing and breeze |
 | `GrabArea.swift` | Click, long press, drag and drop |
 | `ScreenshotWatcher.swift` | Notices new screenshots |
+| `ClipboardWatcher.swift` | Notices images copied to the clipboard |
 | `Inbox.swift` | Takes over screenshot settings and puts them back |
 | `Markup.swift` | Opens the system Markup editor and saves the result |
+| `Trim.swift` | Trims a screen recording and saves the result |
 | `FullScreen.swift` | Knows when to stay hidden |
 | `Line.swift` | What is hanging, and what you can do with it |
 

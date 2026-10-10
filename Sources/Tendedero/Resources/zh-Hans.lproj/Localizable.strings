@@ -13,20 +13,49 @@
 "Open screenshots folder" = "打开截图文件夹";
 "Sounds" = "声音";
 "Open at login" = "登录时打开";
+"Check for Updates…" = "检查更新…";
 "Quit Tendedero" = "退出 Tendedero";
 "Could not change the login setting" = "无法更改登录项设置";
 "Move Tendedero to the Applications folder and try again." = "请先把 Tendedero 移到「应用程序」文件夹，再试一次。";
+"Keep on line" = "绳上保留";
+"As many as fit" = "放得下的数量";
+"%d photos" = "%d 张";
+"Also watch folders" = "同时监视文件夹";
+"Add Folder…" = "添加文件夹…";
+"Stop Watching" = "停止监视";
+"Watch" = "监视";
+"New images saved to this folder will hang on the line." = "保存到此文件夹的新图片会挂到晾衣绳上。";
+"Shortcut" = "快捷键";
+"Change Shortcut…" = "更改快捷键…";
+"Change Shortcut" = "更改快捷键";
+"None" = "无";
+"Space" = "空格";
+"Press the new shortcut" = "请按下新的快捷键";
+"Escape cancels. Delete removes the shortcut." = "按 Esc 取消，按删除键移除快捷键。";
+"Size" = "大小";
+"Small" = "小";
+"Medium" = "中";
+"Large" = "大";
+"Bring the line down" = "放下晾衣绳";
+"When the pointer rests in the menu bar" = "指针停在菜单栏时";
+"When something new hangs" = "有新内容挂上时";
+"Over full screen apps" = "在全屏 App 上";
+"Hang copied images" = "挂上复制的图片";
+"Images you copy hang on the line too" = "复制的图片也会挂上绳";
+"Tendedero, hanging copied images" = "Tendedero，正在挂上复制的图片";
 
 /* GrabArea */
 "Copy" = "复制";
 "Open" = "打开";
+"Quick Look" = "快速查看";
 "Markup" = "标记";
 "Show in Finder" = "在访达中显示";
 "Save to Desktop" = "存储到桌面";
 "Discard" = "丢弃";
 "Take down" = "取下";
 "Move to Trash" = "移到废纸篓";
-"Move everything to the right to the Trash" = "将右侧全部移到废纸篓";
+"Take down everything to the left" = "取下左侧全部";
+"Take down everything to the right" = "取下右侧全部";
 
 /* LineView */
 "Take a screenshot and it will hang here" = "截个图，它就会挂在这里";

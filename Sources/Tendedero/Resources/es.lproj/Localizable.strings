@@ -13,20 +13,49 @@
 "Open screenshots folder" = "Abrir carpeta de capturas";
 "Sounds" = "Sonidos";
 "Open at login" = "Abrir al iniciar sesión";
+"Check for Updates…" = "Buscar actualizaciones…";
 "Quit Tendedero" = "Salir de Tendedero";
 "Could not change the login setting" = "No se pudo cambiar el inicio de sesión";
 "Move Tendedero to the Applications folder and try again." = "Mueve Tendedero a la carpeta Aplicaciones y vuelve a intentarlo.";
+"Keep on line" = "Guardar en la cuerda";
+"As many as fit" = "Las que quepan";
+"%d photos" = "%d fotos";
+"Also watch folders" = "Vigilar también carpetas";
+"Add Folder…" = "Añadir carpeta…";
+"Stop Watching" = "Dejar de vigilar";
+"Watch" = "Vigilar";
+"New images saved to this folder will hang on the line." = "Las imágenes nuevas que se guarden en esta carpeta se colgarán en la cuerda.";
+"Shortcut" = "Atajo";
+"Change Shortcut…" = "Cambiar atajo…";
+"Change Shortcut" = "Cambiar atajo";
+"None" = "Ninguno";
+"Space" = "Espacio";
+"Press the new shortcut" = "Pulsa el nuevo atajo";
+"Escape cancels. Delete removes the shortcut." = "Escape cancela. Borrar quita el atajo.";
+"Size" = "Tamaño";
+"Small" = "Pequeño";
+"Medium" = "Mediano";
+"Large" = "Grande";
+"Bring the line down" = "Bajar la cuerda";
+"When the pointer rests in the menu bar" = "Al dejar el puntero en la barra de menús";
+"When something new hangs" = "Cuando se cuelga algo nuevo";
+"Over full screen apps" = "Sobre apps a pantalla completa";
+"Hang copied images" = "Colgar imágenes copiadas";
+"Images you copy hang on the line too" = "Las imágenes que copias también se cuelgan";
+"Tendedero, hanging copied images" = "Tendedero, colgando imágenes copiadas";
 
 /* GrabArea */
 "Copy" = "Copiar";
 "Open" = "Abrir";
+"Quick Look" = "Vista Rápida";
 "Markup" = "Marcación";
 "Show in Finder" = "Mostrar en Finder";
 "Save to Desktop" = "Guardar en el Escritorio";
 "Discard" = "Descartar";
 "Take down" = "Descolgar";
 "Move to Trash" = "Mover a la Papelera";
-"Move everything to the right to the Trash" = "Mover a la Papelera todo lo de la derecha";
+"Take down everything to the left" = "Descolgar todo lo de la izquierda";
+"Take down everything to the right" = "Descolgar todo lo de la derecha";
 
 /* LineView */
 "Take a screenshot and it will hang here" = "Haz una captura y se quedará colgada aquí";

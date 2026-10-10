@@ -51,6 +51,10 @@ final class CaptureFlight {
 
     private static var current: [CaptureFlight] = []
 
+    /// Captures flying to the line right now. Each one holds a large image,
+    /// so in a burst of captures only a couple fly and the rest drop in.
+    static var flightsInProgress: Int { current.filter { !$0.falling }.count }
+
     /// - Parameters:
     ///   - from: the captured area, in screen coordinates.
     ///   - to: the card's frame on the line, in screen coordinates, unrotated.
@@ -89,7 +93,7 @@ final class CaptureFlight {
         window.hasShadow = false
         window.ignoresMouseEvents = true
         window.level = NSWindow.Level(rawValue: NSWindow.Level.floating.rawValue + 1)
-        window.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
+        window.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenAuxiliary]
 
         let host = NSView(frame: NSRect(origin: .zero, size: screen.frame.size))
         host.wantsLayer = true

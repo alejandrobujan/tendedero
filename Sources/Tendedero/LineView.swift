@@ -1,10 +1,31 @@
 import SwiftUI
 
 enum Layout {
-    static let panelHeight: CGFloat = 210
+    /// How big the photos hang, from Size in the menu bar. The clip, the rope
+    /// and the glass frame keep their size; the photos and the room they take
+    /// grow or shrink. Medium is the original size.
+    enum Size: String, CaseIterable {
+        case small, medium, large
+
+        var scale: CGFloat {
+            switch self {
+            case .small: 0.8
+            case .medium: 1
+            case .large: 1.35
+            }
+        }
+    }
+
+    static var size: Size {
+        get { Size(rawValue: UserDefaults.standard.string(forKey: "lineSize") ?? "") ?? .medium }
+        set { UserDefaults.standard.set(newValue.rawValue, forKey: "lineSize") }
+    }
+
+    static var photoMaxHeight: CGFloat { (104 * size.scale).rounded() }
+    static var cardWidth: CGFloat { (150 * size.scale).rounded() }
+    static var spacing: CGFloat { cardWidth + 24 }
+    static var panelHeight: CGFloat { photoMaxHeight + 106 }
     static let ropeTop: CGFloat = 10
-    static let spacing: CGFloat = 174
-    static let cardWidth: CGFloat = 150
     static let pinAbove: CGFloat = 9.5
 
     /// The rope hangs as a parabola from edge to edge of the screen.
@@ -16,9 +37,19 @@ enum Layout {
         return ropeTop + 4 * sag(width: width) * f * (1 - f)
     }
 
-    static func x(index: Int, count: Int, width: CGFloat) -> CGFloat {
-        let total = CGFloat(max(count - 1, 0)) * spacing
-        return width / 2 - total / 2 + CGFloat(index) * spacing
+    /// Photos hang `spacing` apart, centred. When there are more than the
+    /// `visible` that fit: with Keep on line set, they keep their spacing,
+    /// the newest stays where the last one would hang on a full line, and
+    /// `scroll` brings older ones in from the left. Otherwise (a line hung
+    /// on a wider screen) they move closer together so none is past the edge.
+    static func x(index: Int, count: Int, width: CGFloat, visible: Int, scroll: CGFloat) -> CGFloat {
+        if Line.keepOnLine != nil && count > visible {
+            let newest = width / 2 + CGFloat(visible - 1) * spacing / 2
+            return newest - CGFloat(count - 1 - index) * spacing + scroll
+        }
+        let gaps = CGFloat(max(count - 1, 0))
+        let step = gaps > 0 ? min(spacing, max(0, width - 200) / gaps) : spacing
+        return width / 2 - gaps * step / 2 + CGFloat(index) * step
     }
 }
 
@@ -38,10 +69,13 @@ struct LineView: View {
                 }
 
                 ForEach(Array(line.items.enumerated()), id: \.element.id) { index, item in
-                    let x = Layout.x(index: index, count: line.items.count, width: width)
+                    let x = Layout.x(index: index, count: line.items.count, width: width,
+                                     visible: line.visibleCount, scroll: line.scroll)
                     let ropeY = Layout.ropeY(x: x, width: width)
                     PeggedView(item: item, line: line)
                         .frame(width: Layout.cardWidth, height: Layout.panelHeight - ropeY, alignment: .top)
+                        // Photos scrolled towards an edge fade out before they reach it.
+                        .opacity(min(1, max(0, min(x, width - x) / 90)))
                         .position(x: x, y: ropeY - Layout.pinAbove + (Layout.panelHeight - ropeY) / 2)
                 }
             }

@@ -15,20 +15,49 @@
 "Open screenshots folder" = "Open screenshots folder";
 "Sounds" = "Sounds";
 "Open at login" = "Open at login";
+"Check for Updates…" = "Check for Updates…";
 "Quit Tendedero" = "Quit Tendedero";
 "Could not change the login setting" = "Could not change the login setting";
 "Move Tendedero to the Applications folder and try again." = "Move Tendedero to the Applications folder and try again.";
+"Keep on line" = "Keep on line";
+"As many as fit" = "As many as fit";
+"%d photos" = "%d photos";
+"Also watch folders" = "Also watch folders";
+"Add Folder…" = "Add Folder…";
+"Stop Watching" = "Stop Watching";
+"Watch" = "Watch";
+"New images saved to this folder will hang on the line." = "New images saved to this folder will hang on the line.";
+"Shortcut" = "Shortcut";
+"Change Shortcut…" = "Change Shortcut…";
+"Change Shortcut" = "Change Shortcut";
+"None" = "None";
+"Space" = "Space";
+"Press the new shortcut" = "Press the new shortcut";
+"Escape cancels. Delete removes the shortcut." = "Escape cancels. Delete removes the shortcut.";
+"Size" = "Size";
+"Small" = "Small";
+"Medium" = "Medium";
+"Large" = "Large";
+"Bring the line down" = "Bring the line down";
+"When the pointer rests in the menu bar" = "When the pointer rests in the menu bar";
+"When something new hangs" = "When something new hangs";
+"Over full screen apps" = "Over full screen apps";
+"Hang copied images" = "Hang copied images";
+"Images you copy hang on the line too" = "Images you copy hang on the line too";
+"Tendedero, hanging copied images" = "Tendedero, hanging copied images";
 
 /* GrabArea */
 "Copy" = "Copy";
 "Open" = "Open";
+"Quick Look" = "Quick Look";
 "Markup" = "Markup";
 "Show in Finder" = "Show in Finder";
 "Save to Desktop" = "Save to Desktop";
 "Discard" = "Discard";
 "Take down" = "Take down";
 "Move to Trash" = "Move to Trash";
-"Move everything to the right to the Trash" = "Move everything to the right to the Trash";
+"Take down everything to the left" = "Take down everything to the left";
+"Take down everything to the right" = "Take down everything to the right";
 
 /* LineView */
 "Take a screenshot and it will hang here" = "Take a screenshot and it will hang here";

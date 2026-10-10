@@ -36,7 +36,7 @@ struct PeggedView: View {
     /// The photo fits inside the card area keeping its proportions, so the
     /// white border hugs it whether the screenshot is wide or tall.
     static func photoSize(for size: CGSize) -> CGSize {
-        let maxW = Layout.cardWidth - 14, maxH: CGFloat = 104
+        let maxW = Layout.cardWidth - 14, maxH = Layout.photoMaxHeight
         guard size.width > 0, size.height > 0 else { return CGSize(width: maxW, height: maxH) }
         let scale = min(maxW / size.width, maxH / size.height)
         return CGSize(width: size.width * scale, height: size.height * scale)
@@ -65,6 +65,17 @@ struct PeggedView: View {
                 RoundedRectangle(cornerRadius: Frame.radius - Frame.inset, style: .continuous)
                     .strokeBorder(Color.white.opacity(0.18), lineWidth: 0.5)
             )
+            .overlay {
+                // A recording says so with a play button over its first frame.
+                if item.isRecording {
+                    Image(systemName: "play.fill")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.primary)
+                        .frame(width: 28, height: 28)
+                        .glassFrame(circle: true)
+                        .allowsHitTesting(false)
+                }
+            }
             .padding(Frame.inset)
             .glassFrame(cornerRadius: Frame.radius)
             .shadow(color: .black.opacity(hovering ? 0.26 : 0.18), radius: hovering ? 14 : 10, y: hovering ? 8 : 5)
@@ -74,8 +85,10 @@ struct PeggedView: View {
             .animation(pressed ? .easeInOut(duration: 0.45) : .spring(response: 0.3, dampingFraction: 0.6), value: pressed)
             .opacity(dragging ? 0.45 : 1)
             .overlay(alignment: .topLeading) {
-                // Drawn here, clicked through GrabView, which sits on top.
-                Image(systemName: "xmark")
+                // Drawn here, clicked through GrabView, which sits on top. A
+                // cross sends a file in Tendedero's folder to the Trash; for a
+                // file anywhere else it only hides it from the line.
+                Image(systemName: line.isInInbox(item.id) ? "xmark" : "eye.slash")
                     .font(.system(size: 8, weight: .bold))
                     .foregroundStyle(.primary)
                     .frame(width: 20, height: 20)
