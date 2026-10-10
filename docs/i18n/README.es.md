@@ -4,7 +4,7 @@
 </picture>
 
 <p align="center">
-  Gratis y de código abierto. Para macOS 14 o posterior.
+  Gratis y de código abierto. Para macOS 12 o posterior.
   <br>
   <a href="../../../../releases/latest">Descargar&nbsp;&rsaquo;</a>
   &nbsp;&nbsp;
@@ -75,7 +75,7 @@ Tendedero funciona solo en tu Mac, y tus capturas nunca salen de él.
 
 | | |
 |:--|:--|
-| **Compatibilidad** | macOS 14 Sonoma o posterior, en Mac con Apple silicon o Intel. Pensado para macOS 27. |
+| **Compatibilidad** | macOS 12 Monterey o posterior, en Mac con Apple silicon o Intel. Pensado para macOS 27. |
 | **Tamaño** | 1,7 MB |
 | **Idiomas** | Inglés, español, chino simplificado, turco y azerbaiyano |
 | **Hecho con** | Swift, AppKit y SwiftUI |
@@ -108,7 +108,7 @@ scripts/build-app.sh
 open build/Tendedero.app
 ```
 
-Solo necesitas las herramientas de Swift; Xcode es opcional. Si usas las
+Solo necesitas Swift 5.7 o posterior; Xcode es opcional. Si usas las
 Command Line Tools de macOS 27, el script tira del SDK de macOS 26 que se
 instala con ellas, porque el nuevo necesita un plugin de macros de SwiftUI que
 solo viene con Xcode. Las compilaciones locales se firman ad hoc, así que macOS

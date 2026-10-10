@@ -2,6 +2,7 @@ import SwiftUI
 
 /// One photo with its clothespin. All the charm lives here: it drops onto
 /// the line, swings, sways with the breeze and falls when you pull it off.
+@MainActor
 struct PeggedView: View {
     let item: Pegged
     @ObservedObject var line: Line
@@ -27,10 +28,10 @@ struct PeggedView: View {
         .opacity(item.falling || item.flying ? 0 : (arrived ? 1 : 0))
         .transaction { t in if item.falling { t.animation = nil } }
         .animation(.easeOut(duration: 0.16), value: item.flying)
-        .onAppear(perform: arrive)
-        .onChange(of: item.flying) { was, now in if was && !now { land() } }
-        .onChange(of: line.gust) { _, _ in breeze() }
-        .onChange(of: copied) { _, isCopied in if isCopied { nudge(3) } }
+        .onAppear { arrive() }
+        .onChange(of: item.flying) { now in if !now { land() } }
+        .onChange(of: line.gust) { _ in breeze() }
+        .onChange(of: copied) { isCopied in if isCopied { nudge(3) } }
     }
 
     /// The photo fits inside the card area keeping its proportions, so the
@@ -150,9 +151,7 @@ extension View {
     /// edge, lit from above. No refraction, so the background stays sharp
     /// around the frame instead of bending like gel.
     func glassFrame(cornerRadius: CGFloat = 0, circle: Bool = false, capsule: Bool = false) -> some View {
-        let shape: AnyShape = circle ? AnyShape(Circle())
-            : capsule ? AnyShape(Capsule())
-            : AnyShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        let shape = GlassShape(cornerRadius: cornerRadius, circle: circle, capsule: capsule)
         return background(.ultraThinMaterial, in: shape)
             .overlay(
                 shape.stroke(
@@ -195,5 +194,18 @@ struct Clothespin: View {
             }
             .shadow(color: .black.opacity(0.30), radius: 2, y: 1.5)
             .allowsHitTesting(false)
+    }
+}
+
+/// The three original frame paths without macOS 13's AnyShape.
+private struct GlassShape: Shape {
+    let cornerRadius: CGFloat
+    let circle: Bool
+    let capsule: Bool
+
+    func path(in rect: CGRect) -> Path {
+        if circle { return Circle().path(in: rect) }
+        if capsule { return Capsule().path(in: rect) }
+        return RoundedRectangle(cornerRadius: cornerRadius, style: .continuous).path(in: rect)
     }
 }

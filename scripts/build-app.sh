@@ -13,7 +13,7 @@ VERSION="1.0.0"
 # plugin they do not include. If the default SDK fails, fall back to the
 # newest macOS 26 SDK installed alongside it.
 build_arch() {
-  local triple="$1-apple-macosx14.0"
+  local triple="$1-apple-macosx12.0"
   if [ -z "${SDKROOT:-}" ] && ! swift build -c "$CONFIG" --triple "$triple" >&2; then
     FALLBACK="$(ls -d /Library/Developer/CommandLineTools/SDKs/MacOSX26*.sdk 2>/dev/null | sort -V | tail -1)"
     if [ -z "$FALLBACK" ]; then exit 1; fi
@@ -22,15 +22,18 @@ build_arch() {
   fi
   if [ -n "${SDKROOT:-}" ]; then swift build -c "$CONFIG" --triple "$triple" >&2; fi
   cp "$(swift build -c "$CONFIG" --triple "$triple" --show-bin-path)/Tendedero" "$OUT/Tendedero-$1"
+  swiftc -O -sdk "${SDKROOT:-$(xcrun --show-sdk-path)}" -target "$triple" \
+    scripts/login-helper.swift -o "$OUT/LoginHelper-$1"
 }
 
 # A universal binary, so it runs on Apple silicon and on Intel Macs, from
-# macOS 14 Sonoma onwards.
+# macOS 12 Monterey onwards.
 OUT="$(mktemp -d)"
 build_arch arm64
 build_arch x86_64
 lipo -create "$OUT/Tendedero-arm64" "$OUT/Tendedero-x86_64" -output "$OUT/Tendedero"
 BIN="$OUT/Tendedero"
+lipo -create "$OUT/LoginHelper-arm64" "$OUT/LoginHelper-x86_64" -output "$OUT/LoginHelper"
 
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
@@ -71,7 +74,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleVersion</key><string>1</string>
   <key>CFBundleDevelopmentRegion</key><string>en</string>
   <key>CFBundleLocalizations</key><array>${LANGUAGES}</array>
-  <key>LSMinimumSystemVersion</key><string>14.0</string>
+  <key>LSMinimumSystemVersion</key><string>12.0</string>
   <key>LSUIElement</key><true/>
   <key>NSHighResolutionCapable</key><true/>
   <key>NSDesktopFolderUsageDescription</key>
@@ -80,14 +83,34 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 </plist>
 PLIST
 
+# Monterey's supported login API requires an embedded helper app.
+HELPER="$APP/Contents/Library/LoginItems/TendederoLoginHelper.app"
+mkdir -p "$HELPER/Contents/MacOS"
+cp "$OUT/LoginHelper" "$HELPER/Contents/MacOS/LoginHelper"
+cat > "$HELPER/Contents/Info.plist" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>CFBundleIdentifier</key><string>app.tendedero.Tendedero.LoginHelper</string>
+<key>CFBundleName</key><string>Tendedero Login Helper</string>
+<key>CFBundleExecutable</key><string>LoginHelper</string>
+<key>CFBundlePackageType</key><string>APPL</string>
+<key>CFBundleVersion</key><string>1</string>
+<key>LSMinimumSystemVersion</key><string>12.0</string>
+<key>LSBackgroundOnly</key><true/>
+</dict></plist>
+PLIST
+
 # Sign with a Developer ID when one is in the keychain (or SIGN_IDENTITY is
 # set), with the hardened runtime and a secure timestamp that notarization
 # requires. Without one, sign ad hoc so the app still runs locally.
 IDENTITY="${SIGN_IDENTITY:-$(security find-identity -v -p codesigning 2>/dev/null | awk -F'"' '/Developer ID Application/{print $2; exit}')}"
 if [ -n "$IDENTITY" ]; then
+  codesign --force --options runtime --timestamp --sign "$IDENTITY" "$HELPER"
   codesign --force --options runtime --timestamp --sign "$IDENTITY" "$APP"
   echo "Signed with $IDENTITY"
 else
+  codesign --force --sign - "$HELPER" >/dev/null
   codesign --force --deep --sign - "$APP" >/dev/null
   echo "Signed ad hoc (no Developer ID found)"
 fi
