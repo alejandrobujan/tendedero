@@ -118,7 +118,25 @@ final class Line: ObservableObject {
 
     /// "Take everything down": every photo goes the way of its corner cross.
     func clear() {
+        takeDown(items.filter { !$0.falling })
+    }
+
+    /// The photos hung before (left) or after (right) this one.
+    func neighbours(of id: UUID, toTheLeft: Bool) -> [Pegged] {
         let live = items.filter { !$0.falling }
+        guard let i = live.firstIndex(where: { $0.id == id }) else { return [] }
+        return toTheLeft ? Array(live[..<i]) : Array(live[(i + 1)...])
+    }
+
+    /// Takes down everything on one side of a photo. Each one goes the way
+    /// of its own corner button: to the Trash from Tendedero's folder, and
+    /// only off the line from anywhere else.
+    func takeDown(_ id: UUID, toTheLeft: Bool) {
+        takeDown(neighbours(of: id, toTheLeft: toTheLeft))
+    }
+
+    /// One after another, and only the first makes a sound.
+    private func takeDown(_ live: [Pegged]) {
         for (n, item) in live.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.06 * Double(n)) { [weak self] in
                 self?.discard(item.id, quietly: n > 0)

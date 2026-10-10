@@ -56,6 +56,8 @@
 "Discard" = "At";
 "Take down" = "İpdən götür";
 "Move to Trash" = "Zibil qutusuna at";
+"Take down everything to the left" = "Soldakıların hamısını götür";
+"Take down everything to the right" = "Sağdakıların hamısını götür";
 
 /* LineView */
 "Take a screenshot and it will hang here" = "Ekran şəkli çəkin, burada asılacaq";

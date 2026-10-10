@@ -54,6 +54,8 @@
 "Discard" = "Sil";
 "Take down" = "İndir";
 "Move to Trash" = "Çöp Kutusu'na taşı";
+"Take down everything to the left" = "Soldakilerin hepsini indir";
+"Take down everything to the right" = "Sağdakilerin hepsini indir";
 
 /* LineView */
 "Take a screenshot and it will hang here" = "Bir ekran görüntüsü al, buraya asılacak";

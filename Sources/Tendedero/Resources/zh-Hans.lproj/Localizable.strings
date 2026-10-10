@@ -54,6 +54,8 @@
 "Discard" = "丢弃";
 "Take down" = "取下";
 "Move to Trash" = "移到废纸篓";
+"Take down everything to the left" = "取下左侧全部";
+"Take down everything to the right" = "取下右侧全部";
 
 /* LineView */
 "Take a screenshot and it will hang here" = "截个图，它就会挂在这里";

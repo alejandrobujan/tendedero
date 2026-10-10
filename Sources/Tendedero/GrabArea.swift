@@ -45,6 +45,8 @@ struct GrabArea: NSViewRepresentable {
         view.onPressChange = { pressed in line.pressedID = pressed ? id : nil }
         view.menuProvider = {
             let menu = NSMenu()
+            // Items say themselves whether they can be used.
+            menu.autoenablesItems = false
             menu.addItem(ClosureMenuItem(L("Copy")) { line.copy(id) })
             menu.addItem(ClosureMenuItem(L("Open")) { line.open(id) })
             menu.addItem(ClosureMenuItem(L("Quick Look")) { line.quickLook(id) })
@@ -63,6 +65,12 @@ struct GrabArea: NSViewRepresentable {
                 menu.addItem(ClosureMenuItem(L("Take down")) { line.discard(id) })
                 menu.addItem(ClosureMenuItem(L("Move to Trash")) { line.trash(id) })
             }
+            let left = ClosureMenuItem(L("Take down everything to the left")) { line.takeDown(id, toTheLeft: true) }
+            left.isEnabled = !line.neighbours(of: id, toTheLeft: true).isEmpty
+            menu.addItem(left)
+            let right = ClosureMenuItem(L("Take down everything to the right")) { line.takeDown(id, toTheLeft: false) }
+            right.isEnabled = !line.neighbours(of: id, toTheLeft: false).isEmpty
+            menu.addItem(right)
             return menu
         }
     }

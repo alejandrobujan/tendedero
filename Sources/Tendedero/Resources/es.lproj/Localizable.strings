@@ -54,6 +54,8 @@
 "Discard" = "Descartar";
 "Take down" = "Descolgar";
 "Move to Trash" = "Mover a la Papelera";
+"Take down everything to the left" = "Descolgar todo lo de la izquierda";
+"Take down everything to the right" = "Descolgar todo lo de la derecha";
 
 /* LineView */
 "Take a screenshot and it will hang here" = "Haz una captura y se quedará colgada aquí";
