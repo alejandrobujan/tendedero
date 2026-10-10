@@ -9,7 +9,7 @@ final class ScreenshotWatcher {
     /// extended attribute. In a dedicated folder, any image counts.
     private let onlyTaggedScreenshots: Bool
     /// Screen recordings carry no tag, so they are only picked up in
-    /// Tendedero's own folder, where nothing else is saved.
+    /// the selected capture folder, including a custom destination.
     private let acceptsRecordings: Bool
     private var known: Set<String>?
     private var source: DispatchSourceFileSystemObject?

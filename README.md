@@ -57,9 +57,24 @@ Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 
 ## Your Desktop. Finally clear.
 
-Hand Tendedero your screenshots<sup>1</sup> and they skip the Desktop
+Use Tendedero's default temporary folder<sup>1</sup> and screenshots skip the Desktop
 entirely. No floating thumbnail. No five-second wait. Each capture hangs
 the instant you take it, and only what you drag out is kept.
+
+Want to keep every capture in a work, research or teaching folder instead?
+Choose **Screenshot location → Choose Folder…** in the menu bar, then turn
+on **Handle screenshots**. New screenshots and recordings save there
+automatically and hang at once. Copied images save there too when **Hang
+copied images** is on. Selecting a folder while handling is off only saves
+your choice; it does not change the system's screenshot destination.
+
+The **Default temporary folder** keeps the current behavior: captures that
+leave the line through its cross, clearing or capacity limit go to the
+Trash. In a custom folder, those actions only take the pictures off the
+line; their files stay put. **Move to Trash** and dragging to the Trash
+still discard a file explicitly. Choose a custom folder outside the default
+temporary folder. Changing location affects new captures; existing files
+are not moved, and old default-folder captures remain temporary.
 
 Screen recordings hang there too, with a play button over them.
 Press and hold one to trim it.
@@ -158,7 +173,7 @@ language. `swift scripts/check-strings.swift` checks that none is missing.
 ---
 
 <sub>
-1. On first launch, Tendedero offers to handle your screenshots. If you accept, it turns off the floating thumbnail and saves new screenshots to its own folder, two settings also found under Options in Cmd+Shift+5. Your previous settings are saved and restored when Tendedero quits or the option is turned off from the menu bar. Tendedero hides automatically while an app is in full screen.
+1. On first launch, Tendedero offers to handle your screenshots. If you accept, it turns off the floating thumbnail and saves new screenshots to the selected folder (its own temporary folder by default), two settings also found under Options in Cmd+Shift+5. Your previous settings are saved and restored when Tendedero quits or the option is turned off from the menu bar, including after switching folders. Tendedero hides automatically while an app is in full screen.
 </sub>
 
 <br>
