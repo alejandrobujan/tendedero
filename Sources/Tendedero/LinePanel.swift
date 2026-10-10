@@ -21,6 +21,17 @@ final class LinePanel: NSPanel {
         contentView = content
     }
 
+    /// Two-finger swipes and the scroll wheel, for moving along a long line.
+    var onScroll: ((NSEvent) -> Void)?
+
+    override func sendEvent(_ event: NSEvent) {
+        if event.type == .scrollWheel, let onScroll {
+            onScroll(event)
+        } else {
+            super.sendEvent(event)
+        }
+    }
+
     override var canBecomeKey: Bool { false }
     override var canBecomeMain: Bool { false }
 

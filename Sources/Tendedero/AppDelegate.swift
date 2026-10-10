@@ -83,6 +83,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         Markup.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         Trim.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
+        panel.onScroll = { [weak self] event in
+            // Sideways on a trackpad, or the wheel of a mouse.
+            let delta = abs(event.scrollingDeltaX) >= abs(event.scrollingDeltaY)
+                ? event.scrollingDeltaX : event.scrollingDeltaY
+            self?.line.scroll(by: event.hasPreciseScrollingDeltas ? delta : delta * 12)
+        }
         line.onFall = { [weak self] item in self?.fall(item) }
 
         line.$items
@@ -325,7 +331,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func cardFrame(for id: UUID) -> CGRect? {
         guard let index = line.items.firstIndex(where: { $0.id == id }) else { return nil }
         let width = panel.frame.width
-        let x = Layout.x(index: index, count: line.items.count, width: width)
+        let x = Layout.x(index: index, count: line.items.count, width: width,
+                         visible: line.visibleCount, scroll: line.scroll)
         let viewTop = Layout.ropeY(x: x, width: width) - Layout.pinAbove
         let cardTop = viewTop + PeggedView.cardOffsetBelowTop
         let size = PeggedView.cardSize(for: line.items[index].thumb.size)
@@ -379,6 +386,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard on != isRevealed else { return }
         isRevealed = on
         line.revealed = on
+        // It always comes down showing the newest.
+        if on { line.scroll = 0 }
         // Tucked away, the line leaves no window behind: an invisible strip
         // over the top of the screen would still sit above other apps for
         // anything that checks what is on top, like screen automation.
@@ -528,7 +537,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard !GrabView.isDragging else { return }
         let local = panel.convertPoint(fromScreen: mouse)
         let flipped = CGPoint(x: local.x, y: panel.frame.height - local.y)
-        let overPhoto = line.hitRects.values.contains { $0.insetBy(dx: -4, dy: -4).contains(flipped) }
+        var overPhoto = line.hitRects.values.contains { $0.insetBy(dx: -4, dy: -4).contains(flipped) }
+        // A line longer than the screen also takes the band the photos hang
+        // in, gaps included, so a swipe anywhere along it moves it.
+        if !overPhoto, line.items.count > line.visibleCount, Line.keepOnLine != nil {
+            let band = line.hitRects.values.reduce(CGRect.null) { $0.union($1) }
+            overPhoto = !band.isNull && flipped.y >= band.minY - 4 && flipped.y <= band.maxY + 4
+        }
         if panel.ignoresMouseEvents == overPhoto {
             panel.ignoresMouseEvents = !overPhoto
         }
@@ -562,6 +577,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
     }
 
+    private func setKeep(_ n: Int?) {
+        guard n != Line.keepOnLine else { return }
+        Line.keepOnLine = n
+        updateCapacity()
+        line.trim()
+    }
+
     private func setSize(_ size: Layout.Size) {
         guard size != Layout.size else { return }
         Layout.size = size
@@ -572,7 +594,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func updateCapacity() {
         let usable = panel.frame.width - 200
-        line.maxItems = max(3, min(12, Int(usable / Layout.spacing)))
+        let fits = max(3, min(12, Int(usable / Layout.spacing)))
+        line.visibleCount = fits
+        line.maxItems = max(fits, Line.keepOnLine ?? fits)
     }
 
     // MARK: Menu bar
@@ -681,6 +705,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         folderItem.submenu = folderMenu
         menu.addItem(folderItem)
+
+        let keepItem = NSMenuItem(title: L("Keep on line"), action: nil, keyEquivalent: "")
+        let keeps = NSMenu()
+        let fit = ClosureMenuItem(L("As many as fit")) { [weak self] in self?.setKeep(nil) }
+        fit.state = Line.keepOnLine == nil ? .on : .off
+        keeps.addItem(fit)
+        for n in Line.keepChoices {
+            let item = ClosureMenuItem(String(format: L("%d photos"), n)) { [weak self] in self?.setKeep(n) }
+            item.state = Line.keepOnLine == n ? .on : .off
+            keeps.addItem(item)
+        }
+        keepItem.submenu = keeps
+        menu.addItem(keepItem)
 
         let sizeItem = NSMenuItem(title: L("Size"), action: nil, keyEquivalent: "")
         let sizes = NSMenu()

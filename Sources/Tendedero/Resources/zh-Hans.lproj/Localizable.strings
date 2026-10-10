@@ -17,6 +17,9 @@
 "Quit Tendedero" = "退出 Tendedero";
 "Could not change the login setting" = "无法更改登录项设置";
 "Move Tendedero to the Applications folder and try again." = "请先把 Tendedero 移到「应用程序」文件夹，再试一次。";
+"Keep on line" = "绳上保留";
+"As many as fit" = "放得下的数量";
+"%d photos" = "%d 张";
 "Also watch folders" = "同时监视文件夹";
 "Add Folder…" = "添加文件夹…";
 "Stop Watching" = "停止监视";

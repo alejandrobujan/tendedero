@@ -40,6 +40,23 @@ final class Line: ObservableObject {
     var hitRects: [UUID: CGRect] = [:]
 
     var maxItems = 8
+    /// How many photos fit across the screen. With Keep on line set, the
+    /// line can hold more, and the rest are reached by scrolling.
+    var visibleCount = 8
+    /// How far the line is scrolled towards older photos, in points; 0 shows
+    /// the newest.
+    @Published var scroll: CGFloat = 0
+
+    /// Keep on line, from the menu bar: how many photos the line keeps, or
+    /// nil for as many as fit across the screen.
+    nonisolated static let keepChoices = [25, 50, 100]
+    nonisolated static var keepOnLine: Int? {
+        get {
+            let n = UserDefaults.standard.integer(forKey: "keepOnLine")
+            return keepChoices.contains(n) ? n : nil
+        }
+        set { UserDefaults.standard.set(newValue ?? 0, forKey: "keepOnLine") }
+    }
 
 
     var soundOn: Bool {
@@ -65,6 +82,7 @@ final class Line: ObservableObject {
         var item = Pegged(url: url, thumb: thumb)
         item.flying = flying
         items.append(item)
+        scroll = 0
         // A full line lets the oldest photo fall off the far end. Only one: a
         // line hung on a wider screen keeps its length here instead of losing
         // several photos to a single capture.
@@ -177,6 +195,22 @@ final class Line: ObservableObject {
     /// The oldest photo falling off a full line. Like the cross, a file from
     /// Tendedero's folder goes to the Trash, or nothing would ever take it out
     /// of that folder. If the Trash refuses it, it still leaves the line.
+    /// Moves along a line that holds more than fit, from a scroll gesture.
+    func scroll(by delta: CGFloat) {
+        let most = CGFloat(max(0, items.count - visibleCount)) * Layout.spacing
+        let next = min(most, max(0, scroll + delta))
+        if next != scroll { scroll = next }
+    }
+
+    /// After Keep on line is lowered, the oldest photos past it go the way
+    /// of a full line.
+    func trim() {
+        while liveCount > maxItems, let oldest = items.first(where: { !$0.falling }) {
+            letGo(oldest.id)
+        }
+        scroll = 0
+    }
+
     private func letGo(_ id: UUID) {
         if isInInbox(id), trash(id, quietly: true) { return }
         drop(id, quietly: true)
