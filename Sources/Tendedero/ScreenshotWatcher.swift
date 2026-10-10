@@ -11,7 +11,9 @@ final class ScreenshotWatcher {
     private var known = Set<String>()
     private var source: DispatchSourceFileSystemObject?
     private var pending: DispatchWorkItem?
-    private let onNew: (URL) -> Void
+    private var retryCounts: [String: Int] = [:]
+    private var incompleteSources: [String: DispatchSourceFileSystemObject] = [:]
+    private let onNew: (URL) -> Bool
     private let onChange: () -> Void
 
     private static let imageExtensions: Set<String> = ["png", "jpg", "jpeg", "heic", "tif", "tiff", "gif", "webp"]
@@ -19,7 +21,7 @@ final class ScreenshotWatcher {
     static let desktop = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
 
     /// Watches the folder macOS saves screenshots to, or a given folder.
-    init(folder: URL? = nil, onNew: @escaping (URL) -> Void, onChange: @escaping () -> Void) {
+    init(folder: URL? = nil, onNew: @escaping (URL) -> Bool, onChange: @escaping () -> Void) {
         self.onNew = onNew
         self.onChange = onChange
         self.folder = folder ?? Self.screenshotFolder()
@@ -48,12 +50,10 @@ final class ScreenshotWatcher {
     private let launchDate = Date()
 
     func start() {
-        let files = listing()
-        known = Set(files.filter { creationDate($0) < launchDate }.map(\.path))
-        for url in files where !known.contains(url.path) && isCandidate(url) {
-            onNew(url)
-        }
-        known = Set(files.map(\.path))
+        guard source == nil else { return }
+        stop()
+        known = []
+        retryCounts = [:]
         let fd = open(folder.path, O_EVTONLY)
         guard fd >= 0 else {
             NSLog("Tendedero: cannot watch \(folder.path)")
@@ -65,15 +65,44 @@ final class ScreenshotWatcher {
         src.setCancelHandler { close(fd) }
         src.resume()
         source = src
+        // Watch before listing, so a capture arriving during startup still
+        // generates an event rather than falling into the listing/open gap.
+        if let files = listing() {
+            known = Set(files.filter { creationDate($0) < launchDate }.map(\.path))
+        }
+        scan()
     }
 
     func stop() {
         pending?.cancel()
+        pending = nil
         source?.cancel()
         source = nil
+        for incomplete in incompleteSources.values { incomplete.cancel() }
+        incompleteSources = [:]
     }
 
-    private func scheduleScan() {
+    deinit { stop() }
+
+    private func watchIncomplete(_ url: URL) {
+        guard incompleteSources[url.path] == nil else { return }
+        let fd = open(url.path, O_EVTONLY)
+        guard fd >= 0 else { return }
+        let incomplete = DispatchSource.makeFileSystemObjectSource(
+            fileDescriptor: fd, eventMask: [.write, .rename, .delete], queue: .main)
+        incomplete.setEventHandler { [weak self] in
+            guard let self else { return }
+            self.incompleteSources.removeValue(forKey: url.path)?.cancel()
+            self.scheduleScan()
+        }
+        incomplete.setCancelHandler { close(fd) }
+        incompleteSources[url.path] = incomplete
+        incomplete.resume()
+    }
+
+    private func scheduleScan(resetRetries: Bool = true) {
+        guard source != nil else { return }
+        if resetRetries { retryCounts = [:] }
         pending?.cancel()
         let work = DispatchWorkItem { [weak self] in self?.scan() }
         pending = work
@@ -82,17 +111,40 @@ final class ScreenshotWatcher {
     }
 
     private func scan() {
-        let files = listing()
-        for url in files where !known.contains(url.path) && isCandidate(url) {
-            onNew(url)
+        guard source != nil else { return }
+        guard let files = listing() else { return }
+        let paths = Set(files.map(\.path))
+        known.formIntersection(paths)
+        retryCounts = retryCounts.filter { paths.contains($0.key) }
+        for path in incompleteSources.keys.filter({ !paths.contains($0) }) {
+            incompleteSources.removeValue(forKey: path)?.cancel()
         }
-        known = Set(files.map(\.path))
+        var needsRetry = false
+        for url in files where !known.contains(url.path) {
+            if !isCandidate(url) || (retryCounts[url.path] ?? 0) >= 10 { continue }
+            if onNew(url) {
+                known.insert(url.path)
+                retryCounts[url.path] = nil
+                incompleteSources.removeValue(forKey: url.path)?.cancel()
+            } else {
+                // Updating an existing file does not necessarily notify the
+                // directory watcher. Watch rejected files themselves as well.
+                watchIncomplete(url)
+                // A file may exist before it can be decoded. Do not mark it
+                // handled until the line actually accepted it. Bound retries
+                // for a damaged image; a later file event starts another try.
+                let attempts = (retryCounts[url.path] ?? 0) + 1
+                retryCounts[url.path] = attempts
+                if attempts < 10 { needsRetry = true }
+            }
+        }
         onChange()
+        if needsRetry { scheduleScan(resetRetries: false) }
     }
 
-    private func listing() -> [URL] {
-        let urls = (try? FileManager.default.contentsOfDirectory(
-            at: folder, includingPropertiesForKeys: [.creationDateKey], options: [.skipsHiddenFiles])) ?? []
+    private func listing() -> [URL]? {
+        guard let urls = try? FileManager.default.contentsOfDirectory(
+            at: folder, includingPropertiesForKeys: [.creationDateKey], options: [.skipsHiddenFiles]) else { return nil }
         return urls.sorted { creationDate($0) < creationDate($1) }
     }
 
