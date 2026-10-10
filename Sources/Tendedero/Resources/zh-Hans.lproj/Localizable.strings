@@ -1,34 +1,62 @@
-/* Chinese (Simplified). */
+// Run swift scripts/check-strings.swift after changing these translations.
 
-/* AppDelegate */
-"Let Tendedero handle your screenshots?" = "让 Tendedero 接管你的截图？";
-"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "你截图的那一瞬间，图片就会挂到晾衣绳上——没有浮动缩略图，也不会堆到桌面上。拖进文件夹即保留，点叉即丢弃。随时可以从菜单栏关掉，退出 Tendedero 后你的设置会自动还原。";
-"Turn on" = "开启";
-"Not now" = "以后再说";
-"Hide line" = "隐藏晾衣绳";
-"Show line" = "显示晾衣绳";
-"Take everything down" = "全部取下";
-"Handle screenshots" = "接管截图";
-"Screenshots hang instantly and skip the Desktop" = "截图即刻挂上，不再经过桌面";
-"Open screenshots folder" = "打开截图文件夹";
-"Sounds" = "声音";
-"Open at login" = "登录时打开";
-"Quit Tendedero" = "退出 Tendedero";
-"Could not change the login setting" = "无法更改登录项设置";
-"Move Tendedero to the Applications folder and try again." = "请先把 Tendedero 移到「应用程序」文件夹，再试一次。";
-
-/* GrabArea */
-"Copy" = "复制";
-"Open" = "打开";
-"Markup" = "标记";
-"Show in Finder" = "在访达中显示";
-"Save to Desktop" = "存储到桌面";
-"Discard" = "丢弃";
-"Take down" = "取下";
-"Move to Trash" = "移到废纸篓";
-
-/* LineView */
-"Take a screenshot and it will hang here" = "截个图，它就会挂在这里";
-
-/* PeggedView */
+"AirDrop" = "隔空投送";
+"Annotate" = "标注";
+"Arrow" = "箭头";
+"Auto-clean after 7 days" = "7 天后自动清理";
+"Black" = "黑色";
+"Blue" = "蓝色";
+"Blur" = "模糊";
 "Copied" = "已复制";
+"Copy" = "复制";
+"Copy an image anywhere, then hang it here" = "在任何地方复制图片后，从这里挂上";
+"Could not change the login setting" = "无法更改登录项设置";
+"Discard" = "丢弃";
+"Discard changes" = "放弃修改";
+"Done" = "完成";
+"Drag to move   ·   Drag the handles to resize   ·   ⌫ Delete   ·   ←↑↓→ Nudge   ·   ⌘D Duplicate   ·   Double-click text to edit" = "拖动移动   ·   拖动手柄缩放   ·   ⌫ 删除   ·   ←↑↓→ 微调   ·   ⌘D 复制   ·   双击文字可修改";
+"Ellipse" = "圆形";
+"Empty screenshots folder (%@)" = "清空截图文件夹（%@）";
+"Esc or click outside  Finish   ·   ⏎ New line   ·   ⌘Z Undo typing   ·   Size and color apply as you type" = "Esc 或点击空白处  完成输入   ·   ⏎ 换行   ·   ⌘Z 撤销输入   ·   字号和颜色可边打边改";
+"Green" = "绿色";
+"Handle screenshots" = "接管截图";
+"Hang clipboard image" = "挂剪贴板里的图";
+"Hide line" = "隐藏晾衣绳";
+"Let Tendedero handle your screenshots?" = "让 Tendedero 接管你的截图？";
+"Line width" = "线条粗细";
+"Mosaic" = "马赛克";
+"Move Tendedero to the Applications folder and try again." = "请先把 Tendedero 移到「应用程序」文件夹，再试一次。";
+"Move to Trash" = "移到废纸篓";
+"Moves everything in it to the Trash" = "把里面所有内容移到废纸篓";
+"Moves screenshots in that folder to the Trash once they are 7 days old" = "该文件夹里的截图满 7 天后移到废纸篓";
+"Not now" = "以后再说";
+"Open" = "打开";
+"Open at login" = "登录时打开";
+"Open screenshots folder" = "打开截图文件夹";
+"Pen" = "画笔";
+"Press Esc again to discard your changes" = "再按一次 Esc 放弃修改";
+"Quit Tendedero" = "退出 Tendedero";
+"Rectangle" = "矩形";
+"Red" = "红色";
+"Redo" = "重做";
+"Save to Desktop" = "存储到桌面";
+"Save to the file" = "保存到原文件";
+"Screenshots hang instantly and skip the Desktop" = "截图即刻挂上，不再经过桌面";
+"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "你截图的那一瞬间，图片就会挂到晾衣绳上——没有浮动缩略图，也不会堆到桌面上。拖进文件夹即保留，点叉即丢弃。随时可以从菜单栏关掉，退出 Tendedero 后你的设置会自动还原。";
+"Select and move" = "选择/移动";
+"Share…" = "分享…";
+"Show in Finder" = "在访达中显示";
+"Show line" = "显示晾衣绳";
+"Sounds" = "声音";
+"Take a screenshot and it will hang here" = "截个图，它就会挂在这里";
+"Take down" = "取下";
+"Take everything down" = "全部取下";
+"Text" = "文字";
+"Text box" = "文本框";
+"Text size" = "文字大小";
+"Turn on" = "开启";
+"Type…" = "输入文字…";
+"Undo" = "撤销";
+"White" = "白色";
+"Yellow" = "黄色";
+"⏎ Done   ·   Esc Cancel   ·   ⌘Z Undo   ·   V Select   ·   1–8 Tools   ·   [ ] Size   ·   ⇧ Straight / square / circle   ·   Pinch or ⌘± Zoom   ·   Space-drag Pan" = "⏎ 完成   ·   Esc 取消   ·   ⌘Z 撤销   ·   V 选择   ·   1–8 切换工具   ·   [ ] 粗细/字号   ·   ⇧ 水平/正方形/正圆   ·   双指捏合或 ⌘± 缩放   ·   空格+拖动 平移";

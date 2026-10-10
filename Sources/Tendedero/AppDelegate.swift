@@ -18,6 +18,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var hotKey: HotKey?
     private var cancellables = Set<AnyCancellable>()
     private var mouseTimer: Timer?
+    private var cleanTimer: Timer?
 
     /// Whether the panel is ordered in. It can be in and still tucked away
     /// above the top edge, like an auto-hiding Dock.
@@ -45,6 +46,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var pendingScreen: NSScreen?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Advertises "Hang in Tendedero" inside every app's Services menu:
+        // right-click a file in the Finder and it lands on the line.
+        NSRegisterServicesProvider(self, "Tendedero")
         let host = NSHostingView(rootView: LineView(line: line))
         host.sizingOptions = []
         panel = LinePanel(content: host)
@@ -55,6 +59,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         restoreSettingsOnTermination()
         startWatcher()
 
+        // Old inbox screenshots are recycled once a day, and once shortly
+        // after launch so a Mac that is often restarted still gets cleaned.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in self?.autoClean() }
+        let cleaner = Timer(timeInterval: 86400, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated { self?.autoClean() }
+        }
+        RunLoop.main.add(cleaner, forMode: .common)
+        cleanTimer = cleaner
+
         hotKey = HotKey(keyCode: kVK_ANSI_T, modifiers: controlKey | optionKey) { [weak self] in
             self?.toggle()
         }
@@ -62,7 +75,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         setUpStatusItem()
         watchMenuBarClicks()
 
-        Markup.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
+        Annotate.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         line.onFall = { [weak self] item in self?.fall(item) }
 
         line.$items
@@ -143,13 +156,39 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         startWatcher()
     }
 
+    // MARK: Reclaiming space
+
+    /// Recycles inbox screenshots older than seven days, while the toggle
+    /// is on. The Trash is the safety net: nothing is erased permanently.
+    private func autoClean() {
+        let days = Inbox.autoCleanDays
+        guard days > 0 else { return }
+        let trashed = Inbox.clean(olderThan: days)
+        if trashed > 0 {
+            log.notice("Auto-clean moved \(trashed, privacy: .public) old screenshot(s) to the Trash")
+            line.prune()
+        }
+    }
+
+    private func toggleAutoClean() {
+        Inbox.autoCleanDays = Inbox.autoCleanDays > 0 ? 0 : 7
+        autoClean()
+    }
+
+    private func emptyInbox() {
+        let trashed = Inbox.empty()
+        if trashed > 0 {
+            log.notice("Emptied the screenshots folder: \(trashed, privacy: .public) item(s) to the Trash")
+        }
+        line.prune()
+    }
+
     /// Asked once. Changing system settings is the user's call, never ours.
     private func offerInbox() {
         Inbox.wasOffered = true
         let alert = NSAlert()
         alert.messageText = L("Let Tendedero handle your screenshots?")
-        alert.informativeText = L(
-            "Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits.")
+        alert.informativeText = L("Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits.")
         alert.addButton(withTitle: L("Turn on"))
         alert.addButton(withTitle: L("Not now"))
         if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
@@ -261,7 +300,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             dismiss()
         }
         // The cursor is watched while there is a line, even tucked away,
-        // to notice it pushing against the top edge.
+        // to notice the pointer hovering over the status item.
         if wanted { startMouseTracking() } else { stopMouseTracking() }
     }
 
@@ -334,7 +373,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         panel.ignoresMouseEvents = true
     }
 
-    /// How long the cursor rests against the top edge before the line comes
+    /// How long the cursor rests on the status item before the line comes
     /// down. Short enough to feel instant, long enough that a quick trip to
     /// the menu bar does not trigger it.
     private static let revealDelay: TimeInterval = 0.25
@@ -345,6 +384,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         var h = screen.frame.maxY - screen.visibleFrame.maxY
         if h < 1 { h = max(NSStatusBar.system.thickness, screen.safeAreaInsets.top) }
         return NSRect(x: screen.frame.minX, y: screen.frame.maxY - h, width: screen.frame.width, height: h)
+    }
+
+    /// Convert the button's current bounds so moving the menu bar icon also
+    /// moves its hover target.
+    private func isOverStatusItem(_ point: NSPoint) -> Bool {
+        guard let button = statusItem?.button, let window = button.window,
+              window.isVisible, !button.isHidden else { return false }
+        let frame = window.convertToScreen(button.convert(button.bounds, to: nil))
+        return frame.contains(point)
     }
 
     /// A click anywhere in the top bar of any screen, a menu or an icon, puts the line away.
@@ -375,16 +423,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func tick() {
         let mouse = NSEvent.mouseLocation
         let now = Date()
+        let overStatusItem = isOverStatusItem(mouse)
 
         let screenUnderPointer = NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) }
         let inMenuBar = screenUnderPointer.map { NSMouseInRect(mouse, Self.menuBarBand(of: $0), false) } ?? false
         if !inMenuBar { menuBarSuppressed = false }
 
+        // The annotate editor covers the screen: the line stays tucked away
+        // underneath it, and hovering over the status item does not bring it
+        // down over the image being marked up.
+        if Annotate.shared.isOpen {
+            hotZoneSince = nil
+            awaySince = nil
+            if isRevealed { setRevealed(false) }
+            return
+        }
+
         guard isRevealed else {
-            // Resting in the menu bar brings the line down on that screen.
-            // Pushing against the top edge is part of it, and it also works
-            // when another display sits above and the pointer never stops.
-            if let screen = screenUnderPointer, inMenuBar, !menuBarSuppressed,
+            // The status item's current position is the only hover trigger.
+            if let screen = screenUnderPointer,
+               overStatusItem, !menuBarSuppressed,
                !FullScreen.isActive(on: screen) {
                 let since = hotZoneSince ?? now
                 hotZoneSince = since
@@ -395,7 +453,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                         updateCapacity()
                     }
                     refresh()
-                    reveal()
+                    reveal(peekFor: 1.5)
                 }
             } else {
                 hotZoneSince = nil
@@ -405,11 +463,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         updateMousePassThrough(mouse)
 
-        // The line's zone runs from its lowest point up to the top of the
-        // screen, menu bar included, so moving up never hides it.
+        // The line's zone runs from its lowest point up to the bottom of the
+        // menu bar. Our status item also keeps it open; other menu bar items
+        // count as leaving so their menus remain accessible.
         var zone = panel.frame
-        if let screen = panel.screen { zone.size.height = screen.frame.maxY - zone.minY }
-        let inside = NSMouseInRect(mouse, zone, false)
+        if let screen = panel.screen { zone.size.height = screen.visibleFrame.maxY - zone.minY }
+        let inside = NSMouseInRect(mouse, zone, false) || (overStatusItem && !menuBarSuppressed)
         if inside && pinned { pinned = false }
 
         let busy = pinned || GrabView.isDragging || line.pressedID != nil || now < peekUntil
@@ -458,7 +517,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
 
-        let toggleItem = ClosureMenuItem(isRevealed ? L("Hide line") : L("Show line")) { [weak self] in
+        let toggleItem = ClosureMenuItem(isRevealed ? L("Hide line")
+                                                 : L("Show line")) { [weak self] in
             self?.toggle()
         }
         toggleItem.keyEquivalent = "t"
@@ -471,6 +531,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         clearItem.isEnabled = line.liveCount > 0
         menu.addItem(clearItem)
 
+        // Browsers keep our Services entry out of their context menus, so
+        // for web images the path is: right-click > Copy image, then this.
+        let pb = NSPasteboard.general
+        let pasteItem = ClosureMenuItem(
+            L("Hang clipboard image")) { [weak self] in
+            self?.hangClipboard()
+        }
+        pasteItem.isEnabled = (pb.types ?? []).contains { [.fileURL, .png, .tiff].contains($0) }
+        pasteItem.toolTip = L("Copy an image anywhere, then hang it here")
+        menu.addItem(pasteItem)
+
         let inbox = ClosureMenuItem(L("Handle screenshots")) { [weak self] in
             self?.setInbox(!Inbox.isEnabled)
         }
@@ -482,6 +553,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             guard let self else { return }
             NSWorkspace.shared.open(self.watcher.folder)
         })
+
+        let inboxFiles = Inbox.files()
+        let inboxSize = ByteCountFormatter.string(fromByteCount: Inbox.size(of: inboxFiles), countStyle: .file)
+        let emptyItem = ClosureMenuItem(
+            String(format: L("Empty screenshots folder (%@)"), inboxSize)
+        ) { [weak self] in self?.emptyInbox() }
+        emptyItem.isEnabled = !inboxFiles.isEmpty
+        emptyItem.toolTip = L("Moves everything in it to the Trash")
+        menu.addItem(emptyItem)
+
+        let autoCleanItem = ClosureMenuItem(
+            L("Auto-clean after 7 days")
+        ) { [weak self] in self?.toggleAutoClean() }
+        autoCleanItem.state = Inbox.autoCleanDays > 0 ? .on : .off
+        autoCleanItem.toolTip = L("Moves screenshots in that folder to the Trash once they are 7 days old")
+        menu.addItem(autoCleanItem)
 
         menu.addItem(.separator())
 
@@ -517,6 +604,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             alert.informativeText = L("Move Tendedero to the Applications folder and try again.")
             NSApp.activate(ignoringOtherApps: true)
             alert.runModal()
+        }
+    }
+
+    /// Services menu entry point: whatever the sender selected arrives on a
+    /// pasteboard — file URLs from the Finder, image data from elsewhere.
+    /// Everything is copied into the inbox before it hangs.
+    @objc(hangService:userData:error:)
+    private func hangService(_ pboard: NSPasteboard, userData: String?,
+                             error: NSErrorPointer) {
+        var urls = (pboard.readObjects(forClasses: [NSURL.self],
+                                       options: [.urlReadingFileURLsOnly: true]) as? [URL]) ?? []
+        if urls.isEmpty, let data = pboard.data(forType: .tiff) ?? pboard.data(forType: .png),
+           let saved = Inbox.save(image: data) {
+            urls = [saved]
+        }
+        for url in Inbox.copyIn(urls) { line.hang(url) }
+    }
+
+    /// The clipboard counterpart of the service above, for apps whose
+    /// context menus never show Services (browsers).
+    private func hangClipboard() {
+        let pb = NSPasteboard.general
+        let urls = (pb.readObjects(forClasses: [NSURL.self],
+                                   options: [.urlReadingFileURLsOnly: true]) as? [URL]) ?? []
+        if !urls.isEmpty {
+            for url in Inbox.copyIn(urls) { line.hang(url) }
+        } else if let data = pb.data(forType: .png) ?? pb.data(forType: .tiff),
+                  let saved = Inbox.save(image: data) {
+            line.hang(saved)
         }
     }
 }

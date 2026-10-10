@@ -74,6 +74,27 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>LSMinimumSystemVersion</key><string>14.0</string>
   <key>LSUIElement</key><true/>
   <key>NSHighResolutionCapable</key><true/>
+  <key>NSServices</key>
+  <array>
+    <dict>
+      <key>NSMenuItem</key><dict>
+        <key>default</key><string>Hang</string>
+        <key>zh-Hans</key><string>挂</string>
+        <key>zh-Hant</key><string>掛</string>
+        <key>es</key><string>Colgar</string>
+      </dict>
+      <key>NSMessage</key><string>hangService</string>
+      <key>NSPortName</key><string>Tendedero</string>
+      <key>NSSendTypes</key>
+      <array>
+        <string>NSFilenamesPboardType</string>
+        <string>NSImagePboardType</string>
+        <string>public.image</string>
+        <string>public.file-url</string>
+      </array>
+      <key>NSRequiredContext</key><dict/>
+    </dict>
+  </array>
   <key>NSDesktopFolderUsageDescription</key>
   <string>Tendedero watches the folder where macOS saves your screenshots so it can hang them on the line.</string>
 </dict>

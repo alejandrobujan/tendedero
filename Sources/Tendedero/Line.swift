@@ -190,10 +190,10 @@ final class Line: ObservableObject {
         return candidate
     }
 
-    /// Long press: open the photo in the system Markup editor.
+    /// Long press: open the photo in the fast in-place annotate editor.
     func markup(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
-        Markup.shared.edit(item.url)
+        Annotate.shared.edit(item.url)
     }
 
     /// After editing, the photo on the line shows the new version.

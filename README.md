@@ -41,7 +41,7 @@ Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 | | |
 |:--|:--|
 | Click | Copy the image. |
-| Press and hold | Open it in Markup. |
+| Press and hold | Mark it up: box, arrow, pen, text, mosaic, blur. |
 | Double click | Open it in Preview. |
 | Drag into an app | Send a copy. It stays on the line. |
 | Drag into a folder | Keep it there. It leaves the line. |
@@ -122,7 +122,7 @@ so macOS asks again for access to the Desktop after each rebuild.
 | `GrabArea.swift` | Click, long press, drag and drop |
 | `ScreenshotWatcher.swift` | Notices new screenshots |
 | `Inbox.swift` | Takes over screenshot settings and puts them back |
-| `Markup.swift` | Opens the system Markup editor and saves the result |
+| `Annotate.swift` | The in-place markup editor: tools, undo, saving back to the file |
 | `FullScreen.swift` | Knows when to stay hidden |
 | `Line.swift` | What is hanging, and what you can do with it |
 

@@ -1,34 +1,62 @@
-/* Spanish. */
+// Run swift scripts/check-strings.swift after changing these translations.
 
-/* AppDelegate */
-"Let Tendedero handle your screenshots?" = "¿Quieres que Tendedero se encargue de tus capturas?";
-"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "Las capturas se colgarán al instante, sin la miniatura flotante, y no se acumularán en el Escritorio. Arrastra una a una carpeta para guardarla, o descártala con la cruz. Puedes desactivarlo desde la barra de menús, y tus ajustes vuelven a ser los de antes al salir de Tendedero.";
-"Turn on" = "Activar";
-"Not now" = "Ahora no";
-"Hide line" = "Ocultar tendedero";
-"Show line" = "Mostrar tendedero";
-"Take everything down" = "Descolgar todo";
-"Handle screenshots" = "Encargarse de las capturas";
-"Screenshots hang instantly and skip the Desktop" = "Las capturas se cuelgan al instante y no pasan por el Escritorio";
-"Open screenshots folder" = "Abrir carpeta de capturas";
-"Sounds" = "Sonidos";
-"Open at login" = "Abrir al iniciar sesión";
-"Quit Tendedero" = "Salir de Tendedero";
-"Could not change the login setting" = "No se pudo cambiar el inicio de sesión";
-"Move Tendedero to the Applications folder and try again." = "Mueve Tendedero a la carpeta Aplicaciones y vuelve a intentarlo.";
-
-/* GrabArea */
-"Copy" = "Copiar";
-"Open" = "Abrir";
-"Markup" = "Marcación";
-"Show in Finder" = "Mostrar en Finder";
-"Save to Desktop" = "Guardar en el Escritorio";
-"Discard" = "Descartar";
-"Take down" = "Descolgar";
-"Move to Trash" = "Mover a la Papelera";
-
-/* LineView */
-"Take a screenshot and it will hang here" = "Haz una captura y se quedará colgada aquí";
-
-/* PeggedView */
+"AirDrop" = "AirDrop";
+"Annotate" = "Anotar";
+"Arrow" = "Flecha";
+"Auto-clean after 7 days" = "Limpiar automáticamente tras 7 días";
+"Black" = "Negro";
+"Blue" = "Azul";
+"Blur" = "Difuminar";
 "Copied" = "Copiado";
+"Copy" = "Copiar";
+"Copy an image anywhere, then hang it here" = "Copia una imagen donde sea y cuélgala desde aquí";
+"Could not change the login setting" = "No se pudo cambiar el inicio de sesión";
+"Discard" = "Descartar";
+"Discard changes" = "Descartar cambios";
+"Done" = "Listo";
+"Drag to move   ·   Drag the handles to resize   ·   ⌫ Delete   ·   ←↑↓→ Nudge   ·   ⌘D Duplicate   ·   Double-click text to edit" = "Arrastra para mover   ·   Tiradores para cambiar el tamaño   ·   ⌫ Borrar   ·   ←↑↓→ Mover   ·   ⌘D Duplicar   ·   Doble clic para editar el texto";
+"Ellipse" = "Elipse";
+"Empty screenshots folder (%@)" = "Vaciar carpeta de capturas (%@)";
+"Esc or click outside  Finish   ·   ⏎ New line   ·   ⌘Z Undo typing   ·   Size and color apply as you type" = "Esc o clic fuera  Terminar   ·   ⏎ Nueva línea   ·   ⌘Z Deshacer   ·   Tamaño y color se aplican al escribir";
+"Green" = "Verde";
+"Handle screenshots" = "Encargarse de las capturas";
+"Hang clipboard image" = "Colgar imagen del portapapeles";
+"Hide line" = "Ocultar tendedero";
+"Let Tendedero handle your screenshots?" = "¿Quieres que Tendedero se encargue de tus capturas?";
+"Line width" = "Grosor";
+"Mosaic" = "Mosaico";
+"Move Tendedero to the Applications folder and try again." = "Mueve Tendedero a la carpeta Aplicaciones y vuelve a intentarlo.";
+"Move to Trash" = "Mover a la Papelera";
+"Moves everything in it to the Trash" = "Mueve todo su contenido a la Papelera";
+"Moves screenshots in that folder to the Trash once they are 7 days old" = "Mueve a la Papelera las capturas de esa carpeta al cumplir 7 días";
+"Not now" = "Ahora no";
+"Open" = "Abrir";
+"Open at login" = "Abrir al iniciar sesión";
+"Open screenshots folder" = "Abrir carpeta de capturas";
+"Pen" = "Lápiz";
+"Press Esc again to discard your changes" = "Pulsa Esc otra vez para descartar los cambios";
+"Quit Tendedero" = "Salir de Tendedero";
+"Rectangle" = "Rectángulo";
+"Red" = "Rojo";
+"Redo" = "Rehacer";
+"Save to Desktop" = "Guardar en el Escritorio";
+"Save to the file" = "Guardar en el archivo";
+"Screenshots hang instantly and skip the Desktop" = "Las capturas se cuelgan al instante y no pasan por el Escritorio";
+"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "Las capturas se colgarán al instante, sin la miniatura flotante, y no se acumularán en el Escritorio. Arrastra una a una carpeta para guardarla, o descártala con la cruz. Puedes desactivarlo desde la barra de menús, y tus ajustes vuelven a ser los de antes al salir de Tendedero.";
+"Select and move" = "Seleccionar y mover";
+"Share…" = "Compartir…";
+"Show in Finder" = "Mostrar en Finder";
+"Show line" = "Mostrar tendedero";
+"Sounds" = "Sonidos";
+"Take a screenshot and it will hang here" = "Haz una captura y se quedará colgada aquí";
+"Take down" = "Descolgar";
+"Take everything down" = "Descolgar todo";
+"Text" = "Texto";
+"Text box" = "Cuadro de texto";
+"Text size" = "Tamaño del texto";
+"Turn on" = "Activar";
+"Type…" = "Escribe…";
+"Undo" = "Deshacer";
+"White" = "Blanco";
+"Yellow" = "Amarillo";
+"⏎ Done   ·   Esc Cancel   ·   ⌘Z Undo   ·   V Select   ·   1–8 Tools   ·   [ ] Size   ·   ⇧ Straight / square / circle   ·   Pinch or ⌘± Zoom   ·   Space-drag Pan" = "⏎ Listo   ·   Esc Cancelar   ·   ⌘Z Deshacer   ·   V Seleccionar   ·   1–8 Herramientas   ·   [ ] Tamaño   ·   ⇧ Recto / cuadrado / círculo   ·   Pellizca o ⌘± Zoom   ·   Espacio + arrastrar Mover";
