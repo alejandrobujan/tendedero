@@ -40,7 +40,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var wanted = false
     /// Set when you open the line on purpose, so it stays up while empty.
     private var keepOpen = false
-    private var lastLiveCount = 0
+    private var receivedInitialItems = false
     /// The screen a new capture was taken on: the line goes there.
     private var pendingScreen: NSScreen?
 
@@ -50,6 +50,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         panel = LinePanel(content: host)
         panel.placeOnScreen()
         updateCapacity()
+        line.onCapture = { [weak self] in self?.captureAdded() }
 
         if Inbox.isEnabled { Inbox.apply() }
         restoreSettingsOnTermination()
@@ -174,23 +175,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     // MARK: Showing and hiding
 
+    private func captureAdded() {
+        panel.placeOnScreen(pendingScreen)
+        pendingScreen = nil
+        updateCapacity()
+        wanted = true
+        refresh()
+        reveal(peekFor: 2.5)
+    }
+
     private func itemsChanged() {
-        let live = line.liveCount
-        if live > lastLiveCount {
-            panel.placeOnScreen(pendingScreen)
-            pendingScreen = nil
-            updateCapacity()
+        let initial = !receivedInitialItems
+        receivedInitialItems = true
+        if line.liveCount > 0 {
             wanted = true
             refresh()
-            reveal(peekFor: 2.5)
-        } else if live == 0 && !keepOpen {
+            // Preserve the launch preview for restored photos. Later previews
+            // are driven by accepted captures, rather than a count increase.
+            if initial { reveal(peekFor: 2.5) }
+        } else if !keepOpen {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [weak self] in
                 guard let self, self.line.liveCount == 0, !self.keepOpen else { return }
                 self.wanted = false
                 self.refresh()
             }
         }
-        lastLiveCount = live
     }
 
     // MARK: The capture flying to the line

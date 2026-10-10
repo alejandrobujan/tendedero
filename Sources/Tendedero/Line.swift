@@ -37,18 +37,21 @@ final class Line: ObservableObject {
     var hitRects: [UUID: CGRect] = [:]
 
     var maxItems = 8
-
+    /// Called after accepting a new capture, including when the line is full.
+    var onCapture: (() -> Void)?
+    private let defaults: UserDefaults
 
     var soundOn: Bool {
-        get { !UserDefaults.standard.bool(forKey: "soundOff") }
-        set { UserDefaults.standard.set(!newValue, forKey: "soundOff") }
+        get { !defaults.bool(forKey: "soundOff") }
+        set { defaults.set(!newValue, forKey: "soundOff") }
     }
 
     var liveCount: Int { items.filter { !$0.falling }.count }
 
     private let storeKey = "pegged"
 
-    init() {
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
         restore()
         scheduleGust()
     }
@@ -67,7 +70,10 @@ final class Line: ObservableObject {
             drop(oldest.id, quietly: true)
         }
         save()
-        if !quietly { play("Tink", volume: 0.35) }
+        if !quietly {
+            onCapture?()
+            play("Tink", volume: 0.35)
+        }
         return item.id
     }
 
@@ -224,11 +230,11 @@ final class Line: ObservableObject {
 
     private func save() {
         let paths = items.filter { !$0.falling }.map(\.url.path)
-        UserDefaults.standard.set(paths, forKey: storeKey)
+        defaults.set(paths, forKey: storeKey)
     }
 
     private func restore() {
-        let paths = UserDefaults.standard.stringArray(forKey: storeKey) ?? []
+        let paths = defaults.stringArray(forKey: storeKey) ?? []
         for path in paths where FileManager.default.fileExists(atPath: path) {
             hang(URL(fileURLWithPath: path), quietly: true)
         }
