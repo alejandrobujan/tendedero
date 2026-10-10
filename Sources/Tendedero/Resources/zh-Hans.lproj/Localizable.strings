@@ -16,6 +16,9 @@
 "Quit Tendedero" = "退出 Tendedero";
 "Could not change the login setting" = "无法更改登录项设置";
 "Move Tendedero to the Applications folder and try again." = "请先把 Tendedero 移到「应用程序」文件夹，再试一次。";
+"Hang copied images" = "挂上复制的图片";
+"Images you copy hang on the line too" = "复制的图片也会挂上绳";
+"Tendedero, hanging copied images" = "Tendedero，正在挂上复制的图片";
 
 /* GrabArea */
 "Copy" = "复制";

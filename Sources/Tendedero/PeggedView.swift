@@ -65,6 +65,17 @@ struct PeggedView: View {
                 RoundedRectangle(cornerRadius: Frame.radius - Frame.inset, style: .continuous)
                     .strokeBorder(Color.white.opacity(0.18), lineWidth: 0.5)
             )
+            .overlay {
+                // A recording says so with a play button over its first frame.
+                if item.isRecording {
+                    Image(systemName: "play.fill")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.primary)
+                        .frame(width: 28, height: 28)
+                        .glassFrame(circle: true)
+                        .allowsHitTesting(false)
+                }
+            }
             .padding(Frame.inset)
             .glassFrame(cornerRadius: Frame.radius)
             .shadow(color: .black.opacity(hovering ? 0.26 : 0.18), radius: hovering ? 14 : 10, y: hovering ? 8 : 5)

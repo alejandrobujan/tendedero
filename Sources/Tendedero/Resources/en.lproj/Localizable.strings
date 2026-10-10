@@ -18,6 +18,9 @@
 "Quit Tendedero" = "Quit Tendedero";
 "Could not change the login setting" = "Could not change the login setting";
 "Move Tendedero to the Applications folder and try again." = "Move Tendedero to the Applications folder and try again.";
+"Hang copied images" = "Hang copied images";
+"Images you copy hang on the line too" = "Images you copy hang on the line too";
+"Tendedero, hanging copied images" = "Tendedero, hanging copied images";
 
 /* GrabArea */
 "Copy" = "Copy";

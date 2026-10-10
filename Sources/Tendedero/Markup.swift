@@ -51,10 +51,7 @@ final class Markup: NSObject, NSSharingServiceDelegate {
         case let url as URL:
             write(from: url, to: target)
         case let image as NSImage:
-            do {
-                try writePNG(image, to: target)
-                onSaved(target)
-            } catch { reportWriteError(error) }
+            write(data: pngData(image), to: target)
         case let provider as NSItemProvider:
             load(provider, into: target)
         default:
@@ -77,24 +74,8 @@ final class Markup: NSObject, NSSharingServiceDelegate {
         let imageType = types.first { $0 == original }
             ?? types.first { UTType($0)?.conforms(to: .image) == true }
         guard let imageType else { return }
-        let loadData: @MainActor @Sendable () -> Void = {
-            provider.loadDataRepresentation(forTypeIdentifier: imageType) { data, _ in
-                DispatchQueue.main.async { self.write(data: data, to: target) }
-            }
-        }
-        // A provider's temporary file is only valid during this callback.
-        // Copy it synchronously to disk, then notify the UI on the main queue.
-        provider.loadFileRepresentation(forTypeIdentifier: imageType) { url, _ in
-            if let url {
-                do {
-                    try replaceFileContents(from: url, to: target)
-                    DispatchQueue.main.async { self.onSaved(target) }
-                } catch {
-                    DispatchQueue.main.async { self.reportWriteError(error) }
-                }
-            } else {
-                DispatchQueue.main.async { loadData() }
-            }
+        provider.loadDataRepresentation(forTypeIdentifier: imageType) { data, _ in
+            DispatchQueue.main.async { self.write(data: data, to: target) }
         }
     }
 
@@ -102,10 +83,7 @@ final class Markup: NSObject, NSSharingServiceDelegate {
         if source.standardizedFileURL == target.standardizedFileURL {
             onSaved(target)
         } else {
-            do {
-                try replaceFileContents(from: source, to: target)
-                onSaved(target)
-            } catch { reportWriteError(error) }
+            write(data: try? Data(contentsOf: source), to: target)
         }
     }
 
@@ -115,12 +93,13 @@ final class Markup: NSObject, NSSharingServiceDelegate {
             try data.write(to: target, options: .atomic)
             onSaved(target)
         } catch {
-            reportWriteError(error)
+            log.error("Could not save markup: \(error.localizedDescription, privacy: .public)")
+            NSSound.beep()
         }
     }
 
-    private func reportWriteError(_ error: Error) {
-        log.error("Could not save markup: \(error.localizedDescription, privacy: .public)")
-        NSSound.beep()
+    private func pngData(_ image: NSImage) -> Data? {
+        guard let tiff = image.tiffRepresentation, let rep = NSBitmapImageRep(data: tiff) else { return nil }
+        return rep.representation(using: .png, properties: [:])
     }
 }

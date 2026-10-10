@@ -1,4 +1,5 @@
 import AppKit
+import AVFoundation
 import Combine
 import os
 
@@ -14,6 +15,8 @@ struct Pegged: Identifiable, Equatable {
     var falling = false
     /// Still flying in from where it was captured; the card waits hidden.
     var flying = false
+    /// A screen recording rather than a screenshot.
+    var isRecording: Bool { Tendedero.isRecording(url) }
 
     static func == (a: Pegged, b: Pegged) -> Bool {
         a.id == b.id && a.falling == b.falling && a.flying == b.flying && a.thumb === b.thumb
@@ -62,9 +65,11 @@ final class Line: ObservableObject {
         var item = Pegged(url: url, thumb: thumb)
         item.flying = flying
         items.append(item)
-        // A full line lets the oldest photo fall off the far end.
-        while liveCount > maxItems, let oldest = items.first(where: { !$0.falling }) {
-            drop(oldest.id, quietly: true)
+        // A full line lets the oldest photo fall off the far end. Only one: a
+        // line hung on a wider screen keeps its length here instead of losing
+        // several photos to a single capture.
+        if liveCount > maxItems, let oldest = items.first(where: { !$0.falling }) {
+            letGo(oldest.id)
         }
         save()
         if !quietly { play("Tink", volume: 0.35) }
@@ -93,11 +98,12 @@ final class Line: ObservableObject {
         }
     }
 
+    /// "Take everything down": every photo goes the way of its corner cross.
     func clear() {
         let live = items.filter { !$0.falling }
         for (n, item) in live.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.06 * Double(n)) { [weak self] in
-                self?.drop(item.id, quietly: n > 0)
+                self?.discard(item.id, quietly: n > 0)
             }
         }
     }
@@ -113,7 +119,13 @@ final class Line: ObservableObject {
 
     func copy(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
-        ClipboardImage.copy(item.url)
+        let entry = NSPasteboardItem()
+        // A recording is copied as the file, which apps paste as the video.
+        if !item.isRecording, let png = pngData(item.url) { entry.setData(png, forType: .png) }
+        entry.setString(item.url.absoluteString, forType: .fileURL)
+        let pb = NSPasteboard.general
+        pb.clearContents()
+        pb.writeObjects([entry])
 
         copiedID = id
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
@@ -129,16 +141,19 @@ final class Line: ObservableObject {
     /// Moves the file to the Trash and takes the photo off the line. When a
     /// drag ends on the Dock's Trash, macOS only reports it: deleting the file
     /// is the source app's job, as Finder does.
-    func trash(_ id: UUID) {
-        guard let item = items.first(where: { $0.id == id }) else { return }
+    @discardableResult
+    func trash(_ id: UUID, quietly: Bool = false) -> Bool {
+        guard let item = items.first(where: { $0.id == id }) else { return false }
         do {
             try FileManager.default.trashItem(at: item.url, resultingItemURL: nil)
             log.notice("Trashed \(item.url.lastPathComponent, privacy: .public)")
-            if soundOn { Line.trashSound?.play() }
+            if soundOn && !quietly { Line.trashSound?.play() }
             drop(id, quietly: true)
+            return true
         } catch {
             log.error("Could not trash \(item.url.path, privacy: .public): \(error.localizedDescription, privacy: .public)")
-            NSSound.beep()
+            if !quietly { NSSound.beep() }
+            return false
         }
     }
 
@@ -155,8 +170,16 @@ final class Line: ObservableObject {
     }
 
     /// The corner cross and "Take down" both end up here.
-    func discard(_ id: UUID) {
-        if isInInbox(id) { trash(id) } else { drop(id) }
+    func discard(_ id: UUID, quietly: Bool = false) {
+        if isInInbox(id) { trash(id, quietly: quietly) } else { drop(id, quietly: quietly) }
+    }
+
+    /// The oldest photo falling off a full line. Like the cross, a file from
+    /// Tendedero's folder goes to the Trash, or nothing would ever take it out
+    /// of that folder. If the Trash refuses it, it still leaves the line.
+    private func letGo(_ id: UUID) {
+        if isInInbox(id), trash(id, quietly: true) { return }
+        drop(id, quietly: true)
     }
 
     /// Inbox mode: keep a screenshot by moving it to the Desktop.
@@ -185,10 +208,15 @@ final class Line: ObservableObject {
         return candidate
     }
 
-    /// Long press: open the photo in the system Markup editor.
+    /// Long press: open the photo in the system Markup editor. Markup does
+    /// not edit video, so a recording opens in the trimming editor instead.
     func markup(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
-        Markup.shared.edit(item.url)
+        if item.isRecording {
+            Trim.shared.edit(item.url, size: item.thumb.size)
+        } else {
+            Markup.shared.edit(item.url)
+        }
     }
 
     /// After editing, the photo on the line shows the new version.
@@ -222,10 +250,15 @@ final class Line: ObservableObject {
         UserDefaults.standard.set(paths, forKey: storeKey)
     }
 
+    /// Everything comes back as it was. This runs before the line knows its
+    /// screen, so the capacity is still the default one: hanging through
+    /// `hang` would let photos fall off a wide screen's line at every launch.
     private func restore() {
         let paths = UserDefaults.standard.stringArray(forKey: storeKey) ?? []
         for path in paths where FileManager.default.fileExists(atPath: path) {
-            hang(URL(fileURLWithPath: path), quietly: true)
+            let url = URL(fileURLWithPath: path)
+            guard !items.contains(where: { $0.url == url }), let thumb = makeThumbnail(url) else { continue }
+            items.append(Pegged(url: url, thumb: thumb))
         }
     }
 
@@ -237,4 +270,38 @@ final class Line: ObservableObject {
         sound.play()
     }
 
+    private func pngData(_ url: URL) -> Data? {
+        if url.pathExtension.lowercased() == "png" { return try? Data(contentsOf: url) }
+        guard let tiff = NSImage(contentsOf: url)?.tiffRepresentation,
+              let rep = NSBitmapImageRep(data: tiff) else { return nil }
+        return rep.representation(using: .png, properties: [:])
+    }
+}
+
+/// Screen recordings, as macOS saves them.
+func isRecording(_ url: URL) -> Bool {
+    ["mov", "mp4"].contains(url.pathExtension.lowercased())
+}
+
+/// The default size covers a card at twice its size in points, as on a
+/// Retina screen, and no more: every photo on the line keeps one in memory.
+func makeThumbnail(_ url: URL, maxPixels: Int = 320) -> NSImage? {
+    if isRecording(url) { return firstFrame(url, maxPixels: maxPixels) }
+    guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
+    let options: [CFString: Any] = [
+        kCGImageSourceCreateThumbnailFromImageAlways: true,
+        kCGImageSourceCreateThumbnailWithTransform: true,
+        kCGImageSourceThumbnailMaxPixelSize: maxPixels,
+    ]
+    guard let cg = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else { return nil }
+    return NSImage(cgImage: cg, size: NSSize(width: cg.width, height: cg.height))
+}
+
+/// A recording shows its first frame.
+private func firstFrame(_ url: URL, maxPixels: Int) -> NSImage? {
+    let generator = AVAssetImageGenerator(asset: AVURLAsset(url: url))
+    generator.appliesPreferredTrackTransform = true
+    generator.maximumSize = CGSize(width: maxPixels, height: maxPixels)
+    guard let cg = try? generator.copyCGImage(at: .zero, actualTime: nil) else { return nil }
+    return NSImage(cgImage: cg, size: NSSize(width: cg.width, height: cg.height))
 }

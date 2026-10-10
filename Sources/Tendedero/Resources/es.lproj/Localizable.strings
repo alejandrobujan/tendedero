@@ -16,6 +16,9 @@
 "Quit Tendedero" = "Salir de Tendedero";
 "Could not change the login setting" = "No se pudo cambiar el inicio de sesión";
 "Move Tendedero to the Applications folder and try again." = "Mueve Tendedero a la carpeta Aplicaciones y vuelve a intentarlo.";
+"Hang copied images" = "Colgar imágenes copiadas";
+"Images you copy hang on the line too" = "Las imágenes que copias también se cuelgan";
+"Tendedero, hanging copied images" = "Tendedero, colgando imágenes copiadas";
 
 /* GrabArea */
 "Copy" = "Copiar";

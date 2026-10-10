@@ -16,9 +16,13 @@ enum Layout {
         return ropeTop + 4 * sag(width: width) * f * (1 - f)
     }
 
+    /// Photos hang `spacing` apart. A line hung on a wider screen can hold
+    /// more than this one has room for, and then they move closer together
+    /// so that none ends up past the edge.
     static func x(index: Int, count: Int, width: CGFloat) -> CGFloat {
-        let total = CGFloat(max(count - 1, 0)) * spacing
-        return width / 2 - total / 2 + CGFloat(index) * spacing
+        let gaps = CGFloat(max(count - 1, 0))
+        let step = gaps > 0 ? min(spacing, max(0, width - 200) / gaps) : spacing
+        return width / 2 - gaps * step / 2 + CGFloat(index) * step
     }
 }
 

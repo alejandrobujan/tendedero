@@ -60,7 +60,20 @@ Deja que Tendedero se encargue de tus capturas<sup>1</sup> y dejarán de pasar
 por el Escritorio. Sin miniatura flotante ni cinco segundos de espera: cada
 captura se cuelga al momento, y solo se queda lo que tú saques de la cuerda.
 
+Las grabaciones de pantalla también se cuelgan, con un botón de play encima.
+Mantén pulsada una para recortarla.
+
 Los mismos atajos y las mismas costumbres. Pero sin desorden.
+
+<br>
+
+## También las imágenes que copias.
+
+Haz una captura con <kbd>⌃</kbd> pulsado, o copia una imagen en Vista Previa,
+y se cuelga como cualquier otra. Activa Colgar imágenes copiadas en la barra
+de menús; mientras está activo, la camiseta se rellena. Solo imágenes: lo que
+se copia junto con texto o un archivo, y lo que un gestor de contraseñas marca
+como privado, se deja tal cual.
 
 <br>
 
@@ -77,7 +90,7 @@ Tendedero funciona solo en tu Mac, y tus capturas nunca salen de él.
 |:--|:--|
 | **Compatibilidad** | macOS 14 Sonoma o posterior, en Mac con Apple silicon o Intel. Pensado para macOS 27. |
 | **Tamaño** | 1,7 MB |
-| **Idiomas** | Inglés, español y chino simplificado |
+| **Idiomas** | Inglés, español, chino simplificado, turco y azerbaiyano |
 | **Hecho con** | Swift, AppKit y SwiftUI |
 | **Conexión a internet** | No la usa |
 | **Precio** | Gratis |
@@ -126,8 +139,10 @@ vuelve a pedir acceso al Escritorio cada vez que recompilas.
 | `PeggedView.swift` | Cada foto: marco de cristal, pinza, balanceo y brisa |
 | `GrabArea.swift` | Clic, pulsación larga, y arrastrar y soltar |
 | `ScreenshotWatcher.swift` | Se da cuenta de las capturas nuevas |
+| `ClipboardWatcher.swift` | Se da cuenta de las imágenes copiadas |
 | `Inbox.swift` | Toma el control de los ajustes de captura y luego los devuelve |
 | `Markup.swift` | Abre el editor de Marcación del sistema y guarda el resultado |
+| `Trim.swift` | Recorta una grabación de pantalla y guarda el resultado |
 | `FullScreen.swift` | Sabe cuándo tiene que quedarse oculto |
 | `Line.swift` | Qué hay colgado y qué puedes hacer con ello |
 
