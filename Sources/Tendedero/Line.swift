@@ -37,21 +37,18 @@ final class Line: ObservableObject {
     var hitRects: [UUID: CGRect] = [:]
 
     var maxItems = 8
-    /// Called after accepting a new capture, including when the line is full.
-    var onCapture: (() -> Void)?
-    private let defaults: UserDefaults
+
 
     var soundOn: Bool {
-        get { !defaults.bool(forKey: "soundOff") }
-        set { defaults.set(!newValue, forKey: "soundOff") }
+        get { !UserDefaults.standard.bool(forKey: "soundOff") }
+        set { UserDefaults.standard.set(!newValue, forKey: "soundOff") }
     }
 
     var liveCount: Int { items.filter { !$0.falling }.count }
 
     private let storeKey = "pegged"
 
-    init(defaults: UserDefaults = .standard) {
-        self.defaults = defaults
+    init() {
         restore()
         scheduleGust()
     }
@@ -65,15 +62,14 @@ final class Line: ObservableObject {
         var item = Pegged(url: url, thumb: thumb)
         item.flying = flying
         items.append(item)
-        // A full line lets the oldest photo fall off the far end.
-        while liveCount > maxItems, let oldest = items.first(where: { !$0.falling }) {
-            drop(oldest.id, quietly: true)
+        // A full line lets the oldest photo fall off the far end. Only one: a
+        // line hung on a wider screen keeps its length here instead of losing
+        // several photos to a single capture.
+        if liveCount > maxItems, let oldest = items.first(where: { !$0.falling }) {
+            letGo(oldest.id)
         }
         save()
-        if !quietly {
-            onCapture?()
-            play("Tink", volume: 0.35)
-        }
+        if !quietly { play("Tink", volume: 0.35) }
         return item.id
     }
 
@@ -99,11 +95,12 @@ final class Line: ObservableObject {
         }
     }
 
+    /// "Take everything down": every photo goes the way of its corner cross.
     func clear() {
         let live = items.filter { !$0.falling }
         for (n, item) in live.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.06 * Double(n)) { [weak self] in
-                self?.drop(item.id, quietly: n > 0)
+                self?.discard(item.id, quietly: n > 0)
             }
         }
     }
@@ -140,16 +137,19 @@ final class Line: ObservableObject {
     /// Moves the file to the Trash and takes the photo off the line. When a
     /// drag ends on the Dock's Trash, macOS only reports it: deleting the file
     /// is the source app's job, as Finder does.
-    func trash(_ id: UUID) {
-        guard let item = items.first(where: { $0.id == id }) else { return }
+    @discardableResult
+    func trash(_ id: UUID, quietly: Bool = false) -> Bool {
+        guard let item = items.first(where: { $0.id == id }) else { return false }
         do {
             try FileManager.default.trashItem(at: item.url, resultingItemURL: nil)
             log.notice("Trashed \(item.url.lastPathComponent, privacy: .public)")
-            if soundOn { Line.trashSound?.play() }
+            if soundOn && !quietly { Line.trashSound?.play() }
             drop(id, quietly: true)
+            return true
         } catch {
             log.error("Could not trash \(item.url.path, privacy: .public): \(error.localizedDescription, privacy: .public)")
-            NSSound.beep()
+            if !quietly { NSSound.beep() }
+            return false
         }
     }
 
@@ -166,8 +166,16 @@ final class Line: ObservableObject {
     }
 
     /// The corner cross and "Take down" both end up here.
-    func discard(_ id: UUID) {
-        if isInInbox(id) { trash(id) } else { drop(id) }
+    func discard(_ id: UUID, quietly: Bool = false) {
+        if isInInbox(id) { trash(id, quietly: quietly) } else { drop(id, quietly: quietly) }
+    }
+
+    /// The oldest photo falling off a full line. Like the cross, a file from
+    /// Tendedero's folder goes to the Trash, or nothing would ever take it out
+    /// of that folder. If the Trash refuses it, it still leaves the line.
+    private func letGo(_ id: UUID) {
+        if isInInbox(id), trash(id, quietly: true) { return }
+        drop(id, quietly: true)
     }
 
     /// Inbox mode: keep a screenshot by moving it to the Desktop.
@@ -230,13 +238,18 @@ final class Line: ObservableObject {
 
     private func save() {
         let paths = items.filter { !$0.falling }.map(\.url.path)
-        defaults.set(paths, forKey: storeKey)
+        UserDefaults.standard.set(paths, forKey: storeKey)
     }
 
+    /// Everything comes back as it was. This runs before the line knows its
+    /// screen, so the capacity is still the default one: hanging through
+    /// `hang` would let photos fall off a wide screen's line at every launch.
     private func restore() {
-        let paths = defaults.stringArray(forKey: storeKey) ?? []
+        let paths = UserDefaults.standard.stringArray(forKey: storeKey) ?? []
         for path in paths where FileManager.default.fileExists(atPath: path) {
-            hang(URL(fileURLWithPath: path), quietly: true)
+            let url = URL(fileURLWithPath: path)
+            guard !items.contains(where: { $0.url == url }), let thumb = makeThumbnail(url) else { continue }
+            items.append(Pegged(url: url, thumb: thumb))
         }
     }
 

@@ -40,9 +40,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var wanted = false
     /// Set when you open the line on purpose, so it stays up while empty.
     private var keepOpen = false
-    private var receivedInitialItems = false
-    /// The screen a new capture was taken on: the line goes there.
-    private var pendingScreen: NSScreen?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let host = NSHostingView(rootView: LineView(line: line))
@@ -50,7 +47,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         panel = LinePanel(content: host)
         panel.placeOnScreen()
         updateCapacity()
-        line.onCapture = { [weak self] in self?.captureAdded() }
 
         if Inbox.isEnabled { Inbox.apply() }
         restoreSettingsOnTermination()
@@ -70,6 +66,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in self?.itemsChanged() }
             .store(in: &cancellables)
+        // Photos kept from last time show themselves for a moment.
+        if line.liveCount > 0 { comeDown(on: nil) }
 
         // Entering or leaving full screen switches Space. Check again once the
         // switch animation has settled.
@@ -175,31 +173,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     // MARK: Showing and hiding
 
-    private func captureAdded() {
-        panel.placeOnScreen(pendingScreen)
-        pendingScreen = nil
+    /// An empty line goes away, unless it was opened on purpose.
+    private func itemsChanged() {
+        guard line.liveCount == 0, !keepOpen else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [weak self] in
+            guard let self, self.line.liveCount == 0, !self.keepOpen else { return }
+            self.wanted = false
+            self.refresh()
+        }
+    }
+
+    /// The line comes down on that screen for a moment, then tucks away.
+    /// Without a screen, it uses the one under the pointer.
+    private func comeDown(on screen: NSScreen?) {
+        panel.placeOnScreen(screen)
         updateCapacity()
         wanted = true
         refresh()
         reveal(peekFor: 2.5)
-    }
-
-    private func itemsChanged() {
-        let initial = !receivedInitialItems
-        receivedInitialItems = true
-        if line.liveCount > 0 {
-            wanted = true
-            refresh()
-            // Preserve the launch preview for restored photos. Later previews
-            // are driven by accepted captures, rather than a count increase.
-            if initial { reveal(peekFor: 2.5) }
-        } else if !keepOpen {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [weak self] in
-                guard let self, self.line.liveCount == 0, !self.keepOpen else { return }
-                self.wanted = false
-                self.refresh()
-            }
-        }
     }
 
     // MARK: The capture flying to the line
@@ -208,11 +199,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// place on the line. Without a known capture area it simply drops in.
     private func hangCapture(_ url: URL) {
         let from = captureRect(of: url)
-        if let from {
-            let center = CGPoint(x: from.midX, y: from.midY)
-            pendingScreen = NSScreen.screens.first { NSMouseInRect(center, $0.frame, false) }
+        let screen = from.flatMap { from in
+            NSScreen.screens.first { NSMouseInRect(CGPoint(x: from.midX, y: from.midY), $0.frame, false) }
         }
-        guard let id = line.hang(url, flying: from != nil), let from else { return }
+        // Every capture brings the line down before it hangs, on the screen it
+        // was taken on. On a full line the oldest photo then falls in view as
+        // the new one flies in.
+        comeDown(on: screen)
+        guard let id = line.hang(url, flying: from != nil) else {
+            // Nothing hung after all, so an empty line goes away again.
+            itemsChanged()
+            return
+        }
+        guard let from else { return }
         // Let the line come down and lay out before measuring the landing spot.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) { [weak self] in
             self?.fly(id, from: from)
@@ -278,7 +277,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard !isPresent else { return }
         isPresent = true
         panel.alphaValue = 1
-        panel.orderFrontRegardless()
+        // The window itself only comes in while the line is down; see setRevealed.
+        if isRevealed { panel.orderFrontRegardless() }
     }
 
     private func dismiss() {
@@ -303,6 +303,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard on != isRevealed else { return }
         isRevealed = on
         line.revealed = on
+        // Tucked away, the line leaves no window behind: an invisible strip
+        // over the top of the screen would still sit above other apps for
+        // anything that checks what is on top, like screen automation.
+        if on {
+            if isPresent { panel.orderFrontRegardless() }
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                guard let self, !self.isRevealed else { return }
+                self.panel.orderOut(nil)
+            }
+        }
         if !on {
             pinned = false
             peekUntil = .distantPast
