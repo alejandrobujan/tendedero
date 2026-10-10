@@ -70,7 +70,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         panel.placeOnScreen()
         updateCapacity()
 
-        if Inbox.isEnabled { Inbox.apply() }
+        if Inbox.isEnabled {
+            do {
+                try Inbox.apply()
+            } catch {
+                Inbox.restore()
+                Inbox.isEnabled = false
+                DispatchQueue.main.async { [weak self] in self?.showScreenshotFolderError(error) }
+            }
+        }
         restoreSettingsOnTermination()
         startWatcher()
         clipboardWatcher = ClipboardWatcher { [weak self] url in self?.hangCapture(url) }
@@ -210,9 +218,48 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     private func setInbox(_ on: Bool) {
+        if on {
+            do {
+                try Inbox.apply()
+            } catch {
+                showScreenshotFolderError(error)
+                return
+            }
+        } else {
+            Inbox.restore()
+        }
         Inbox.isEnabled = on
-        if on { Inbox.apply() } else { Inbox.restore() }
         startWatcher()
+    }
+
+    private func chooseScreenshotFolder() {
+        let panel = NSOpenPanel()
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.canCreateDirectories = true
+        panel.allowsMultipleSelection = false
+        panel.directoryURL = Inbox.folder
+        panel.message = L("Screenshots in a custom folder are kept when taken off the line. Choose a folder outside the default temporary folder.")
+        NSApp.activate(ignoringOtherApps: true)
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        setScreenshotFolder(url)
+    }
+
+    private func setScreenshotFolder(_ url: URL?) {
+        do {
+            try Inbox.selectFolder(url)
+            if Inbox.isEnabled { startWatcher() }
+        } catch {
+            showScreenshotFolderError(error)
+        }
+    }
+
+    private func showScreenshotFolderError(_ error: Error) {
+        let alert = NSAlert()
+        alert.messageText = L("Could not use the screenshot folder")
+        alert.informativeText = L("Choose a writable folder and try again.") + "\n\n" + error.localizedDescription
+        NSApp.activate(ignoringOtherApps: true)
+        alert.runModal()
     }
 
     /// Asked once. Changing system settings is the user's call, never ours.
@@ -221,7 +268,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let alert = NSAlert()
         alert.messageText = L("Let Tendedero handle your screenshots?")
         alert.informativeText = L(
-            "Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits.")
+            "Screenshots will hang instantly and save to the folder in Screenshot location, without the floating thumbnail. The default folder is temporary; files in a custom folder are kept when taken off the line. Your previous screenshot settings return when Tendedero quits.")
         alert.addButton(withTitle: L("Turn on"))
         alert.addButton(withTitle: L("Not now"))
         if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
@@ -646,8 +693,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             self?.setInbox(!Inbox.isEnabled)
         }
         inbox.state = Inbox.isEnabled ? .on : .off
-        inbox.toolTip = L("Screenshots hang instantly and skip the Desktop")
+        inbox.toolTip = L("Screenshots hang instantly and save to the selected folder")
         menu.addItem(inbox)
+
+        let locationItem = NSMenuItem(title: L("Screenshot location"), action: nil, keyEquivalent: "")
+        let locations = NSMenu()
+        let defaultLocation = ClosureMenuItem(L("Default temporary folder")) { [weak self] in
+            self?.setScreenshotFolder(nil)
+        }
+        defaultLocation.state = Inbox.customFolder == nil ? .on : .off
+        defaultLocation.toolTip = Inbox.defaultFolder.path
+        locations.addItem(defaultLocation)
+        if let custom = Inbox.customFolder {
+            let selected = NSMenuItem(title: FileManager.default.displayName(atPath: custom.path),
+                                      action: nil, keyEquivalent: "")
+            selected.state = .on
+            selected.isEnabled = false
+            selected.toolTip = custom.path
+            locations.addItem(selected)
+        }
+        locations.addItem(ClosureMenuItem(L("Choose Folder…")) { [weak self] in self?.chooseScreenshotFolder() })
+        locations.addItem(ClosureMenuItem(L("Open selected folder")) { NSWorkspace.shared.open(Inbox.folder) })
+        locationItem.submenu = locations
+        menu.addItem(locationItem)
 
         let clipboard = ClosureMenuItem(L("Hang copied images")) { [weak self] in
             self?.setClipboard(!ClipboardWatcher.isEnabled)

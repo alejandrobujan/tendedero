@@ -2,7 +2,8 @@ import AppKit
 
 /// Hangs images copied to the clipboard, like a screenshot taken with Control
 /// held or an image copied in Preview. Each one is saved as a PNG in
-/// Tendedero's own folder, so on the line it behaves like any screenshot.
+/// the selected screenshot folder, so on the line it behaves like a capture
+/// saved there (temporary by default, kept in a custom folder).
 ///
 /// Off until the user turns it on. The pasteboard has no change notification,
 /// so its change count is checked twice a second; what was copied is only read
