@@ -12,7 +12,11 @@
   &nbsp;&nbsp;
   <a href="#build-from-source">Build from source&nbsp;&rsaquo;</a>
   <br><br>
-  English&nbsp;·&nbsp;<a href="docs/i18n/README.es.md">Español</a>&nbsp;·&nbsp;<a href="docs/i18n/README.fr.md">Français</a>&nbsp;·&nbsp;<a href="docs/i18n/README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="docs/i18n/README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="docs/i18n/README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="docs/i18n/README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="docs/i18n/README.tr.md">Türkçe</a>
+  English&nbsp;·&nbsp;<a href="docs/i18n/README.es.md">Español</a>&nbsp;·&nbsp;<a href="docs/i18n/README.fr.md">Français</a>&nbsp;·&nbsp;<a href="docs/i18n/README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="docs/i18n/README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="docs/i18n/README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="docs/i18n/README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="docs/i18n/README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="docs/i18n/README.az.md">Azərbaycanca</a>
+</p>
+
+<p align="center">
+  <a href="https://trendshift.io/repositories/287033?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-287033" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/287033/daily?language=Swift" alt="alejandrobujan%2Ftendedero | Trendshift" width="250" height="55"/></a>
 </p>
 
 <br>
@@ -40,17 +44,17 @@ Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 <br>
 <br>
 
-|                                                      |                                                                  |
-| :--------------------------------------------------- | :--------------------------------------------------------------- |
-| Click                                                | Copy the image.                                                  |
-| Press and hold                                       | Open it in Markup.                                               |
-| Double click                                         | Open it in Preview.                                              |
-| Force click                                          | Take a quick look.                                               |
-| Drag into an app                                     | Send a copy. It stays on the line.                               |
-| Drag into a folder                                   | Keep it there. It leaves the line.                               |
-| Drag to the Trash, or click the cross                | Let it go.                                                       |
-| Rest the pointer in the menu bar                     | Bring the line down on that screen.                              |
-| Click anything in the menu bar                       | Put it away.                                                     |
+| | |
+|:--|:--|
+| Click | Copy the image. |
+| Press and hold | Open it in Markup. |
+| Double click | Open it in Preview. |
+| Force click | Take a quick look. |
+| Drag into an app | Send a copy. It stays on the line. |
+| Drag into a folder | Keep it there. It leaves the line. |
+| Drag to the Trash, or click the cross | Let it go. |
+| Rest the pointer in the menu bar | Bring the line down on that screen. |
+| Click anything in the menu bar | Put it away. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Show or hide the line. Change it under Shortcut in the menu bar. |
 
 <br>
@@ -87,15 +91,15 @@ Tendedero runs entirely on your Mac, and your screenshots never leave it.
 
 ## Tech Specs
 
-|                    |                                                                                                             |
-| :----------------- | :---------------------------------------------------------------------------------------------------------- |
-| **Compatibility**  | macOS 14 Sonoma or later, on Apple silicon and Intel. Designed for macOS 27.                                |
-| **Size**           | 1.7 MB                                                                                                      |
-| **Languages**      | English, Spanish, French, Portuguese (Brazil), Japanese, Korean, Chinese (Simplified), Turkish, Azerbaijani |
-| **Built with**     | Swift, AppKit and SwiftUI                                                                                   |
-| **Network access** | None                                                                                                        |
-| **Price**          | Free                                                                                                        |
-| **License**        | MIT for the code. The name and icon are not included.                                                       |
+| | |
+|:--|:--|
+| **Compatibility** | macOS 14 Sonoma or later, on Apple silicon and Intel. Designed for macOS 27. |
+| **Size** | 1.7 MB |
+| **Languages** | English, Spanish, French, Portuguese (Brazil), Japanese, Korean, Chinese (Simplified), Turkish, Azerbaijani |
+| **Built with** | Swift, AppKit and SwiftUI |
+| **Network access** | None |
+| **Price** | Free |
+| **License** | MIT for the code. The name and icon are not included. |
 
 <br>
 
@@ -129,20 +133,20 @@ so macOS asks again for access to the Desktop after each rebuild.
 <summary>Inside the app</summary>
 <br>
 
-| File                      | Role                                                    |
-| :------------------------ | :------------------------------------------------------ |
-| `AppDelegate.swift`       | Menu bar, shortcut, revealing and tucking away the line |
-| `LinePanel.swift`         | The transparent strip along the top of the screen       |
-| `LineView.swift`          | The line and where each photo hangs                     |
-| `PeggedView.swift`        | One photo: glass frame, clip, swing and breeze          |
-| `GrabArea.swift`          | Click, long press, drag and drop                        |
-| `ScreenshotWatcher.swift` | Notices new screenshots                                 |
-| `ClipboardWatcher.swift`  | Notices images copied to the clipboard                  |
-| `Inbox.swift`             | Takes over screenshot settings and puts them back       |
-| `Markup.swift`            | Opens the system Markup editor and saves the result     |
-| `Trim.swift`              | Trims a screen recording and saves the result           |
-| `FullScreen.swift`        | Knows when to stay hidden                               |
-| `Line.swift`              | What is hanging, and what you can do with it            |
+| File | Role |
+|:--|:--|
+| `AppDelegate.swift` | Menu bar, shortcut, revealing and tucking away the line |
+| `LinePanel.swift` | The transparent strip along the top of the screen |
+| `LineView.swift` | The line and where each photo hangs |
+| `PeggedView.swift` | One photo: glass frame, clip, swing and breeze |
+| `GrabArea.swift` | Click, long press, drag and drop |
+| `ScreenshotWatcher.swift` | Notices new screenshots |
+| `ClipboardWatcher.swift` | Notices images copied to the clipboard |
+| `Inbox.swift` | Takes over screenshot settings and puts them back |
+| `Markup.swift` | Opens the system Markup editor and saves the result |
+| `Trim.swift` | Trims a screen recording and saves the result |
+| `FullScreen.swift` | Knows when to stay hidden |
+| `Line.swift` | What is hanging, and what you can do with it |
 
 Every image here, the icon included, is drawn in code by
 `scripts/make-icon.swift` and `scripts/make-readme-art.swift`.
