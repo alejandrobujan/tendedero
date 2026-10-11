@@ -104,6 +104,7 @@ struct PeggedView: View {
                     Label(L("Copied"), systemImage: "checkmark")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(.primary)
+                        .fixedSize()
                         .padding(.horizontal, 10)
                         .padding(.vertical, 5)
                         .glassFrame(capsule: true)

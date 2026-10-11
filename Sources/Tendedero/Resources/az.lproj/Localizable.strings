@@ -46,6 +46,10 @@
 "Images you copy hang on the line too" = "Kopyaladığınız şəkillər də ipdən asılır";
 "Tendedero, hanging copied images" = "Tendedero, kopyalanmış şəkilləri asır";
 
+/* Language menu */
+"Language" = "Dil";
+"System Default" = "Sistem dili";
+
 /* GrabArea */
 "Copy" = "Kopyala";
 "Open" = "Aç";
