@@ -43,8 +43,9 @@ Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 | | |
 |:--|:--|
 | Click | Copy the image. |
-| Press and hold | Open it in Markup. |
-| Double click | Open it in Preview. |
+| Press and hold | Open the image editor; trim a recording. |
+| Double click | Open the image editor; play a recording. |
+| Hover and click Edit | Open Crop, Cut Out, Arrow, and Rectangle tools. |
 | Force click | Take a quick look. |
 | Drag into an app | Send a copy. It stays on the line. |
 | Drag into a folder | Keep it there. It leaves the line. |
@@ -75,6 +76,38 @@ hangs on the line like any other. Turn on Hang copied images in the menu bar
 and the shirt fills in while it is on. Only images: anything copied along
 with text or a file, and anything a password manager marks as private, is
 left alone.
+
+<br>
+
+## Long pages. Shorter images.
+
+Choose **Scrolling Capture…** in the menu bar, then drag around the scrollable
+content. Choose **Vertical** or **Horizontal**, click **Start Capture**, and
+scroll down or right. A live preview grows as new content is captured. Use
+**Auto-scroll** to move the page in small steps; **Pause** stops it. Moving the
+pointer outside the selected area also pauses Auto-scroll. Click **Done** to
+save the preview as a PNG and open it in the image editor.
+
+Select content inside one display, preferably leaving toolbars and scrollbars
+outside. Matching tolerates small animations and stationary edges, and keeps
+detected fixed headers and footers once. Views must still overlap. If matching
+stalls, scroll back slightly to recover or click **Done** to save what the preview
+shows. Large animations, repeated patterns, or layout changes may prevent a
+reliable match. Avoid resizing or zooming the original window during capture.
+Screen Recording access is required; Auto-scroll additionally needs macOS
+Accessibility access. Manual scrolling works without Accessibility access.
+Capture runs locally and omits the pointer and Tendedero's windows. Images are
+limited to 80 million pixels and 32,768 pixels along either edge.
+
+Hover over a screenshot and click **Edit**, double-click it, or use **Edit Latest
+Image…** / **Open Image in Editor…** in the menu bar. The native editor offers
+**Crop**, **Cut Out**, **Arrow**, and **Rectangle**, plus zoom, copy, and PNG export.
+For Cut Out, choose **Horizontal** to remove rows and join the top and
+bottom, or **Vertical** to remove columns and join the left and right.
+Drag either way across the unwanted strip and click **Cut**. Repeat as needed;
+**Undo** or **⌘Z** reverses the last edit. **Save Copy** hangs an edited PNG while
+preserving the original. System **Markup** remains in the right-click menu for
+additional annotation tools. Recordings retain their existing trimming action.
 
 <br>
 
@@ -122,8 +155,10 @@ scripts/build-app.sh
 open build/Tendedero.app
 ```
 
-Requires the Swift toolchain. Xcode is optional. With the Command Line Tools for macOS 27, the script falls back to the macOS 26 SDK they install alongside, because the new SDK needs a SwiftUI macro plugin only Xcode includes. Local builds are signed ad hoc,
-so macOS asks again for access to the Desktop after each rebuild.
+Requires the Swift toolchain. Xcode is optional. With the Command Line Tools for macOS 27, the script falls back to the macOS 26 SDK they install alongside, because the new SDK needs a SwiftUI macro plugin only Xcode includes. Local builds use an available Developer ID identity, selected by certificate SHA to avoid duplicate-name ambiguity. Without an identity, they use ad hoc signing. macOS may request folder access again after an ad hoc rebuild.
+
+To force ad hoc signing for a local test build, use
+`SIGN_IDENTITY=- scripts/build-app.sh debug`.
 
 <details>
 <summary>Inside the app</summary>
@@ -141,6 +176,10 @@ so macOS asks again for access to the Desktop after each rebuild.
 | `Inbox.swift` | Takes over screenshot settings and puts them back |
 | `Markup.swift` | Opens the system Markup editor and saves the result |
 | `Trim.swift` | Trims a screen recording and saves the result |
+| `ScrollingCapture.swift` | Selects a scrolling area, captures viewports, and joins them |
+| `ImageEditor.swift` | Visible crop, cut-out, arrow, and rectangle tools; copy and export |
+| `ImageGeometry.swift` | Pixel selection and overlap matching |
+| `ImageEditing.swift` | Image decoding, lossless strip removal, joining, and PNG export |
 | `FullScreen.swift` | Knows when to stay hidden |
 | `Line.swift` | What is hanging, and what you can do with it |
 
@@ -150,6 +189,11 @@ Every image here, the icon included, is drawn in code by
 
 Translations live in `Sources/Tendedero/Resources`, one `.lproj` folder per
 language. `swift scripts/check-strings.swift` checks that none is missing.
+
+Run `scripts/test-image-tools.sh` on macOS for the geometry, overlap, pixel order,
+transparency, and PNG tests. On Linux, the same script runs the portable geometry
+and overlap tests. Screen Recording permission and interaction with other apps
+must be checked on a Mac; see [the manual checks](docs/image-tools-testing.md).
 
 </details>
 

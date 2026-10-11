@@ -9,7 +9,7 @@ import SwiftUI
 /// - The Trash discards it.
 /// - Nowhere that accepts it: the photo flies back to the line.
 ///
-/// Click copies, press and hold opens Markup, the corner cross discards.
+/// Click copies, double-click or the visible Edit button opens the editor.
 struct GrabArea: NSViewRepresentable {
     let item: Pegged
     let line: Line
@@ -31,7 +31,9 @@ struct GrabArea: NSViewRepresentable {
         view.url = item.url
         view.dragImage = item.thumb
         view.onClick = { line.copy(id) }
-        view.onDoubleClick = { line.open(id) }
+        view.onDoubleClick = { isRecording ? line.open(id) : line.edit(id) }
+        view.canEdit = !isRecording
+        view.onEdit = { line.edit(id) }
         view.onDragStart = { line.draggingID = id }
         view.onDragEnd = {
             line.draggingID = nil
@@ -40,7 +42,7 @@ struct GrabArea: NSViewRepresentable {
         }
         view.onTrash = { line.trash(id) }
         view.onDiscard = { line.discard(id) }
-        view.onLongPress = { line.markup(id) }
+        view.onLongPress = { isRecording ? line.markup(id) : line.edit(id) }
         view.onForceClick = { line.quickLook(id) }
         view.onPressChange = { pressed in line.pressedID = pressed ? id : nil }
         view.menuProvider = {
@@ -51,7 +53,9 @@ struct GrabArea: NSViewRepresentable {
             menu.addItem(ClosureMenuItem(L("Open")) { line.open(id) })
             menu.addItem(ClosureMenuItem(L("Quick Look")) { line.quickLook(id) })
             if !isRecording {
+                menu.addItem(ClosureMenuItem(L("Edit…")) { line.edit(id) })
                 menu.addItem(ClosureMenuItem(L("Markup")) { line.markup(id) })
+                menu.addItem(ClosureMenuItem(L("Cut Out…")) { line.cutOut(id) })
             }
             menu.addItem(ClosureMenuItem(L("Show in Finder")) { line.reveal(id) })
             let inInbox = line.isInInbox(id)
@@ -85,6 +89,8 @@ final class GrabView: NSView, NSDraggingSource {
     var dragImage: NSImage?
     var onClick: () -> Void = {}
     var onDoubleClick: () -> Void = {}
+    var canEdit = false
+    var onEdit: () -> Void = {}
     var onDragStart: () -> Void = {}
     var onDragEnd: () -> Void = {}
     var onTrash: () -> Void = {}
@@ -99,7 +105,7 @@ final class GrabView: NSView, NSDraggingSource {
     private var holdTimer: Timer?
     private var didLongPress = false
 
-    /// How long you hold before Markup opens. Long enough not to fire on a
+    /// How long you hold before the editor opens. Long enough not to fire on a
     /// slow click, short enough to feel deliberate.
     private static let holdDuration: TimeInterval = 0.45
 
@@ -120,6 +126,14 @@ final class GrabView: NSView, NSDraggingSource {
         if isInCross(event) {
             downPoint = nil
             onDiscard()
+            return
+        }
+        let point = convert(event.locationInWindow, from: nil)
+        let editRect = NSRect(x: max(0, bounds.width - 64), y: isFlipped ? bounds.height - 30 : 0,
+                              width: min(64, bounds.width), height: 30)
+        if canEdit, editRect.contains(point) {
+            downPoint = nil
+            onEdit()
             return
         }
         if event.clickCount == 2 {

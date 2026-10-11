@@ -64,3 +64,69 @@
 
 /* PeggedView */
 "Copied" = "Kopyalandı";
+
+/* Scrolling capture and cut-out */
+"Allow screen recording to capture a scrolling area" = "Sürüşdürülən sahəni çəkmək üçün ekran qeydinə icazə verin";
+"Cancel" = "Ləğv et";
+"Capturing the first frame…" = "İlk kadr çəkilir…";
+"Could not capture the scrolling area" = "Sürüşdürülən sahəni çəkmək mümkün olmadı";
+"Could not open this image" = "Bu şəkli açmaq mümkün olmadı";
+"Could not save the image" = "Şəkli saxlamaq mümkün olmadı";
+"Cut" = "Kəs";
+"Cut Out" = "Zolağı kəs";
+"Cut Out…" = "Zolağı kəs…";
+"Drag to select the scrolling area. Escape cancels." = "Sürüşdürülən sahəni seçmək üçün sürükləyin. Escape ləğv edir.";
+"Enable Tendedero in System Settings → Privacy & Security → Screen Recording, then try again. You may need to reopen Tendedero." = "Sistem parametrləri → Məxfilik və təhlükəsizlik → Ekran qeydi bölməsində Tendedero-nu aktivləşdirib yenidən cəhd edin. Tendedero-nu yenidən açmaq lazım ola bilər.";
+"Horizontal strip" = "Üfüqi zolaq";
+"Joining the capture…" = "Çəkiliş birləşdirilir…";
+"Open Settings" = "Parametrləri aç";
+"Save Copy" = "Surəti saxla";
+"Scrolling Capture" = "Sürüşdürərək çəkiliş";
+"Scrolling Capture…" = "Sürüşdürərək çəkiliş…";
+"Undo" = "Geri al";
+"Vertical strip" = "Şaquli zolaq";
+
+/* Image editor and live scrolling capture */
+"%@ frames · %@ × %@ pixels" = "%@ kadr · %@ × %@ piksel";
+"Allow Accessibility to use Auto-scroll" = "Avtomatik sürüşdürmə üçün Əlçatanlığa icazə verin";
+"Apply" = "Tətbiq et";
+"Arrow" = "Ox";
+"Auto-scroll" = "Avtomatik sürüşdür";
+"Auto-scroll paused. Click Auto-scroll to resume." = "Avtomatik sürüşdürmə dayandırıldı. Davam etmək üçün Avtomatik sürüşdür düyməsinə klikləyin.";
+"Capture paused. Click Done to save what is shown in the preview." = "Çəkiliş dayandırıldı. Önizləmədə görünəni saxlamaq üçün Hazır düyməsinə klikləyin.";
+"Capture size limit reached. Click Done to save." = "Çəkiliş ölçü həddinə çatdı. Saxlamaq üçün Hazır düyməsinə klikləyin.";
+"Crop" = "Kəsib saxla";
+"Done" = "Hazır";
+"Edit" = "Düzəliş et";
+"Edit Latest Image…" = "Son şəklə düzəliş et…";
+"Edit…" = "Düzəliş et…";
+"Enable Tendedero in System Settings → Privacy & Security → Accessibility. You can still scroll manually without this permission." = "Sistem parametrləri → Məxfilik və təhlükəsizlik → Əlçatanlıq bölməsində Tendedero-nu aktiv edin. Bu icazə olmadan da əl ilə sürüşdürə bilərsiniz.";
+"Export…" = "İxrac et…";
+"Fit" = "Sığdır";
+"Horizontal" = "Üfüqi";
+"Image Editor" = "Şəkil redaktoru";
+"Live preview" = "Canlı önizləmə";
+"No more movement detected. Click Done to open the editor." = "Daha hərəkət aşkarlanmadı. Redaktoru açmaq üçün Hazır düyməsinə klikləyin.";
+"Open Image in Editor…" = "Şəkli redaktorda aç…";
+"Pause" = "Dayandır";
+"Rectangle" = "Düzbucaqlı";
+"Save changes before closing?" = "Bağlamazdan əvvəl dəyişikliklər saxlanılsın?";
+"Start Capture" = "Çəkilişi başlat";
+"Vertical" = "Şaquli";
+"Waiting for matching content. Scroll back slightly, or click Done to save the preview." = "Uyğun məzmun gözlənilir. Bir az geri sürüşdürün və ya önizləməni saxlamaq üçün Hazır düyməsinə klikləyin.";
+"Zoom in" = "Yaxınlaşdır";
+"Zoom out" = "Uzaqlaşdır";
+
+/* Image tools polish */
+"Original preserved" = "Orijinal qorunur";
+"%@ × %@ pixels" = "%@ × %@ piksel";
+"Drag over the band to remove." = "Silinəcək zolağın üzərindən sürüşdürün.";
+"Drag around the area to keep." = "Saxlanılacaq sahəni sürüşdürərək seçin.";
+"Drag to draw, then click Apply." = "Çəkmək üçün sürüşdürün, sonra Tətbiq et düyməsini basın.";
+"Remove %@ pixels" = "%@ pikseli sil";
+"Start at the top or left, then capture." = "Yuxarıdan və ya soldan başlayın, sonra çəkilişi başladın.";
+"Preview appears when capture starts." = "Çəkiliş başladıqda önbaxış görünəcək.";
+"Scroll slowly, or use Auto-scroll." = "Yavaş sürüşdürün və ya Avtomatik sürüşdürmədən istifadə edin.";
+"Auto-scroll is running." = "Avtomatik sürüşdürmə işləyir.";
+"Saving…" = "Saxlanılır…";
+"%@ frame · %@ × %@ pixels" = "%@ kadr · %@ × %@ piksel";
