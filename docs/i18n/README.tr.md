@@ -1,6 +1,6 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/hero-dark.png">
-  <img src="../images/hero-light.png" alt="Tendedero. Ekran görüntüleri, ipin üzerinde. macOS menü çubuğunun altında ince bir ipten sallanan cam çerçeveli üç ekran görüntüsü.">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/tr/hero-dark.png">
+  <img src="../images/tr/hero-light.png" alt="Tendedero. Ekran görüntüleri, ipin üzerinde. macOS menü çubuğunun altında ince bir ipten sallanan cam çerçeveli üç ekran görüntüsü.">
 </picture>
 
 <h3 align="center"><a href="https://tendedero.app/?lang=tr">tendedero.app adresinde tarayıcıdan deneyin&nbsp;&rsaquo;</a></h3>
@@ -25,8 +25,8 @@ Aldığınız her ekran görüntüsü, ekranınızın hemen üstündeki bir ipe 
 İşaretçiyi menü çubuğuna götürün, ip aşağı süzülür. Uzaklaşın, kaybolur.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/demo-dark.gif">
-  <img src="../images/demo-light.gif" alt="İşaretçi üst kenara değiyor, ip üç ekran görüntüsüyle sallanarak aşağı iniyor, bir tıklamayla biri kopyalanıyor ve işaretçi ayrılınca ip geri çekiliyor.">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/tr/demo-dark.gif">
+  <img src="../images/tr/demo-light.gif" alt="İşaretçi üst kenara değiyor, ip üç ekran görüntüsüyle sallanarak aşağı iniyor, bir tıklamayla biri kopyalanıyor ve işaretçi ayrılınca ip geri çekiliyor.">
 </picture>
 
 <br>
@@ -35,8 +35,8 @@ Aldığınız her ekran görüntüsü, ekranınızın hemen üstündeki bir ipe 
 ## Her şey için bir hareket.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/bento-dark.png">
-  <img src="../images/bento-light.png" alt="Tıkla ve kopyala. Basılı tut ve işaretle. Sürükle ve paylaş. Bırak gitsin.">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/tr/bento-dark.png">
+  <img src="../images/tr/bento-light.png" alt="Tıkla ve kopyala. Basılı tut ve işaretle. Sürükle ve paylaş. Bırak gitsin.">
 </picture>
 
 <br>
