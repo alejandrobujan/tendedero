@@ -62,3 +62,7 @@
 
 /* PeggedView */
 "Copied" = "복사됨";
+
+/* Hover activation area */
+"Only beside the notch" = "노치 옆에서만";
+"Rest the pointer just beside the notch, or in the centre of the menu bar on screens without a notch" = "노치 바로 옆에 포인터를 두세요. 노치가 없는 화면에서는 메뉴 막대 중앙에 두세요";

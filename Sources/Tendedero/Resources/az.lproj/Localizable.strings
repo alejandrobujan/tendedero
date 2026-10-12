@@ -64,3 +64,7 @@
 
 /* PeggedView */
 "Copied" = "Kopyalandı";
+
+/* Hover activation area */
+"Only beside the notch" = "Yalnız çentiğin yanında";
+"Rest the pointer just beside the notch, or in the centre of the menu bar on screens without a notch" = "Göstəricini çentiğin yanında, çentiği olmayan ekranlarda isə menyu sətrinin mərkəzində saxlayın";

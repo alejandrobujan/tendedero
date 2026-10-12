@@ -64,3 +64,7 @@
 
 /* PeggedView */
 "Copied" = "Copied";
+
+/* Hover activation area */
+"Only beside the notch" = "Only beside the notch";
+"Rest the pointer just beside the notch, or in the centre of the menu bar on screens without a notch" = "Rest the pointer just beside the notch, or in the centre of the menu bar on screens without a notch";

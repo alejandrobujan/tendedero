@@ -62,3 +62,7 @@
 
 /* PeggedView */
 "Copied" = "Copiado";
+
+/* Hover activation area */
+"Only beside the notch" = "Só ao carón da muesca";
+"Rest the pointer just beside the notch, or in the centre of the menu bar on screens without a notch" = "Deixa o punteiro ao carón da muesca, ou no centro da barra de menús nas pantallas sen muesca";

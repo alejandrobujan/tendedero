@@ -62,3 +62,7 @@
 
 /* PeggedView */
 "Copied" = "Copié";
+
+/* Hover activation area */
+"Only beside the notch" = "Uniquement près de l’encoche";
+"Rest the pointer just beside the notch, or in the centre of the menu bar on screens without a notch" = "Laissez le pointeur près de l’encoche, ou au centre de la barre des menus sur les écrans sans encoche";
