@@ -80,6 +80,18 @@ and the shirt fills in while it is on. Only images: anything copied along
 with text or a file, and anything a password manager marks as private, is
 left alone.
 
+QQ's screenshot tool includes a file URL alongside the image, so it needs
+an opt-in exception. Under **QQ screenshots**, turn on **Handle QQ screenshots (requires “Hang copied images”)**
+after enabling **Hang copied images**. This accepts QQ's temporary PNG format;
+ordinary file copies and private clipboard entries are still left alone.
+QQ may also use this format for other images copied in QQ.
+Turning off **Hang copied images** also turns off QQ handling and disables its
+menu item. After turning copied images back on, enable QQ handling again if wanted.
+
+The same submenu has **Allow QQ screenshots to run independently**. Each click
+sets QQ's standalone setting to true; it never toggles it off or launches QQ.
+The setting takes effect the next time QQ's screenshot tool starts.
+
 <br>
 
 ## Private by design.
