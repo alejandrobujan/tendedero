@@ -10,6 +10,7 @@ import SwiftUI
 /// - Nowhere that accepts it: the photo flies back to the line.
 ///
 /// Click copies, press and hold opens Markup, the corner cross discards.
+/// A note copies its text, and holding or double-clicking it edits it.
 struct GrabArea: NSViewRepresentable {
     let item: Pegged
     let line: Line
@@ -28,10 +29,13 @@ struct GrabArea: NSViewRepresentable {
         let id = item.id
         let line = line
         let isRecording = item.isRecording
-        view.url = item.url
+        let isNote = item.isNote
+        let url = item.url
+        view.url = url
+        view.isNote = isNote
         view.dragImage = item.thumb
         view.onClick = { line.copy(id) }
-        view.onDoubleClick = { line.open(id) }
+        view.onDoubleClick = { isNote ? line.markup(id) : line.open(id) }
         view.onDragStart = { line.draggingID = id }
         view.onDragEnd = {
             line.draggingID = nil
@@ -48,9 +52,22 @@ struct GrabArea: NSViewRepresentable {
             // Items say themselves whether they can be used.
             menu.autoenablesItems = false
             menu.addItem(ClosureMenuItem(L("Copy")) { line.copy(id) })
+            if isNote {
+                menu.addItem(ClosureMenuItem(L("Edit Note")) { line.markup(id) })
+                let colorItem = NSMenuItem(title: L("Color"), action: nil, keyEquivalent: "")
+                let colors = NSMenu()
+                let current = Notes.color(of: url)
+                for color in NoteColor.allCases {
+                    let item = ClosureMenuItem(color.name) { line.setColor(color, of: id) }
+                    item.state = color == current ? .on : .off
+                    colors.addItem(item)
+                }
+                colorItem.submenu = colors
+                menu.addItem(colorItem)
+            }
             menu.addItem(ClosureMenuItem(L("Open")) { line.open(id) })
             menu.addItem(ClosureMenuItem(L("Quick Look")) { line.quickLook(id) })
-            if !isRecording {
+            if !isRecording && !isNote {
                 menu.addItem(ClosureMenuItem(L("Markup")) { line.markup(id) })
             }
             menu.addItem(ClosureMenuItem(L("Show in Finder")) { line.reveal(id) })
@@ -82,6 +99,7 @@ final class GrabView: NSView, NSDraggingSource {
     static var isShowingMenu = false
 
     var url: URL?
+    var isNote = false
     var dragImage: NSImage?
     var onClick: () -> Void = {}
     var onDoubleClick: () -> Void = {}
@@ -164,7 +182,17 @@ final class GrabView: NSView, NSDraggingSource {
         startedDrag = true
         endPress()
 
-        let item = NSDraggingItem(pasteboardWriter: url as NSURL)
+        // A note also carries its words, for apps that take text.
+        let writer: NSPasteboardWriting
+        if isNote {
+            let entry = NSPasteboardItem()
+            entry.setString(url.absoluteString, forType: .fileURL)
+            entry.setString(Notes.text(of: url), forType: .string)
+            writer = entry
+        } else {
+            writer = url as NSURL
+        }
+        let item = NSDraggingItem(pasteboardWriter: writer)
         item.setDraggingFrame(imageFrame(), contents: dragImage)
         let session = beginDraggingSession(with: [item], event: event, source: self)
         // Released where nothing accepts it: it flies back to the line.

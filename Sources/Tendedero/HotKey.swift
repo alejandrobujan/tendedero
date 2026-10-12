@@ -1,27 +1,32 @@
 import AppKit
 import Carbon
 
-/// A single global shortcut through the Carbon hot key API. Unlike a global
-/// key monitor, it needs no Accessibility permission.
+/// A global shortcut through the Carbon hot key API. Unlike a global key
+/// monitor, it needs no Accessibility permission. Each shortcut has its own
+/// id: 1 shows the line, 2 writes a new note.
 final class HotKey {
     private var ref: EventHotKeyRef?
-    private static var action: (() -> Void)?
+    private static var actions: [UInt32: () -> Void] = [:]
     private static var handlerInstalled = false
 
     /// Nil when the combination cannot be registered, for example because
     /// another app already took it.
-    init?(_ shortcut: Shortcut, action: @escaping () -> Void) {
-        HotKey.action = action
-        // One handler for the app, however many times the shortcut changes.
+    init?(_ shortcut: Shortcut, id: UInt32 = 1, action: @escaping () -> Void) {
+        HotKey.actions[id] = action
+        // One handler for the app, however many times the shortcuts change.
         if !HotKey.handlerInstalled {
             var spec = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
-            InstallEventHandler(GetApplicationEventTarget(), { _, _, _ in
-                DispatchQueue.main.async { HotKey.action?() }
+            InstallEventHandler(GetApplicationEventTarget(), { _, event, _ in
+                var pressed = EventHotKeyID()
+                GetEventParameter(event, EventParamName(kEventParamDirectObject), EventParamType(typeEventHotKeyID),
+                                  nil, MemoryLayout<EventHotKeyID>.size, nil, &pressed)
+                let id = pressed.id
+                DispatchQueue.main.async { HotKey.actions[id]?() }
                 return noErr
             }, 1, &spec, nil, nil)
             HotKey.handlerInstalled = true
         }
-        let id = EventHotKeyID(signature: OSType(0x5445_4E44), id: 1) // "TEND"
+        let id = EventHotKeyID(signature: OSType(0x5445_4E44), id: id) // "TEND"
         let status = RegisterEventHotKey(UInt32(shortcut.keyCode), UInt32(shortcut.carbonModifiers), id,
                                          GetApplicationEventTarget(), 0, &ref)
         guard status == noErr, ref != nil else { return nil }
@@ -40,6 +45,8 @@ struct Shortcut: Equatable {
     var key: String
 
     static let standard = Shortcut(keyCode: kVK_ANSI_T, modifiers: [.control, .option], key: "t")
+    /// Writes a new note. Fixed, next to the one for the line.
+    static let newNote = Shortcut(keyCode: kVK_ANSI_N, modifiers: [.control, .option], key: "n")
 
     private static let defaultsKey = "shortcut"
 

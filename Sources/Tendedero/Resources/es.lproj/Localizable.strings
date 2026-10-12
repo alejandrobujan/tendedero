@@ -62,3 +62,17 @@
 
 /* PeggedView */
 "Copied" = "Copiado";
+
+/* Notes */
+"New Note…" = "Nueva nota…";
+"New Note" = "Nueva nota";
+"Edit Note" = "Editar nota";
+"Hang" = "Colgar";
+"Save" = "Guardar";
+"Cancel" = "Cancelar";
+"Write something…" = "Escribe algo…";
+"Color" = "Color";
+"Yellow" = "Amarillo";
+"Pink" = "Rosa";
+"Blue" = "Azul";
+"Green" = "Verde";
