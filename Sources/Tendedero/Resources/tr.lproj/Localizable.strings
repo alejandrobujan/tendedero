@@ -76,3 +76,6 @@
 "Pink" = "Pembe";
 "Blue" = "Mavi";
 "Green" = "Yeşil";
+
+/* Zoom */
+"Zoom on hover" = "Üzerine gelince büyüt";

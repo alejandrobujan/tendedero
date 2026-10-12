@@ -47,6 +47,7 @@ Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 
 | | |
 |:--|:--|
+| Rest the pointer on it | See it larger, just below the line. Turn it off with Zoom on hover in the menu bar. |
 | Click | Copy the image. |
 | Press and hold | Open it in Markup. |
 | Double click | Open it in Preview. |
@@ -162,6 +163,7 @@ so macOS asks again for access to the Desktop after each rebuild.
 | `Line.swift` | What is hanging, and what you can do with it |
 | `Note.swift` | Sticky notes: the text file, its colour and how it is drawn |
 | `NoteEditor.swift` | The window a note is written in |
+| `Zoom.swift` | The larger copy under the pointer |
 
 Every image here, the icon included, is drawn in code by
 `scripts/make-icon.swift` and `scripts/make-readme-art.swift`.

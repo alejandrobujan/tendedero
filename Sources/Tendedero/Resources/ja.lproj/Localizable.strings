@@ -76,3 +76,6 @@
 "Pink" = "ピンク";
 "Blue" = "青";
 "Green" = "緑";
+
+/* Zoom */
+"Zoom on hover" = "ポインタを重ねて拡大";

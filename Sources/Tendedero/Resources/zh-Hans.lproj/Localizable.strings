@@ -76,3 +76,6 @@
 "Pink" = "粉色";
 "Blue" = "蓝色";
 "Green" = "绿色";
+
+/* Zoom */
+"Zoom on hover" = "悬停时放大";

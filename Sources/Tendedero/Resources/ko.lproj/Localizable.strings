@@ -76,3 +76,6 @@
 "Pink" = "분홍색";
 "Blue" = "파란색";
 "Green" = "초록색";
+
+/* Zoom */
+"Zoom on hover" = "포인터를 올리면 확대";

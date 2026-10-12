@@ -76,3 +76,6 @@
 "Pink" = "Rosa";
 "Blue" = "Azul";
 "Green" = "Verde";
+
+/* Zoom */
+"Zoom on hover" = "Ampliar al pasar el puntero";

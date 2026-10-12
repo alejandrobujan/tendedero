@@ -49,6 +49,7 @@ Posez le pointeur dans la barre des menus et la corde descend. Éloignez-le et e
 
 | | |
 |:--|:--|
+| Poser le pointeur dessus | L’affiche en grand, juste sous la corde. Désactivable via Agrandir au survol, dans la barre des menus. |
 | Clic | Copie l’image. |
 | Clic maintenu | L’ouvre dans Annotation. |
 | Double-clic | L’ouvre dans Aperçu. |
@@ -168,6 +169,7 @@ l’accès au bureau après chaque recompilation.
 | `Line.swift` | Ce qui est accroché, et ce que vous pouvez en faire |
 | `Note.swift` | Les post-it : le fichier texte, sa couleur et son dessin |
 | `NoteEditor.swift` | La fenêtre où l’on écrit un post-it |
+| `Zoom.swift` | L’aperçu agrandi sous le pointeur |
 
 Toutes les images de cette page, icône comprise, sont dessinées en code par
 `scripts/make-icon.swift` et `scripts/make-readme-art.swift`.
