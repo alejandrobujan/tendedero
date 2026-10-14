@@ -43,6 +43,8 @@
 "Hang copied images" = "Pendurar imaxes copiadas";
 "Images you copy hang on the line too" = "As imaxes que copias tamén se penduran";
 "Tendedero, hanging copied images" = "Tendedero, pendurando imaxes copiadas";
+"Delete permanently" = "Eliminar definitivamente";
+"Discarded screenshots skip the Trash" = "As capturas descartadas non pasan pola Papeleira";
 
 /* GrabArea */
 "Copy" = "Copiar";
@@ -56,6 +58,7 @@
 "Move to Trash" = "Mover á Papeleira";
 "Take down everything to the left" = "Descolgar todo o da esquerda";
 "Take down everything to the right" = "Descolgar todo o da dereita";
+"Delete" = "Eliminar";
 
 /* LineView */
 "Take a screenshot and it will hang here" = "Fai unha captura e quedará pendurada aquí";

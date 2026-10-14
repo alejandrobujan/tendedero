@@ -45,6 +45,8 @@
 "Hang copied images" = "Kopyalanmış şəkilləri as";
 "Images you copy hang on the line too" = "Kopyaladığınız şəkillər də ipdən asılır";
 "Tendedero, hanging copied images" = "Tendedero, kopyalanmış şəkilləri asır";
+"Delete permanently" = "Həmişəlik sil";
+"Discarded screenshots skip the Trash" = "Atılan ekran görüntüləri Zibil qutusuna düşmür";
 
 /* GrabArea */
 "Copy" = "Kopyala";
@@ -58,6 +60,7 @@
 "Move to Trash" = "Zibil qutusuna at";
 "Take down everything to the left" = "Soldakıların hamısını götür";
 "Take down everything to the right" = "Sağdakıların hamısını götür";
+"Delete" = "Həmişəlik sil";
 
 /* LineView */
 "Take a screenshot and it will hang here" = "Ekran şəkli çəkin, burada asılacaq";

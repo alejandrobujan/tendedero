@@ -43,6 +43,8 @@
 "Hang copied images" = "Accrocher les images copiées";
 "Images you copy hang on the line too" = "Les images copiées s’accrochent aussi à la corde";
 "Tendedero, hanging copied images" = "Tendedero, accroche les images copiées";
+"Delete permanently" = "Supprimer définitivement";
+"Discarded screenshots skip the Trash" = "Les captures jetées ne passent pas par la corbeille";
 
 /* GrabArea */
 "Copy" = "Copier";
@@ -56,6 +58,7 @@
 "Move to Trash" = "Placer dans la corbeille";
 "Take down everything to the left" = "Tout décrocher à gauche";
 "Take down everything to the right" = "Tout décrocher à droite";
+"Delete" = "Supprimer";
 
 /* LineView */
 "Take a screenshot and it will hang here" = "Prenez une capture d’écran et elle s’accrochera ici";

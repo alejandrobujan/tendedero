@@ -43,6 +43,8 @@
 "Hang copied images" = "コピーした画像を吊るす";
 "Images you copy hang on the line too" = "コピーした画像もロープに吊るされます";
 "Tendedero, hanging copied images" = "Tendedero、コピーした画像を吊るしています";
+"Delete permanently" = "完全に削除";
+"Discarded screenshots skip the Trash" = "破棄したスクリーンショットをゴミ箱に入れない";
 
 /* GrabArea */
 "Copy" = "コピー";
@@ -56,6 +58,7 @@
 "Move to Trash" = "ゴミ箱に入れる";
 "Take down everything to the left" = "左側をすべて外す";
 "Take down everything to the right" = "右側をすべて外す";
+"Delete" = "削除";
 
 /* LineView */
 "Take a screenshot and it will hang here" = "スクリーンショットを撮ると、ここに吊るされます";

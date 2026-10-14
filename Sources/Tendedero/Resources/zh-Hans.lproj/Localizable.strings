@@ -43,6 +43,8 @@
 "Hang copied images" = "挂上复制的图片";
 "Images you copy hang on the line too" = "复制的图片也会挂上绳";
 "Tendedero, hanging copied images" = "Tendedero，正在挂上复制的图片";
+"Delete permanently" = "永久删除";
+"Discarded screenshots skip the Trash" = "丢弃的截图不进废纸篓";
 
 /* GrabArea */
 "Copy" = "复制";
@@ -56,6 +58,7 @@
 "Move to Trash" = "移到废纸篓";
 "Take down everything to the left" = "取下左侧全部";
 "Take down everything to the right" = "取下右侧全部";
+"Delete" = "删除";
 
 /* LineView */
 "Take a screenshot and it will hang here" = "截个图，它就会挂在这里";
