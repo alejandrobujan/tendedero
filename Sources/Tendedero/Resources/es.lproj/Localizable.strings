@@ -62,3 +62,11 @@
 
 /* PeggedView */
 "Copied" = "Copiado";
+
+// QQ screenshot integration
+"QQ screenshots" = "Capturas de QQ";
+"Allow QQ screenshots to run independently" = "Permitir que las capturas de QQ funcionen de forma independiente";
+"Handle QQ screenshots (requires “Hang copied images”)" = "Gestionar capturas de QQ (requiere «Colgar imágenes copiadas»)";
+"QQ screenshots can now run independently" = "Las capturas de QQ ya pueden funcionar de forma independiente";
+"The setting is saved. It takes effect the next time QQ's screenshot tool starts." = "La configuración se ha guardado. Se aplicará la próxima vez que se inicie la herramienta de capturas de QQ.";
+"Could not enable independent QQ screenshots" = "No se pudo activar el funcionamiento independiente de las capturas de QQ";
