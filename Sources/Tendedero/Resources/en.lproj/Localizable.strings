@@ -64,3 +64,69 @@
 
 /* PeggedView */
 "Copied" = "Copied";
+
+/* Scrolling capture and cut-out */
+"Allow screen recording to capture a scrolling area" = "Allow screen recording to capture a scrolling area";
+"Cancel" = "Cancel";
+"Capturing the first frame…" = "Capturing the first frame…";
+"Could not capture the scrolling area" = "Could not capture the scrolling area";
+"Could not open this image" = "Could not open this image";
+"Could not save the image" = "Could not save the image";
+"Cut" = "Cut";
+"Cut Out" = "Cut Out";
+"Cut Out…" = "Cut Out…";
+"Drag to select the scrolling area. Escape cancels." = "Drag to select the scrolling area. Escape cancels.";
+"Enable Tendedero in System Settings → Privacy & Security → Screen Recording, then try again. You may need to reopen Tendedero." = "Enable Tendedero in System Settings → Privacy & Security → Screen Recording, then try again. You may need to reopen Tendedero.";
+"Horizontal strip" = "Horizontal strip";
+"Joining the capture…" = "Joining the capture…";
+"Open Settings" = "Open Settings";
+"Save Copy" = "Save Copy";
+"Scrolling Capture" = "Scrolling Capture";
+"Scrolling Capture…" = "Scrolling Capture…";
+"Undo" = "Undo";
+"Vertical strip" = "Vertical strip";
+
+/* Image editor and live scrolling capture */
+"%@ frames · %@ × %@ pixels" = "%@ frames · %@ × %@ pixels";
+"Allow Accessibility to use Auto-scroll" = "Allow Accessibility to use Auto-scroll";
+"Apply" = "Apply";
+"Arrow" = "Arrow";
+"Auto-scroll" = "Auto-scroll";
+"Auto-scroll paused. Click Auto-scroll to resume." = "Auto-scroll paused. Click Auto-scroll to resume.";
+"Capture paused. Click Done to save what is shown in the preview." = "Capture paused. Click Done to save what is shown in the preview.";
+"Capture size limit reached. Click Done to save." = "Capture size limit reached. Click Done to save.";
+"Crop" = "Crop";
+"Done" = "Done";
+"Edit" = "Edit";
+"Edit Latest Image…" = "Edit Latest Image…";
+"Edit…" = "Edit…";
+"Enable Tendedero in System Settings → Privacy & Security → Accessibility. You can still scroll manually without this permission." = "Enable Tendedero in System Settings → Privacy & Security → Accessibility. You can still scroll manually without this permission.";
+"Export…" = "Export…";
+"Fit" = "Fit";
+"Horizontal" = "Horizontal";
+"Image Editor" = "Image Editor";
+"Live preview" = "Live preview";
+"No more movement detected. Click Done to open the editor." = "No more movement detected. Click Done to open the editor.";
+"Open Image in Editor…" = "Open Image in Editor…";
+"Pause" = "Pause";
+"Rectangle" = "Rectangle";
+"Save changes before closing?" = "Save changes before closing?";
+"Start Capture" = "Start Capture";
+"Vertical" = "Vertical";
+"Waiting for matching content. Scroll back slightly, or click Done to save the preview." = "Waiting for matching content. Scroll back slightly, or click Done to save the preview.";
+"Zoom in" = "Zoom in";
+"Zoom out" = "Zoom out";
+
+/* Image tools polish */
+"Original preserved" = "Original preserved";
+"%@ × %@ pixels" = "%@ × %@ pixels";
+"Drag over the band to remove." = "Drag over the band to remove.";
+"Drag around the area to keep." = "Drag around the area to keep.";
+"Drag to draw, then click Apply." = "Drag to draw, then click Apply.";
+"Remove %@ pixels" = "Remove %@ pixels";
+"Start at the top or left, then capture." = "Start at the top or left, then capture.";
+"Preview appears when capture starts." = "Preview appears when capture starts.";
+"Scroll slowly, or use Auto-scroll." = "Scroll slowly, or use Auto-scroll.";
+"Auto-scroll is running." = "Auto-scroll is running.";
+"Saving…" = "Saving…";
+"%@ frame · %@ × %@ pixels" = "%@ frame · %@ × %@ pixels";

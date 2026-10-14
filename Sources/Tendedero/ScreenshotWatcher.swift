@@ -1,8 +1,8 @@
 import Foundation
 
 /// Watches the folder macOS saves screenshots to and reports new ones.
-/// Tendedero never takes screenshots itself: you keep your usual shortcut
-/// (or CleanShot, or anything else) and the line just picks them up.
+/// Your usual screenshot shortcut (or another capture app) still works; the
+/// line also accepts images made by Tendedero's scrolling capture and cut-out.
 final class ScreenshotWatcher {
     let folder: URL
     /// On the Desktop we only accept real screenshots, tagged by macOS with an

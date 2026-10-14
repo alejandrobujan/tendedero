@@ -62,3 +62,69 @@
 
 /* PeggedView */
 "Copied" = "Copiado";
+
+/* Scrolling capture and cut-out */
+"Allow screen recording to capture a scrolling area" = "Permite la grabación de pantalla para capturar un área desplazable";
+"Cancel" = "Cancelar";
+"Capturing the first frame…" = "Capturando la primera imagen…";
+"Could not capture the scrolling area" = "No se pudo capturar el área desplazable";
+"Could not open this image" = "No se pudo abrir esta imagen";
+"Could not save the image" = "No se pudo guardar la imagen";
+"Cut" = "Recortar";
+"Cut Out" = "Recortar franja";
+"Cut Out…" = "Recortar franja…";
+"Drag to select the scrolling area. Escape cancels." = "Arrastra para seleccionar el área desplazable. Escape cancela.";
+"Enable Tendedero in System Settings → Privacy & Security → Screen Recording, then try again. You may need to reopen Tendedero." = "Activa Tendedero en Ajustes del Sistema → Privacidad y seguridad → Grabación de pantalla e inténtalo de nuevo. Puede que necesites volver a abrir Tendedero.";
+"Horizontal strip" = "Franja horizontal";
+"Joining the capture…" = "Uniendo las capturas…";
+"Open Settings" = "Abrir ajustes";
+"Save Copy" = "Guardar copia";
+"Scrolling Capture" = "Captura con desplazamiento";
+"Scrolling Capture…" = "Captura con desplazamiento…";
+"Undo" = "Deshacer";
+"Vertical strip" = "Franja vertical";
+
+/* Image editor and live scrolling capture */
+"%@ frames · %@ × %@ pixels" = "%@ fotogramas · %@ × %@ píxeles";
+"Allow Accessibility to use Auto-scroll" = "Permite Accesibilidad para usar el desplazamiento automático";
+"Apply" = "Aplicar";
+"Arrow" = "Flecha";
+"Auto-scroll" = "Desplazamiento automático";
+"Auto-scroll paused. Click Auto-scroll to resume." = "Desplazamiento automático en pausa. Haz clic en Desplazamiento automático para continuar.";
+"Capture paused. Click Done to save what is shown in the preview." = "Captura en pausa. Haz clic en Listo para guardar lo que aparece en la vista previa.";
+"Capture size limit reached. Click Done to save." = "Se ha alcanzado el límite de tamaño. Haz clic en Listo para guardar.";
+"Crop" = "Recortar";
+"Done" = "Listo";
+"Edit" = "Editar";
+"Edit Latest Image…" = "Editar última imagen…";
+"Edit…" = "Editar…";
+"Enable Tendedero in System Settings → Privacy & Security → Accessibility. You can still scroll manually without this permission." = "Activa Tendedero en Ajustes del Sistema → Privacidad y seguridad → Accesibilidad. Puedes desplazarte manualmente sin este permiso.";
+"Export…" = "Exportar…";
+"Fit" = "Ajustar";
+"Horizontal" = "Horizontal";
+"Image Editor" = "Editor de imágenes";
+"Live preview" = "Vista previa en directo";
+"No more movement detected. Click Done to open the editor." = "No se detecta más movimiento. Haz clic en Listo para abrir el editor.";
+"Open Image in Editor…" = "Abrir imagen en el editor…";
+"Pause" = "Pausar";
+"Rectangle" = "Rectángulo";
+"Save changes before closing?" = "¿Guardar los cambios antes de cerrar?";
+"Start Capture" = "Iniciar captura";
+"Vertical" = "Vertical";
+"Waiting for matching content. Scroll back slightly, or click Done to save the preview." = "Esperando contenido coincidente. Retrocede un poco o haz clic en Listo para guardar la vista previa.";
+"Zoom in" = "Acercar";
+"Zoom out" = "Alejar";
+
+/* Image tools polish */
+"Original preserved" = "Se conserva el original";
+"%@ × %@ pixels" = "%@ × %@ píxeles";
+"Drag over the band to remove." = "Arrastra sobre la franja que quieres eliminar.";
+"Drag around the area to keep." = "Arrastra para seleccionar el área que quieres conservar.";
+"Drag to draw, then click Apply." = "Arrastra para dibujar y haz clic en Aplicar.";
+"Remove %@ pixels" = "Eliminar %@ píxeles";
+"Start at the top or left, then capture." = "Empieza arriba o a la izquierda e inicia la captura.";
+"Preview appears when capture starts." = "La vista previa aparece al iniciar la captura.";
+"Scroll slowly, or use Auto-scroll." = "Desplázate lentamente o usa el desplazamiento automático.";
+"Auto-scroll is running." = "El desplazamiento automático está en marcha.";
+"Saving…" = "Guardando…";
+"%@ frame · %@ × %@ pixels" = "%@ fotograma · %@ × %@ píxeles";
