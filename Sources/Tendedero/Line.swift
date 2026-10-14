@@ -202,7 +202,7 @@ final class Line: ObservableObject {
     /// Files anywhere else, like the Desktop, stay where they are.
     func isInInbox(_ id: UUID) -> Bool {
         guard let item = items.first(where: { $0.id == id }) else { return false }
-        return item.url.standardizedFileURL.path.hasPrefix(Inbox.folder.standardizedFileURL.path + "/")
+        return Inbox.isTemporaryFile(item.url)
     }
 
     /// The corner cross and "Take down" both end up here.

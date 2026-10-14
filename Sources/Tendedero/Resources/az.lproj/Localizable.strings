@@ -4,14 +4,12 @@
 
 /* AppDelegate */
 "Let Tendedero handle your screenshots?" = "Ekran şəkillərinizi Tendedero idarə etsin?";
-"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "Ekran şəkilləri üzən miniatür olmadan, çəkdiyiniz an ipdən asılacaq və İş masanızda yığılıb qalmayacaq. Saxlamaq istədiyinizi qovluğa sürükləyin, istəmədiyinizi çarpazla atın. Bunu menyu panelindən söndürə bilərsiniz, Tendedero bağlananda isə ayarlarınız əvvəlki halına qayıdır.";
 "Turn on" = "Aktiv et";
 "Not now" = "İndi yox";
 "Hide line" = "İpi gizlət";
 "Show line" = "İpi göstər";
 "Take everything down" = "Hamısını ipdən yığ";
 "Handle screenshots" = "Ekran şəkillərini idarə et";
-"Screenshots hang instantly and skip the Desktop" = "Ekran şəkilləri dərhal asılır və İş masasına düşmür";
 "Open screenshots folder" = "Ekran şəkilləri qovluğunu aç";
 "Sounds" = "Səslər";
 "Open at login" = "Sistemə girişdə aç";
@@ -64,3 +62,14 @@
 
 /* PeggedView */
 "Copied" = "Kopyalandı";
+
+/* Screenshot location */
+"Screenshots will hang instantly and save to the folder in Screenshot location, without the floating thumbnail. The default folder is temporary; files in a custom folder are kept when taken off the line. Your previous screenshot settings return when Tendedero quits." = "Ekran görüntüləri üzən kiçik şəkil olmadan dərhal asılır və Ekran görüntülərinin yeri bölməsində seçilən qovluğa saxlanılır. Standart qovluq müvəqqətidir; xüsusi qovluqdakı fayllar ipdən endiriləndə saxlanılır. Tendedero bağlandıqda əvvəlki ekran görüntüsü ayarlarınız bərpa olunur.";
+"Screenshots hang instantly and save to the selected folder" = "Ekran görüntüləri dərhal asılır və seçilən qovluğa saxlanılır";
+"Screenshot location" = "Ekran görüntülərinin yeri";
+"Default temporary folder" = "Standart müvəqqəti qovluq";
+"Choose Folder…" = "Qovluq Seç…";
+"Open selected folder" = "Seçilən qovluğu aç";
+"Screenshots in a custom folder are kept when taken off the line. Choose a folder outside the default temporary folder." = "Xüsusi qovluqdakı ekran görüntüləri ipdən endiriləndə saxlanılır. Standart müvəqqəti qovluqdan kənarda bir qovluq seçin.";
+"Could not use the screenshot folder" = "Ekran görüntüsü qovluğundan istifadə etmək mümkün olmadı";
+"Choose a writable folder and try again." = "Yazıla bilən qovluq seçib yenidən cəhd edin.";

@@ -2,14 +2,12 @@
 
 /* AppDelegate */
 "Let Tendedero handle your screenshots?" = "Ekran görüntülerini Tendedero yönetsin mi?";
-"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "Ekran görüntüleri, kayan küçük resim olmadan anında ipin üzerine asılacak ve Masaüstünüzde birikmeyecek. Saklamak için bir klasöre sürükleyin ya da çarpı ile silin. Bunu menü çubuğundan kapatabilirsiniz; Tendedero kapandığında ayarlarınız geri gelir.";
 "Turn on" = "Etkinleştir";
 "Not now" = "Şimdi değil";
 "Hide line" = "İpi gizle";
 "Show line" = "İpi göster";
 "Take everything down" = "Hepsini indir";
 "Handle screenshots" = "Ekran görüntülerini yönet";
-"Screenshots hang instantly and skip the Desktop" = "Ekran görüntüleri anında asılır ve Masaüstünü atlar";
 "Open screenshots folder" = "Ekran görüntüleri klasörünü aç";
 "Sounds" = "Sesler";
 "Open at login" = "Başlangıçta aç";
@@ -62,3 +60,14 @@
 
 /* PeggedView */
 "Copied" = "Kopyalandı";
+
+/* Screenshot location */
+"Screenshots will hang instantly and save to the folder in Screenshot location, without the floating thumbnail. The default folder is temporary; files in a custom folder are kept when taken off the line. Your previous screenshot settings return when Tendedero quits." = "Ekran görüntüleri, kayan küçük resim olmadan anında asılır ve Ekran görüntüsü konumu bölümünde seçilen klasöre kaydedilir. Varsayılan klasör geçicidir; özel klasördeki dosyalar ipten indirildiğinde saklanır. Tendedero kapatıldığında önceki ekran görüntüsü ayarlarınız geri yüklenir.";
+"Screenshots hang instantly and save to the selected folder" = "Ekran görüntüleri anında asılır ve seçilen klasöre kaydedilir";
+"Screenshot location" = "Ekran görüntüsü konumu";
+"Default temporary folder" = "Varsayılan geçici klasör";
+"Choose Folder…" = "Klasör Seç…";
+"Open selected folder" = "Seçilen klasörü aç";
+"Screenshots in a custom folder are kept when taken off the line. Choose a folder outside the default temporary folder." = "Özel klasördeki ekran görüntüleri ipten indirildiğinde saklanır. Varsayılan geçici klasörün dışında bir klasör seçin.";
+"Could not use the screenshot folder" = "Ekran görüntüsü klasörü kullanılamadı";
+"Choose a writable folder and try again." = "Yazılabilir bir klasör seçip tekrar deneyin.";

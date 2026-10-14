@@ -2,14 +2,12 @@
 
 /* AppDelegate */
 "Let Tendedero handle your screenshots?" = "让 Tendedero 接管你的截图？";
-"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "你截图的那一瞬间，图片就会挂到晾衣绳上——没有浮动缩略图，也不会堆到桌面上。拖进文件夹即保留，点叉即丢弃。随时可以从菜单栏关掉，退出 Tendedero 后你的设置会自动还原。";
 "Turn on" = "开启";
 "Not now" = "以后再说";
 "Hide line" = "隐藏晾衣绳";
 "Show line" = "显示晾衣绳";
 "Take everything down" = "全部取下";
 "Handle screenshots" = "接管截图";
-"Screenshots hang instantly and skip the Desktop" = "截图即刻挂上，不再经过桌面";
 "Open screenshots folder" = "打开截图文件夹";
 "Sounds" = "声音";
 "Open at login" = "登录时打开";
@@ -62,3 +60,14 @@
 
 /* PeggedView */
 "Copied" = "已复制";
+
+/* Screenshot location */
+"Screenshots will hang instantly and save to the folder in Screenshot location, without the floating thumbnail. The default folder is temporary; files in a custom folder are kept when taken off the line. Your previous screenshot settings return when Tendedero quits." = "截图会立即挂上，并保存到「截图保存位置」中选择的文件夹，不显示浮动缩略图。默认文件夹用于临时存放；自定义文件夹中的图片从绳上取下后仍会保留。退出 Tendedero 后会恢复原来的截图设置。";
+"Screenshots hang instantly and save to the selected folder" = "截图即刻挂上，并保存到所选文件夹";
+"Screenshot location" = "截图保存位置";
+"Default temporary folder" = "默认临时文件夹";
+"Choose Folder…" = "选择文件夹…";
+"Open selected folder" = "打开所选文件夹";
+"Screenshots in a custom folder are kept when taken off the line. Choose a folder outside the default temporary folder." = "自定义文件夹中的截图从绳上取下后仍会保留。请选择默认临时文件夹以外的位置。";
+"Could not use the screenshot folder" = "无法使用截图文件夹";
+"Choose a writable folder and try again." = "请选择可写入的文件夹，然后重试。";

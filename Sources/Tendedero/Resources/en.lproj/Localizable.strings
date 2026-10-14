@@ -4,14 +4,12 @@
 
 /* AppDelegate */
 "Let Tendedero handle your screenshots?" = "Let Tendedero handle your screenshots?";
-"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits.";
 "Turn on" = "Turn on";
 "Not now" = "Not now";
 "Hide line" = "Hide line";
 "Show line" = "Show line";
 "Take everything down" = "Take everything down";
 "Handle screenshots" = "Handle screenshots";
-"Screenshots hang instantly and skip the Desktop" = "Screenshots hang instantly and skip the Desktop";
 "Open screenshots folder" = "Open screenshots folder";
 "Sounds" = "Sounds";
 "Open at login" = "Open at login";
@@ -64,3 +62,14 @@
 
 /* PeggedView */
 "Copied" = "Copied";
+
+/* Screenshot location */
+"Screenshots will hang instantly and save to the folder in Screenshot location, without the floating thumbnail. The default folder is temporary; files in a custom folder are kept when taken off the line. Your previous screenshot settings return when Tendedero quits." = "Screenshots will hang instantly and save to the folder in Screenshot location, without the floating thumbnail. The default folder is temporary; files in a custom folder are kept when taken off the line. Your previous screenshot settings return when Tendedero quits.";
+"Screenshots hang instantly and save to the selected folder" = "Screenshots hang instantly and save to the selected folder";
+"Screenshot location" = "Screenshot location";
+"Default temporary folder" = "Default temporary folder";
+"Choose Folder…" = "Choose Folder…";
+"Open selected folder" = "Open selected folder";
+"Screenshots in a custom folder are kept when taken off the line. Choose a folder outside the default temporary folder." = "Screenshots in a custom folder are kept when taken off the line. Choose a folder outside the default temporary folder.";
+"Could not use the screenshot folder" = "Could not use the screenshot folder";
+"Choose a writable folder and try again." = "Choose a writable folder and try again.";
