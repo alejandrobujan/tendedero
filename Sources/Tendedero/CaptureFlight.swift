@@ -44,6 +44,8 @@ final class CaptureFlight {
     private let to: CGRect
     private let tilt: CGFloat
     private var falling = false
+    /// A note: bare paper, with no glass frame around it.
+    private var bare = false
     private var duration: CFTimeInterval = CaptureFlight.duration
     private var start: CFTimeInterval = 0
     private var timer: Timer?
@@ -73,9 +75,10 @@ final class CaptureFlight {
     /// A discarded card falling off the line, drawn over the whole screen so
     /// it is never cut by the line's strip. Same motion as the app always had:
     /// 520 points down, tilting further, fading, 0.55 s ease in.
-    static func fall(image: CGImage, card: CGRect, tilt: CGFloat, on screen: NSScreen) {
+    static func fall(image: CGImage, card: CGRect, tilt: CGFloat, bare: Bool = false, on screen: NSScreen) {
         let flight = CaptureFlight(image: image, from: card, to: card, tilt: tilt, screen: screen)
         flight.falling = true
+        flight.bare = bare
         flight.duration = 0.55
         current.append(flight)
         flight.completion = { [weak flight] in current.removeAll { $0 === flight } }
@@ -190,14 +193,15 @@ final class CaptureFlight {
     private func update(_ raw: Double) {
         let k = CGFloat(Self.easeInOutCubic(raw))
         let chrome = Float(Self.smooth(Double(k), 0.35, 1))
+        let glassy: Float = bare ? 0 : chrome
         let origin = window.frame.origin
         func lerp(_ a: CGFloat, _ b: CGFloat) -> CGFloat { a + (b - a) * k }
 
         let w = lerp(from.width, to.width), h = lerp(from.height, to.height)
         let topX = lerp(from.midX, to.midX) - origin.x
         let topY = lerp(from.maxY, to.maxY) - origin.y + sin(.pi * k) * Self.arc
-        let inset = 4 * k
-        let radius = lerp(0, 16)
+        let inset = bare ? 0 : 4 * k
+        let radius = bare ? Frame.noteRadius : lerp(0, 16)
 
         CATransaction.begin()
         CATransaction.setDisableActions(true)
@@ -209,11 +213,11 @@ final class CaptureFlight {
 
         glass.frame = container.bounds
         glass.cornerRadius = radius
-        glass.opacity = chrome
+        glass.opacity = glassy
         edge.frame = container.bounds
         edgeMask.path = CGPath(roundedRect: container.bounds.insetBy(dx: 0.75, dy: 0.75),
                                cornerWidth: max(0, radius - 0.75), cornerHeight: max(0, radius - 0.75), transform: nil)
-        edge.opacity = chrome
+        edge.opacity = glassy
         photo.frame = container.bounds.insetBy(dx: inset, dy: inset)
         photo.cornerRadius = max(0, radius - inset)
         // The clip grips the top edge: 26 points tall, 12 of them over the card.

@@ -62,3 +62,17 @@
 
 /* PeggedView */
 "Copied" = "복사됨";
+
+/* Notes */
+"New Note…" = "새 메모…";
+"New Note" = "새 메모";
+"Edit Note" = "메모 편집";
+"Hang" = "걸기";
+"Save" = "저장";
+"Cancel" = "취소";
+"Write something…" = "무언가 적어 보세요…";
+"Color" = "색상";
+"Yellow" = "노란색";
+"Pink" = "분홍색";
+"Blue" = "파란색";
+"Green" = "초록색";

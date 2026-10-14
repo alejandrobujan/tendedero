@@ -62,3 +62,17 @@
 
 /* PeggedView */
 "Copied" = "已复制";
+
+/* Notes */
+"New Note…" = "新建便签…";
+"New Note" = "新建便签";
+"Edit Note" = "编辑便签";
+"Hang" = "挂上";
+"Save" = "存储";
+"Cancel" = "取消";
+"Write something…" = "写点什么…";
+"Color" = "颜色";
+"Yellow" = "黄色";
+"Pink" = "粉色";
+"Blue" = "蓝色";
+"Green" = "绿色";

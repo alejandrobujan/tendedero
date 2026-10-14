@@ -62,3 +62,17 @@
 
 /* PeggedView */
 "Copied" = "Copié";
+
+/* Notes */
+"New Note…" = "Nouveau post-it…";
+"New Note" = "Nouveau post-it";
+"Edit Note" = "Modifier le post-it";
+"Hang" = "Accrocher";
+"Save" = "Enregistrer";
+"Cancel" = "Annuler";
+"Write something…" = "Écrivez quelque chose…";
+"Color" = "Couleur";
+"Yellow" = "Jaune";
+"Pink" = "Rose";
+"Blue" = "Bleu";
+"Green" = "Vert";
