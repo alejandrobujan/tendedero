@@ -62,3 +62,6 @@
 
 /* PeggedView */
 "Copied" = "Kopyalandı";
+
+"Remove after dragging to an app" = "Bir uygulamaya sürükledikten sonra kaldır";
+"Take down after a successful drop; keep the original file" = "Başarıyla bırakıldığında ipten kaldır; özgün dosyayı koru";

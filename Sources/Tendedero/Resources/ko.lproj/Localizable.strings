@@ -62,3 +62,6 @@
 
 /* PeggedView */
 "Copied" = "복사됨";
+
+"Remove after dragging to an app" = "앱으로 드래그한 후 내리기";
+"Take down after a successful drop; keep the original file" = "놓기에 성공하면 줄에서 내리고 원본 파일은 유지합니다";

@@ -4,7 +4,7 @@ import SwiftUI
 /// Bridges each photo to AppKit's drag and drop, so it can be dragged into
 /// any app as a real file. Each destination means one thing:
 ///
-/// - An app gets a copy, and the photo stays on the line.
+/// - An app gets a copy; the optional setting takes the photo off the line.
 /// - A folder or the Desktop keeps the file, and the photo leaves the line.
 /// - The Trash discards it.
 /// - Nowhere that accepts it: the photo flies back to the line.
@@ -33,11 +33,7 @@ struct GrabArea: NSViewRepresentable {
         view.onClick = { line.copy(id) }
         view.onDoubleClick = { line.open(id) }
         view.onDragStart = { line.draggingID = id }
-        view.onDragEnd = {
-            line.draggingID = nil
-            // Moved into a folder: it is saved where you wanted it.
-            line.prune()
-        }
+        view.onDragEnd = { operation in line.finishDrag(id, operation: operation) }
         view.onTrash = { line.trash(id) }
         view.onDiscard = { line.discard(id) }
         view.onLongPress = { line.markup(id) }
@@ -86,7 +82,7 @@ final class GrabView: NSView, NSDraggingSource {
     var onClick: () -> Void = {}
     var onDoubleClick: () -> Void = {}
     var onDragStart: () -> Void = {}
-    var onDragEnd: () -> Void = {}
+    var onDragEnd: (NSDragOperation) -> Void = { _ in }
     var onTrash: () -> Void = {}
     var onDiscard: () -> Void = {}
     var onLongPress: () -> Void = {}
@@ -203,16 +199,16 @@ final class GrabView: NSView, NSDraggingSource {
         log.notice("Drag ended with operation \(operation.rawValue, privacy: .public)")
         // Dropped on the Trash: macOS only tells us, we move the file.
         if operation.contains(.delete) {
-            onDragEnd()
+            onDragEnd(operation)
             onTrash()
             return
         }
-        onDragEnd()
+        onDragEnd(operation)
         // Finder finishes a move a moment later. Check again then, so a photo
         // saved into a folder leaves the line.
         if operation.contains(.move) {
             let done = onDragEnd
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { done() }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { done(operation) }
         }
     }
 

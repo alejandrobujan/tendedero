@@ -62,3 +62,6 @@
 
 /* PeggedView */
 "Copied" = "已复制";
+
+"Remove after dragging to an app" = "拖入其他 App 后自动取下";
+"Take down after a successful drop; keep the original file" = "拖放成功后从晾衣架取下，保留原文件";

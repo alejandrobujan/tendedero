@@ -656,6 +656,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         clipboard.toolTip = L("Images you copy hang on the line too")
         menu.addItem(clipboard)
 
+        let removeAfterDrag = ClosureMenuItem(L("Remove after dragging to an app")) {
+            Line.removeAfterDrag.toggle()
+        }
+        removeAfterDrag.state = Line.removeAfterDrag ? .on : .off
+        removeAfterDrag.toolTip = L("Take down after a successful drop; keep the original file")
+        menu.addItem(removeAfterDrag)
+
         let bringDown = NSMenuItem(title: L("Bring the line down"), action: nil, keyEquivalent: "")
         let options = NSMenu()
         let hover = ClosureMenuItem(L("When the pointer rests in the menu bar")) {

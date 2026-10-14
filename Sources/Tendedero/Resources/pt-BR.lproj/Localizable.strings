@@ -62,3 +62,6 @@
 
 /* PeggedView */
 "Copied" = "Copiado";
+
+"Remove after dragging to an app" = "Retirar ao arrastar para um app";
+"Take down after a successful drop; keep the original file" = "Retirar após soltar com sucesso; manter o arquivo original";
