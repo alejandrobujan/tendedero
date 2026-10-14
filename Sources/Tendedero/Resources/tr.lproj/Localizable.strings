@@ -62,3 +62,20 @@
 
 /* PeggedView */
 "Copied" = "Kopyalandı";
+
+/* Notes */
+"New Note…" = "Yeni Not…";
+"New Note" = "Yeni Not";
+"Edit Note" = "Notu Düzenle";
+"Hang" = "As";
+"Save" = "Kaydet";
+"Cancel" = "Vazgeç";
+"Write something…" = "Bir şeyler yazın…";
+"Color" = "Renk";
+"Yellow" = "Sarı";
+"Pink" = "Pembe";
+"Blue" = "Mavi";
+"Green" = "Yeşil";
+
+/* Zoom */
+"Zoom on hover" = "Üzerine gelince büyüt";

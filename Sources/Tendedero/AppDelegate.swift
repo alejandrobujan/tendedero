@@ -21,6 +21,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var clipboardWatcher: ClipboardWatcher!
     private var signalSources: [DispatchSourceSignal] = []
     private var hotKey: HotKey?
+    private var noteHotKey: HotKey?
+    private let zoom = Zoom()
     private var cancellables = Set<AnyCancellable>()
     private var mouseTimer: Timer?
 
@@ -77,12 +79,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if ClipboardWatcher.isEnabled { clipboardWatcher.start() }
 
         registerShortcut()
+        registerNoteShortcut()
 
         setUpStatusItem()
         watchMenuBarClicks()
 
         Markup.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         Trim.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
+        NoteEditor.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
+        NoteEditor.shared.onCreated = { [weak self] url in self?.hangNote(url) }
         panel.onScroll = { [weak self] event in
             // Sideways on a trackpad, or the wheel of a mouse.
             let delta = abs(event.scrollingDeltaX) >= abs(event.scrollingDeltaY)
@@ -298,6 +303,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
     }
 
+    /// A note you just wrote: the line comes down where you are, whatever
+    /// the settings say, and the note drops onto it.
+    private func hangNote(_ url: URL) {
+        panel.placeOnScreen()
+        updateCapacity()
+        wanted = true
+        refresh()
+        reveal(peekFor: 2.5)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+            guard let self else { return }
+            if self.line.hang(url) == nil { self.itemsChanged() }
+        }
+    }
+
     private func fly(_ id: UUID, from: CGRect) {
         guard isPresent, isRevealed, CaptureFlight.flightsInProgress < 2, let screen = panel.screen,
               let to = cardFrame(for: id),
@@ -323,7 +342,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard isPresent, isRevealed, !item.flying, let screen = panel.screen,
               let card = cardFrame(for: item.id),
               let image = item.thumb.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return }
-        CaptureFlight.fall(image: image, card: card, tilt: CGFloat(item.tilt), on: screen)
+        CaptureFlight.fall(image: image, card: card, tilt: CGFloat(item.tilt), bare: item.isNote, on: screen)
     }
 
     /// Where a card will hang, in screen coordinates, using the same layout
@@ -335,7 +354,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                          visible: line.visibleCount, scroll: line.scroll)
         let viewTop = Layout.ropeY(x: x, width: width) - Layout.pinAbove
         let cardTop = viewTop + PeggedView.cardOffsetBelowTop
-        let size = PeggedView.cardSize(for: line.items[index].thumb.size)
+        let size = PeggedView.cardSize(for: line.items[index].thumb.size, bare: line.items[index].isNote)
         return CGRect(x: panel.frame.minX + x - size.width / 2,
                       y: panel.frame.maxY - cardTop - size.height,
                       width: size.width, height: size.height)
@@ -400,6 +419,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
         }
         if !on {
+            zoom.hide()
             pinned = false
             peekUntil = .distantPast
             panel.ignoresMouseEvents = true
@@ -509,6 +529,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
 
         updateMousePassThrough(mouse)
+        updateZoom(mouse)
 
         // The line's zone runs from its lowest point up to the top of the
         // screen, menu bar included, so moving up never hides it.
@@ -550,12 +571,36 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
     }
 
+    /// The card under the pointer opens larger below the line. Not while
+    /// dragging, in a card's menu, or while one of our windows is in front,
+    /// like the note editor or Quick Look.
+    private func updateZoom(_ mouse: NSPoint) {
+        guard Zoom.isEnabled, !GrabView.isDragging, !GrabView.isShowingMenu, NSApp.keyWindow == nil,
+              let screen = panel.screen else {
+            zoom.hide()
+            return
+        }
+        let local = panel.convertPoint(fromScreen: mouse)
+        let flipped = CGPoint(x: local.x, y: panel.frame.height - local.y)
+        let hit = line.hitRects.first { $0.value.contains(flipped) }
+        let item = hit.flatMap { hit in line.items.first { $0.id == hit.key && !$0.falling && !$0.flying } }
+        let card = hit.map {
+            CGRect(x: panel.frame.minX + $0.value.minX, y: panel.frame.maxY - $0.value.maxY,
+                   width: $0.value.width, height: $0.value.height)
+        }
+        zoom.update(item, card: card, on: screen)
+    }
+
     // MARK: Shortcut
 
     private func registerShortcut() {
         hotKey = nil
         guard let shortcut = Shortcut.current else { return }
         hotKey = HotKey(shortcut) { [weak self] in self?.toggle() }
+    }
+
+    private func registerNoteShortcut() {
+        noteHotKey = HotKey(Shortcut.newNote, id: 2) { NoteEditor.shared.new() }
     }
 
     private func changeShortcut() {
@@ -635,6 +680,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             toggleItem.keyEquivalentModifierMask = shortcut.modifiers
         }
         menu.addItem(toggleItem)
+
+        let noteItem = ClosureMenuItem(L("New Note…")) { NoteEditor.shared.new() }
+        if noteHotKey != nil {
+            noteItem.keyEquivalent = Shortcut.newNote.key
+            noteItem.keyEquivalentModifierMask = Shortcut.newNote.modifiers
+        }
+        menu.addItem(noteItem)
 
         let clearItem = ClosureMenuItem(L("Take everything down")) { [weak self] in
             self?.line.clear()
@@ -729,6 +781,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         sizeItem.submenu = sizes
         menu.addItem(sizeItem)
+
+        let zoomItem = ClosureMenuItem(L("Zoom on hover")) { [weak self] in
+            Zoom.isEnabled.toggle()
+            if !Zoom.isEnabled { self?.zoom.hide() }
+        }
+        zoomItem.state = Zoom.isEnabled ? .on : .off
+        menu.addItem(zoomItem)
 
         let shortcutItem = NSMenuItem(title: L("Shortcut"), action: nil, keyEquivalent: "")
         let shortcuts = NSMenu()

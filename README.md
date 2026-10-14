@@ -47,6 +47,7 @@ Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 
 | | |
 |:--|:--|
+| Rest the pointer on it | See it larger, just below the line. Turn it off with Zoom on hover in the menu bar. |
 | Click | Copy the image. |
 | Press and hold | Open it in Markup. |
 | Double click | Open it in Preview. |
@@ -57,6 +58,7 @@ Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 | Rest the pointer in the menu bar | Bring the line down on that screen. |
 | Click anything in the menu bar | Put it away. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Show or hide the line. Change it under Shortcut in the menu bar. |
+| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>N</kbd> | Write a sticky note. Also New Note in the menu bar. |
 
 <br>
 
@@ -80,6 +82,17 @@ hangs on the line like any other. Turn on Hang copied images in the menu bar
 and the shirt fills in while it is on. Only images: anything copied along
 with text or a file, and anything a password manager marks as private, is
 left alone.
+
+<br>
+
+## Sticky notes too.
+
+Press <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>N</kbd>, or choose New Note in the
+menu bar, write a few words, pick a colour and press <kbd>⌘</kbd>&thinsp;<kbd>↩</kbd>.
+The note hangs on the line next to your screenshots. Click it to copy its text,
+press and hold or double click it to rewrite it, and change its colour from its
+menu. Each note is a plain text file in Tendedero's own folder, so the cross
+sends it to the Trash and a drag to a folder keeps it.
 
 <br>
 
@@ -148,6 +161,9 @@ so macOS asks again for access to the Desktop after each rebuild.
 | `Trim.swift` | Trims a screen recording and saves the result |
 | `FullScreen.swift` | Knows when to stay hidden |
 | `Line.swift` | What is hanging, and what you can do with it |
+| `Note.swift` | Sticky notes: the text file, its colour and how it is drawn |
+| `NoteEditor.swift` | The window a note is written in |
+| `Zoom.swift` | The larger copy under the pointer |
 
 Every image here, the icon included, is drawn in code by
 `scripts/make-icon.swift` and `scripts/make-readme-art.swift`.

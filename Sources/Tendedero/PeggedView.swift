@@ -42,10 +42,12 @@ struct PeggedView: View {
         return CGSize(width: size.width * scale, height: size.height * scale)
     }
 
-    /// The card around the photo: the photo plus the glass inset.
-    static func cardSize(for size: CGSize) -> CGSize {
+    /// The card around the photo: the photo plus the glass inset. A note is
+    /// bare paper, with no frame around it.
+    static func cardSize(for size: CGSize, bare: Bool = false) -> CGSize {
         let p = photoSize(for: size)
-        return CGSize(width: p.width + Frame.inset * 2, height: p.height + Frame.inset * 2)
+        let inset = bare ? 0 : Frame.inset * 2
+        return CGSize(width: p.width + inset, height: p.height + inset)
     }
 
     /// Distance from the top of the hanging view (the clip) to the card.
@@ -53,7 +55,20 @@ struct PeggedView: View {
 
     private var photoSize: CGSize { Self.photoSize(for: item.thumb.size) }
 
-    private var card: some View {
+    /// What the card shows: a photo in its glass frame, or a note's paper.
+    @ViewBuilder private var face: some View {
+        if item.isNote {
+            Image(nsImage: item.thumb)
+                .resizable()
+                .interpolation(.high)
+                .frame(width: photoSize.width, height: photoSize.height)
+                .clipShape(RoundedRectangle(cornerRadius: Frame.noteRadius, style: .continuous))
+        } else {
+            framedPhoto
+        }
+    }
+
+    private var framedPhoto: some View {
         Image(nsImage: item.thumb)
             .resizable()
             .interpolation(.high)
@@ -78,6 +93,10 @@ struct PeggedView: View {
             }
             .padding(Frame.inset)
             .glassFrame(cornerRadius: Frame.radius)
+    }
+
+    private var card: some View {
+        face
             .shadow(color: .black.opacity(hovering ? 0.26 : 0.18), radius: hovering ? 14 : 10, y: hovering ? 8 : 5)
             // Holding presses the photo in slowly, so a long press feels like
             // it is building up to something.
@@ -156,6 +175,8 @@ struct PeggedView: View {
 enum Frame {
     static let radius: CGFloat = 16
     static let inset: CGFloat = 4
+    /// Paper has barely rounded corners.
+    static let noteRadius: CGFloat = 2
 }
 
 extension View {

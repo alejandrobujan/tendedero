@@ -5,7 +5,7 @@ import os
 
 let log = Logger(subsystem: "app.tendedero.Tendedero", category: "line")
 
-/// One screenshot hanging on the line.
+/// One screenshot, or one note, hanging on the line.
 struct Pegged: Identifiable, Equatable {
     let id = UUID()
     let url: URL
@@ -17,6 +17,8 @@ struct Pegged: Identifiable, Equatable {
     var flying = false
     /// A screen recording rather than a screenshot.
     var isRecording: Bool { Tendedero.isRecording(url) }
+    /// A sticky note rather than an image.
+    var isNote: Bool { Notes.isNote(url) }
 
     static func == (a: Pegged, b: Pegged) -> Bool {
         a.id == b.id && a.falling == b.falling && a.flying == b.flying && a.thumb === b.thumb
@@ -156,9 +158,14 @@ final class Line: ObservableObject {
     func copy(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
         let entry = NSPasteboardItem()
-        // A recording is copied as the file, which apps paste as the video.
-        if !item.isRecording, let png = pngData(item.url) { entry.setData(png, forType: .png) }
-        entry.setString(item.url.absoluteString, forType: .fileURL)
+        if item.isNote {
+            // A note is copied as its words, to paste anywhere you type.
+            entry.setString(Notes.text(of: item.url), forType: .string)
+        } else {
+            // A recording is copied as the file, which apps paste as the video.
+            if !item.isRecording, let png = pngData(item.url) { entry.setData(png, forType: .png) }
+            entry.setString(item.url.absoluteString, forType: .fileURL)
+        }
         let pb = NSPasteboard.general
         pb.clearContents()
         pb.writeObjects([entry])
@@ -197,12 +204,14 @@ final class Line: ObservableObject {
         contentsOfFile: "/System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/dock/drag to trash.aif",
         byReference: true)
 
-    /// Whether the file lives in Tendedero's own folder. Those are discarded
-    /// to the Trash, or the folder would fill up with forgotten screenshots.
-    /// Files anywhere else, like the Desktop, stay where they are.
+    /// Whether the file lives in one of Tendedero's own folders, for
+    /// screenshots or notes. Those are discarded to the Trash, or the folder
+    /// would fill up with forgotten files. Files anywhere else, like the
+    /// Desktop, stay where they are.
     func isInInbox(_ id: UUID) -> Bool {
         guard let item = items.first(where: { $0.id == id }) else { return false }
-        return item.url.standardizedFileURL.path.hasPrefix(Inbox.folder.standardizedFileURL.path + "/")
+        let path = item.url.standardizedFileURL.path
+        return [Inbox.folder, Notes.folder].contains { path.hasPrefix($0.standardizedFileURL.path + "/") }
     }
 
     /// The corner cross and "Take down" both end up here.
@@ -261,14 +270,25 @@ final class Line: ObservableObject {
     }
 
     /// Long press: open the photo in the system Markup editor. Markup does
-    /// not edit video, so a recording opens in the trimming editor instead.
+    /// not edit video, so a recording opens in the trimming editor instead,
+    /// and a note in the note editor.
     func markup(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
-        if item.isRecording {
+        if item.isNote {
+            NoteEditor.shared.edit(item.url)
+        } else if item.isRecording {
             Trim.shared.edit(item.url, size: item.thumb.size)
         } else {
             Markup.shared.edit(item.url)
         }
+    }
+
+    /// A note takes another colour of paper.
+    func setColor(_ color: NoteColor, of id: UUID) {
+        guard let item = items.first(where: { $0.id == id }), item.isNote else { return }
+        Notes.setColor(color, of: item.url)
+        Notes.lastColor = color
+        reloadThumbnail(for: item.url)
     }
 
     /// After editing, the photo on the line shows the new version.
@@ -352,6 +372,9 @@ func isRecording(_ url: URL) -> Bool {
 /// The default size covers a card at twice its size in points, as on a
 /// Retina screen, and no more: every photo on the line keeps one in memory.
 func makeThumbnail(_ url: URL, maxPixels: Int = Int(320 * Layout.size.scale)) -> NSImage? {
+    if Notes.isNote(url) {
+        return Notes.render(Notes.text(of: url), color: Notes.color(of: url), pixels: maxPixels)
+    }
     if isRecording(url) { return firstFrame(url, maxPixels: maxPixels) }
     guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
     let options: [CFString: Any] = [

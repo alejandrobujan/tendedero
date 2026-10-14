@@ -49,6 +49,7 @@ Posez le pointeur dans la barre des menus et la corde descend. Éloignez-le et e
 
 | | |
 |:--|:--|
+| Poser le pointeur dessus | L’affiche en grand, juste sous la corde. Désactivable via Agrandir au survol, dans la barre des menus. |
 | Clic | Copie l’image. |
 | Clic maintenu | L’ouvre dans Annotation. |
 | Double-clic | L’ouvre dans Aperçu. |
@@ -59,6 +60,7 @@ Posez le pointeur dans la barre des menus et la corde descend. Éloignez-le et e
 | Poser le pointeur dans la barre des menus | Fait descendre la corde sur cet écran. |
 | Cliquer n’importe où dans la barre des menus | La range. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Affiche ou masque la corde. Modifiable dans Raccourci, dans la barre des menus. |
+| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>N</kbd> | Écrit un post-it. Aussi via Nouveau post-it, dans la barre des menus. |
 
 <br>
 
@@ -82,6 +84,18 @@ et elle s’accroche à la corde comme les autres. Activez Accrocher les images
 copiées dans la barre des menus ; le t-shirt se remplit tant que l’option est
 active. Uniquement des images : ce qui est copié avec du texte ou un fichier, et
 ce qu’un gestionnaire de mots de passe marque comme privé, est laissé de côté.
+
+<br>
+
+## Les post-it aussi.
+
+Appuyez sur <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>N</kbd>, ou choisissez Nouveau
+post-it dans la barre des menus, écrivez quelques mots, choisissez une couleur et
+appuyez sur <kbd>⌘</kbd>&thinsp;<kbd>↩</kbd>. Le post-it s’accroche à la corde à côté
+de vos captures. Cliquez dessus pour copier son texte, maintenez le clic ou
+double-cliquez pour le réécrire, et changez sa couleur depuis son menu. Chaque
+post-it est un simple fichier texte dans le dossier de Tendedero : la croix
+l’envoie à la corbeille, et un glisser dans un dossier le garde.
 
 <br>
 
@@ -153,6 +167,9 @@ l’accès au bureau après chaque recompilation.
 | `Trim.swift` | Raccourcit un enregistrement d’écran et enregistre le résultat |
 | `FullScreen.swift` | Sait quand rester caché |
 | `Line.swift` | Ce qui est accroché, et ce que vous pouvez en faire |
+| `Note.swift` | Les post-it : le fichier texte, sa couleur et son dessin |
+| `NoteEditor.swift` | La fenêtre où l’on écrit un post-it |
+| `Zoom.swift` | L’aperçu agrandi sous le pointeur |
 
 Toutes les images de cette page, icône comprise, sont dessinées en code par
 `scripts/make-icon.swift` et `scripts/make-readme-art.swift`.

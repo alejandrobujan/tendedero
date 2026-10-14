@@ -62,3 +62,20 @@
 
 /* PeggedView */
 "Copied" = "コピーしました";
+
+/* Notes */
+"New Note…" = "新規メモ…";
+"New Note" = "新規メモ";
+"Edit Note" = "メモを編集";
+"Hang" = "吊るす";
+"Save" = "保存";
+"Cancel" = "キャンセル";
+"Write something…" = "何か書いてください…";
+"Color" = "カラー";
+"Yellow" = "黄";
+"Pink" = "ピンク";
+"Blue" = "青";
+"Green" = "緑";
+
+/* Zoom */
+"Zoom on hover" = "ポインタを重ねて拡大";
