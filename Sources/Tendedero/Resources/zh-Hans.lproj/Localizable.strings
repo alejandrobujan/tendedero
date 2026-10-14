@@ -38,6 +38,7 @@
 "Large" = "大";
 "Bring the line down" = "放下晾衣绳";
 "When the pointer rests in the menu bar" = "指针停在菜单栏时";
+"When the pointer swipes down or up" = "指针上下滑动时";
 "When something new hangs" = "有新内容挂上时";
 "Over full screen apps" = "在全屏 App 上";
 "Hang copied images" = "挂上复制的图片";

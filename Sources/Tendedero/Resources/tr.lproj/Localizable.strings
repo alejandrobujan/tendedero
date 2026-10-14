@@ -38,6 +38,7 @@
 "Large" = "Büyük";
 "Bring the line down" = "İpi indir";
 "When the pointer rests in the menu bar" = "İşaretçi menü çubuğunda durduğunda";
+"When the pointer swipes down or up" = "İşaretçi aşağı veya yukarı kaydırıldığında";
 "When something new hangs" = "Yeni bir şey asıldığında";
 "Over full screen apps" = "Tam ekran uygulamaların üzerinde";
 "Hang copied images" = "Kopyalanan görselleri as";

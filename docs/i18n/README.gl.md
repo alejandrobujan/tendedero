@@ -57,6 +57,8 @@ Leva o punteiro á barra de menús e a corda baixa. Apártao e desaparece.
 | Arrastrar a un cartafol | Queda alí e sae da corda. |
 | Arrastrar á Papeleira ou facer clic na cruz | Desfaste dela. |
 | Deixar o punteiro na barra de menús | Baixa a corda nesa pantalla. |
+| Esvarar dous dedos cara abaixo na barra de menús | Baixa a corda nesa pantalla e déixaa aí. |
+| Esvarar dous dedos cara arriba na barra de menús | Recolle a corda. |
 | Facer clic en calquera sitio da barra de menús | Recolle a corda. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Amosa ou oculta a corda. Cámbiase en Atallo, na barra de menús. |
 

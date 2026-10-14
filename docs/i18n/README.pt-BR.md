@@ -57,6 +57,8 @@ Pare o ponteiro na barra de menus e o varal desce. Afaste-o e ele some.
 | Arrastar para uma pasta | Guarda a imagem ali. Ela sai do varal. |
 | Arrastar para o Lixo, ou clicar no X | Desapegue. |
 | Parar o ponteiro na barra de menus | Baixa o varal naquela tela. |
+| Deslizar dois dedos para baixo na barra de menus | Baixa o varal naquela tela e o deixa lá. |
+| Deslizar dois dedos para cima na barra de menus | Recolhe o varal. |
 | Clicar em qualquer lugar da barra de menus | Recolhe o varal. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Mostra ou oculta o varal. Altere em Atalho, na barra de menus. |
 

@@ -38,6 +38,7 @@
 "Large" = "크게";
 "Bring the line down" = "빨랫줄 내리기";
 "When the pointer rests in the menu bar" = "포인터가 메뉴 막대에 머무를 때";
+"When the pointer swipes down or up" = "포인터를 아래나 위로 쓸 때";
 "When something new hangs" = "새 항목이 걸릴 때";
 "Over full screen apps" = "전체 화면 앱 위에서도";
 "Hang copied images" = "복사한 이미지 걸기";

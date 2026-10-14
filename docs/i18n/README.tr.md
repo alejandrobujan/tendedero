@@ -57,6 +57,8 @@ Aldığınız her ekran görüntüsü, ekranınızın hemen üstündeki bir ipe 
 | Klasöre sürükle | Orada saklar. İpten ayrılır. |
 | Çöp Kutusu'na sürükle ya da çarpıya tıkla | Siler. |
 | İşaretçiyi menü çubuğunda bırak | O ekranda ipi aşağı indirir. |
+| Menü çubuğunda iki parmakla aşağı kaydır | O ekranda ipi aşağı indirir ve orada tutar. |
+| Menü çubuğunda iki parmakla yukarı kaydır | İpi geri kaldırır. |
 | Menü çubuğunda herhangi bir yere tıkla | İpi geri kaldırır. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | İpi gösterir ya da gizler. Menü çubuğundaki Kısayol bölümünden değiştirilebilir. |
 

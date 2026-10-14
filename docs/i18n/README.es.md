@@ -57,6 +57,8 @@ Lleva el puntero a la barra de menús y la cuerda baja. Apártalo y desaparece.
 | Arrastrar a una carpeta | Se queda ahí y sale de la cuerda. |
 | Arrastrar a la Papelera o hacer clic en la cruz | Te deshaces de ella. |
 | Dejar el puntero en la barra de menús | Baja la cuerda en esa pantalla. |
+| Deslizar dos dedos hacia abajo en la barra de menús | Baja la cuerda en esa pantalla y la deja ahí. |
+| Deslizar dos dedos hacia arriba en la barra de menús | Recoge la cuerda. |
 | Hacer clic en cualquier sitio de la barra de menús | Recoge la cuerda. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Muestra u oculta la cuerda. Se cambia en Atajo, en la barra de menús. |
 

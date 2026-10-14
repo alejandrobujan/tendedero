@@ -57,6 +57,8 @@ Göstəricini menyu panelində saxlayın, ip aşağı enir. Uzaqlaşdırın, yox
 | Qovluğa sürükləmək | Orada saxlanır və ipdən çıxır. |
 | Zibil qutusuna sürükləmək və ya çarpaza klik | Ondan qurtulursunuz. |
 | Göstəricini menyu panelində saxlamaq | İpi həmin ekranda endirir. |
+| Menyu panelində iki barmaqla aşağı sürüşdürmək | İpi həmin ekranda endirir və orada saxlayır. |
+| Menyu panelində iki barmaqla yuxarı sürüşdürmək | İpi yığır. |
 | Menyu panelində istənilən yerə klik | İpi yığır. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | İpi göstərir və ya gizlədir. Menyu panelində Qısayol bölməsindən dəyişdirmək olar. |
 

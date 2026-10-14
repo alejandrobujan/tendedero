@@ -38,6 +38,7 @@
 "Large" = "Grande";
 "Bring the line down" = "Faire descendre la corde";
 "When the pointer rests in the menu bar" = "Quand le pointeur reste dans la barre des menus";
+"When the pointer swipes down or up" = "Quand le pointeur glisse vers le bas ou vers le haut";
 "When something new hangs" = "Quand une nouvelle capture s’accroche";
 "Over full screen apps" = "Au-dessus des apps en plein écran";
 "Hang copied images" = "Accrocher les images copiées";

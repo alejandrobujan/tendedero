@@ -21,6 +21,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var clipboardWatcher: ClipboardWatcher!
     private var signalSources: [DispatchSourceSignal] = []
     private var hotKey: HotKey?
+    private var menuBarSwipe: MenuBarSwipe?
     private var cancellables = Set<AnyCancellable>()
     private var mouseTimer: Timer?
 
@@ -47,13 +48,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var keepOpen = false
 
     // What brings the line down, from the menu bar's "Bring the line down".
-    // Out of the box, the first two are on and the third off.
+    // Out of the box, the first three are on and the last off.
 
-    /// Resting the pointer in the menu bar. Off, only the shortcut and the
-    /// menu open it.
+    /// Resting the pointer in the menu bar. Off, only the shortcut, a
+    /// swipe, and the menu open it.
     static var opensFromMenuBar: Bool {
         get { !UserDefaults.standard.bool(forKey: "menuBarRevealOff") }
         set { UserDefaults.standard.set(!newValue, forKey: "menuBarRevealOff") }
+    }
+
+    /// Two-finger swipe down in the menu bar brings the line down; swipe
+    /// up puts it away. Same switch.
+    static var swipeFromMenuBar: Bool {
+        get { !UserDefaults.standard.bool(forKey: "menuBarSwipeOff") }
+        set { UserDefaults.standard.set(!newValue, forKey: "menuBarSwipeOff") }
     }
 
     /// Something new hanging shows itself for a moment. Off, it hangs
@@ -80,6 +88,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         setUpStatusItem()
         watchMenuBarClicks()
+        watchMenuBarSwipe()
 
         Markup.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         Trim.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
@@ -474,6 +483,54 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             clickMonitors.append(local)
         }
     }
+
+    private func watchMenuBarSwipe() {
+        let swipe = MenuBarSwipe()
+        swipe.isEnabled = { AppDelegate.swipeFromMenuBar }
+        swipe.onSwipe = { [weak self] direction, screen in
+            switch direction {
+            case .down: self?.revealFromSwipe(on: screen)
+            case .up: self?.hideFromSwipe()
+            }
+        }
+        swipe.start()
+        menuBarSwipe = swipe
+    }
+
+    /// A two-finger swipe down from the menu bar, like opening the line on
+    /// purpose with the shortcut. It stays until the pointer has visited it
+    /// and left. Already down, it only pins.
+    private func revealFromSwipe(on screen: NSScreen) {
+        guard !FullScreen.blocksLine(on: screen) else { return }
+        menuBarSuppressed = false
+        if isRevealed {
+            pinned = true
+            return
+        }
+        keepOpen = true
+        wanted = true
+        panel.placeOnScreen(screen)
+        updateCapacity()
+        refresh()
+        reveal(pinned: true)
+    }
+
+    /// Swipe up from the menu bar tucks the line away. The pointer is still
+    /// in the menu bar, so hover is held off until it leaves, as after a
+    /// click there.
+    private func hideFromSwipe() {
+        guard isRevealed else { return }
+        menuBarSuppressed = true
+        hotZoneSince = nil
+        pinned = false
+        setRevealed(false)
+        if line.liveCount == 0 {
+            keepOpen = false
+            wanted = false
+            refresh()
+        }
+    }
+
     /// How long the cursor is away before the line tucks back up.
     private static let retractDelay: TimeInterval = 0.5
 
@@ -663,6 +720,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         hover.state = Self.opensFromMenuBar ? .on : .off
         options.addItem(hover)
+        let swipe = ClosureMenuItem(L("When the pointer swipes down or up")) {
+            AppDelegate.swipeFromMenuBar.toggle()
+        }
+        swipe.state = Self.swipeFromMenuBar ? .on : .off
+        options.addItem(swipe)
         let peek = ClosureMenuItem(L("When something new hangs")) {
             AppDelegate.peeksAtNew.toggle()
         }

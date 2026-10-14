@@ -38,6 +38,7 @@
 "Large" = "大";
 "Bring the line down" = "ロープを降ろす";
 "When the pointer rests in the menu bar" = "ポインタがメニューバーにとどまったとき";
+"When the pointer swipes down or up" = "ポインタを上下にスワイプしたとき";
 "When something new hangs" = "新しいものが吊るされたとき";
 "Over full screen apps" = "フルスクリーンのアプリの上にも";
 "Hang copied images" = "コピーした画像を吊るす";
