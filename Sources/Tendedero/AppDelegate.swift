@@ -34,7 +34,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var pinned = false
     /// A new screenshot shows itself for a moment, then tucks away.
     private var peekUntil = Date.distantPast
-    private var hotZoneSince: Date?
+    private var hoverDwell = HoverActivation.Dwell()
     /// After a click in the menu bar the line stays up there hidden until the
     /// pointer leaves the menu bar, so it does not come back over a menu.
     private var menuBarSuppressed = false
@@ -54,6 +54,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     static var opensFromMenuBar: Bool {
         get { !UserDefaults.standard.bool(forKey: "menuBarRevealOff") }
         set { UserDefaults.standard.set(!newValue, forKey: "menuBarRevealOff") }
+    }
+
+    /// Opt in to small hover targets beside the notch, or at the centre of
+    /// a display without one. The rest of the menu bar stays quiet.
+    static var opensOnlyBesideNotch: Bool {
+        get { UserDefaults.standard.bool(forKey: "revealOnlyBesideNotch") }
+        set { UserDefaults.standard.set(newValue, forKey: "revealOnlyBesideNotch") }
     }
 
     /// Something new hanging shows itself for a moment. Off, it hangs
@@ -436,6 +443,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func stopMouseTracking() {
         mouseTimer?.invalidate()
         mouseTimer = nil
+        hoverDwell.reset()
         panel.ignoresMouseEvents = true
     }
 
@@ -452,6 +460,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return NSRect(x: screen.frame.minX, y: screen.frame.maxY - h, width: screen.frame.width, height: h)
     }
 
+    private static func hoverRegions(on screen: NSScreen) -> [NSRect] {
+        let band = menuBarBand(of: screen)
+        guard opensOnlyBesideNotch else { return [band] }
+        return HoverActivation.regions(menuBar: band, screen: screen.frame,
+                                       safeAreaTop: screen.safeAreaInsets.top,
+                                       left: screen.auxiliaryTopLeftArea,
+                                       right: screen.auxiliaryTopRightArea)
+    }
+
     /// A click anywhere in the top bar of any screen, a menu or an icon, puts the line away.
     private func watchMenuBarClicks() {
         let handler: (NSEvent?) -> Void = { [weak self] _ in
@@ -460,7 +477,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 let p = NSEvent.mouseLocation
                 guard NSScreen.screens.contains(where: { NSMouseInRect(p, Self.menuBarBand(of: $0), false) }) else { return }
                 self.menuBarSuppressed = true
-                self.hotZoneSince = nil
+                self.hoverDwell.reset()
                 if self.isRevealed {
                     self.pinned = false
                     self.setRevealed(false)
@@ -490,11 +507,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             // Pushing against the top edge is part of it, and it also works
             // when another display sits above and the pointer never stops.
             if Self.opensFromMenuBar, let screen = screenUnderPointer, inMenuBar, !menuBarSuppressed,
-               !FullScreen.blocksLine(on: screen) {
-                let since = hotZoneSince ?? now
-                hotZoneSince = since
-                if now.timeIntervalSince(since) >= Self.revealDelay {
-                    hotZoneSince = nil
+               !FullScreen.blocksLine(on: screen),
+               let region = Self.hoverRegions(on: screen).first(where: { NSMouseInRect(mouse, $0, false) }) {
+                let display = (screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value ?? 0
+                if hoverDwell.isReady(in: region, display: display, at: now, delay: Self.revealDelay) {
+                    hoverDwell.reset()
                     if panel.screen != screen {
                         panel.placeOnScreen()
                         updateCapacity()
@@ -503,7 +520,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                     reveal()
                 }
             } else {
-                hotZoneSince = nil
+                hoverDwell.reset()
             }
             return
         }
@@ -658,11 +675,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         let bringDown = NSMenuItem(title: L("Bring the line down"), action: nil, keyEquivalent: "")
         let options = NSMenu()
-        let hover = ClosureMenuItem(L("When the pointer rests in the menu bar")) {
+        options.autoenablesItems = false
+        let hover = ClosureMenuItem(L("When the pointer rests in the menu bar")) { [weak self] in
             AppDelegate.opensFromMenuBar.toggle()
+            self?.hoverDwell.reset()
         }
         hover.state = Self.opensFromMenuBar ? .on : .off
         options.addItem(hover)
+        let notch = ClosureMenuItem(L("Only beside the notch")) { [weak self] in
+            AppDelegate.opensOnlyBesideNotch.toggle()
+            self?.hoverDwell.reset()
+        }
+        notch.state = Self.opensOnlyBesideNotch ? .on : .off
+        notch.isEnabled = Self.opensFromMenuBar
+        notch.toolTip = L("Rest the pointer just beside the notch, or in the centre of the menu bar on screens without a notch")
+        options.addItem(notch)
         let peek = ClosureMenuItem(L("When something new hangs")) {
             AppDelegate.peeksAtNew.toggle()
         }

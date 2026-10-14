@@ -62,3 +62,7 @@
 
 /* PeggedView */
 "Copied" = "コピーしました";
+
+/* Hover activation area */
+"Only beside the notch" = "ノッチの横のみ";
+"Rest the pointer just beside the notch, or in the centre of the menu bar on screens without a notch" = "ノッチのすぐ横、またはノッチのない画面ではメニューバーの中央にポインタを置きます";

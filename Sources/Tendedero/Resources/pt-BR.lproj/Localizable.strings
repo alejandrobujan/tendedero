@@ -62,3 +62,7 @@
 
 /* PeggedView */
 "Copied" = "Copiado";
+
+/* Hover activation area */
+"Only beside the notch" = "Somente ao lado do recorte";
+"Rest the pointer just beside the notch, or in the centre of the menu bar on screens without a notch" = "Deixe o cursor ao lado do recorte, ou no centro da barra de menus em telas sem recorte";

@@ -62,3 +62,7 @@
 
 /* PeggedView */
 "Copied" = "已复制";
+
+/* Hover activation area */
+"Only beside the notch" = "仅在刘海两侧";
+"Rest the pointer just beside the notch, or in the centre of the menu bar on screens without a notch" = "将指针停留在刘海旁边；在没有刘海的屏幕上，停留在菜单栏中央";

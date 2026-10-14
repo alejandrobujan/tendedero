@@ -60,6 +60,8 @@ Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 
 <br>
 
+To avoid bringing the line down while visiting app menus, turn on **Bring the line down → Only beside the notch** in Tendedero's menu. Hover within 80 points of either side of the notch to reveal it. On screens without a notch, hover in the central 160 points of the menu bar. This option is off by default and applies only when menu-bar hover is enabled; the shortcut and new-screenshot setting still work as before.
+
 ## Your Desktop. Finally clear.
 
 Hand Tendedero your screenshots<sup>1</sup> and they skip the Desktop
