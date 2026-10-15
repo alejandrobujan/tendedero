@@ -7,5 +7,5 @@ import Foundation
 /// The folders are copied into the app by `scripts/build-app.sh`. Running the
 /// bare binary, outside the app, shows English.
 func L(_ english: String) -> String {
-    NSLocalizedString(english, comment: "")
+    NSLocalizedString(english, comment: "").replacingOccurrences(of: "Tendedero", with: AppIdentity.name)
 }

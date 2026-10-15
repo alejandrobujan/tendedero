@@ -36,7 +36,7 @@ enum Inbox {
 
     static let folder: URL = {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        return base.appendingPathComponent("Tendedero/Screenshots", isDirectory: true)
+        return base.appendingPathComponent("ImageLine/Screenshots", isDirectory: true)
     }()
 
     /// The user's choice, kept across launches.

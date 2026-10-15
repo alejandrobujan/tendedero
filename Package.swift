@@ -2,11 +2,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "Tendedero",
+    name: "ImageLine",
     platforms: [.macOS(.v14)],
     targets: [
         // Resources holds the translations. scripts/build-app.sh copies them
         // into the app, so SwiftPM leaves them alone.
-        .executableTarget(name: "Tendedero", path: "Sources/Tendedero", exclude: ["Resources"])
+        .target(name: "ClipboardSupport"),
+        .executableTarget(name: "Tendedero", dependencies: ["ClipboardSupport"], path: "Sources/Tendedero", exclude: ["Resources"]),
+        .testTarget(name: "ClipboardSupportTests", dependencies: ["ClipboardSupport"]),
+        .testTarget(name: "LineTests", dependencies: ["Tendedero"])
     ]
 )
