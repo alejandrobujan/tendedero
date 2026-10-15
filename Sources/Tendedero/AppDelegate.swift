@@ -66,6 +66,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         let host = NSHostingView(rootView: LineView(line: line))
         host.sizingOptions = []
+        // The line and the editor come and go; the app does not with them.
+        ProcessInfo.processInfo.disableAutomaticTermination("Tendedero keeps running without windows")
         panel = LinePanel(content: host)
         panel.placeOnScreen()
         updateCapacity()
@@ -82,6 +84,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         watchMenuBarClicks()
 
         Markup.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
+        Editor.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
+        Editor.shared.onTrash = { [weak self] url in self?.line.discard(at: url) }
+        // The editor covers the screen the line hangs from; it tucks away at once.
+        Editor.shared.onOpen = { [weak self] in self?.setRevealed(false) }
+        Trim.shared.onOpen = { [weak self] in self?.setRevealed(false) }
         Trim.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         panel.onScroll = { [weak self] event in
             // Sideways on a trackpad, or the wheel of a mouse.
@@ -137,6 +144,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
         }
     }
+
+    /// Utilities like RedQuits quit an app when the red button of its last
+    /// window is clicked. On a menu bar app that is a mistake: closing the
+    /// editor would take the line down with it. A Quit Apple event that
+    /// arrives from another ordinary app right after one of our windows
+    /// closed is that, and is refused. Quitting from the menu, logging out
+    /// and shutting down go through as always.
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        guard let event = NSAppleEventManager.shared().currentAppleEvent,
+              event.eventID == kAEQuitApplication,
+              let pid = event.attributeDescriptor(forKeyword: keySenderPIDAttr)?.int32Value,
+              pid != getpid() else { return .terminateNow }
+        let app = NSRunningApplication(processIdentifier: pid)
+        let name = app?.bundleIdentifier ?? "pid \(pid)"
+        let sinceClose = Date().timeIntervalSince(Self.lastWindowClose)
+        // Only an app, not a shell tool; those are the user at a terminal.
+        guard sinceClose < 3, let app, app.bundleIdentifier != nil,
+              !Self.systemQuitters.contains(app.bundleIdentifier!) else {
+            log.notice("Quit from \(name, privacy: .public), \(Int(sinceClose), privacy: .public)s after a window closed")
+            return .terminateNow
+        }
+        log.notice("Refused a quit from \(name, privacy: .public) right after a window closed")
+        return .terminateCancel
+    }
+
+    /// When one of our ordinary windows was last closed. Set by the editor.
+    static var lastWindowClose = Date.distantPast
+    /// Senders whose quit is always the user's or the system's.
+    private static let systemQuitters: Set<String> = [
+        "com.apple.loginwindow", "com.apple.finder", "com.apple.ActivityMonitor", "com.apple.dock",
+    ]
 
     func applicationWillTerminate(_ notification: Notification) {
         if Inbox.isEnabled { Inbox.restore() }

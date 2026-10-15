@@ -46,6 +46,11 @@
 
 /* GrabArea */
 "Copy" = "Kopyala";
+"Zoom" = "Yakınlaştırma";
+"Zoom in" = "Yakınlaştır";
+"Zoom out" = "Uzaklaştır";
+"Actual size" = "Gerçek boyut";
+"Fit to window" = "Pencereye sığdır";
 "Open" = "Aç";
 "Quick Look" = "Hızlı Bakış";
 "Markup" = "İşaretle";
@@ -62,3 +67,37 @@
 
 /* PeggedView */
 "Copied" = "Kopyalandı";
+
+/* Editor */
+"Annotate" = "Not al";
+"Select" = "Seç";
+"Rectangle" = "Dikdörtgen";
+"Ellipse" = "Elips";
+"Line" = "Çizgi";
+"Arrow" = "Ok";
+"Text" = "Metin";
+"Number" = "Numara";
+"Blur" = "Bulanıklaştır";
+"Pixelate" = "Pikselleştir";
+"Crop" = "Kırp";
+"Add" = "Ekle";
+"Edit" = "Düzenle";
+"Clear Selection" = "Seçileni temizle";
+"Clear All" = "Tümünü temizle";
+"Delete" = "Sil";
+"Press Enter to crop" = "Kırpmak için Enter'a bas";
+"Red" = "Kırmızı";
+"Orange" = "Turuncu";
+"Yellow" = "Sarı";
+"Green" = "Yeşil";
+"Blue" = "Mavi";
+"Black" = "Siyah";
+"White" = "Beyaz";
+"Tools" = "Araçlar";
+"Color" = "Renk";
+"Save" = "Kaydet";
+"Cancel" = "Vazgeç";
+"Don't Save" = "Kaydetme";
+"Save your changes?" = "Değişiklikler kaydedilsin mi?";
+"The screenshot has marks that are not saved yet." = "Ekran görüntüsündeki işaretler henüz kaydedilmedi.";
+\n"Zoom" = "Yakınlaştırma";\n"Zoom out" = "Uzaklaştır";\n"Zoom in" = "Yakınlaştır";\n"Actual size" = "Gerçek boyut";\n"Fit to window" = "Pencereye sığdır";\n

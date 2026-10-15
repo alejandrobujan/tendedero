@@ -11,6 +11,8 @@ final class Trim: NSObject, NSWindowDelegate {
 
     /// Called with the file once the trimmed recording has replaced it.
     var onSaved: (URL) -> Void = { _ in }
+    /// The editor is up; the line can get out of the way.
+    var onOpen: () -> Void = {}
 
     private var window: NSWindow?
     private var ready: AnyCancellable?
@@ -33,6 +35,7 @@ final class Trim: NSObject, NSWindowDelegate {
         self.window = window
         NSApp.activate(ignoringOtherApps: true)
         window.makeKeyAndOrderFront(nil)
+        onOpen()
 
         // The trimming bar can only come up once the recording has loaded.
         ready = item.publisher(for: \.status)

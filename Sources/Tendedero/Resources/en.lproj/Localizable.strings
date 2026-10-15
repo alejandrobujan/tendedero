@@ -64,3 +64,37 @@
 
 /* PeggedView */
 "Copied" = "Copied";
+
+/* Editor */
+"Annotate" = "Annotate";
+"Select" = "Select";
+"Rectangle" = "Rectangle";
+"Ellipse" = "Ellipse";
+"Line" = "Line";
+"Arrow" = "Arrow";
+"Text" = "Text";
+"Number" = "Number";
+"Blur" = "Blur";
+"Pixelate" = "Pixelate";
+"Crop" = "Crop";
+"Add" = "Add";
+"Edit" = "Edit";
+"Clear Selection" = "Clear Selection";
+"Clear All" = "Clear All";
+"Delete" = "Delete";
+"Press Enter to crop" = "Press Enter to crop";
+"Red" = "Red";
+"Orange" = "Orange";
+"Yellow" = "Yellow";
+"Green" = "Green";
+"Blue" = "Blue";
+"Black" = "Black";
+"White" = "White";
+"Tools" = "Tools";
+"Color" = "Color";
+"Save" = "Save";
+"Cancel" = "Cancel";
+"Don't Save" = "Don't Save";
+"Save your changes?" = "Save your changes?";
+"The screenshot has marks that are not saved yet." = "The screenshot has marks that are not saved yet.";
+\n"Zoom" = "Zoom";\n"Zoom out" = "Zoom out";\n"Zoom in" = "Zoom in";\n"Actual size" = "Actual size";\n"Fit to window" = "Fit to window";\n
