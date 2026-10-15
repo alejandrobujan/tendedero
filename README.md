@@ -81,6 +81,10 @@ and the shirt fills in while it is on. Only images: anything copied along
 with text or a file, and anything a password manager marks as private, is
 left alone.
 
+Turn on **Hang copied text** and copied text hangs as well, as a small note
+card that wraps the text. Click it to copy the text again, press and hold to
+open it in your text editor. Off by default.
+
 <br>
 
 ## Private by design.
@@ -142,7 +146,7 @@ so macOS asks again for access to the Desktop after each rebuild.
 | `PeggedView.swift` | One photo: glass frame, clip, swing and breeze |
 | `GrabArea.swift` | Click, long press, drag and drop |
 | `ScreenshotWatcher.swift` | Notices new screenshots |
-| `ClipboardWatcher.swift` | Notices images copied to the clipboard |
+| `ClipboardWatcher.swift` | Notices images and text copied to the clipboard |
 | `Inbox.swift` | Takes over screenshot settings and puts them back |
 | `Markup.swift` | Opens the system Markup editor and saves the result |
 | `Trim.swift` | Trims a screen recording and saves the result |

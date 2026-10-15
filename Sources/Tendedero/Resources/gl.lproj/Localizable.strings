@@ -43,6 +43,9 @@
 "Hang copied images" = "Pendurar imaxes copiadas";
 "Images you copy hang on the line too" = "As imaxes que copias tamén se penduran";
 "Tendedero, hanging copied images" = "Tendedero, pendurando imaxes copiadas";
+"Hang copied text" = "Pendurar texto copiado";
+"Text you copy hangs as a note card" = "O texto que copias pendúrase como unha nota";
+"Tendedero, hanging copied text" = "Tendedero, pendurando texto copiado";
 
 /* GrabArea */
 "Copy" = "Copiar";

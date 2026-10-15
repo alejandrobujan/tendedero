@@ -43,6 +43,9 @@
 "Hang copied images" = "挂上复制的图片";
 "Images you copy hang on the line too" = "复制的图片也会挂上绳";
 "Tendedero, hanging copied images" = "Tendedero，正在挂上复制的图片";
+"Hang copied text" = "挂上复制的文字";
+"Text you copy hangs as a note card" = "复制的文字会作为便签卡挂上";
+"Tendedero, hanging copied text" = "Tendedero，正在挂上复制的文字";
 
 /* GrabArea */
 "Copy" = "复制";

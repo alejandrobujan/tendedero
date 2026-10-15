@@ -45,6 +45,9 @@
 "Hang copied images" = "Kopyalanmış şəkilləri as";
 "Images you copy hang on the line too" = "Kopyaladığınız şəkillər də ipdən asılır";
 "Tendedero, hanging copied images" = "Tendedero, kopyalanmış şəkilləri asır";
+"Hang copied text" = "Kopyalanmış mətni as";
+"Text you copy hangs as a note card" = "Kopyaladığınız mətn qeyd kartı kimi asılır";
+"Tendedero, hanging copied text" = "Tendedero, kopyalanmış mətni asır";
 
 /* GrabArea */
 "Copy" = "Kopyala";

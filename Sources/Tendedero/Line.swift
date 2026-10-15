@@ -156,8 +156,12 @@ final class Line: ObservableObject {
     func copy(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
         let entry = NSPasteboardItem()
-        // A recording is copied as the file, which apps paste as the video.
-        if !item.isRecording, let png = pngData(item.url) { entry.setData(png, forType: .png) }
+        if isNote(item.url) {
+            if let text = try? String(contentsOf: item.url, encoding: .utf8) { entry.setString(text, forType: .string) }
+        } else if !item.isRecording, let png = pngData(item.url) {
+            // A recording is copied as the file, which apps paste as the video.
+            entry.setData(png, forType: .png)
+        }
         entry.setString(item.url.absoluteString, forType: .fileURL)
         let pb = NSPasteboard.general
         pb.clearContents()
@@ -264,7 +268,10 @@ final class Line: ObservableObject {
     /// not edit video, so a recording opens in the trimming editor instead.
     func markup(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
-        if item.isRecording {
+        if isNote(item.url) {
+            // A note has nothing to mark up: it opens in the text editor instead.
+            NSWorkspace.shared.open(item.url)
+        } else if item.isRecording {
             Trim.shared.edit(item.url, size: item.thumb.size)
         } else {
             Markup.shared.edit(item.url)
@@ -349,10 +356,14 @@ func isRecording(_ url: URL) -> Bool {
     ["mov", "mp4"].contains(url.pathExtension.lowercased())
 }
 
+/// Copied text is kept as a .txt file and hangs as a note card.
+func isNote(_ url: URL) -> Bool { url.pathExtension.lowercased() == "txt" }
+
 /// The default size covers a card at twice its size in points, as on a
 /// Retina screen, and no more: every photo on the line keeps one in memory.
 func makeThumbnail(_ url: URL, maxPixels: Int = Int(320 * Layout.size.scale)) -> NSImage? {
     if isRecording(url) { return firstFrame(url, maxPixels: maxPixels) }
+    if isNote(url) { return makeNoteCard(url, scale: min(1, CGFloat(maxPixels) / 1040)) }
     guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
     let options: [CFString: Any] = [
         kCGImageSourceCreateThumbnailFromImageAlways: true,
@@ -370,4 +381,38 @@ private func firstFrame(_ url: URL, maxPixels: Int) -> NSImage? {
     generator.maximumSize = CGSize(width: maxPixels, height: maxPixels)
     guard let cg = try? generator.copyCGImage(at: .zero, actualTime: nil) else { return nil }
     return NSImage(cgImage: cg, size: NSSize(width: cg.width, height: cg.height))
+}
+
+/// Draws the text on a paper card, wrapped and cut off with an ellipsis
+/// when it runs past the bottom.
+func makeNoteCard(_ url: URL, scale: CGFloat = 1) -> NSImage? {
+    guard let data = try? Data(contentsOf: url, options: .mappedIfSafe) else { return nil }
+    let text = String(decoding: data.prefix(4000), as: UTF8.self)
+        .trimmingCharacters(in: .whitespacesAndNewlines)
+    let width = Int(1040 * scale), height = Int(800 * scale), pad: CGFloat = 60 * scale
+    guard let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: width, pixelsHigh: height,
+                                     bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+                                     colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0),
+          let context = NSGraphicsContext(bitmapImageRep: rep) else { return nil }
+    NSGraphicsContext.saveGraphicsState()
+    NSGraphicsContext.current = context
+    NSColor(srgbRed: 0.995, green: 0.985, blue: 0.95, alpha: 1).setFill()
+    NSRect(x: 0, y: 0, width: width, height: height).fill()
+
+    let style = NSMutableParagraphStyle()
+    style.lineBreakMode = .byWordWrapping
+    style.lineSpacing = 6 * scale
+    let attributes: [NSAttributedString.Key: Any] = [
+        .font: NSFont.systemFont(ofSize: 72 * scale, weight: .medium),
+        .foregroundColor: NSColor(white: 0.13, alpha: 1),
+        .paragraphStyle: style,
+    ]
+    let box = NSRect(x: pad, y: pad, width: CGFloat(width) - pad * 2, height: CGFloat(height) - pad * 2)
+    NSAttributedString(string: text, attributes: attributes)
+        .draw(with: box, options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine])
+    NSGraphicsContext.restoreGraphicsState()
+
+    let image = NSImage(size: NSSize(width: width, height: height))
+    image.addRepresentation(rep)
+    return image
 }

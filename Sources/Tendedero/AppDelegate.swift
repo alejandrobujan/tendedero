@@ -74,7 +74,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         restoreSettingsOnTermination()
         startWatcher()
         clipboardWatcher = ClipboardWatcher { [weak self] url in self?.hangCapture(url) }
-        if ClipboardWatcher.isEnabled { clipboardWatcher.start() }
+        if ClipboardWatcher.isWatching { clipboardWatcher.start() }
 
         registerShortcut()
 
@@ -232,7 +232,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// Watching the clipboard is opt in, from the menu bar only.
     private func setClipboard(_ on: Bool) {
         ClipboardWatcher.isEnabled = on
-        if on { clipboardWatcher.start() } else { clipboardWatcher.stop() }
+        updateClipboardWatcher()
+    }
+
+    private func setClipboardText(_ on: Bool) {
+        ClipboardWatcher.textEnabled = on
+        updateClipboardWatcher()
+    }
+
+    private func updateClipboardWatcher() {
+        if ClipboardWatcher.isWatching { clipboardWatcher.start() } else { clipboardWatcher.stop() }
         updateStatusIcon()
     }
 
@@ -616,8 +625,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// The shirt fills in while copied images are hung, so it shows at a
     /// glance that the clipboard is being watched.
     private func updateStatusIcon() {
-        let on = ClipboardWatcher.isEnabled
-        let description = on ? L("Tendedero, hanging copied images") : "Tendedero"
+        let on = ClipboardWatcher.isWatching
+        let description = ClipboardWatcher.isEnabled ? L("Tendedero, hanging copied images")
+            : on ? L("Tendedero, hanging copied text") : "Tendedero"
         let image = NSImage(systemSymbolName: on ? "tshirt.fill" : "tshirt", accessibilityDescription: description)
         image?.isTemplate = true
         statusItem.button?.image = image
@@ -655,6 +665,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         clipboard.state = ClipboardWatcher.isEnabled ? .on : .off
         clipboard.toolTip = L("Images you copy hang on the line too")
         menu.addItem(clipboard)
+
+        let clipText = ClosureMenuItem(L("Hang copied text")) { [weak self] in
+            self?.setClipboardText(!ClipboardWatcher.textEnabled)
+        }
+        clipText.state = ClipboardWatcher.textEnabled ? .on : .off
+        clipText.toolTip = L("Text you copy hangs as a note card")
+        menu.addItem(clipText)
 
         let bringDown = NSMenuItem(title: L("Bring the line down"), action: nil, keyEquivalent: "")
         let options = NSMenu()

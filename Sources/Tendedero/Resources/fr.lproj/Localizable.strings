@@ -43,6 +43,9 @@
 "Hang copied images" = "Accrocher les images copiées";
 "Images you copy hang on the line too" = "Les images copiées s’accrochent aussi à la corde";
 "Tendedero, hanging copied images" = "Tendedero, accroche les images copiées";
+"Hang copied text" = "Accrocher le texte copié";
+"Text you copy hangs as a note card" = "Le texte copié s’accroche comme une fiche";
+"Tendedero, hanging copied text" = "Tendedero, accroche le texte copié";
 
 /* GrabArea */
 "Copy" = "Copier";

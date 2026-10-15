@@ -83,6 +83,10 @@ de menús; mientras está activo, la camiseta se rellena. Solo imágenes: lo que
 se copia junto con texto o un archivo, y lo que un gestor de contraseñas marca
 como privado, se deja tal cual.
 
+Activa **Colgar texto copiado** y el texto que copias también se cuelga, como
+una pequeña nota con el texto ajustado. Haz clic para volver a copiarlo, o
+mantén pulsado para abrirlo en tu editor de texto. Viene desactivado.
+
 <br>
 
 ## Privacidad de serie.
@@ -147,7 +151,7 @@ vuelve a pedir acceso al Escritorio cada vez que recompilas.
 | `PeggedView.swift` | Cada foto: marco de cristal, pinza, balanceo y brisa |
 | `GrabArea.swift` | Clic, pulsación larga, y arrastrar y soltar |
 | `ScreenshotWatcher.swift` | Se da cuenta de las capturas nuevas |
-| `ClipboardWatcher.swift` | Se da cuenta de las imágenes copiadas |
+| `ClipboardWatcher.swift` | Se da cuenta de las imágenes y el texto copiados |
 | `Inbox.swift` | Toma el control de los ajustes de captura y luego los devuelve |
 | `Markup.swift` | Abre el editor de Marcación del sistema y guarda el resultado |
 | `Trim.swift` | Recorta una grabación de pantalla y guarda el resultado |

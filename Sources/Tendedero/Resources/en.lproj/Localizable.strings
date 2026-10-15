@@ -45,6 +45,9 @@
 "Hang copied images" = "Hang copied images";
 "Images you copy hang on the line too" = "Images you copy hang on the line too";
 "Tendedero, hanging copied images" = "Tendedero, hanging copied images";
+"Tendedero, hanging copied text" = "Tendedero, hanging copied text";
+"Hang copied text" = "Hang copied text";
+"Text you copy hangs as a note card" = "Text you copy hangs as a note card";
 
 /* GrabArea */
 "Copy" = "Copy";

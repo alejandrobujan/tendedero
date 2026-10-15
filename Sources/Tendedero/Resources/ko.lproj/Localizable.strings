@@ -43,6 +43,9 @@
 "Hang copied images" = "복사한 이미지 걸기";
 "Images you copy hang on the line too" = "복사한 이미지도 빨랫줄에 걸려요";
 "Tendedero, hanging copied images" = "Tendedero, 복사한 이미지 거는 중";
+"Hang copied text" = "복사한 텍스트 걸기";
+"Text you copy hangs as a note card" = "복사한 텍스트를 메모 카드로 겁니다";
+"Tendedero, hanging copied text" = "Tendedero, 복사한 텍스트 거는 중";
 
 /* GrabArea */
 "Copy" = "복사하기";
