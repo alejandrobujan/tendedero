@@ -210,6 +210,13 @@ final class Line: ObservableObject {
         if isInInbox(id) { trash(id, quietly: quietly) } else { drop(id, quietly: quietly) }
     }
 
+    /// The editor's Trash button: it only knows the file. Files outside
+    /// Tendedero's folder go to the Trash too, that is what the button says.
+    func discard(at url: URL) {
+        guard let item = items.first(where: { $0.url == url && !$0.falling }) else { return }
+        trash(item.id)
+    }
+
     /// The oldest photo falling off a full line. Like the cross, a file from
     /// Tendedero's folder goes to the Trash, or nothing would ever take it out
     /// of that folder. If the Trash refuses it, it still leaves the line.
@@ -260,15 +267,21 @@ final class Line: ObservableObject {
         return candidate
     }
 
-    /// Long press: open the photo in the system Markup editor. Markup does
-    /// not edit video, so a recording opens in the trimming editor instead.
+    /// Long press: open the photo in the annotation editor. It does not edit
+    /// video, so a recording opens in the trimming editor instead.
     func markup(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
         if item.isRecording {
             Trim.shared.edit(item.url, size: item.thumb.size)
         } else {
-            Markup.shared.edit(item.url)
+            Editor.shared.edit(item.url)
         }
+    }
+
+    /// The system Markup editor, from the context menu.
+    func systemMarkup(_ id: UUID) {
+        guard let item = items.first(where: { $0.id == id }), !item.isRecording else { return }
+        Markup.shared.edit(item.url)
     }
 
     /// After editing, the photo on the line shows the new version.

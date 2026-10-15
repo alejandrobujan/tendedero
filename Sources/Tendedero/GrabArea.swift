@@ -9,7 +9,7 @@ import SwiftUI
 /// - The Trash discards it.
 /// - Nowhere that accepts it: the photo flies back to the line.
 ///
-/// Click copies, press and hold opens Markup, the corner cross discards.
+/// Click copies, press and hold opens the editor, the corner cross discards.
 struct GrabArea: NSViewRepresentable {
     let item: Pegged
     let line: Line
@@ -51,7 +51,8 @@ struct GrabArea: NSViewRepresentable {
             menu.addItem(ClosureMenuItem(L("Open")) { line.open(id) })
             menu.addItem(ClosureMenuItem(L("Quick Look")) { line.quickLook(id) })
             if !isRecording {
-                menu.addItem(ClosureMenuItem(L("Markup")) { line.markup(id) })
+                menu.addItem(ClosureMenuItem(L("Annotate")) { line.markup(id) })
+                menu.addItem(ClosureMenuItem(L("Markup")) { line.systemMarkup(id) })
             }
             menu.addItem(ClosureMenuItem(L("Show in Finder")) { line.reveal(id) })
             let inInbox = line.isInInbox(id)
