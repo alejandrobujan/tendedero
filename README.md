@@ -54,9 +54,14 @@ Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 | Drag into an app | Send a copy. It stays on the line. |
 | Drag into a folder | Keep it there. It leaves the line. |
 | Drag to the Trash, or click the cross | Let it go. |
+| Pull an empty stretch of rope down until it frays, then release | Take everything down as the rope breaks and the photos slide off. Release early, pull back, or press Esc to cancel. |
 | Rest the pointer in the menu bar | Bring the line down on that screen. |
 | Click anything in the menu bar | Put it away. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Show or hide the line. Change it under Shortcut in the menu bar. |
+
+Pulling the rope clears the whole line, including photos outside the visible area.
+As with the corner cross, files in Tendedero's own folder go to the Trash;
+files elsewhere only leave the line. Captures made during the gesture are kept.
 
 <br>
 

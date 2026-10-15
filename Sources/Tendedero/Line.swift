@@ -34,6 +34,7 @@ final class Line: ObservableObject {
     @Published var pressedID: UUID?
     /// Whether the line has slid down into view.
     @Published var revealed = false
+    @Published var ropeInteractionActive = false
 
     /// Card frames in window coordinates, reported by the views. The panel
     /// uses them to only catch clicks over photos and let the rest through.
@@ -67,8 +68,15 @@ final class Line: ObservableObject {
     var liveCount: Int { items.filter { !$0.falling }.count }
 
     private let storeKey = "pegged"
+    private let defaults: UserDefaults
+    private let inboxFolder: URL
+    private let trashFile: (URL) throws -> Void
 
-    init() {
+    init(defaults: UserDefaults = .standard, inboxFolder: URL = Inbox.folder,
+         trashFile: @escaping (URL) throws -> Void = { try FileManager.default.trashItem(at: $0, resultingItemURL: nil) }) {
+        self.defaults = defaults
+        self.inboxFolder = inboxFolder
+        self.trashFile = trashFile
         restore()
         scheduleGust()
     }
@@ -104,9 +112,9 @@ final class Line: ObservableObject {
     /// over the whole screen.
     var onFall: ((Pegged) -> Void)?
 
-    func drop(_ id: UUID, quietly: Bool = false) {
+    func drop(_ id: UUID, quietly: Bool = false, animate: Bool = true) {
         guard let i = items.firstIndex(where: { $0.id == id }), !items[i].falling else { return }
-        onFall?(items[i])
+        if animate { onFall?(items[i]) }
         items[i].falling = true
         hitRects[id] = nil
         save()
@@ -119,6 +127,23 @@ final class Line: ObservableObject {
     /// "Take everything down": every photo goes the way of its corner cross.
     func clear() {
         takeDown(items.filter { !$0.falling })
+    }
+
+    /// Clear the snapshot selected at mouse-down, keeping failed files visible.
+    /// The rope overlay owns the animation instead of the usual single fall.
+    func discardForRope(_ ids: Set<UUID>) -> Set<UUID> {
+        var removed = Set<UUID>()
+        for item in items where ids.contains(item.id) && !item.falling {
+            if isInInbox(item.id) {
+                if trash(item.id, quietly: true, animate: false) { removed.insert(item.id) }
+            } else {
+                drop(item.id, quietly: true, animate: false)
+                removed.insert(item.id)
+            }
+        }
+        scroll = 0
+        if removed.count < ids.count { NSSound.beep() }
+        return removed
     }
 
     /// The photos hung before (left) or after (right) this one.
@@ -178,13 +203,13 @@ final class Line: ObservableObject {
     /// drag ends on the Dock's Trash, macOS only reports it: deleting the file
     /// is the source app's job, as Finder does.
     @discardableResult
-    func trash(_ id: UUID, quietly: Bool = false) -> Bool {
+    func trash(_ id: UUID, quietly: Bool = false, animate: Bool = true) -> Bool {
         guard let item = items.first(where: { $0.id == id }) else { return false }
         do {
-            try FileManager.default.trashItem(at: item.url, resultingItemURL: nil)
+            try trashFile(item.url)
             log.notice("Trashed \(item.url.lastPathComponent, privacy: .public)")
             if soundOn && !quietly { Line.trashSound?.play() }
-            drop(id, quietly: true)
+            drop(id, quietly: true, animate: animate)
             return true
         } catch {
             log.error("Could not trash \(item.url.path, privacy: .public): \(error.localizedDescription, privacy: .public)")
@@ -202,7 +227,7 @@ final class Line: ObservableObject {
     /// Files anywhere else, like the Desktop, stay where they are.
     func isInInbox(_ id: UUID) -> Bool {
         guard let item = items.first(where: { $0.id == id }) else { return false }
-        return item.url.standardizedFileURL.path.hasPrefix(Inbox.folder.standardizedFileURL.path + "/")
+        return item.url.standardizedFileURL.path.hasPrefix(inboxFolder.standardizedFileURL.path + "/")
     }
 
     /// The corner cross and "Take down" both end up here.
@@ -313,14 +338,14 @@ final class Line: ObservableObject {
 
     private func save() {
         let paths = items.filter { !$0.falling }.map(\.url.path)
-        UserDefaults.standard.set(paths, forKey: storeKey)
+        defaults.set(paths, forKey: storeKey)
     }
 
     /// Everything comes back as it was. This runs before the line knows its
     /// screen, so the capacity is still the default one: hanging through
     /// `hang` would let photos fall off a wide screen's line at every launch.
     private func restore() {
-        let paths = UserDefaults.standard.stringArray(forKey: storeKey) ?? []
+        let paths = defaults.stringArray(forKey: storeKey) ?? []
         for path in paths where FileManager.default.fileExists(atPath: path) {
             let url = URL(fileURLWithPath: path)
             guard !items.contains(where: { $0.url == url }), let thumb = makeThumbnail(url) else { continue }
