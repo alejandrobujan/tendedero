@@ -31,10 +31,21 @@ enum Layout {
     /// The rope hangs as a parabola from edge to edge of the screen.
     static func sag(width: CGFloat) -> CGFloat { min(30, width * 0.018) }
 
-    static func ropeY(x: CGFloat, width: CGFloat) -> CGFloat {
+    static func ropeY(x: CGFloat, width: CGFloat, pull: CGFloat = 0) -> CGFloat {
         guard width > 0 else { return ropeTop }
         let f = x / width
-        return ropeTop + 4 * sag(width: width) * f * (1 - f)
+        return ropeTop + 4 * sag(width: width) * f * (1 - f) + pull * pullWeight(x: x, width: width)
+    }
+
+    static let pullTargetSize: CGFloat = 64
+    static let pullCenterOffset: CGFloat = 36
+    /// Keep the ring one fifth of the screen width from the right edge.
+    static func pullX(width: CGFloat) -> CGFloat { width * 0.8 }
+
+    static func pullWeight(x: CGFloat, width: CGFloat) -> CGFloat {
+        let anchor = pullX(width: width)
+        let t = min(1, max(0, x <= anchor ? x / max(1, anchor) : (width - x) / max(1, width - anchor)))
+        return t * t * (3 - 2 * t)
     }
 
     /// Photos hang `spacing` apart, centred. When there are more than the
@@ -60,9 +71,9 @@ struct LineView: View {
         GeometryReader { geo in
             let width = geo.size.width
             ZStack(alignment: .topLeading) {
-                Rope(width: width)
+                Rope(width: width, pull: line.ropeOffset)
 
-                if line.items.isEmpty {
+                if line.items.isEmpty && !line.isClearing {
                     Hint()
                         .position(x: width / 2, y: Layout.ropeY(x: width / 2, width: width) + 34)
                         .transition(.opacity)
@@ -71,12 +82,46 @@ struct LineView: View {
                 ForEach(Array(line.items.enumerated()), id: \.element.id) { index, item in
                     let x = Layout.x(index: index, count: line.items.count, width: width,
                                      visible: line.visibleCount, scroll: line.scroll)
-                    let ropeY = Layout.ropeY(x: x, width: width)
+                    let ropeY = Layout.ropeY(x: x, width: width, pull: line.ropeOffset)
                     PeggedView(item: item, line: line)
                         .frame(width: Layout.cardWidth, height: Layout.panelHeight - ropeY, alignment: .top)
                         // Photos scrolled towards an edge fade out before they reach it.
                         .opacity(min(1, max(0, min(x, width - x) / 90)))
                         .position(x: x, y: ropeY - Layout.pinAbove + (Layout.panelHeight - ropeY) / 2)
+                }
+            }
+            .frame(width: geo.size.width, height: geo.size.height)
+            .overlay(alignment: .topLeading) {
+                if line.liveCount > 0 || line.isClearing {
+                    let x = Layout.pullX(width: width)
+                    let y = Layout.ropeY(x: x, width: width, pull: line.ropeOffset)
+                    Path { path in
+                        path.move(to: CGPoint(x: x, y: y))
+                        path.addLine(to: CGPoint(x: x, y: y + 14))
+                    }
+                    .stroke(Color(white: 0.7), lineWidth: 2)
+                    .shadow(color: .black.opacity(0.3), radius: 1, y: 1)
+                    .allowsHitTesting(false)
+                    RopePullArea(line: line)
+                        .frame(width: Layout.pullTargetSize, height: Layout.pullTargetSize)
+                        .position(x: x, y: y + Layout.pullCenterOffset)
+                    Text(line.pullArmed ? L("Release to clear") : L("Pull to clear"))
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.primary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(.regularMaterial, in: Capsule())
+                        .fixedSize()
+                        .position(x: min(width - 72, x + 100), y: y + Layout.pullCenterOffset)
+                        .allowsHitTesting(false)
+                }
+            }
+            .overlay(alignment: .bottomTrailing) {
+                if line.liveCount > 0 {
+                    ClearLineButton(line: line)
+                        .frame(width: max(112, CGFloat(L("Take everything down").count) * 8 + 44), height: 32)
+                        .padding(.trailing, 20)
+                        .padding(.bottom, 8)
                 }
             }
             .animation(.spring(response: 0.55, dampingFraction: 0.78), value: line.items.map(\.id))
@@ -109,22 +154,13 @@ private struct Hint: View {
 /// both ends so it seems to come from beyond the screen.
 struct Rope: View {
     let width: CGFloat
-
-    private var path: Path {
-        Path { p in
-            let top = Layout.ropeTop
-            p.move(to: CGPoint(x: -20, y: top))
-            p.addQuadCurve(
-                to: CGPoint(x: width + 20, y: top),
-                control: CGPoint(x: width / 2, y: top + 2 * Layout.sag(width: width)))
-        }
-    }
+    var pull: CGFloat = 0
 
     var body: some View {
         ZStack {
-            path.stroke(Color.black.opacity(0.22), lineWidth: 1.4).offset(y: 1.2).blur(radius: 1.2)
-            path.stroke(Color(white: 0.55), lineWidth: 1.2)
-            path.stroke(Color.white.opacity(0.45), lineWidth: 0.4).offset(y: -0.35)
+            RopeCurve(pull: pull).stroke(Color.black.opacity(0.22), lineWidth: 1.4).offset(y: 1.2).blur(radius: 1.2)
+            RopeCurve(pull: pull).stroke(Color(white: 0.55), lineWidth: 1.2)
+            RopeCurve(pull: pull).stroke(Color.white.opacity(0.45), lineWidth: 0.4).offset(y: -0.35)
         }
         .mask(
             LinearGradient(stops: [
@@ -142,5 +178,23 @@ struct HitRectsKey: PreferenceKey {
     static var defaultValue: [UUID: CGRect] = [:]
     static func reduce(value: inout [UUID: CGRect], nextValue: () -> [UUID: CGRect]) {
         value.merge(nextValue()) { $1 }
+    }
+}
+
+private struct RopeCurve: Shape {
+    var pull: CGFloat
+    var animatableData: CGFloat {
+        get { pull }
+        set { pull = newValue }
+    }
+
+    func path(in rect: CGRect) -> Path {
+        Path { path in
+            for step in 0...160 {
+                let x = -20 + (rect.width + 40) * CGFloat(step) / 160
+                let point = CGPoint(x: x, y: Layout.ropeY(x: x, width: rect.width, pull: pull))
+                if step == 0 { path.move(to: point) } else { path.addLine(to: point) }
+            }
+        }
     }
 }

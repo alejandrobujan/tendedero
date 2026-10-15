@@ -9,7 +9,10 @@
 "Not now" = "Not now";
 "Hide line" = "Hide line";
 "Show line" = "Show line";
-"Take everything down" = "Take everything down";
+"Take everything down" = "Clear All";
+"Pull to clear" = "Pull to Clear";
+"Release to clear" = "Release to Clear";
+"Pull down and release to clear all" = "Pull down until Release to Clear appears, then release to clear all. Pull back up to cancel.";
 "Handle screenshots" = "Handle screenshots";
 "Screenshots hang instantly and skip the Desktop" = "Screenshots hang instantly and skip the Desktop";
 "Open screenshots folder" = "Open screenshots folder";
@@ -43,7 +46,7 @@
 "When something new hangs" = "When something new hangs";
 "Over full screen apps" = "Over full screen apps";
 "Hang copied images" = "Hang copied images";
-"Images you copy hang on the line too" = "Images you copy hang on the line too";
+"Images you copy hang on the line too" = "Images and image files you copy hang on the line too";
 "Tendedero, hanging copied images" = "Tendedero, hanging copied images";
 
 /* GrabArea */
@@ -60,7 +63,7 @@
 "Take down everything to the right" = "Take down everything to the right";
 
 /* LineView */
-"Take a screenshot and it will hang here" = "Take a screenshot and it will hang here";
+"Take a screenshot and it will hang here" = "Take a screenshot or copy an image and it will hang here";
 
 /* PeggedView */
 "Copied" = "Copied";

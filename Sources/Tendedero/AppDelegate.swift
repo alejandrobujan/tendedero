@@ -73,13 +73,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if Inbox.isEnabled { Inbox.apply() }
         restoreSettingsOnTermination()
         startWatcher()
-        clipboardWatcher = ClipboardWatcher { [weak self] url in self?.hangCapture(url) }
+        clipboardWatcher = ClipboardWatcher(onImage: { [weak self] url in self?.hangCapture(url) },
+            onDuplicate: { [weak self] url in self?.line.discardDuplicateCopy(url) })
         if ClipboardWatcher.isEnabled { clipboardWatcher.start() }
 
         registerShortcut()
 
         setUpStatusItem()
         watchMenuBarClicks()
+
+        // Installation carries over an existing login-item choice from the
+        // original app. Register the new identity once, without toggling it off.
+        if UserDefaults.standard.bool(forKey: "restoreLaunchAtLogin") {
+            do {
+                if SMAppService.mainApp.status != .enabled { try SMAppService.mainApp.register() }
+                if SMAppService.mainApp.status == .enabled {
+                    UserDefaults.standard.removeObject(forKey: "restoreLaunchAtLogin")
+                }
+            } catch {
+                log.error("Could not preserve launch at login: \(error.localizedDescription, privacy: .public)")
+            }
+        }
 
         Markup.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         Trim.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
@@ -224,7 +238,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             "Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits.")
         alert.addButton(withTitle: L("Turn on"))
         alert.addButton(withTitle: L("Not now"))
-        if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
+        alert.icon = NSApp.applicationIconImage
         NSApp.activate(ignoringOtherApps: true)
         if alert.runModal() == .alertFirstButtonReturn { setInbox(true) }
     }
@@ -320,7 +334,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     /// A discarded card falls over the whole screen, from where it hangs.
     private func fall(_ item: Pegged) {
-        guard isPresent, isRevealed, !item.flying, let screen = panel.screen,
+        guard isPresent, isRevealed, !item.flying, !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
+              let screen = panel.screen,
               let card = cardFrame(for: item.id),
               let image = item.thumb.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return }
         CaptureFlight.fall(image: image, card: card, tilt: CGFloat(item.tilt), on: screen)
@@ -333,7 +348,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let width = panel.frame.width
         let x = Layout.x(index: index, count: line.items.count, width: width,
                          visible: line.visibleCount, scroll: line.scroll)
-        let viewTop = Layout.ropeY(x: x, width: width) - Layout.pinAbove
+        let viewTop = Layout.ropeY(x: x, width: width, pull: line.ropeOffset) - Layout.pinAbove
         let cardTop = viewTop + PeggedView.cardOffsetBelowTop
         let size = PeggedView.cardSize(for: line.items[index].thumb.size)
         return CGRect(x: panel.frame.minX + x - size.width / 2,
@@ -400,6 +415,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
         }
         if !on {
+            panel.cancelControlInteraction()
+            line.cancelPull()
             pinned = false
             peekUntil = .distantPast
             panel.ignoresMouseEvents = true
@@ -518,6 +535,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if inside && pinned { pinned = false }
 
         let busy = pinned || GrabView.isDragging || GrabView.isShowingMenu
+            || line.isPulling || line.isClearing || line.controlPressed
             || line.pressedID != nil || now < peekUntil
         if inside || busy {
             awaySince = nil
@@ -532,10 +550,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     /// The panel spans the whole width of the screen, so it only accepts the
-    /// mouse while the cursor is over a photo. Everywhere else, clicks go to
+    /// mouse while the cursor is over a photo or the clear button. Elsewhere, clicks go to
     /// whatever is underneath.
     private func updateMousePassThrough(_ mouse: NSPoint) {
-        guard !GrabView.isDragging else { return }
+        guard !GrabView.isDragging, !line.isPulling, !line.controlPressed else { return }
         let local = panel.convertPoint(fromScreen: mouse)
         let flipped = CGPoint(x: local.x, y: panel.frame.height - local.y)
         var overPhoto = line.hitRects.values.contains { $0.insetBy(dx: -4, dy: -4).contains(flipped) }
@@ -545,8 +563,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             let band = line.hitRects.values.reduce(CGRect.null) { $0.union($1) }
             overPhoto = !band.isNull && flipped.y >= band.minY - 4 && flipped.y <= band.maxY + 4
         }
-        if panel.ignoresMouseEvents == overPhoto {
-            panel.ignoresMouseEvents = !overPhoto
+        let overControl = panel.control(atScreenPoint: mouse) != nil
+        let acceptsMouse = overPhoto || overControl
+        if panel.ignoresMouseEvents == acceptsMouse {
+            panel.ignoresMouseEvents = !acceptsMouse
         }
     }
 
@@ -617,8 +637,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// glance that the clipboard is being watched.
     private func updateStatusIcon() {
         let on = ClipboardWatcher.isEnabled
-        let description = on ? L("Tendedero, hanging copied images") : "Tendedero"
-        let image = NSImage(systemSymbolName: on ? "tshirt.fill" : "tshirt", accessibilityDescription: description)
+        let description = on ? L("Tendedero, hanging copied images") : AppIdentity.name
+        let image = NSImage(systemSymbolName: on ? "photo.stack.fill" : "photo.stack", accessibilityDescription: description)
         image?.isTemplate = true
         statusItem.button?.image = image
         statusItem.button?.toolTip = description
@@ -639,7 +659,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let clearItem = ClosureMenuItem(L("Take everything down")) { [weak self] in
             self?.line.clear()
         }
-        clearItem.isEnabled = line.liveCount > 0
+        clearItem.isEnabled = line.canClear
         menu.addItem(clearItem)
 
         let inbox = ClosureMenuItem(L("Handle screenshots")) { [weak self] in
@@ -772,17 +792,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         })
     }
 
-    /// tendedero.app with the running version, and the menus' language when
-    /// the website has it too, so the page answers in the same words.
+    /// The fork's releases; the original author's updater does not serve ImageLine.
     private static var updatesURL: URL {
-        var components = URLComponents(string: "https://tendedero.app/")!
-        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
-        var query = [URLQueryItem(name: "update", value: version)]
-        if let language = Bundle.main.preferredLocalizations.first, ["en", "es", "gl", "fr", "pt-BR", "ja", "ko", "zh-Hans"].contains(language) {
-            query.append(URLQueryItem(name: "lang", value: language))
-        }
-        components.queryItems = query
-        return components.url!
+        URL(string: "https://github.com/baiyuff001-maker/tendedero-plus/releases")!
     }
 
     private static func toggleLaunchAtLogin() {

@@ -7,7 +7,10 @@
 "Not now" = "以后再说";
 "Hide line" = "隐藏晾衣绳";
 "Show line" = "显示晾衣绳";
-"Take everything down" = "全部取下";
+"Take everything down" = "清空全部";
+"Pull to clear" = "下拉清空";
+"Release to clear" = "松手清空";
+"Pull down and release to clear all" = "下拉至出现“松手清空”后松开，清空全部挂载内容；向上收回可取消。";
 "Handle screenshots" = "接管截图";
 "Screenshots hang instantly and skip the Desktop" = "截图即刻挂上，不再经过桌面";
 "Open screenshots folder" = "打开截图文件夹";
@@ -41,7 +44,7 @@
 "When something new hangs" = "有新内容挂上时";
 "Over full screen apps" = "在全屏 App 上";
 "Hang copied images" = "挂上复制的图片";
-"Images you copy hang on the line too" = "复制的图片也会挂上绳";
+"Images you copy hang on the line too" = "复制的图片内容和图片文件都会挂上绳";
 "Tendedero, hanging copied images" = "Tendedero，正在挂上复制的图片";
 
 /* GrabArea */
@@ -58,7 +61,7 @@
 "Take down everything to the right" = "取下右侧全部";
 
 /* LineView */
-"Take a screenshot and it will hang here" = "截个图，它就会挂在这里";
+"Take a screenshot and it will hang here" = "截个图，或复制一张图片，它就会挂在这里";
 
 /* PeggedView */
 "Copied" = "已复制";

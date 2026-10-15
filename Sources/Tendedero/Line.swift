@@ -2,8 +2,10 @@ import AppKit
 import AVFoundation
 import Combine
 import os
+import ClipboardSupport
+import SwiftUI
 
-let log = Logger(subsystem: "app.tendedero.Tendedero", category: "line")
+let log = Logger(subsystem: "com.baiyuff001.imageline", category: "line")
 
 /// One screenshot hanging on the line.
 struct Pegged: Identifiable, Equatable {
@@ -38,6 +40,16 @@ final class Line: ObservableObject {
     /// Card frames in window coordinates, reported by the views. The panel
     /// uses them to only catch clicks over photos and let the rest through.
     var hitRects: [UUID: CGRect] = [:]
+    @Published private(set) var ropeOffset: CGFloat = 0
+    @Published private(set) var isPulling = false
+    @Published private(set) var isClearing = false
+    @Published private(set) var clearPulse = 0
+    /// AppKit controls keep the floating panel receptive throughout a press.
+    var controlPressed = false
+    nonisolated static let pullThreshold: CGFloat = 52
+    nonisolated static let maxPull: CGFloat = 64
+    var pullArmed: Bool { isPulling && ropeOffset >= Self.pullThreshold }
+    var canClear: Bool { liveCount > 0 && !isClearing }
 
     var maxItems = 8
     /// How many photos fit across the screen. With Keep on line set, the
@@ -118,7 +130,62 @@ final class Line: ObservableObject {
 
     /// "Take everything down": every photo goes the way of its corner cross.
     func clear() {
-        takeDown(items.filter { !$0.falling })
+        guard canClear else { return }
+        let snapshot = items.filter { !$0.falling }
+        isClearing = true
+        isPulling = false
+        let motion = revealed && !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+        if motion {
+            clearPulse += 1
+            if ropeOffset < 1 {
+                withAnimation(.easeOut(duration: 0.07)) { ropeOffset = 16 }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.07) { [weak self] in self?.settleRope() }
+            } else {
+                settleRope()
+            }
+        } else {
+            ropeOffset = 0
+        }
+        // A short ripple, even with 100 items. New arrivals aren't in this snapshot.
+        let spacing = min(0.025, 0.28 / Double(max(1, snapshot.count - 1)))
+        takeDown(snapshot, spacing: spacing, delay: motion ? 0.09 : 0)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.05) { [weak self] in
+            self?.isClearing = false
+        }
+    }
+
+    @discardableResult
+    func beginPull() -> Bool {
+        guard canClear, !isPulling else { return false }
+        isPulling = true
+        ropeOffset = 0
+        return true
+    }
+
+    func updatePull(distance: CGFloat) {
+        guard isPulling else { return }
+        ropeOffset = min(Self.maxPull, max(0, distance))
+    }
+
+    @discardableResult
+    func endPull() -> Bool {
+        guard isPulling else { return false }
+        let clearOnRelease = pullArmed
+        isPulling = false
+        if clearOnRelease { clear() } else { settleRope() }
+        return clearOnRelease
+    }
+
+    func cancelPull() {
+        guard isPulling else { return }
+        isPulling = false
+        settleRope()
+    }
+
+    private func settleRope() {
+        let animation: Animation = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+            ? .easeOut(duration: 0.12) : .interpolatingSpring(stiffness: 440, damping: 13)
+        withAnimation(animation) { ropeOffset = 0 }
     }
 
     /// The photos hung before (left) or after (right) this one.
@@ -136,10 +203,11 @@ final class Line: ObservableObject {
     }
 
     /// One after another, and only the first makes a sound.
-    private func takeDown(_ live: [Pegged]) {
+    private func takeDown(_ live: [Pegged], spacing: Double = 0.06, delay: Double = 0) {
         for (n, item) in live.enumerated() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.06 * Double(n)) { [weak self] in
-                self?.discard(item.id, quietly: n > 0)
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay + spacing * Double(n)) { [weak self] in
+                guard let self, self.items.contains(where: { $0.id == item.id && !$0.falling }) else { return }
+                self.discard(item.id, quietly: n > 0)
             }
         }
     }
@@ -156,6 +224,7 @@ final class Line: ObservableObject {
     func copy(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
         let entry = NSPasteboardItem()
+        entry.setString("ImageLine", forType: ClipboardImageReader.ownCopyType)
         // A recording is copied as the file, which apps paste as the video.
         if !item.isRecording, let png = pngData(item.url) { entry.setData(png, forType: .png) }
         entry.setString(item.url.absoluteString, forType: .fileURL)
@@ -208,6 +277,15 @@ final class Line: ObservableObject {
     /// The corner cross and "Take down" both end up here.
     func discard(_ id: UUID, quietly: Bool = false) {
         if isInInbox(id) { trash(id, quietly: quietly) } else { drop(id, quietly: quietly) }
+    }
+
+    /// Repairs duplicate imports from earlier builds, preserving screenshots
+    /// and external source files. Only redundant internal clipboard copies go.
+    func discardDuplicateCopy(_ url: URL) {
+        guard url.lastPathComponent.hasPrefix("Copied "),
+              let item = items.first(where: { $0.url == url && !$0.falling }),
+              isInInbox(item.id) else { return }
+        discard(item.id, quietly: true)
     }
 
     /// The oldest photo falling off a full line. Like the cross, a file from

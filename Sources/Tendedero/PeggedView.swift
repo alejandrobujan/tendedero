@@ -30,6 +30,9 @@ struct PeggedView: View {
         .onAppear(perform: arrive)
         .onChange(of: item.flying) { was, now in if was && !now { land() } }
         .onChange(of: line.gust) { _, _ in breeze() }
+        .onChange(of: line.clearPulse) { _, _ in
+            if !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion { nudge(9) }
+        }
         .onChange(of: copied) { _, isCopied in if isCopied { nudge(3) } }
     }
 
