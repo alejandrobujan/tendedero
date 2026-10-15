@@ -86,6 +86,7 @@ struct LineView: View {
             .offset(y: line.revealed ? 0 : -(Layout.panelHeight + 12))
             .animation(line.revealed ? .spring(response: 0.42, dampingFraction: 0.82)
                                      : .easeIn(duration: 0.22), value: line.revealed)
+            .opacity(line.ropeInteractionActive ? 0 : 1)
         }
         .onPreferenceChange(HitRectsKey.self) { rects in
             line.hitRects = rects

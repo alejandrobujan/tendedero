@@ -9,6 +9,9 @@ import SwiftUI
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let line = Line()
     private var panel: LinePanel!
+    private var ropePull: RopePull!
+    private var pendingCaptures: [URL] = []
+    private var showingRopeCursor = false
     private var statusItem: NSStatusItem!
     private var watcher: ScreenshotWatcher!
     /// In inbox mode, a second watcher on the Desktop. If a macOS version
@@ -64,11 +67,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        let host = NSHostingView(rootView: LineView(line: line))
+        let host = RopeHostingView(rootView: LineView(line: line))
         host.sizingOptions = []
         panel = LinePanel(content: host)
         panel.placeOnScreen()
         updateCapacity()
+        ropePull = RopePull(line: line, panel: panel)
+        panel.ropePull = ropePull
+        host.ropePull = ropePull
+        ropePull.onFinish = { [weak self] cleared in
+            guard let self else { return }
+            if cleared && self.line.liveCount == 0 {
+                self.keepOpen = false
+                self.wanted = false
+                self.refresh()
+            } else {
+                self.peekUntil = Date().addingTimeInterval(1)
+            }
+            let captures = self.pendingCaptures
+            self.pendingCaptures.removeAll()
+            for url in captures { self.hangCapture(url) }
+        }
 
         if Inbox.isEnabled { Inbox.apply() }
         restoreSettingsOnTermination()
@@ -104,6 +123,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         for name in [NSWorkspace.activeSpaceDidChangeNotification, NSWorkspace.didActivateApplicationNotification] {
             workspace.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated {
+                    self?.ropePull.interrupt()
                     self?.refresh()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { self?.refresh() }
                 }
@@ -114,6 +134,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main
         ) { [weak self] _ in
             MainActor.assumeIsolated {
+                self?.ropePull.interrupt()
                 self?.panel.placeOnScreen()
                 self?.updateCapacity()
             }
@@ -139,6 +160,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        ropePull?.onFinish = nil
+        ropePull?.interrupt()
+        panel?.resetRopeCursor()
         if Inbox.isEnabled { Inbox.restore() }
     }
 
@@ -255,9 +279,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     /// An empty line goes away, unless it was opened on purpose.
     private func itemsChanged() {
-        guard line.liveCount == 0, !keepOpen else { return }
+        guard line.liveCount == 0, !keepOpen, !line.ropeInteractionActive else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [weak self] in
-            guard let self, self.line.liveCount == 0, !self.keepOpen else { return }
+            guard let self, self.line.liveCount == 0, !self.keepOpen, !self.line.ropeInteractionActive else { return }
             self.wanted = false
             self.refresh()
         }
@@ -278,6 +302,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// A new screenshot lifts off from where it was taken and flies to its
     /// place on the line. Without a known capture area it simply drops in.
     private func hangCapture(_ url: URL) {
+        if ropePull.isActive {
+            if !pendingCaptures.contains(url) { pendingCaptures.append(url) }
+            return
+        }
         let from = captureRect(of: url)
         let screen = from.flatMap { from in
             NSScreen.screens.first { NSMouseInRect(CGPoint(x: from.midX, y: from.midY), $0.frame, false) }
@@ -383,6 +411,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     private func setRevealed(_ on: Bool) {
+        if !on, ropePull?.isActive == true { ropePull.interrupt() }
         guard on != isRevealed else { return }
         isRevealed = on
         line.revealed = on
@@ -518,7 +547,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if inside && pinned { pinned = false }
 
         let busy = pinned || GrabView.isDragging || GrabView.isShowingMenu
-            || line.pressedID != nil || now < peekUntil
+            || line.pressedID != nil || now < peekUntil || ropePull.isActive
         if inside || busy {
             awaySince = nil
         } else {
@@ -536,6 +565,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// whatever is underneath.
     private func updateMousePassThrough(_ mouse: NSPoint) {
         guard !GrabView.isDragging else { return }
+        if ropePull.isActive {
+            panel.ignoresMouseEvents = !ropePull.isDragging
+            panel.updateRopeCursor(at: mouse)
+            return
+        }
         let local = panel.convertPoint(fromScreen: mouse)
         let flipped = CGPoint(x: local.x, y: panel.frame.height - local.y)
         var overPhoto = line.hitRects.values.contains { $0.insetBy(dx: -4, dy: -4).contains(flipped) }
@@ -545,9 +579,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             let band = line.hitRects.values.reduce(CGRect.null) { $0.union($1) }
             overPhoto = !band.isNull && flipped.y >= band.minY - 4 && flipped.y <= band.maxY + 4
         }
-        if panel.ignoresMouseEvents == overPhoto {
-            panel.ignoresMouseEvents = !overPhoto
+        let overRope = ropePull.canGrab(at: mouse)
+        if overRope != showingRopeCursor, let content = panel.contentView {
+            panel.invalidateCursorRects(for: content)
         }
+        showingRopeCursor = overRope
+        let accepts = overPhoto || overRope
+        if panel.ignoresMouseEvents == accepts {
+            panel.ignoresMouseEvents = !accepts
+        }
+        // Establish ownership of mouse events before asking AppKit to show
+        // this background panel's cursor.
+        panel.updateRopeCursor(at: mouse)
     }
 
     // MARK: Shortcut
