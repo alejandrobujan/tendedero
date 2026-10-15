@@ -90,6 +90,9 @@ final class Line: ObservableObject {
             letGo(oldest.id)
         }
         save()
+        // Every new capture is on the clipboard at once; clicking it later
+        // copies it again.
+        copy(item.id)
         if !quietly { play("Tink", volume: 0.35) }
         return item.id
     }
