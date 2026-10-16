@@ -28,6 +28,7 @@ struct GrabArea: NSViewRepresentable {
         let id = item.id
         let line = line
         let isRecording = item.isRecording
+        let isText = item.isText
         view.url = item.url
         view.dragImage = item.thumb
         view.onClick = { line.copy(id) }
@@ -40,7 +41,7 @@ struct GrabArea: NSViewRepresentable {
         }
         view.onTrash = { line.trash(id) }
         view.onDiscard = { line.discard(id) }
-        view.onLongPress = { line.markup(id) }
+        view.onLongPress = { if !isText { line.markup(id) } }
         view.onForceClick = { line.quickLook(id) }
         view.onPressChange = { pressed in line.pressedID = pressed ? id : nil }
         view.menuProvider = {
@@ -50,7 +51,7 @@ struct GrabArea: NSViewRepresentable {
             menu.addItem(ClosureMenuItem(L("Copy")) { line.copy(id) })
             menu.addItem(ClosureMenuItem(L("Open")) { line.open(id) })
             menu.addItem(ClosureMenuItem(L("Quick Look")) { line.quickLook(id) })
-            if !isRecording {
+            if !isRecording && !isText {
                 menu.addItem(ClosureMenuItem(L("Markup")) { line.markup(id) })
             }
             menu.addItem(ClosureMenuItem(L("Show in Finder")) { line.reveal(id) })
@@ -164,7 +165,15 @@ final class GrabView: NSView, NSDraggingSource {
         startedDrag = true
         endPress()
 
-        let item = NSDraggingItem(pasteboardWriter: url as NSURL)
+        let item: NSDraggingItem
+        if isText(url), let text = try? String(contentsOf: url, encoding: .utf8) {
+            let pbItem = NSPasteboardItem()
+            pbItem.setString(text, forType: .string)
+            pbItem.setString(url.absoluteString, forType: .fileURL)
+            item = NSDraggingItem(pasteboardWriter: pbItem)
+        } else {
+            item = NSDraggingItem(pasteboardWriter: url as NSURL)
+        }
         item.setDraggingFrame(imageFrame(), contents: dragImage)
         let session = beginDraggingSession(with: [item], event: event, source: self)
         // Released where nothing accepts it: it flies back to the line.
