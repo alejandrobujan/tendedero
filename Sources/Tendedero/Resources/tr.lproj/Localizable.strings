@@ -42,6 +42,8 @@
 "Over full screen apps" = "Tam ekran uygulamaların üzerinde";
 "Hang copied images" = "Kopyalanan görselleri as";
 "Images you copy hang on the line too" = "Kopyaladığınız görseller de ipe asılır";
+"Hang copied text" = "Kopyalanan metni as";
+"Text you copy hangs on the line too" = "Kopyaladığınız metin de ipe asılır";
 "Tendedero, hanging copied images" = "Tendedero, kopyalanan görselleri asıyor";
 
 /* GrabArea */

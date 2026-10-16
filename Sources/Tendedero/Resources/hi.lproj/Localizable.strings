@@ -44,6 +44,8 @@
 "Over full screen apps" = "फ़ुल स्क्रीन ऐप्स के ऊपर";
 "Hang copied images" = "कॉपी की गई तस्वीरें टाँगें";
 "Images you copy hang on the line too" = "आप जो तस्वीरें कॉपी करते हैं, वे भी रस्सी पर टँगती हैं";
+"Hang copied text" = "कॉपी किया गया टेक्स्ट लटकाएं";
+"Text you copy hangs on the line too" = "आपके द्वारा कॉपी किया गया टेक्स्ट भी तार पर लटकेगा";
 "Tendedero, hanging copied images" = "Tendedero, कॉपी की गई तस्वीरें टाँग रहा है";
 
 /* GrabArea */

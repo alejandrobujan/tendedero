@@ -44,6 +44,8 @@
 "Over full screen apps" = "Tam ekran proqramların üzərində";
 "Hang copied images" = "Kopyalanmış şəkilləri as";
 "Images you copy hang on the line too" = "Kopyaladığınız şəkillər də ipdən asılır";
+"Hang copied text" = "Kopyalanmış mətni asmaq";
+"Text you copy hangs on the line too" = "Kopyaladığınız mətn də ipə asılır";
 "Tendedero, hanging copied images" = "Tendedero, kopyalanmış şəkilləri asır";
 
 /* GrabArea */

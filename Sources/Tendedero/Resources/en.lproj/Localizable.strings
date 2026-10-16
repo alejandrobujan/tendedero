@@ -44,6 +44,8 @@
 "Over full screen apps" = "Over full screen apps";
 "Hang copied images" = "Hang copied images";
 "Images you copy hang on the line too" = "Images you copy hang on the line too";
+"Hang copied text" = "Hang copied text";
+"Text you copy hangs on the line too" = "Text you copy hangs on the line too";
 "Tendedero, hanging copied images" = "Tendedero, hanging copied images";
 
 /* GrabArea */

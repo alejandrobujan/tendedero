@@ -42,6 +42,8 @@
 "Over full screen apps" = "Au-dessus des apps en plein écran";
 "Hang copied images" = "Accrocher les images copiées";
 "Images you copy hang on the line too" = "Les images copiées s’accrochent aussi à la corde";
+"Hang copied text" = "Accrocher le texte copié";
+"Text you copy hangs on the line too" = "Le texte copié s'accroche aussi";
 "Tendedero, hanging copied images" = "Tendedero, accroche les images copiées";
 
 /* GrabArea */

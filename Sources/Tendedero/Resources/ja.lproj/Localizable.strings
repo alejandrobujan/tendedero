@@ -42,6 +42,8 @@
 "Over full screen apps" = "フルスクリーンのアプリの上にも";
 "Hang copied images" = "コピーした画像を吊るす";
 "Images you copy hang on the line too" = "コピーした画像もロープに吊るされます";
+"Hang copied text" = "コピーしたテキストを掛ける";
+"Text you copy hangs on the line too" = "コピーしたテキストも掛けられます";
 "Tendedero, hanging copied images" = "Tendedero、コピーした画像を吊るしています";
 
 /* GrabArea */
