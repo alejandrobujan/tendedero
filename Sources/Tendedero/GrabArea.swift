@@ -52,6 +52,7 @@ struct GrabArea: NSViewRepresentable {
             menu.addItem(ClosureMenuItem(L("Quick Look")) { line.quickLook(id) })
             if !isRecording {
                 menu.addItem(ClosureMenuItem(L("Markup")) { line.markup(id) })
+                menu.addItem(ClosureMenuItem(L("Pin on Top")) { line.pin(id) })
             }
             menu.addItem(ClosureMenuItem(L("Show in Finder")) { line.reveal(id) })
             let inInbox = line.isInInbox(id)

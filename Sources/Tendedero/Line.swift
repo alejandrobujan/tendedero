@@ -285,6 +285,12 @@ final class Line: ObservableObject {
         QuickLook.shared.show(live.map(\.url), at: index)
     }
 
+    /// Keeps the photo floating over everything, to look at while you work.
+    func pin(_ id: UUID) {
+        guard let item = items.first(where: { $0.id == id }), !item.isRecording else { return }
+        Pin.show(item.url)
+    }
+
     /// After a change of size, every photo is redrawn sharp at the new one.
     func reloadThumbnails() {
         for i in items.indices where !items[i].falling {
