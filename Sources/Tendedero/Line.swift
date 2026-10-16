@@ -81,6 +81,8 @@ final class Line: ObservableObject {
               let thumb = makeThumbnail(url) else { return nil }
         var item = Pegged(url: url, thumb: thumb)
         item.flying = flying
+        // The line moves anyway for a new photo, so the gaps close with it.
+        sweepFallen()
         items.append(item)
         scroll = 0
         // A full line lets the oldest photo fall off the far end. Only one: a
@@ -111,9 +113,27 @@ final class Line: ObservableObject {
         hitRects[id] = nil
         save()
         if !quietly { play("Pop", volume: 0.25) }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
-            self?.items.removeAll { $0.id == id }
-        }
+        scheduleSweep()
+    }
+
+    /// How long the line waits after the last discard before closing the
+    /// gaps. A fallen photo keeps its empty place until then, so the next
+    /// cross stays under the pointer while discarding several in a row.
+    private static let sweepDelay: TimeInterval = 2.5
+    private var sweep: DispatchWorkItem?
+
+    private func scheduleSweep() {
+        sweep?.cancel()
+        let work = DispatchWorkItem { [weak self] in self?.sweepFallen() }
+        sweep = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.sweepDelay, execute: work)
+    }
+
+    /// The fallen photos leave their places and the rest close up.
+    private func sweepFallen() {
+        sweep?.cancel()
+        sweep = nil
+        items.removeAll { $0.falling }
     }
 
     /// "Take everything down": every photo goes the way of its corner cross.
