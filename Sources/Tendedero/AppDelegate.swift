@@ -642,37 +642,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         clearItem.isEnabled = line.liveCount > 0
         menu.addItem(clearItem)
 
-        let inbox = ClosureMenuItem(L("Handle screenshots")) { [weak self] in
+        // Settings keep the menu open, so several can be changed in one go.
+        let inbox = StayOpenMenuItem(L("Handle screenshots"), isOn: { Inbox.isEnabled }) { [weak self] in
             self?.setInbox(!Inbox.isEnabled)
         }
-        inbox.state = Inbox.isEnabled ? .on : .off
         inbox.toolTip = L("Screenshots hang instantly and skip the Desktop")
         menu.addItem(inbox)
 
-        let clipboard = ClosureMenuItem(L("Hang copied images")) { [weak self] in
+        let clipboard = StayOpenMenuItem(L("Hang copied images"), isOn: { ClipboardWatcher.isEnabled }) { [weak self] in
             self?.setClipboard(!ClipboardWatcher.isEnabled)
         }
-        clipboard.state = ClipboardWatcher.isEnabled ? .on : .off
         clipboard.toolTip = L("Images you copy hang on the line too")
         menu.addItem(clipboard)
 
         let bringDown = NSMenuItem(title: L("Bring the line down"), action: nil, keyEquivalent: "")
         let options = NSMenu()
-        let hover = ClosureMenuItem(L("When the pointer rests in the menu bar")) {
+        let hover = StayOpenMenuItem(L("When the pointer rests in the menu bar"), isOn: { Self.opensFromMenuBar }) {
             AppDelegate.opensFromMenuBar.toggle()
         }
-        hover.state = Self.opensFromMenuBar ? .on : .off
         options.addItem(hover)
-        let peek = ClosureMenuItem(L("When something new hangs")) {
+        let peek = StayOpenMenuItem(L("When something new hangs"), isOn: { Self.peeksAtNew }) {
             AppDelegate.peeksAtNew.toggle()
         }
-        peek.state = Self.peeksAtNew ? .on : .off
         options.addItem(peek)
-        let fullScreen = ClosureMenuItem(L("Over full screen apps")) { [weak self] in
+        let fullScreen = StayOpenMenuItem(L("Over full screen apps"), isOn: { FullScreen.showLineOver }) { [weak self] in
             FullScreen.showLineOver.toggle()
             self?.refresh()
         }
-        fullScreen.state = FullScreen.showLineOver ? .on : .off
         options.addItem(fullScreen)
         bringDown.submenu = options
         menu.addItem(bringDown)
@@ -709,12 +705,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         let keepItem = NSMenuItem(title: L("Keep on line"), action: nil, keyEquivalent: "")
         let keeps = NSMenu()
-        let fit = ClosureMenuItem(L("As many as fit")) { [weak self] in self?.setKeep(nil) }
-        fit.state = Line.keepOnLine == nil ? .on : .off
+        let fit = StayOpenMenuItem(L("As many as fit"), isOn: { Line.keepOnLine == nil }) { [weak self] in
+            self?.setKeep(nil)
+        }
         keeps.addItem(fit)
         for n in Line.keepChoices {
-            let item = ClosureMenuItem(String(format: L("%d photos"), n)) { [weak self] in self?.setKeep(n) }
-            item.state = Line.keepOnLine == n ? .on : .off
+            let item = StayOpenMenuItem(String(format: L("%d photos"), n), isOn: { Line.keepOnLine == n }) { [weak self] in
+                self?.setKeep(n)
+            }
             keeps.addItem(item)
         }
         keepItem.submenu = keeps
@@ -723,8 +721,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let sizeItem = NSMenuItem(title: L("Size"), action: nil, keyEquivalent: "")
         let sizes = NSMenu()
         for (size, title) in [(Layout.Size.small, L("Small")), (.medium, L("Medium")), (.large, L("Large"))] {
-            let item = ClosureMenuItem(title) { [weak self] in self?.setSize(size) }
-            item.state = Layout.size == size ? .on : .off
+            let item = StayOpenMenuItem(title, isOn: { Layout.size == size }) { [weak self] in self?.setSize(size) }
             sizes.addItem(item)
         }
         sizeItem.submenu = sizes
@@ -746,11 +743,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         menu.addItem(.separator())
 
-        let sound = ClosureMenuItem(L("Sounds")) { [weak self] in
+        let sound = StayOpenMenuItem(L("Sounds"), isOn: { [weak self] in self?.line.soundOn ?? false }) { [weak self] in
             guard let self else { return }
             self.line.soundOn.toggle()
         }
-        sound.state = line.soundOn ? .on : .off
         menu.addItem(sound)
 
         let login = ClosureMenuItem(L("Open at login")) {
