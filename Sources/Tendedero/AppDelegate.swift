@@ -255,6 +255,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     /// An empty line goes away, unless it was opened on purpose.
     private func itemsChanged() {
+        updateStatusIcon()
         guard line.liveCount == 0, !keepOpen else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [weak self] in
             guard let self, self.line.liveCount == 0, !self.keepOpen else { return }
@@ -614,14 +615,48 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     /// The shirt fills in while copied images are hung, so it shows at a
-    /// glance that the clipboard is being watched.
+    /// glance that the clipboard is being watched. It is dimmed while the
+    /// line is empty, so resting in the menu bar and seeing nothing come down
+    /// does not look broken. It always carries a count, a dimmed 0 included.
     private func updateStatusIcon() {
         let on = ClipboardWatcher.isEnabled
+        let count = line.liveCount
         let description = on ? L("Tendedero, hanging copied images") : "Tendedero"
-        let image = NSImage(systemSymbolName: on ? "tshirt.fill" : "tshirt", accessibilityDescription: description)
-        image?.isTemplate = true
+        let state = count == 0 ? L("The line is empty") : String(format: L("%d on the line"), count)
+        guard let symbol = NSImage(systemSymbolName: on ? "tshirt.fill" : "tshirt",
+                                   accessibilityDescription: "\(description), \(state)") else { return }
+        let image = Self.badged(symbol, count: count)
+        image.isTemplate = true
         statusItem.button?.image = image
-        statusItem.button?.toolTip = description
+        statusItem.button?.appearsDisabled = count == 0
+        statusItem.button?.toolTip = "\(description)\n\(state)"
+    }
+
+    /// The shirt with a small count in its lower right corner, cut out of
+    /// the shirt so it reads on top of it.
+    private static func badged(_ symbol: NSImage, count: Int) -> NSImage {
+        let label = NSAttributedString(string: count > 9 ? "9+" : "\(count)", attributes: [
+            .font: NSFont.monospacedDigitSystemFont(ofSize: count > 9 ? 7 : 8, weight: .bold),
+            .foregroundColor: NSColor.black,
+        ])
+        let text = label.size()
+        let size = symbol.size
+        let badge = NSRect(x: size.width - max(text.height, text.width + 2), y: 0,
+                           width: max(text.height, text.width + 2), height: text.height)
+        let image = NSImage(size: size, flipped: false) { _ in
+            guard let ctx = NSGraphicsContext.current?.cgContext else { return false }
+            symbol.draw(in: NSRect(origin: .zero, size: size))
+            ctx.setBlendMode(.destinationOut)
+            NSBezierPath(roundedRect: badge.insetBy(dx: -1.5, dy: -1.5),
+                         xRadius: badge.height / 2 + 1.5, yRadius: badge.height / 2 + 1.5).fill()
+            ctx.setBlendMode(.normal)
+            NSBezierPath(roundedRect: badge, xRadius: badge.height / 2, yRadius: badge.height / 2).fill()
+            ctx.setBlendMode(.destinationOut)
+            label.draw(at: NSPoint(x: badge.midX - text.width / 2, y: badge.minY))
+            return true
+        }
+        image.accessibilityDescription = symbol.accessibilityDescription
+        return image
     }
 
     func menuNeedsUpdate(_ menu: NSMenu) {

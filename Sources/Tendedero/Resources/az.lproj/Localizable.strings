@@ -45,6 +45,8 @@
 "Hang copied images" = "Kopyalanmış şəkilləri as";
 "Images you copy hang on the line too" = "Kopyaladığınız şəkillər də ipdən asılır";
 "Tendedero, hanging copied images" = "Tendedero, kopyalanmış şəkilləri asır";
+"The line is empty" = "İp boşdur";
+"%d on the line" = "İpdə %d ədəd";
 
 /* GrabArea */
 "Copy" = "Kopyala";

@@ -45,6 +45,8 @@
 "Hang copied images" = "Hang copied images";
 "Images you copy hang on the line too" = "Images you copy hang on the line too";
 "Tendedero, hanging copied images" = "Tendedero, hanging copied images";
+"The line is empty" = "The line is empty";
+"%d on the line" = "%d on the line";
 
 /* GrabArea */
 "Copy" = "Copy";

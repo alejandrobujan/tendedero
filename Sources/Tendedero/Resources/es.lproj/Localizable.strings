@@ -43,6 +43,8 @@
 "Hang copied images" = "Colgar imágenes copiadas";
 "Images you copy hang on the line too" = "Las imágenes que copias también se cuelgan";
 "Tendedero, hanging copied images" = "Tendedero, colgando imágenes copiadas";
+"The line is empty" = "La cuerda está vacía";
+"%d on the line" = "%d en la cuerda";
 
 /* GrabArea */
 "Copy" = "Copiar";

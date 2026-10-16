@@ -45,6 +45,8 @@
 "Hang copied images" = "कॉपी की गई तस्वीरें टाँगें";
 "Images you copy hang on the line too" = "आप जो तस्वीरें कॉपी करते हैं, वे भी रस्सी पर टँगती हैं";
 "Tendedero, hanging copied images" = "Tendedero, कॉपी की गई तस्वीरें टाँग रहा है";
+"The line is empty" = "रस्सी खाली है";
+"%d on the line" = "रस्सी पर %d";
 
 /* GrabArea */
 "Copy" = "कॉपी करें";
