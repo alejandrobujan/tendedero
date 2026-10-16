@@ -47,7 +47,7 @@ Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 
 | | |
 |:--|:--|
-| Click | Copy the image. |
+| Click | Copy the image or text. |
 | Press and hold | Open it in Markup. |
 | Double click | Open it in Preview. |
 | Force click | Take a quick look. |
@@ -73,13 +73,13 @@ Same shortcuts. Same muscle memory. Just less mess.
 
 <br>
 
-## Copied images too.
+## Copied images and text too.
 
-Take a screenshot with <kbd>⌃</kbd> held, or copy an image in Preview, and it
-hangs on the line like any other. Turn on Hang copied images in the menu bar
-and the shirt fills in while it is on. Only images: anything copied along
-with text or a file, and anything a password manager marks as private, is
-left alone.
+Take a screenshot with <kbd>⌃</kbd> held, copy an image in Preview, or copy
+text snippets, and they hang on the line like any other. Turn on Hang copied
+images or Hang copied text in the menu bar and the shirt fills in while
+either is on. Click a note card to copy the text, or drag it straight into
+an app. Anything a password manager marks as private is left alone.
 
 <br>
 
