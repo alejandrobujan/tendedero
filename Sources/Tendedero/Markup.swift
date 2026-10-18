@@ -40,6 +40,30 @@ final class Markup: NSObject, NSSharingServiceDelegate {
         log.notice("Markup ended without saving: \(error.localizedDescription, privacy: .public)")
     }
 
+    /// Where the editor belongs, in screen coordinates. With no source window
+    /// AppKit falls back to a hidden one at the screen's origin, which is why
+    /// the editor otherwise opens in the bottom-left corner. Markup places its
+    /// editor over this rect, so returning the upper middle of the screen is
+    /// enough to move it there without handing over a window of our own.
+    nonisolated func sharingService(_ sharingService: NSSharingService,
+                                    sourceFrameOnScreenForShareItem item: Any) -> NSRect {
+        MainActor.assumeIsolated {
+            let visible = (LinePanel.screenUnderPointer() ?? NSScreen.main)?.visibleFrame ?? .zero
+            // Markup keeps this rect's bottom-left corner and sizes the editor
+            // itself: measured on a 1470×956 screen it came out about 10%
+            // narrower and 6% taller than the rect. The numbers below target
+            // the finished editor (~720×600) rather than the rect.
+            let expectedW: CGFloat = 720
+            let expectedH: CGFloat = 600
+            let width = min(visible.width - 80, expectedW / 0.897)
+            let height = min(visible.height - 140, expectedH / 1.06)
+            return NSRect(x: visible.midX - expectedW / 2,
+                          y: visible.midY - expectedH / 2,
+                          width: width,
+                          height: height)
+        }
+    }
+
     // MARK: Writing back
 
     private func save(_ items: [Any]) {
