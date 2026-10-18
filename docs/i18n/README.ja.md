@@ -12,13 +12,14 @@
   &nbsp;&nbsp;
   <a href="#ソースからビルド">ソースからビルド&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;日本語&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;日本語&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
   <br>
   <sub>このページは英語版READMEの翻訳です。内容に相違がある場合は英語版が優先されます。</sub>
 </p>
 
 <p align="center">
   <a href="https://trendshift.io/repositories/287033?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-287033" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/287033/daily?language=Swift" alt="alejandrobujan%2Ftendedero | Trendshift" width="250" height="55"/></a>
+  <a href="https://trendshift.io/repositories/287033?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-287033" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/287033/weekly?language=Swift" alt="alejandrobujan%2Ftendedero | Trendshift" width="250" height="55"/></a>
 </p>
 
 <br>
@@ -94,7 +95,7 @@ Tendederoは完全にMac上で動作し、スクリーンショットがMacの�
 |:--|:--|
 | **互換性** | macOS 14 Sonoma以降、Appleシリコン搭載MacとIntel搭載Macに対応。macOS 27向けにデザイン。 |
 | **サイズ** | 1.7MB |
-| **言語** | 英語、スペイン語、ガリシア語、フランス語、ポルトガル語（ブラジル）、日本語、韓国語、中国語（簡体字）、トルコ語、アゼルバイジャン語 |
+| **言語** | 英語、スペイン語、ガリシア語、フランス語、ポルトガル語（ブラジル）、日本語、韓国語、中国語（簡体字）、トルコ語、アゼルバイジャン語、ヒンディー語 |
 | **開発環境** | Swift、AppKit、SwiftUI |
 | **ネットワークアクセス** | なし |
 | **価格** | 無料 |

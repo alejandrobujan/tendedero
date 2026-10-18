@@ -44,10 +44,6 @@
 "Images you copy hang on the line too" = "复制的图片也会挂上绳";
 "Tendedero, hanging copied images" = "Tendedero，正在挂上复制的图片";
 
-/* Language menu */
-"Language" = "语言";
-"System Default" = "系统语言";
-
 /* GrabArea */
 "Copy" = "复制";
 "Open" = "打开";

@@ -44,10 +44,6 @@
 "Images you copy hang on the line too" = "コピーした画像もロープに吊るされます";
 "Tendedero, hanging copied images" = "Tendedero、コピーした画像を吊るしています";
 
-/* Language menu */
-"Language" = "言語";
-"System Default" = "システムの言語";
-
 /* GrabArea */
 "Copy" = "コピー";
 "Open" = "開く";

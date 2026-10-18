@@ -44,10 +44,6 @@
 "Images you copy hang on the line too" = "As imagens que você copia também vão para o varal";
 "Tendedero, hanging copied images" = "Tendedero, pendurando imagens copiadas";
 
-/* Language menu */
-"Language" = "Idioma";
-"System Default" = "Idioma do sistema";
-
 /* GrabArea */
 "Copy" = "Copiar";
 "Open" = "Abrir";

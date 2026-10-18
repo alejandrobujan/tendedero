@@ -44,10 +44,6 @@
 "Images you copy hang on the line too" = "Les images copiées s’accrochent aussi à la corde";
 "Tendedero, hanging copied images" = "Tendedero, accroche les images copiées";
 
-/* Language menu */
-"Language" = "Langue";
-"System Default" = "Langue du système";
-
 /* GrabArea */
 "Copy" = "Copier";
 "Open" = "Ouvrir";

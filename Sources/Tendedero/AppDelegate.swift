@@ -739,27 +739,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         shortcutItem.submenu = shortcuts
         menu.addItem(shortcutItem)
 
-        let languageItem = NSMenuItem(title: L("Language"), action: nil, keyEquivalent: "")
-        let languages = NSMenu()
-        languages.autoenablesItems = false
-        let activeCode = LanguageOverride.active
-        let systemItem = ClosureMenuItem(L("System Default")) {
-            LanguageOverride.apply(nil)
-        }
-        // System Default is checked when no override is set.
-        systemItem.state = LanguageOverride.current == nil ? .on : .off
-        languages.addItem(systemItem)
-        languages.addItem(.separator())
-        for code in LanguageOverride.available {
-            let item = ClosureMenuItem(LanguageOverride.displayName(code)) {
-                LanguageOverride.apply(code)
-            }
-            item.state = code == activeCode && LanguageOverride.current != nil ? .on : .off
-            languages.addItem(item)
-        }
-        languageItem.submenu = languages
-        menu.addItem(languageItem)
-
         menu.addItem(ClosureMenuItem(L("Open screenshots folder")) { [weak self] in
             guard let self else { return }
             NSWorkspace.shared.open(self.watcher.folder)

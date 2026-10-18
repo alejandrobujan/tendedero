@@ -44,10 +44,6 @@
 "Images you copy hang on the line too" = "Kopyaladığınız görseller de ipe asılır";
 "Tendedero, hanging copied images" = "Tendedero, kopyalanan görselleri asıyor";
 
-/* Language menu */
-"Language" = "Dil";
-"System Default" = "Sistem dili";
-
 /* GrabArea */
 "Copy" = "Kopyala";
 "Open" = "Aç";
