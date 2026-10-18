@@ -43,6 +43,8 @@
 "Hang copied images" = "복사한 이미지 걸기";
 "Images you copy hang on the line too" = "복사한 이미지도 빨랫줄에 걸려요";
 "Tendedero, hanging copied images" = "Tendedero, 복사한 이미지 거는 중";
+"The line is empty" = "빨랫줄이 비어 있어요";
+"%d on the line" = "빨랫줄에 %d개";
 
 /* GrabArea */
 "Copy" = "복사하기";

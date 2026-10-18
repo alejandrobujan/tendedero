@@ -43,6 +43,8 @@
 "Hang copied images" = "コピーした画像を吊るす";
 "Images you copy hang on the line too" = "コピーした画像もロープに吊るされます";
 "Tendedero, hanging copied images" = "Tendedero、コピーした画像を吊るしています";
+"The line is empty" = "ロープは空です";
+"%d on the line" = "ロープに%d件";
 
 /* GrabArea */
 "Copy" = "コピー";

@@ -1,0 +1,68 @@
+/* Hindi. Each key is the English text exactly as written in L("...") in
+   the code. Every language has the same keys; run
+   swift scripts/check-strings.swift to check. */
+
+/* AppDelegate */
+"Let Tendedero handle your screenshots?" = "क्या Tendedero आपके स्क्रीनशॉट संभाले?";
+"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "स्क्रीनशॉट लेते ही वे रस्सी पर टँग जाएँगे, बिना तैरते थंबनेल के, और आपके डेस्कटॉप पर जमा नहीं होंगे। किसी को रखना हो तो उसे फ़ोल्डर में खींचें, या क्रॉस से हटा दें। आप इसे मेनू बार से बंद कर सकते हैं, और Tendedero बंद होने पर आपकी सेटिंग्स वापस आ जाती हैं।";
+"Turn on" = "चालू करें";
+"Not now" = "अभी नहीं";
+"Hide line" = "रस्सी छिपाएँ";
+"Show line" = "रस्सी दिखाएँ";
+"Take everything down" = "सब उतार दें";
+"Handle screenshots" = "स्क्रीनशॉट संभालें";
+"Screenshots hang instantly and skip the Desktop" = "स्क्रीनशॉट तुरंत टँगते हैं और डेस्कटॉप पर नहीं जाते";
+"Open screenshots folder" = "स्क्रीनशॉट फ़ोल्डर खोलें";
+"Sounds" = "आवाज़ें";
+"Open at login" = "लॉगिन पर खोलें";
+"Check for Updates…" = "अपडेट देखें…";
+"Quit Tendedero" = "Tendedero बंद करें";
+"Could not change the login setting" = "लॉगिन सेटिंग बदली नहीं जा सकी";
+"Move Tendedero to the Applications folder and try again." = "Tendedero को Applications फ़ोल्डर में ले जाएँ और फिर से कोशिश करें।";
+"Keep on line" = "रस्सी पर रखें";
+"As many as fit" = "जितने आ सकें";
+"%d photos" = "%d फ़ोटो";
+"Also watch folders" = "फ़ोल्डर पर भी नज़र रखें";
+"Add Folder…" = "फ़ोल्डर जोड़ें…";
+"Stop Watching" = "नज़र रखना बंद करें";
+"Watch" = "नज़र रखें";
+"New images saved to this folder will hang on the line." = "इस फ़ोल्डर में सेव होने वाली नई तस्वीरें रस्सी पर टँग जाएँगी।";
+"Shortcut" = "शॉर्टकट";
+"Change Shortcut…" = "शॉर्टकट बदलें…";
+"Change Shortcut" = "शॉर्टकट बदलें";
+"None" = "कोई नहीं";
+"Space" = "Space";
+"Press the new shortcut" = "नया शॉर्टकट दबाएँ";
+"Escape cancels. Delete removes the shortcut." = "Escape दबाने से रद्द होता है। Delete से शॉर्टकट हट जाता है।";
+"Size" = "आकार";
+"Small" = "छोटा";
+"Medium" = "मध्यम";
+"Large" = "बड़ा";
+"Bring the line down" = "रस्सी नीचे लाएँ";
+"When the pointer rests in the menu bar" = "जब पॉइंटर मेनू बार में रुके";
+"When something new hangs" = "जब कुछ नया टँगे";
+"Over full screen apps" = "फ़ुल स्क्रीन ऐप्स के ऊपर";
+"Hang copied images" = "कॉपी की गई तस्वीरें टाँगें";
+"Images you copy hang on the line too" = "आप जो तस्वीरें कॉपी करते हैं, वे भी रस्सी पर टँगती हैं";
+"Tendedero, hanging copied images" = "Tendedero, कॉपी की गई तस्वीरें टाँग रहा है";
+"The line is empty" = "रस्सी खाली है";
+"%d on the line" = "रस्सी पर %d";
+
+/* GrabArea */
+"Copy" = "कॉपी करें";
+"Open" = "खोलें";
+"Quick Look" = "क्विक लुक";
+"Markup" = "मार्कअप";
+"Show in Finder" = "Finder में दिखाएँ";
+"Save to Desktop" = "डेस्कटॉप पर सेव करें";
+"Discard" = "हटाएँ";
+"Take down" = "उतारें";
+"Move to Trash" = "ट्रैश में ले जाएँ";
+"Take down everything to the left" = "बाईं ओर का सब उतारें";
+"Take down everything to the right" = "दाईं ओर का सब उतारें";
+
+/* LineView */
+"Take a screenshot and it will hang here" = "स्क्रीनशॉट लें, वह यहाँ टँग जाएगा";
+
+/* PeggedView */
+"Copied" = "कॉपी हो गया";

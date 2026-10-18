@@ -9,7 +9,9 @@ import SwiftUI
 /// - The Trash discards it.
 /// - Nowhere that accepts it: the photo flies back to the line.
 ///
-/// Click copies, double-click or the visible Edit button opens the editor.
+/// A single click copies after the double-click interval. Double-click or
+/// press and hold opens the image editor (playback or Trim for recordings).
+/// The visible Edit button opens the image editor; the corner cross discards.
 struct GrabArea: NSViewRepresentable {
     let item: Pegged
     let line: Line
@@ -104,6 +106,9 @@ final class GrabView: NSView, NSDraggingSource {
     private var startedDrag = false
     private var holdTimer: Timer?
     private var didLongPress = false
+    /// A click copies only once it is clear it is not the first half of a
+    /// double click, which opens the photo and must leave the clipboard alone.
+    private var clickTimer: Timer?
 
     /// How long you hold before the editor opens. Long enough not to fire on a
     /// slow click, short enough to feel deliberate.
@@ -123,6 +128,10 @@ final class GrabView: NSView, NSDraggingSource {
     }
 
     override func mouseDown(with event: NSEvent) {
+        if event.clickCount > 1 {
+            clickTimer?.invalidate()
+            clickTimer = nil
+        }
         if isInCross(event) {
             downPoint = nil
             onDiscard()
@@ -189,7 +198,21 @@ final class GrabView: NSView, NSDraggingSource {
 
     override func mouseUp(with event: NSEvent) {
         endPress()
-        if downPoint != nil && !startedDrag && !didLongPress && event.clickCount == 1 { onClick() }
+        if downPoint != nil && !startedDrag && !didLongPress && event.clickCount == 1 {
+            // Waits as long as the system lets a second click count as a double click.
+            clickTimer?.invalidate()
+            // The copy goes ahead even if the line redraws this view meanwhile.
+            let copy = onClick
+            let timer = Timer(timeInterval: NSEvent.doubleClickInterval, repeats: false) { [weak self] _ in
+                MainActor.assumeIsolated {
+                    self?.clickTimer = nil
+                    copy()
+                }
+            }
+            // Keeps time while a menu or a drag runs the loop in another mode.
+            RunLoop.main.add(timer, forMode: .common)
+            clickTimer = timer
+        }
         downPoint = nil
         didLongPress = false
     }

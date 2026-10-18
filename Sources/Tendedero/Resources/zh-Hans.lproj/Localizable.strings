@@ -43,6 +43,8 @@
 "Hang copied images" = "挂上复制的图片";
 "Images you copy hang on the line too" = "复制的图片也会挂上绳";
 "Tendedero, hanging copied images" = "Tendedero，正在挂上复制的图片";
+"The line is empty" = "晾衣绳上是空的";
+"%d on the line" = "晾衣绳上有 %d 张";
 
 /* GrabArea */
 "Copy" = "复制";

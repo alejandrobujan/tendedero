@@ -12,9 +12,14 @@
   &nbsp;&nbsp;
   <a href="#소스에서-빌드하기">소스에서 빌드하기&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;한국어&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;한국어&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
   <br>
   <sub>영어 README를 번역한 문서예요. 내용이 다를 경우 영어 원문이 우선해요.</sub>
+</p>
+
+<p align="center">
+  <a href="https://trendshift.io/repositories/287033?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-287033" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/287033/daily?language=Swift" alt="alejandrobujan%2Ftendedero | Trendshift" width="250" height="55"/></a>
+  <a href="https://trendshift.io/repositories/287033?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-287033" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/287033/weekly?language=Swift" alt="alejandrobujan%2Ftendedero | Trendshift" width="250" height="55"/></a>
 </p>
 
 <br>
@@ -92,7 +97,7 @@ Tendedero는 전적으로 Mac에서만 실행되며, 스크린샷은 절대 Mac 
 |:--|:--|
 | **호환성** | Apple 실리콘 및 Intel 기반 Mac의 macOS 14 Sonoma 이상. macOS 27에 맞춰 디자인됨. |
 | **크기** | 1.7MB |
-| **언어** | 영어, 스페인어, 프랑스어, 포르투갈어(브라질), 일본어, 한국어, 중국어(간체), 튀르키예어, 아제르바이잔어 |
+| **언어** | 영어, 스페인어, 갈리시아어, 프랑스어, 포르투갈어(브라질), 일본어, 한국어, 중국어(간체), 튀르키예어, 아제르바이잔어, 힌디어 |
 | **개발 도구** | Swift, AppKit 및 SwiftUI |
 | **네트워크 접근** | 없음 |
 | **가격** | 무료 |

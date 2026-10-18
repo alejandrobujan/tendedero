@@ -71,3 +71,45 @@ Verify that images initially fit, smaller images remain centred, the footer
 tracks dimensions and zoom, and capture status remains visible separately from
 its frame count and dimensions. Return should start or finish capture, and
 Escape should cancel. Saving should disable capture controls until it finishes.
+
+
+## Verification after integrating upstream 1.6.0
+
+These checks are pending on the integrated branch; earlier PR test results do
+not establish that this revision passes.
+
+- Run `bash scripts/test-image-tools.sh` and `swift scripts/check-strings.swift`.
+  There are now 117 used keys across 11 languages. The original nine languages
+  contain all keys; Galician and Hindi each lack the 60 image-tool keys and use
+  English fallback for those strings. The string checker should warn about
+  those missing translations, with no other warnings or errors. Review new
+  translations with native speakers before claiming complete language coverage.
+- Run `SIGN_IDENTITY=- bash scripts/build-app.sh release`, then
+  `lipo -archs build/Tendedero.app/Contents/MacOS/Tendedero` and
+  `codesign --verify --deep --strict build/Tendedero.app`. Verify version 1.6.0,
+  build 7, English development region, and all 11 bundle localizations. Also
+  exercise `debug --native`, an explicit SDKROOT, and the macOS 27 SDK fallback
+  on a machine with the relevant SDKs installed. Check Developer ID selection
+  when signing credentials are available. A universal binary is not Intel
+  runtime verification.
+- Over a fullscreen app, open the line with both the shortcut and Show line,
+  including an empty line. It must appear when explicitly requested, then hide
+  when tucked away or after a Space change. Automatic hover/new-image behavior
+  must still respect the fullscreen setting. Menu-bar hover must not reveal an
+  empty line, and the status icon/tooltip must reflect empty and nonempty states.
+- Start scrolling capture from that fullscreen Space. Shortcut, Show line,
+  hover, and new screenshots must not reveal the line while capture is active.
+  Cancel and Done must restore normal behavior without a stuck overlay or an
+  unwanted fullscreen reveal. Repeat on multiple displays and after switching
+  Spaces; physically disconnect the selected display during capture.
+- Set a known clipboard value. A single card click copies after the system
+  double-click interval; double-click opens the image editor without changing
+  the clipboard. Repeat with different system double-click speeds. Press and
+  hold, visible Edit, dragging, the discard cross, force click, and context-menu
+  Open/Markup must retain their distinct actions. Recordings must still play
+  on double-click and trim on hold, without exposing image editing.
+- Inspect the unwrapped Copied badge on narrow cards and long translated text.
+  Launch with Galician and Hindi preferred, verify upstream text stays localized
+  and feature text falls back to English. Inspect editor and capture layouts in
+  every supported language. Recheck large animations and all editor entry routes
+  from the original checklist, and run on Intel hardware when available.

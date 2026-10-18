@@ -1,0 +1,66 @@
+/* Galician. */
+
+/* AppDelegate */
+"Let Tendedero handle your screenshots?" = "Queres que Tendedero se encargue das túas capturas?";
+"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "As capturas penduraranse na corda no intre en que as fagas, sen a miniatura flotante, e non se amontoarán no Escritorio. Arrastra unha a un cartafol para gardala, ou descártaa coa cruz. Podes desactivalo dende a barra de menús, e os teus axustes volven ser os de antes ao saír de Tendedero.";
+"Turn on" = "Activar";
+"Not now" = "Agora non";
+"Hide line" = "Ocultar a corda";
+"Show line" = "Amosar a corda";
+"Take everything down" = "Descolgar todo";
+"Handle screenshots" = "Encargarse das capturas";
+"Screenshots hang instantly and skip the Desktop" = "As capturas pendúranse ao momento e non pasan polo Escritorio";
+"Open screenshots folder" = "Abrir o cartafol de capturas";
+"Sounds" = "Sons";
+"Open at login" = "Abrir ao iniciar sesión";
+"Check for Updates…" = "Buscar actualizacións…";
+"Quit Tendedero" = "Saír de Tendedero";
+"Could not change the login setting" = "Non se puido cambiar o inicio de sesión";
+"Move Tendedero to the Applications folder and try again." = "Move Tendedero ao cartafol Aplicacións e téntao de novo.";
+"Keep on line" = "Gardar na corda";
+"As many as fit" = "As que caiban";
+"%d photos" = "%d fotos";
+"Also watch folders" = "Vixiar tamén cartafoles";
+"Add Folder…" = "Engadir cartafol…";
+"Stop Watching" = "Deixar de vixiar";
+"Watch" = "Vixiar";
+"New images saved to this folder will hang on the line." = "As imaxes novas que se garden neste cartafol penduraranse na corda.";
+"Shortcut" = "Atallo";
+"Change Shortcut…" = "Cambiar o atallo…";
+"Change Shortcut" = "Cambiar o atallo";
+"None" = "Ningún";
+"Space" = "Espazo";
+"Press the new shortcut" = "Preme o novo atallo";
+"Escape cancels. Delete removes the shortcut." = "Escape cancela. Borrar quita o atallo.";
+"Size" = "Tamaño";
+"Small" = "Pequeno";
+"Medium" = "Mediano";
+"Large" = "Grande";
+"Bring the line down" = "Baixar a corda";
+"When the pointer rests in the menu bar" = "Ao deixar o punteiro na barra de menús";
+"When something new hangs" = "Cando se pendura algo novo";
+"Over full screen apps" = "Sobre apps a pantalla completa";
+"Hang copied images" = "Pendurar imaxes copiadas";
+"Images you copy hang on the line too" = "As imaxes que copias tamén se penduran";
+"Tendedero, hanging copied images" = "Tendedero, pendurando imaxes copiadas";
+"The line is empty" = "A corda está baleira";
+"%d on the line" = "%d na corda";
+
+/* GrabArea */
+"Copy" = "Copiar";
+"Open" = "Abrir";
+"Quick Look" = "Vista Rápida";
+"Markup" = "Marcación";
+"Show in Finder" = "Amosar no Finder";
+"Save to Desktop" = "Gardar no Escritorio";
+"Discard" = "Descartar";
+"Take down" = "Descolgar";
+"Move to Trash" = "Mover á Papeleira";
+"Take down everything to the left" = "Descolgar todo o da esquerda";
+"Take down everything to the right" = "Descolgar todo o da dereita";
+
+/* LineView */
+"Take a screenshot and it will hang here" = "Fai unha captura e quedará pendurada aquí";
+
+/* PeggedView */
+"Copied" = "Copiado";

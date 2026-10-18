@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 
 CONFIG="${1:-release}"
 APP="build/Tendedero.app"
-VERSION="1.5.0"
+VERSION="1.6.0"
 case "$CONFIG" in debug|release) ;; *) echo "Expected debug or release" >&2; exit 1 ;; esac
 case "${2:-}" in ""|--native) ;; *) echo "Expected --native" >&2; exit 1 ;; esac
 
@@ -90,8 +90,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
   <key>CFBundleSupportedPlatforms</key><array><string>MacOSX</string></array>
   <key>CFBundleShortVersionString</key><string>${VERSION}</string>
-  <key>CFBundleVersion</key><string>6</string>
-  <key>CFBundleDevelopmentRegion</key><string>en_CA</string>
+  <key>CFBundleVersion</key><string>7</string>
+  <key>CFBundleDevelopmentRegion</key><string>en</string>
   <key>CFBundleLocalizations</key><array>${LANGUAGES}</array>
   <key>LSMinimumSystemVersion</key><string>14.0</string>
   <key>LSUIElement</key><true/>
