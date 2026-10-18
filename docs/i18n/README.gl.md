@@ -12,7 +12,7 @@
   &nbsp;&nbsp;
   <a href="#compilar-dende-o-código">Compilar dende o código&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;Galego&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;Galego&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
   <br>
   <sub>Tradución do README en inglés. Se algo non coincide, manda o inglés.</sub>
 </p>
@@ -98,7 +98,7 @@ Tendedero funciona só no teu Mac, e as túas capturas nunca saen del.
 |:--|:--|
 | **Compatibilidade** | macOS 14 Sonoma ou posterior, en Mac con Apple silicon ou Intel. Pensado para macOS 27. |
 | **Tamaño** | 1,7 MB |
-| **Idiomas** | Inglés, español, galego, francés, portugués do Brasil, xaponés, coreano, chinés simplificado, turco e acerbaixano |
+| **Idiomas** | Inglés, español, galego, francés, portugués do Brasil, xaponés, coreano, chinés simplificado, turco, acerbaixano e hindi |
 | **Feito con** | Swift, AppKit e SwiftUI |
 | **Conexión a internet** | Non a usa |
 | **Prezo** | De balde |

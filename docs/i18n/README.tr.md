@@ -12,7 +12,7 @@
   &nbsp;&nbsp;
   <a href="#kaynaktan-derle">Kaynaktan derle&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;Türkçe&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;Türkçe&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
   <br>
   <sub>Bu dosya İngilizce README'nin çevirisidir. Bir tutarsızlık varsa İngilizce sürümü esas alın.</sub>
 </p>
@@ -97,7 +97,7 @@ Tendedero tamamen Mac'inizde çalışır ve ekran görüntüleriniz hiçbir zama
 |:--|:--|
 | **Uyumluluk** | macOS 14 Sonoma veya sonrası, Apple silicon ve Intel. macOS 27 için tasarlandı. |
 | **Boyut** | 1,7 MB |
-| **Diller** | İngilizce, İspanyolca, Galiçyaca, Fransızca, Portekizce (Brezilya), Japonca, Korece, Basitleştirilmiş Çince, Türkçe, Azerice |
+| **Diller** | İngilizce, İspanyolca, Galiçyaca, Fransızca, Portekizce (Brezilya), Japonca, Korece, Basitleştirilmiş Çince, Türkçe, Azerice, Hintçe |
 | **Yapıldığı teknolojiler** | Swift, AppKit ve SwiftUI |
 | **Ağ erişimi** | Yok |
 | **Fiyat** | Ücretsiz |
