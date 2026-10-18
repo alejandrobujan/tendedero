@@ -86,6 +86,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         Markup.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         Trim.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
+        ImageEditor.shared.onSaved = { [weak self] url, source in self?.hangCapture(url, preserving: source) }
+        ScrollingCapture.shared.onSaved = { [weak self] url in
+            self?.hangCapture(url)
+            ImageEditor.shared.edit(url)
+        }
+        ScrollingCapture.shared.onActivityChanged = { [weak self] active in
+            guard let self else { return }
+            if active {
+                self.setRevealed(false)
+                self.panel.orderOut(nil)
+            } else {
+                self.refresh()
+            }
+        }
         panel.onScroll = { [weak self] event in
             // Sideways on a trackpad, or the wheel of a mouse.
             let delta = abs(event.scrollingDeltaX) >= abs(event.scrollingDeltaY)
@@ -143,7 +157,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
     }
 
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        ImageEditor.shared.confirmClosing() ? .terminateNow : .terminateCancel
+    }
+
     func applicationWillTerminate(_ notification: Notification) {
+        ScrollingCapture.shared.cancel()
         if Inbox.isEnabled { Inbox.restore() }
     }
 
@@ -272,6 +291,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// The line comes down on that screen for a moment, then tucks away.
     /// Without a screen, it uses the one under the pointer.
     private func comeDown(on screen: NSScreen?) {
+        guard !ScrollingCapture.shared.isActive else { return }
         panel.placeOnScreen(screen)
         updateCapacity()
         wanted = true
@@ -283,7 +303,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     /// A new screenshot lifts off from where it was taken and flies to its
     /// place on the line. Without a known capture area it simply drops in.
-    private func hangCapture(_ url: URL) {
+    private func hangCapture(_ url: URL, preserving source: URL? = nil) {
         let from = captureRect(of: url)
         let screen = from.flatMap { from in
             NSScreen.screens.first { NSMouseInRect(CGPoint(x: from.midX, y: from.midY), $0.frame, false) }
@@ -292,7 +312,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // was taken on. On a full line the oldest photo then falls in view as
         // the new one flies in.
         comeDown(on: screen)
-        guard let id = line.hang(url, flying: from != nil) else {
+        guard let id = line.hang(url, flying: from != nil, preserving: source) else {
             // Nothing hung after all, so an empty line goes away again.
             itemsChanged()
             return
@@ -350,6 +370,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// Decides whether the panel is ordered in at all: something to show,
     /// and no full screen app on that screen unless you asked for the line.
     private func refresh() {
+        guard !ScrollingCapture.shared.isActive else {
+            setRevealed(false)
+            panel.orderOut(nil)
+            return
+        }
         let blocked = !openedOnPurpose && (panel.screen.map(FullScreen.blocksLine(on:))
             ?? LinePanel.screenUnderPointer().map(FullScreen.blocksLine(on:)) ?? false)
         if wanted && !blocked {
@@ -422,6 +447,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     @objc private func toggle() {
+        guard !ScrollingCapture.shared.isActive else { return }
         if isRevealed {
             setRevealed(false)
         } else {
@@ -489,6 +515,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private static let retractDelay: TimeInterval = 0.5
 
     private func tick() {
+        guard !ScrollingCapture.shared.isActive else { return }
         let mouse = NSEvent.mouseLocation
         let now = Date()
 
@@ -653,7 +680,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             toggleItem.keyEquivalent = shortcut.key
             toggleItem.keyEquivalentModifierMask = shortcut.modifiers
         }
+        toggleItem.isEnabled = !ScrollingCapture.shared.isActive
         menu.addItem(toggleItem)
+
+        let capture = ClosureMenuItem(L("Scrolling Capture…")) {
+            ScrollingCapture.shared.start()
+        }
+        capture.isEnabled = !ScrollingCapture.shared.isActive
+        menu.addItem(capture)
+
+        let editLatest = ClosureMenuItem(L("Edit Latest Image…")) { [weak self] in
+            guard let self, let item = self.line.items.last(where: { !$0.isRecording && !$0.falling }) else { return }
+            self.line.edit(item.id)
+        }
+        editLatest.isEnabled = !ScrollingCapture.shared.isActive && line.items.contains(where: { !$0.isRecording && !$0.falling })
+        menu.addItem(editLatest)
+        let openImage = ClosureMenuItem(L("Open Image in Editor…")) { ImageEditor.shared.openImage() }
+        openImage.isEnabled = !ScrollingCapture.shared.isActive
+        menu.addItem(openImage)
 
         let clearItem = ClosureMenuItem(L("Take everything down")) { [weak self] in
             self?.line.clear()

@@ -99,6 +99,19 @@ struct PeggedView: View {
                     .allowsHitTesting(false)
             }
             .overlay(GrabArea(item: item, line: line))
+            .overlay(alignment: .bottomTrailing) {
+                if !item.isRecording {
+                    Label(L("Edit"), systemImage: "pencil")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(.primary)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 5)
+                        .glassFrame(capsule: true)
+                        .padding(4)
+                        .opacity(hovering && !dragging ? 1 : 0)
+                        .allowsHitTesting(false)
+                }
+            }
             .overlay(alignment: .bottom) {
                 if copied {
                     Label(L("Copied"), systemImage: "checkmark")

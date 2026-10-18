@@ -64,3 +64,69 @@
 
 /* PeggedView */
 "Copied" = "已复制";
+
+/* Scrolling capture and cut-out */
+"Allow screen recording to capture a scrolling area" = "请允许屏幕录制以截取滚动区域";
+"Cancel" = "取消";
+"Capturing the first frame…" = "正在截取第一帧…";
+"Could not capture the scrolling area" = "无法截取滚动区域";
+"Could not open this image" = "无法打开此图像";
+"Could not save the image" = "无法保存图像";
+"Cut" = "剪除";
+"Cut Out" = "剪除条带";
+"Cut Out…" = "剪除条带…";
+"Drag to select the scrolling area. Escape cancels." = "拖动选择滚动区域。按 Escape 取消。";
+"Enable Tendedero in System Settings → Privacy & Security → Screen Recording, then try again. You may need to reopen Tendedero." = "在“系统设置 → 隐私与安全性 → 屏幕录制”中启用 Tendedero，然后重试。可能需要重新打开 Tendedero。";
+"Horizontal strip" = "水平条带";
+"Joining the capture…" = "正在拼接截图…";
+"Open Settings" = "打开设置";
+"Save Copy" = "保存副本";
+"Scrolling Capture" = "滚动截图";
+"Scrolling Capture…" = "滚动截图…";
+"Undo" = "撤销";
+"Vertical strip" = "垂直条带";
+
+/* Image editor and live scrolling capture */
+"%@ frames · %@ × %@ pixels" = "%@ 帧 · %@ × %@ 像素";
+"Allow Accessibility to use Auto-scroll" = "允许辅助功能以使用自动滚动";
+"Apply" = "应用";
+"Arrow" = "箭头";
+"Auto-scroll" = "自动滚动";
+"Auto-scroll paused. Click Auto-scroll to resume." = "自动滚动已暂停。点击“自动滚动”继续。";
+"Capture paused. Click Done to save what is shown in the preview." = "截图已暂停。点击“完成”保存预览中显示的内容。";
+"Capture size limit reached. Click Done to save." = "已达到截图大小上限。点击“完成”保存。";
+"Crop" = "裁剪";
+"Done" = "完成";
+"Edit" = "编辑";
+"Edit Latest Image…" = "编辑最新图片…";
+"Edit…" = "编辑…";
+"Enable Tendedero in System Settings → Privacy & Security → Accessibility. You can still scroll manually without this permission." = "在“系统设置 → 隐私与安全性 → 辅助功能”中启用 Tendedero。无需此权限也可手动滚动。";
+"Export…" = "导出…";
+"Fit" = "适合窗口";
+"Horizontal" = "水平";
+"Image Editor" = "图片编辑器";
+"Live preview" = "实时预览";
+"No more movement detected. Click Done to open the editor." = "未检测到继续滚动。点击“完成”打开编辑器。";
+"Open Image in Editor…" = "在编辑器中打开图片…";
+"Pause" = "暂停";
+"Rectangle" = "矩形";
+"Save changes before closing?" = "关闭前保存更改？";
+"Start Capture" = "开始截图";
+"Vertical" = "垂直";
+"Waiting for matching content. Scroll back slightly, or click Done to save the preview." = "正在等待可匹配的内容。稍微往回滚动，或点击“完成”保存预览。";
+"Zoom in" = "放大";
+"Zoom out" = "缩小";
+
+/* Image tools polish */
+"Original preserved" = "原图保留";
+"%@ × %@ pixels" = "%@ × %@ 像素";
+"Drag over the band to remove." = "拖动选择要移除的条带。";
+"Drag around the area to keep." = "拖动选择要保留的区域。";
+"Drag to draw, then click Apply." = "拖动绘制，然后点按“应用”。";
+"Remove %@ pixels" = "移除 %@ 像素";
+"Start at the top or left, then capture." = "从顶部或左侧开始，然后启动截取。";
+"Preview appears when capture starts." = "开始截取后会显示预览。";
+"Scroll slowly, or use Auto-scroll." = "缓慢滚动，或使用自动滚动。";
+"Auto-scroll is running." = "正在自动滚动。";
+"Saving…" = "正在保存…";
+"%@ frame · %@ × %@ pixels" = "%@ 帧 · %@ × %@ 像素";

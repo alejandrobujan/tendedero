@@ -64,3 +64,69 @@
 
 /* PeggedView */
 "Copied" = "Kopyalandı";
+
+/* Scrolling capture and cut-out */
+"Allow screen recording to capture a scrolling area" = "Kaydırılan alanı yakalamak için ekran kaydına izin verin";
+"Cancel" = "İptal";
+"Capturing the first frame…" = "İlk kare yakalanıyor…";
+"Could not capture the scrolling area" = "Kaydırılan alan yakalanamadı";
+"Could not open this image" = "Bu görüntü açılamadı";
+"Could not save the image" = "Görüntü kaydedilemedi";
+"Cut" = "Kes";
+"Cut Out" = "Şerit Kes";
+"Cut Out…" = "Şerit Kes…";
+"Drag to select the scrolling area. Escape cancels." = "Kaydırılacak alanı sürükleyerek seçin. Escape iptal eder.";
+"Enable Tendedero in System Settings → Privacy & Security → Screen Recording, then try again. You may need to reopen Tendedero." = "Sistem Ayarları → Gizlilik ve Güvenlik → Ekran Kaydı bölümünde Tendedero'yu etkinleştirip tekrar deneyin. Tendedero'yu yeniden açmanız gerekebilir.";
+"Horizontal strip" = "Yatay şerit";
+"Joining the capture…" = "Yakalama birleştiriliyor…";
+"Open Settings" = "Ayarları Aç";
+"Save Copy" = "Kopyayı Kaydet";
+"Scrolling Capture" = "Kaydırarak Yakalama";
+"Scrolling Capture…" = "Kaydırarak Yakalama…";
+"Undo" = "Geri Al";
+"Vertical strip" = "Dikey şerit";
+
+/* Image editor and live scrolling capture */
+"%@ frames · %@ × %@ pixels" = "%@ kare · %@ × %@ piksel";
+"Allow Accessibility to use Auto-scroll" = "Otomatik kaydırma için Erişilebilirliğe izin verin";
+"Apply" = "Uygula";
+"Arrow" = "Ok";
+"Auto-scroll" = "Otomatik kaydır";
+"Auto-scroll paused. Click Auto-scroll to resume." = "Otomatik kaydırma duraklatıldı. Sürdürmek için Otomatik kaydır’a tıklayın.";
+"Capture paused. Click Done to save what is shown in the preview." = "Yakalama duraklatıldı. Önizlemede görüneni kaydetmek için Bitti’ye tıklayın.";
+"Capture size limit reached. Click Done to save." = "Yakalama boyutu sınırına ulaşıldı. Kaydetmek için Bitti’ye tıklayın.";
+"Crop" = "Kırp";
+"Done" = "Bitti";
+"Edit" = "Düzenle";
+"Edit Latest Image…" = "Son Resmi Düzenle…";
+"Edit…" = "Düzenle…";
+"Enable Tendedero in System Settings → Privacy & Security → Accessibility. You can still scroll manually without this permission." = "Sistem Ayarları → Gizlilik ve Güvenlik → Erişilebilirlik bölümünde Tendedero’yu etkinleştirin. Bu izin olmadan elle kaydırabilirsiniz.";
+"Export…" = "Dışa Aktar…";
+"Fit" = "Sığdır";
+"Horizontal" = "Yatay";
+"Image Editor" = "Resim Düzenleyici";
+"Live preview" = "Canlı önizleme";
+"No more movement detected. Click Done to open the editor." = "Artık hareket algılanmıyor. Düzenleyiciyi açmak için Bitti’ye tıklayın.";
+"Open Image in Editor…" = "Resmi Düzenleyicide Aç…";
+"Pause" = "Duraklat";
+"Rectangle" = "Dikdörtgen";
+"Save changes before closing?" = "Kapatmadan önce değişiklikler kaydedilsin mi?";
+"Start Capture" = "Yakalamayı Başlat";
+"Vertical" = "Dikey";
+"Waiting for matching content. Scroll back slightly, or click Done to save the preview." = "Eşleşen içerik bekleniyor. Biraz geri kaydırın veya önizlemeyi kaydetmek için Bitti’ye tıklayın.";
+"Zoom in" = "Yakınlaştır";
+"Zoom out" = "Uzaklaştır";
+
+/* Image tools polish */
+"Original preserved" = "Orijinal korunur";
+"%@ × %@ pixels" = "%@ × %@ piksel";
+"Drag over the band to remove." = "Kaldırılacak şeridin üzerinde sürükleyin.";
+"Drag around the area to keep." = "Tutulacak alanı seçmek için sürükleyin.";
+"Drag to draw, then click Apply." = "Çizmek için sürükleyin, ardından Uygula’ya tıklayın.";
+"Remove %@ pixels" = "%@ piksel kaldır";
+"Start at the top or left, then capture." = "Üstten veya soldan başlayın, ardından yakalamayı başlatın.";
+"Preview appears when capture starts." = "Yakalama başladığında önizleme görünür.";
+"Scroll slowly, or use Auto-scroll." = "Yavaşça kaydırın veya Otomatik kaydırma’yı kullanın.";
+"Auto-scroll is running." = "Otomatik kaydırma çalışıyor.";
+"Saving…" = "Kaydediliyor…";
+"%@ frame · %@ × %@ pixels" = "%@ kare · %@ × %@ piksel";
