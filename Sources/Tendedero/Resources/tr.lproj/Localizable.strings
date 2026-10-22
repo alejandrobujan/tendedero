@@ -64,3 +64,11 @@
 
 /* PeggedView */
 "Copied" = "Kopyalandı";
+
+// QQ screenshot integration
+"QQ screenshots" = "QQ ekran görüntüleri";
+"Allow QQ screenshots to run independently" = "QQ ekran görüntülerinin bağımsız çalışmasına izin ver";
+"Handle QQ screenshots (requires “Hang copied images”)" = "QQ ekran görüntülerini işle (“Kopyalanan görselleri as” açık olmalı)";
+"QQ screenshots can now run independently" = "QQ ekran görüntüleri artık bağımsız çalışabilir";
+"The setting is saved. It takes effect the next time QQ's screenshot tool starts." = "Ayar kaydedildi. QQ ekran görüntüsü aracı bir sonraki başlatıldığında geçerli olacaktır.";
+"Could not enable independent QQ screenshots" = "QQ ekran görüntülerinin bağımsız çalışması etkinleştirilemedi";
