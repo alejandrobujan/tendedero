@@ -58,6 +58,11 @@ final class Line: ObservableObject {
         set { UserDefaults.standard.set(newValue ?? 0, forKey: "keepOnLine") }
     }
 
+    /// Opt in to taking down photos after another app accepts a copy drop.
+    nonisolated static var removeAfterDrag: Bool {
+        get { UserDefaults.standard.bool(forKey: "removeAfterDrag") }
+        set { UserDefaults.standard.set(newValue, forKey: "removeAfterDrag") }
+    }
 
     var soundOn: Bool {
         get { !UserDefaults.standard.bool(forKey: "soundOff") }
@@ -152,6 +157,16 @@ final class Line: ObservableObject {
     }
 
     // MARK: Actions on one photo
+
+    /// A successful copy drop takes down the card without touching its file.
+    /// The receiving app may still need to read the URL after the drag ends.
+    func finishDrag(_ id: UUID, operation: NSDragOperation) {
+        draggingID = nil
+        prune()
+        if Self.removeAfterDrag, operation.contains(.copy), !operation.contains(.delete) {
+            drop(id, quietly: true)
+        }
+    }
 
     func copy(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
