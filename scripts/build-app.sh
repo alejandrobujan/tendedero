@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 
 CONFIG="${1:-release}"
 APP="build/Tendedero.app"
-VERSION="1.6.0"
+VERSION="1.7.1"
 
 # Builds one architecture and prints the binary's path.
 # The Command Line Tools for macOS 27 ship an SDK whose SwiftUI needs a macro
@@ -23,6 +23,13 @@ build_arch() {
   if [ -n "${SDKROOT:-}" ]; then swift build -c "$CONFIG" --triple "$triple" >&2; fi
   cp "$(swift build -c "$CONFIG" --triple "$triple" --show-bin-path)/Tendedero" "$OUT/Tendedero-$1"
 }
+
+# The save-folder checks run against a stand-in preference domain. They go
+# first: a failing check stops the build, and they do not need the app.
+# Built for this machine; the checks are not arch-specific.
+HOST="$(uname -m)"
+swift build -c "$CONFIG" --product CaptureSettingsCheck --triple "$HOST-apple-macosx14.0"
+"$(swift build -c "$CONFIG" --product CaptureSettingsCheck --triple "$HOST-apple-macosx14.0" --show-bin-path)/CaptureSettingsCheck"
 
 # A universal binary, so it runs on Apple silicon and on Intel Macs, from
 # macOS 14 Sonoma onwards.

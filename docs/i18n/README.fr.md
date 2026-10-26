@@ -148,7 +148,9 @@ l’accès au bureau après chaque recompilation.
 | `GrabArea.swift` | Clic, clic maintenu, glisser-déposer |
 | `ScreenshotWatcher.swift` | Repère les nouvelles captures |
 | `ClipboardWatcher.swift` | Repère les images copiées dans le presse-papiers |
-| `Inbox.swift` | Prend en charge les réglages de capture et les rétablit |
+| `CaptureSettings/Inbox.swift` | Prend en charge les réglages de capture et les rétablit |
+| `CaptureSettings/ThirdPartyCapture.swift` | Fait de même pour les autres apps de capture qui le permettent |
+| `CaptureSettingsCheck/` | Vérifie que ces réglages sont bien rétablis |
 | `Markup.swift` | Ouvre l’éditeur Annotation du système et enregistre le résultat |
 | `Trim.swift` | Raccourcit un enregistrement d’écran et enregistre le résultat |
 | `FullScreen.swift` | Sait quand rester caché |

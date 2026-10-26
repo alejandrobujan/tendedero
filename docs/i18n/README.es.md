@@ -148,7 +148,9 @@ vuelve a pedir acceso al Escritorio cada vez que recompilas.
 | `GrabArea.swift` | Clic, pulsación larga, y arrastrar y soltar |
 | `ScreenshotWatcher.swift` | Se da cuenta de las capturas nuevas |
 | `ClipboardWatcher.swift` | Se da cuenta de las imágenes copiadas |
-| `Inbox.swift` | Toma el control de los ajustes de captura y luego los devuelve |
+| `CaptureSettings/Inbox.swift` | Toma el control de los ajustes de captura y luego los devuelve |
+| `CaptureSettings/ThirdPartyCapture.swift` | Hace lo mismo con otras apps de capturas que lo permiten |
+| `CaptureSettingsCheck/` | Comprueba que esos ajustes se devuelven |
 | `Markup.swift` | Abre el editor de Marcación del sistema y guarda el resultado |
 | `Trim.swift` | Recorta una grabación de pantalla y guarda el resultado |
 | `FullScreen.swift` | Sabe cuándo tiene que quedarse oculto |

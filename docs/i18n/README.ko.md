@@ -146,7 +146,9 @@ Xcode에만 포함된 SwiftUI 매크로 플러그인이 필요하기 때문이�
 | `GrabArea.swift` | 클릭, 길게 누르기, 드래그 앤 드롭 |
 | `ScreenshotWatcher.swift` | 새 스크린샷 감지 |
 | `ClipboardWatcher.swift` | 클립보드에 복사된 이미지 감지 |
-| `Inbox.swift` | 스크린샷 설정을 넘겨받았다가 원래대로 되돌림 |
+| `CaptureSettings/Inbox.swift` | 스크린샷 설정을 넘겨받았다가 원래대로 되돌림 |
+| `CaptureSettings/ThirdPartyCapture.swift` | 허용하는 다른 스크린샷 앱에도 같이 함 |
+| `CaptureSettingsCheck/` | 그 설정이 원래대로 되돌아갔는지 확인함 |
 | `Markup.swift` | 시스템 마크업 편집기를 열고 결과를 저장 |
 | `Trim.swift` | 화면 기록을 다듬고 결과를 저장 |
 | `FullScreen.swift` | 숨어 있어야 할 때를 판단 |

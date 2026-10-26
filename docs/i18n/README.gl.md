@@ -148,7 +148,9 @@ acceso ao Escritorio cada vez que recompilas.
 | `GrabArea.swift` | Clic, pulsación longa, e arrastrar e soltar |
 | `ScreenshotWatcher.swift` | Decátase das capturas novas |
 | `ClipboardWatcher.swift` | Decátase das imaxes copiadas |
-| `Inbox.swift` | Toma o control dos axustes de captura e logo devólveos |
+| `CaptureSettings/Inbox.swift` | Toma o control dos axustes de captura e logo devólveos |
+| `CaptureSettings/ThirdPartyCapture.swift` | Fai o mesmo coas outras apps de capturas que o permiten |
+| `CaptureSettingsCheck/` | Comproba que eses axustes se devolven |
 | `Markup.swift` | Abre o editor de Marcación do sistema e garda o resultado |
 | `Trim.swift` | Recorta unha gravación de pantalla e garda o resultado |
 | `FullScreen.swift` | Sabe cando ten que quedar oculto |

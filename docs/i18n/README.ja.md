@@ -139,7 +139,9 @@ Swiftツールチェーンが必要です。Xcodeは任意です。macOS 27のCo
 | `GrabArea.swift` | クリック、長押し、ドラッグ＆ドロップ |
 | `ScreenshotWatcher.swift` | 新しいスクリーンショットを検知 |
 | `ClipboardWatcher.swift` | クリップボードにコピーされた画像を検知 |
-| `Inbox.swift` | スクリーンショットの設定を引き継ぎ、元に戻す |
+| `CaptureSettings/Inbox.swift` | スクリーンショットの設定を引き継ぎ、元に戻す |
+| `CaptureSettings/ThirdPartyCapture.swift` | 許可する他のスクリーンショットアプリにも同じことをする |
+| `CaptureSettingsCheck/` | その設定が元に戻ることを確認する |
 | `Markup.swift` | システムのマークアップエディタを開き、結果を保存 |
 | `Trim.swift` | 画面収録をトリミングし、結果を保存 |
 | `FullScreen.swift` | 隠れているべきときを判断 |

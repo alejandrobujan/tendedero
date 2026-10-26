@@ -143,7 +143,9 @@ so macOS asks again for access to the Desktop after each rebuild.
 | `GrabArea.swift` | Click, long press, drag and drop |
 | `ScreenshotWatcher.swift` | Notices new screenshots |
 | `ClipboardWatcher.swift` | Notices images copied to the clipboard |
-| `Inbox.swift` | Takes over screenshot settings and puts them back |
+| `CaptureSettings/Inbox.swift` | Takes over screenshot settings and puts them back |
+| `CaptureSettings/ThirdPartyCapture.swift` | Does the same for other screenshot apps that allow it |
+| `CaptureSettingsCheck/` | Checks that those settings are put back |
 | `Markup.swift` | Opens the system Markup editor and saves the result |
 | `Trim.swift` | Trims a screen recording and saves the result |
 | `FullScreen.swift` | Knows when to stay hidden |

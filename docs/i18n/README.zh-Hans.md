@@ -137,7 +137,9 @@ open build/Tendedero.app
 | `PeggedView.swift` | 一张照片：玻璃相框、夹子、摇摆与微风 |
 | `GrabArea.swift` | 单击、长按、拖放 |
 | `ScreenshotWatcher.swift` | 发现新的截图 |
-| `Inbox.swift` | 接管截图设置，之后再把它们放回去 |
+| `CaptureSettings/Inbox.swift` | 接管截图设置，之后再把它们放回去 |
+| `CaptureSettings/ThirdPartyCapture.swift` | 对允许这样做的其他截图 App 也一样 |
+| `CaptureSettingsCheck/` | 检查这些设置确实被放回去 |
 | `ClipboardWatcher.swift` | 发现复制到剪贴板的图片 |
 | `Markup.swift` | 打开系统「标记」编辑器并保存结果 |
 | `Trim.swift` | 剪辑屏幕录制并保存结果 |

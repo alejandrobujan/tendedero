@@ -148,7 +148,9 @@ Mesa a cada nova compilação.
 | `GrabArea.swift` | Clique, clique longo, arrastar e soltar |
 | `ScreenshotWatcher.swift` | Percebe novas capturas |
 | `ClipboardWatcher.swift` | Percebe imagens copiadas para a área de transferência |
-| `Inbox.swift` | Assume os ajustes de captura e depois os restaura |
+| `CaptureSettings/Inbox.swift` | Assume os ajustes de captura e depois os restaura |
+| `CaptureSettings/ThirdPartyCapture.swift` | Faz o mesmo com outros apps de captura que permitem |
+| `CaptureSettingsCheck/` | Confere que esses ajustes são restaurados |
 | `Markup.swift` | Abre o editor de Marcação do sistema e salva o resultado |
 | `Trim.swift` | Corta uma gravação de tela e salva o resultado |
 | `FullScreen.swift` | Sabe quando ficar escondido |

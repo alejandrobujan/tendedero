@@ -145,7 +145,9 @@ derlemeden sonra macOS Masaüstü erişimi için tekrar izin ister.
 | `GrabArea.swift` | Tıklama, uzun basış, sürükle ve bırak |
 | `ScreenshotWatcher.swift` | Yeni ekran görüntülerini fark eder |
 | `ClipboardWatcher.swift` | Panoya kopyalanan görselleri fark eder |
-| `Inbox.swift` | Ekran görüntüsü ayarlarını devralır ve geri verir |
+| `CaptureSettings/Inbox.swift` | Ekran görüntüsü ayarlarını devralır ve geri verir |
+| `CaptureSettings/ThirdPartyCapture.swift` | Buna izin veren diğer ekran görüntüsü uygulamaları için de aynısını yapar |
+| `CaptureSettingsCheck/` | Bu ayarların geri verildiğini denetler |
 | `Markup.swift` | Sistem İşaretle düzenleyicisini açar ve sonucu kaydeder |
 | `Trim.swift` | Ekran kaydını kırpar ve sonucu kaydeder |
 | `FullScreen.swift` | Ne zaman gizli kalınacağını bilir |

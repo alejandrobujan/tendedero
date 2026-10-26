@@ -149,7 +149,9 @@ Yerli yığımlar ad hoc imzalanır, ona görə də hər yenidən yığımdan so
 | `GrabArea.swift` | Klik, uzun basma, sürükləyib buraxma |
 | `ScreenshotWatcher.swift` | Yeni ekran şəkillərini görür |
 | `ClipboardWatcher.swift` | Mübadilə buferinə kopyalanmış şəkilləri görür |
-| `Inbox.swift` | Ekran şəkli ayarlarını öz üzərinə götürür və geri qaytarır |
+| `CaptureSettings/Inbox.swift` | Ekran şəkli ayarlarını öz üzərinə götürür və geri qaytarır |
+| `CaptureSettings/ThirdPartyCapture.swift` | Buna icazə verən digər ekran şəkli proqramları üçün də eynisini edir |
+| `CaptureSettingsCheck/` | Bu ayarların geri qaytarıldığını yoxlayır |
 | `Markup.swift` | Sistemin Markup redaktorunu açır və nəticəni saxlayır |
 | `Trim.swift` | Ekran yazısını kəsir və nəticəni saxlayır |
 | `FullScreen.swift` | Nə vaxt gizli qalmalı olduğunu bilir |

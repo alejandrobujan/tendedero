@@ -1,3 +1,4 @@
+import CaptureSettings
 import Foundation
 
 /// Watches the folder macOS saves screenshots to and reports new ones.

@@ -13,7 +13,7 @@ import Foundation
 /// The previous values are saved first and put back when the mode is turned
 /// off or the app quits, so macOS is never left pointing at a folder nobody
 /// is watching.
-enum Inbox {
+public enum Inbox {
     private static let domain = "com.apple.screencapture" as CFString
     /// macOS 26 and earlier read "location". macOS 27 reads
     /// "location-screenshot" and ignores the old key, so both are written.
@@ -34,31 +34,31 @@ enum Inbox {
     private static let offeredKey = "inboxOffered"
     private static let savedKey = "inboxSavedSettings"
 
-    static let folder: URL = {
+    public static let folder: URL = {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         return base.appendingPathComponent("Tendedero/Screenshots", isDirectory: true)
     }()
 
     /// The user's choice, kept across launches.
-    static var isEnabled: Bool {
+    public static var isEnabled: Bool {
         get { UserDefaults.standard.bool(forKey: enabledKey) }
         set { UserDefaults.standard.set(newValue, forKey: enabledKey) }
     }
 
     /// Whether we already asked, so the offer appears only once.
-    static var wasOffered: Bool {
+    public static var wasOffered: Bool {
         get { UserDefaults.standard.bool(forKey: offeredKey) }
         set { UserDefaults.standard.set(newValue, forKey: offeredKey) }
     }
 
     /// Whether macOS is currently sending screenshots to our folder.
-    static var isApplied: Bool {
+    public static var isApplied: Bool {
         guard let current = CFPreferencesCopyAppValue(locationKey, domain) as? String else { return false }
         return URL(fileURLWithPath: (current as NSString).expandingTildeInPath).standardizedFileURL
             == folder.standardizedFileURL
     }
 
-    static func apply() {
+    public static func apply() {
         try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         // Never save our own values as the "previous" ones, for example after
         // a crash left them applied.
@@ -91,7 +91,7 @@ enum Inbox {
         set(thumbnailKey, false)
     }
 
-    static func restore() {
+    public static func restore() {
         guard isApplied else { return }
         let saved = UserDefaults.standard.dictionary(forKey: savedKey) ?? [:]
         set(locationKey, saved["location"])

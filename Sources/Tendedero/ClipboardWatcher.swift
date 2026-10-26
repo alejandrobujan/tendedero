@@ -1,4 +1,5 @@
 import AppKit
+import CaptureSettings
 
 /// Hangs images copied to the clipboard, like a screenshot taken with Control
 /// held or an image copied in Preview. Each one is saved as a PNG in

@@ -1,4 +1,5 @@
 import AppKit
+import CaptureSettings
 import Carbon
 import Combine
 import Quartz
@@ -74,6 +75,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         updateCapacity()
 
         if Inbox.isEnabled { Inbox.apply() }
+        // Each app's own row decides whether it is taken over.
+        ThirdPartyCapture.apply()
         restoreSettingsOnTermination()
         startWatcher()
         clipboardWatcher = ClipboardWatcher { [weak self] url in self?.hangCapture(url) }
@@ -145,6 +148,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         if Inbox.isEnabled { Inbox.restore() }
+        ThirdPartyCapture.restore()
     }
 
     // MARK: Inbox mode
@@ -170,9 +174,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         folderWatchers.forEach { $0.stop() }
         folderWatchers = []
-        // A folder may also be watched for screenshots, like the Desktop; an
-        // image both report hangs once.
-        for folder in Self.extraFolders {
+        // A folder may also be watched for screenshots, like the Desktop.
+        // One a third-party app is already sending into Tendedero's folder
+        // is skipped here, or the same capture would hang twice.
+        let takenOver = ThirdPartyCapture.installed().compactMap(ThirdPartyCapture.saveDirectory)
+        for folder in Self.extraFolders where !takenOver.contains(where: {
+            $0.standardizedFileURL == folder.standardizedFileURL
+        }) {
             let extra = ScreenshotWatcher(
                 folder: folder, anyImage: true,
                 onNew: { [weak self] url in self?.hangCapture(url) },
@@ -180,6 +188,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             extra.start()
             folderWatchers.append(extra)
         }
+        // A third-party app that is not redirected keeps saving to its own
+        // folder. Watching that folder is what makes a new capture hang.
+        for app in ThirdPartyCapture.installed() {
+            guard let folder = ThirdPartyCapture.saveDirectory(of: app),
+                  !alreadyWatched(folder, by: folderWatchers) else { continue }
+            let extra = ScreenshotWatcher(
+                folder: folder, anyImage: true,
+                onNew: { [weak self] url in self?.hangCapture(url) },
+                onChange: { [weak self] in self?.line.prune() })
+            extra.start()
+            folderWatchers.append(extra)
+        }
+    }
+
+    /// True when a watcher is already on this folder. A second one would hang
+    /// each capture twice.
+    private func alreadyWatched(_ folder: URL, by watchers: [ScreenshotWatcher]) -> Bool {
+        let path = folder.standardizedFileURL.path
+        if watcher.folder.standardizedFileURL.path == path { return true }
+        if safetyWatcher?.folder.standardizedFileURL.path == path { return true }
+        return watchers.contains { $0.folder.standardizedFileURL.path == path }
     }
 
     /// Up to three folders: enough for another screenshot app or an export
@@ -220,6 +249,110 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         startWatcher()
     }
 
+    /// One entry for every other screenshot app: one row per app, then the add
+    /// and remove actions. Each row is its own switch.
+    private func otherAppsItem() -> NSMenuItem {
+        let item = NSMenuItem(title: L("Other screenshot apps"), action: nil, keyEquivalent: "")
+        let submenu = NSMenu()
+        for app in ThirdPartyCapture.present() {
+            let title = app.builtIn ? "\(app.name) \(L("(built in)"))" : app.name
+            let row = ClosureMenuItem(title) { [weak self] in self?.toggleApp(app) }
+            row.state = ThirdPartyCapture.isIncluded(app) ? .on : .off
+            submenu.addItem(row)
+        }
+        submenu.addItem(.separator())
+        submenu.addItem(ClosureMenuItem(L("Add screenshot app…")) { [weak self] in self?.addApp() })
+        if !ThirdPartyCapture.userApps().isEmpty {
+            submenu.addItem(ClosureMenuItem(L("Remove screenshot app…")) { [weak self] in self?.removeApp() })
+        }
+        item.submenu = submenu
+        return item
+    }
+
+    /// A row turns one app on or off. The master switch still governs all of
+    /// them: while it is off, nothing is taken over whatever the rows say.
+    /// A row turns one app on or off, and that is the whole choice. There is
+    /// no master switch over them.
+    private func toggleApp(_ app: ThirdPartyCapture.App) {
+        let on = !ThirdPartyCapture.isIncluded(app)
+        ThirdPartyCapture.setIncluded(app, on)
+        if on { ThirdPartyCapture.apply(to: app) } else { ThirdPartyCapture.restore(app) }
+        startWatcher()
+    }
+
+    /// The words for a rejected app. Each is a localized string key.
+    private func rejectionText(_ rejection: ThirdPartyCapture.Rejection) -> String {
+        switch rejection {
+        case .bundleID: return L("Not a bundle id. Use segments like com.example.app.")
+        case .preferenceKey: return L("The preference key can only use letters, digits, dots, and hyphens.")
+        case .bookmarkKey: return L("The bookmark key can only use letters, digits, dots, and hyphens.")
+        case .unwritable: return L("Could not save the app.")
+        }
+    }
+
+    /// Asks for the bundle id, the preference key, and the format, one alert
+    /// at a time. A value that does not fit is rejected and nothing is saved.
+    private func addApp() {
+        NSApp.activate(ignoringOtherApps: true)
+        guard let id = askText(L("Bundle id"), prompt: L("The app's bundle id, such as com.example.app.")) else { return }
+        guard let key = askText(L("Preference key"), prompt: L("The preference that holds the folder the app saves to.")) else { return }
+        let format = NSAlert()
+        format.messageText = L("How does the app store the folder?")
+        format.addButton(withTitle: L("Archived file URL"))
+        format.addButton(withTitle: L("Plain string path"))
+        format.addButton(withTitle: L("Cancel"))
+        let choice = format.runModal()
+        guard choice != .alertThirdButtonReturn else { return }
+        var bookmark: String? = nil
+        if choice == .alertSecondButtonReturn {
+            guard let typed = askText(L("Bookmark key"), prompt: L("The bookmark stored beside the path. Leave it empty if there is none."),
+                                      empty: true) else { return }
+            bookmark = typed
+        }
+        if let problem = ThirdPartyCapture.add(id: id, directoryKey: key, bookmarkKey: bookmark) {
+            let alert = NSAlert()
+            alert.messageText = L("That app could not be added")
+            alert.informativeText = rejectionText(problem)
+            alert.runModal()
+            return
+        }
+        startWatcher()
+    }
+
+    /// Lists only the apps the user added, and deletes the chosen one.
+    private func removeApp() {
+        let apps = ThirdPartyCapture.userApps()
+        guard !apps.isEmpty else { return }
+        let alert = NSAlert()
+        alert.messageText = L("Remove screenshot app…")
+        alert.addButton(withTitle: L("Remove"))
+        alert.addButton(withTitle: L("Cancel"))
+        let popup = NSPopUpButton(frame: NSRect(x: 0, y: 0, width: 240, height: 24))
+        apps.forEach { popup.addItem(withTitle: $0.name) }
+        alert.accessoryView = popup
+        NSApp.activate(ignoringOtherApps: true)
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        ThirdPartyCapture.remove(id: apps[popup.indexOfSelectedItem].id)
+        startWatcher()
+    }
+
+    /// One line of text, asked with an alert. Nil when the user cancels.
+    /// `empty` allows an empty answer, which comes back as an empty string.
+    private func askText(_ title: String, prompt: String, empty: Bool = false) -> String? {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = prompt
+        alert.addButton(withTitle: L("OK"))
+        alert.addButton(withTitle: L("Cancel"))
+        let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 240, height: 24))
+        alert.accessoryView = field
+        alert.window.initialFirstResponder = field
+        guard alert.runModal() == .alertFirstButtonReturn else { return nil }
+        let text = field.stringValue.trimmingCharacters(in: .whitespaces)
+        if text.isEmpty, !empty { return nil }
+        return text
+    }
+
     /// Asked once. Changing system settings is the user's call, never ours.
     private func offerInbox() {
         Inbox.wasOffered = true
@@ -249,6 +382,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             let source = DispatchSource.makeSignalSource(signal: sig, queue: .main)
             source.setEventHandler {
                 if Inbox.isEnabled { Inbox.restore() }
+                ThirdPartyCapture.restore()
                 exit(0)
             }
             source.resume()
@@ -668,12 +802,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         inbox.toolTip = L("Screenshots hang instantly and skip the Desktop")
         menu.addItem(inbox)
 
+        // The capture switches sit together, apart from the line's own
+        // options below, so a submenu opening here does not land on top of the
+        // next row.
+        menu.addItem(.separator())
+
+        // Other screenshot apps are one entry, with the master switch and the
+        // per-app rows nested under it. Nothing is offered when no such app is
+        // installed. CleanShot X and Shottr never appear: their save folder is
+        // not a preference.
+        if !ThirdPartyCapture.installed().isEmpty {
+            menu.addItem(otherAppsItem())
+        }
+
         let clipboard = ClosureMenuItem(L("Hang copied images")) { [weak self] in
             self?.setClipboard(!ClipboardWatcher.isEnabled)
         }
         clipboard.state = ClipboardWatcher.isEnabled ? .on : .off
         clipboard.toolTip = L("Images you copy hang on the line too")
         menu.addItem(clipboard)
+
+        menu.addItem(.separator())
 
         let bringDown = NSMenuItem(title: L("Bring the line down"), action: nil, keyEquivalent: "")
         let options = NSMenu()

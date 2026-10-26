@@ -1,5 +1,6 @@
 import AppKit
 import AVFoundation
+import CaptureSettings
 import Combine
 import os
 
