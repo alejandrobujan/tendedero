@@ -77,6 +77,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         restoreSettingsOnTermination()
         startWatcher()
         clipboardWatcher = ClipboardWatcher { [weak self] url in self?.hangCapture(url) }
+        if !ClipboardWatcher.isEnabled { QQCapture.isEnabled = false }
         if ClipboardWatcher.isEnabled { clipboardWatcher.start() }
 
         registerShortcut()
@@ -240,6 +241,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// Watching the clipboard is opt in, from the menu bar only.
     private func setClipboard(_ on: Bool) {
         ClipboardWatcher.isEnabled = on
+        if !on { QQCapture.isEnabled = false }
         if on { clipboardWatcher.start() } else { clipboardWatcher.stop() }
         updateStatusIcon()
     }
@@ -701,6 +703,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         clipboard.state = ClipboardWatcher.isEnabled ? .on : .off
         clipboard.toolTip = L("Images you copy hang on the line too")
         menu.addItem(clipboard)
+
+        let qqItem = NSMenuItem(title: L("QQ screenshots"), action: nil, keyEquivalent: "")
+        let qqMenu = NSMenu()
+        qqMenu.autoenablesItems = false
+        qqMenu.addItem(ClosureMenuItem(L("Allow QQ screenshots to run independently")) {
+            let alert = NSAlert()
+            do {
+                try QQCapture.allowStandalone()
+                alert.messageText = L("QQ screenshots can now run independently")
+                alert.informativeText = L("The setting is saved. It takes effect the next time QQ's screenshot tool starts.")
+            } catch {
+                alert.alertStyle = .warning
+                alert.messageText = L("Could not enable independent QQ screenshots")
+                alert.informativeText = error.localizedDescription
+            }
+            alert.runModal()
+        })
+        let qqCapture = ClosureMenuItem(L("Handle QQ screenshots (requires “Hang copied images”)")) {
+            guard ClipboardWatcher.isEnabled else { return }
+            QQCapture.isEnabled.toggle()
+        }
+        qqCapture.isEnabled = ClipboardWatcher.isEnabled
+        qqCapture.state = ClipboardWatcher.isEnabled && QQCapture.isEnabled ? .on : .off
+        qqMenu.addItem(qqCapture)
+        qqItem.submenu = qqMenu
+        menu.addItem(qqItem)
 
         let bringDown = NSMenuItem(title: L("Bring the line down"), action: nil, keyEquivalent: "")
         let options = NSMenu()
