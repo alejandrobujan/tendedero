@@ -169,11 +169,6 @@ final class Line: ObservableObject {
         }
     }
 
-    func open(_ id: UUID) {
-        guard let item = items.first(where: { $0.id == id }) else { return }
-        NSWorkspace.shared.open(item.url)
-    }
-
     /// Moves the file to the Trash and takes the photo off the line. When a
     /// drag ends on the Dock's Trash, macOS only reports it: deleting the file
     /// is the source app's job, as Finder does.
