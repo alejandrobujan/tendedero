@@ -56,6 +56,7 @@ Leva o punteiro á barra de menús e a corda baixa. Apártao e desaparece.
 | Arrastrar a unha app | Envía unha copia, e a captura segue pendurada. |
 | Arrastrar a un cartafol | Queda alí e sae da corda. |
 | Arrastrar á Papeleira ou facer clic na cruz | Desfaste dela. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> co punteiro na corda | Volve colgar o que acabas de soltar. |
 | Deixar o punteiro na barra de menús | Baixa a corda nesa pantalla. |
 | Facer clic en calquera sitio da barra de menús | Recolle a corda. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Amosa ou oculta a corda. Cámbiase en Atallo, na barra de menús. |

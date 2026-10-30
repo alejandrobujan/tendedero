@@ -475,6 +475,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         mouseTimer?.invalidate()
         mouseTimer = nil
         panel.ignoresMouseEvents = true
+        holdPutBackKey(false)
     }
 
     /// How long the cursor rests against the top edge before the line comes
@@ -524,6 +525,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if !inMenuBar { menuBarSuppressed = false }
 
         guard isRevealed else {
+            holdPutBackKey(false)
             // Resting in the menu bar brings the line down on that screen.
             // Pushing against the top edge is part of it, and it also works
             // when another display sits above and the pointer never stops.
@@ -556,6 +558,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if let screen = panel.screen { zone.size.height = screen.frame.maxY - zone.minY }
         let inside = NSMouseInRect(mouse, zone, false)
         if inside && pinned { pinned = false }
+        holdPutBackKey(inside)
 
         let busy = pinned || GrabView.isDragging || GrabView.isShowingMenu
             || line.pressedID != nil || now < peekUntil
@@ -588,6 +591,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if panel.ignoresMouseEvents == overPhoto {
             panel.ignoresMouseEvents = !overPhoto
         }
+    }
+
+    // MARK: Putting back
+
+    /// ⌘Z while the pointer is on the line. The line never takes the
+    /// keyboard, so it only borrows ⌘Z then, as a hot key. Everywhere else
+    /// ⌘Z stays the undo of the app you are in.
+    private var putBackKey: HotKey?
+
+    private func holdPutBackKey(_ hold: Bool) {
+        let hold = hold && line.canPutBack
+        guard hold != (putBackKey != nil) else { return }
+        putBackKey = hold ? HotKey(Shortcut.putBack) { [weak self] in self?.putBack() } : nil
+    }
+
+    /// From the menu the line is usually up, so it comes down for a moment
+    /// to show the photos going back.
+    private func putBack() {
+        if !isRevealed {
+            panel.placeOnScreen()
+            updateCapacity()
+            wanted = true
+            refresh()
+            reveal(peekFor: 2.5)
+        }
+        line.putBack()
     }
 
     // MARK: Shortcut
@@ -687,6 +716,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         clearItem.isEnabled = line.liveCount > 0
         menu.addItem(clearItem)
+
+        let putBackItem = ClosureMenuItem(L("Put back"), key: "z") { [weak self] in
+            self?.putBack()
+        }
+        putBackItem.isEnabled = line.canPutBack
+        menu.addItem(putBackItem)
 
         let inbox = ClosureMenuItem(L("Handle screenshots")) { [weak self] in
             self?.setInbox(!Inbox.isEnabled)
