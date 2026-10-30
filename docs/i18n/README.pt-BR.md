@@ -27,7 +27,7 @@
 ## Longe da vista. Ao alcance da mão.
 
 Cada captura de tela que você faz fica pendurada num varal logo acima da tela.
-Pare o ponteiro na barra de menus e o varal desce. Afaste-o e ele some.
+Pare o ponteiro no meio da barra de menus e o varal desce. Afaste-o e ele some.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/pt-BR/demo-dark.gif">
@@ -56,7 +56,8 @@ Pare o ponteiro na barra de menus e o varal desce. Afaste-o e ele some.
 | Arrastar para um app | Envia uma cópia. Ela continua no varal. |
 | Arrastar para uma pasta | Guarda a imagem ali. Ela sai do varal. |
 | Arrastar para o Lixo, ou clicar no X | Desapegue. |
-| Parar o ponteiro na barra de menus | Baixa o varal naquela tela. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> com o ponteiro no varal | Pendura de volta o que você acabou de soltar. |
+| Parar o ponteiro no meio da barra de menus | Baixa o varal naquela tela. |
 | Clicar em qualquer lugar da barra de menus | Recolhe o varal. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Mostra ou oculta o varal. Altere em Atalho, na barra de menus. |
 

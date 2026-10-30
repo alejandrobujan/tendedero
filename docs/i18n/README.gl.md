@@ -27,7 +27,7 @@
 ## Fóra da vista. Sempre a man.
 
 Cada captura que fas queda pendurada nunha corda xusto enriba da pantalla.
-Leva o punteiro á barra de menús e a corda baixa. Apártao e desaparece.
+Leva o punteiro ao centro da barra de menús e a corda baixa. Apártao e desaparece.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/gl/demo-dark.gif">
@@ -56,7 +56,8 @@ Leva o punteiro á barra de menús e a corda baixa. Apártao e desaparece.
 | Arrastrar a unha app | Envía unha copia, e a captura segue pendurada. |
 | Arrastrar a un cartafol | Queda alí e sae da corda. |
 | Arrastrar á Papeleira ou facer clic na cruz | Desfaste dela. |
-| Deixar o punteiro na barra de menús | Baixa a corda nesa pantalla. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> co punteiro na corda | Volve colgar o que acabas de soltar. |
+| Deixar o punteiro no centro da barra de menús | Baixa a corda nesa pantalla. |
 | Facer clic en calquera sitio da barra de menús | Recolle a corda. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Amosa ou oculta a corda. Cámbiase en Atallo, na barra de menús. |
 
