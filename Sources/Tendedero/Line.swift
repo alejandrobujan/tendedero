@@ -387,7 +387,10 @@ final class Line: ObservableObject {
                   let thumb = makeThumbnail(url) else { continue }
             let item = Pegged(url: url, thumb: thumb)
             let live = items.filter { !$0.falling }
-            if photo.index < live.count, let i = items.firstIndex(where: { $0.id == live[photo.index].id }) {
+            if let gap = items.firstIndex(where: { $0.falling && $0.url == photo.url }) {
+                // Its empty place is still on the line: it hangs back there.
+                items[gap] = item
+            } else if photo.index < live.count, let i = items.firstIndex(where: { $0.id == live[photo.index].id }) {
                 items.insert(item, at: i)
             } else {
                 items.append(item)
