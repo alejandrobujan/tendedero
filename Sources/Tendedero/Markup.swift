@@ -100,7 +100,8 @@ final class Markup: NSObject, NSSharingServiceDelegate {
         case let url as URL:
             write(from: url, to: target)
         case let image as NSImage:
-            write(data: pngData(image), to: target)
+            write(data: image.cgImage(forProposedRect: nil, context: nil, hints: nil)
+                .flatMap { Markup.encoded($0, like: target) }, to: target)
         case let provider as NSItemProvider:
             load(provider, into: target)
         default:
@@ -124,6 +125,9 @@ final class Markup: NSObject, NSSharingServiceDelegate {
             ?? types.first { UTType($0)?.conforms(to: .image) == true }
         guard let imageType else { return }
         provider.loadDataRepresentation(forTypeIdentifier: imageType) { data, _ in
+            // Encoding a large image takes a moment, so it happens here, off
+            // the main thread.
+            let data = data.map { Markup.encoded($0, like: target) }
             DispatchQueue.main.async { self.write(data: data, to: target) }
         }
     }
@@ -132,7 +136,7 @@ final class Markup: NSObject, NSSharingServiceDelegate {
         if source.standardizedFileURL == target.standardizedFileURL {
             onSaved(target)
         } else {
-            write(data: try? Data(contentsOf: source), to: target)
+            write(data: (try? Data(contentsOf: source)).map { Markup.encoded($0, like: target) }, to: target)
         }
     }
 
@@ -147,8 +151,27 @@ final class Markup: NSObject, NSSharingServiceDelegate {
         }
     }
 
-    private func pngData(_ image: NSImage) -> Data? {
-        guard let tiff = image.tiffRepresentation, let rep = NSBitmapImageRep(data: tiff) else { return nil }
-        return rep.representation(using: .png, properties: [:])
+    /// Markup hands back a PNG saved with little compression, more than
+    /// twice the size of the screenshot it came from, and a PNG even when
+    /// the screenshot was a JPEG or HEIC. Encoding it again with ImageIO, in
+    /// the file's own format, keeps the file close to its original size.
+    /// Lossless for PNG. Should that fail, Markup's own data is kept.
+    nonisolated private static func encoded(_ data: Data, like target: URL) -> Data {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let image = encode(like: target, { CGImageDestinationAddImageFromSource($0, source, 0, nil) })
+        else { return data }
+        return image
+    }
+
+    nonisolated private static func encoded(_ image: CGImage, like target: URL) -> Data? {
+        encode(like: target) { CGImageDestinationAddImage($0, image, nil) }
+    }
+
+    nonisolated private static func encode(like target: URL, _ add: (CGImageDestination) -> Void) -> Data? {
+        let type = (UTType(filenameExtension: target.pathExtension) ?? .png).identifier as CFString
+        let out = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(out, type, 1, nil) else { return nil }
+        add(destination)
+        return CGImageDestinationFinalize(destination) ? out as Data : nil
     }
 }
