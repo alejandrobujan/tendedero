@@ -27,7 +27,7 @@
 ## Gözdən uzaq. Əl altında.
 
 Çəkdiyiniz hər ekran şəkli ekranın düz üstündəki ipdən asılır.
-Göstəricini menyu panelində saxlayın, ip aşağı enir. Uzaqlaşdırın, yox olur.
+Göstəricini menyu panelinin ortasında saxlayın, ip aşağı enir. Uzaqlaşdırın, yox olur.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/az/demo-dark.gif">
@@ -57,7 +57,7 @@ Göstəricini menyu panelində saxlayın, ip aşağı enir. Uzaqlaşdırın, yox
 | Qovluğa sürükləmək | Orada saxlanır və ipdən çıxır. |
 | Zibil qutusuna sürükləmək və ya çarpaza klik | Ondan qurtulursunuz. |
 | Göstərici ipin üstündəykən <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | Atdığınızı ipə geri asır. |
-| Göstəricini menyu panelində saxlamaq | İpi həmin ekranda endirir. |
+| Göstəricini menyu panelinin ortasında saxlamaq | İpi həmin ekranda endirir. |
 | Menyu panelində istənilən yerə klik | İpi yığır. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | İpi göstərir və ya gizlədir. Menyu panelində Qısayol bölməsindən dəyişdirmək olar. |
 

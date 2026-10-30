@@ -491,11 +491,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return NSRect(x: screen.frame.minX, y: screen.frame.maxY - h, width: screen.frame.width, height: h)
     }
 
-    /// The part of the menu bar that brings the line down: the middle quarter,
+    /// The part of the menu bar that brings the line down: the middle third,
     /// so the menus on the left and the icons on the right stay easy to reach.
     static func revealBand(of screen: NSScreen) -> NSRect {
         let bar = menuBarBand(of: screen)
-        let width = bar.width / 4
+        let width = bar.width / 3
         return NSRect(x: bar.midX - width / 2, y: bar.minY, width: width, height: bar.height)
     }
 

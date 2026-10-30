@@ -27,7 +27,7 @@
 ## Fuera de la vista. Siempre a mano.
 
 Cada captura que haces queda colgada en una cuerda justo encima de la pantalla.
-Lleva el puntero a la barra de menús y la cuerda baja. Apártalo y desaparece.
+Lleva el puntero al centro de la barra de menús y la cuerda baja. Apártalo y desaparece.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/es/demo-dark.gif">
@@ -57,7 +57,7 @@ Lleva el puntero a la barra de menús y la cuerda baja. Apártalo y desaparece.
 | Arrastrar a una carpeta | Se queda ahí y sale de la cuerda. |
 | Arrastrar a la Papelera o hacer clic en la cruz | Te deshaces de ella. |
 | <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> con el puntero en la cuerda | Vuelve a colgar lo que acabas de soltar. |
-| Dejar el puntero en la barra de menús | Baja la cuerda en esa pantalla. |
+| Dejar el puntero en el centro de la barra de menús | Baja la cuerda en esa pantalla. |
 | Hacer clic en cualquier sitio de la barra de menús | Recoge la cuerda. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Muestra u oculta la cuerda. Se cambia en Atajo, en la barra de menús. |
 
