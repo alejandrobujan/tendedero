@@ -58,6 +58,8 @@ Aldığınız her ekran görüntüsü, ekranınızın hemen üstündeki bir ipe 
 | Çöp Kutusu'na sürükle ya da çarpıya tıkla | Siler. |
 | İşaretçi ipin üzerindeyken <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | Az önce bıraktığını geri asar. |
 | İşaretçiyi menü çubuğunda bırak | O ekranda ipi aşağı indirir. |
+| Menü çubuğunda iki parmakla aşağı kaydır | O ekranda ipi aşağı indirir ve orada tutar. |
+| Menü çubuğunda iki parmakla yukarı kaydır | İpi geri kaldırır. |
 | Menü çubuğunda herhangi bir yere tıkla | İpi geri kaldırır. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | İpi gösterir ya da gizler. Menü çubuğundaki Kısayol bölümünden değiştirilebilir. |
 

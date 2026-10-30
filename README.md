@@ -56,6 +56,8 @@ Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 | Drag to the Trash, or click the cross | Let it go. |
 | <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> with the pointer on the line | Hang back what you just let go. |
 | Rest the pointer in the menu bar | Bring the line down on that screen. |
+| Two-finger swipe down in the menu bar | Bring the line down on that screen, and keep it there. |
+| Two-finger swipe up in the menu bar | Put it away. |
 | Click anything in the menu bar | Put it away. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Show or hide the line. Change it under Shortcut in the menu bar. |
 
