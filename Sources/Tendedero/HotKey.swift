@@ -1,34 +1,44 @@
 import AppKit
 import Carbon
 
-/// A single global shortcut through the Carbon hot key API. Unlike a global
-/// key monitor, it needs no Accessibility permission.
+/// A global shortcut through the Carbon hot key API. Unlike a global key
+/// monitor, it needs no Accessibility permission. It lasts as long as the
+/// object.
 final class HotKey {
     private var ref: EventHotKeyRef?
-    private static var action: (() -> Void)?
+    private let id: UInt32
+    private static var actions: [UInt32: () -> Void] = [:]
+    private static var nextID: UInt32 = 1
     private static var handlerInstalled = false
 
     /// Nil when the combination cannot be registered, for example because
     /// another app already took it.
     init?(_ shortcut: Shortcut, action: @escaping () -> Void) {
-        HotKey.action = action
-        // One handler for the app, however many times the shortcut changes.
+        // One handler for the app, whatever the shortcuts. It finds which one
+        // was pressed by its id.
         if !HotKey.handlerInstalled {
             var spec = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
-            InstallEventHandler(GetApplicationEventTarget(), { _, _, _ in
-                DispatchQueue.main.async { HotKey.action?() }
+            InstallEventHandler(GetApplicationEventTarget(), { _, event, _ in
+                var pressed = EventHotKeyID()
+                GetEventParameter(event, EventParamName(kEventParamDirectObject), EventParamType(typeEventHotKeyID),
+                                  nil, MemoryLayout<EventHotKeyID>.size, nil, &pressed)
+                DispatchQueue.main.async { HotKey.actions[pressed.id]?() }
                 return noErr
             }, 1, &spec, nil, nil)
             HotKey.handlerInstalled = true
         }
-        let id = EventHotKeyID(signature: OSType(0x5445_4E44), id: 1) // "TEND"
-        let status = RegisterEventHotKey(UInt32(shortcut.keyCode), UInt32(shortcut.carbonModifiers), id,
+        id = HotKey.nextID
+        HotKey.nextID += 1
+        let hotKeyID = EventHotKeyID(signature: OSType(0x5445_4E44), id: id) // "TEND"
+        let status = RegisterEventHotKey(UInt32(shortcut.keyCode), UInt32(shortcut.carbonModifiers), hotKeyID,
                                          GetApplicationEventTarget(), 0, &ref)
         guard status == noErr, ref != nil else { return nil }
+        HotKey.actions[id] = action
     }
 
     deinit {
         if let ref { UnregisterEventHotKey(ref) }
+        HotKey.actions[id] = nil
     }
 }
 
@@ -40,6 +50,35 @@ struct Shortcut: Equatable {
     var key: String
 
     static let standard = Shortcut(keyCode: kVK_ANSI_T, modifiers: [.control, .option], key: "t")
+
+    /// ⌘Z, for Put back while the pointer is on the line. A hot key is a key
+    /// on the keyboard, not a letter, so it is the key that types Z with
+    /// Command held in the layout in use: on AZERTY, where QWERTY has W.
+    static var putBack: Shortcut {
+        Shortcut(keyCode: keyCode(typing: "z") ?? kVK_ANSI_Z, modifiers: .command, key: "z")
+    }
+
+    /// The key that types this letter with Command held, in a keyboard
+    /// layout, by default the one in use.
+    static func keyCode(typing letter: String,
+                        in source: TISInputSource? = TISCopyCurrentKeyboardLayoutInputSource()?.takeRetainedValue()) -> Int? {
+        guard let source, let data = TISGetInputSourceProperty(source, kTISPropertyUnicodeKeyLayoutData) else { return nil }
+        let layout = Unmanaged<CFData>.fromOpaque(data).takeUnretainedValue() as Data
+        return layout.withUnsafeBytes { bytes -> Int? in
+            guard let keys = bytes.baseAddress?.assumingMemoryBound(to: UCKeyboardLayout.self) else { return nil }
+            let command = UInt32((cmdKey >> 8) & 0xFF)
+            for code in 0..<128 {
+                var dead: UInt32 = 0
+                var chars = [UniChar](repeating: 0, count: 4)
+                var length = 0
+                let status = UCKeyTranslate(keys, UInt16(code), UInt16(kUCKeyActionDown), command,
+                                            UInt32(LMGetKbdType()), OptionBits(kUCKeyTranslateNoDeadKeysBit),
+                                            &dead, chars.count, &length, &chars)
+                if status == noErr, String(utf16CodeUnits: chars, count: length).lowercased() == letter { return code }
+            }
+            return nil
+        }
+    }
 
     private static let defaultsKey = "shortcut"
 
