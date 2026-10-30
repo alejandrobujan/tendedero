@@ -33,15 +33,11 @@ final class Markup: NSObject, NSSharingServiceDelegate {
     /// Done was pressed. The extension hands back the edited image and the
     /// host app is the one that writes it over the original file.
     nonisolated func sharingService(_ sharingService: NSSharingService, didShareItems items: [Any]) {
-        MainActor.assumeIsolated {
-            closeAnchor()
-            self.save(items)
-        }
+        MainActor.assumeIsolated { self.save(items) }
     }
 
     nonisolated func sharingService(_ sharingService: NSSharingService,
                                     didFailToShareItems items: [Any], error: Error) {
-        MainActor.assumeIsolated { closeAnchor() }
         log.notice("Markup ended without saving: \(error.localizedDescription, privacy: .public)")
     }
 
@@ -74,10 +70,28 @@ final class Markup: NSObject, NSSharingServiceDelegate {
     private func tidyEditor() {
         tidying?.invalidate()
         centred = false
-        let timer = Timer(timeInterval: 1.0 / 60, repeats: true) { _ in
+        let start = Date()
+        var shown = false
+        var gone: Date?
+        let timer = Timer(timeInterval: 1.0 / 60, repeats: true) { timer in
             MainActor.assumeIsolated {
                 guard let editor = NSApp.windows.first(where: { $0.isVisible && $0.className.contains("RemoteWindow") })
-                else { return }
+                else {
+                    // Closed, or it never came. AppKit brings the window it
+                    // was shared from back to the front as the editor closes,
+                    // so the anchor is kept out of sight a moment longer.
+                    guard shown || Date().timeIntervalSince(start) > 10 else { return }
+                    self.anchor.orderOut(nil)
+                    let since = gone ?? Date()
+                    gone = since
+                    if Date().timeIntervalSince(since) > 0.5 {
+                        timer.invalidate()
+                        self.tidying = nil
+                    }
+                    return
+                }
+                shown = true
+                gone = nil
                 // Markup keeps the editor to the left of the space it was
                 // given. Once, as it shows up, it moves to the middle.
                 if !self.centred, let area = editor.screen?.visibleFrame {
@@ -96,12 +110,6 @@ final class Markup: NSObject, NSSharingServiceDelegate {
         }
         RunLoop.main.add(timer, forMode: .common)
         tidying = timer
-    }
-
-    private func closeAnchor() {
-        tidying?.invalidate()
-        tidying = nil
-        anchor.orderOut(nil)
     }
 
     private func placeAnchor() {
