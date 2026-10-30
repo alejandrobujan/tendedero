@@ -621,10 +621,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// ⌘Z stays the undo of the app you are in.
     private var putBackKey: HotKey?
 
+    /// Set when another app holds ⌘Z, so it is not asked for again on every
+    /// tick, only the next time the pointer comes to the line.
+    private var putBackKeyRefused = false
+
     private func holdPutBackKey(_ hold: Bool) {
-        let hold = hold && line.canPutBack
-        guard hold != (putBackKey != nil) else { return }
-        putBackKey = hold ? HotKey(Shortcut.putBack) { [weak self] in self?.putBack() } : nil
+        guard hold && line.canPutBack else {
+            putBackKey = nil
+            putBackKeyRefused = false
+            return
+        }
+        guard putBackKey == nil, !putBackKeyRefused else { return }
+        putBackKey = HotKey(Shortcut.putBack) { [weak self] in self?.putBack() }
+        putBackKeyRefused = putBackKey == nil
     }
 
     /// From the menu the line is usually up, so it comes down for a moment

@@ -262,9 +262,6 @@ final class Line: ObservableObject {
         }
     }
 
-    /// The oldest photo falling off a full line. Like the cross, a file from
-    /// Tendedero's folder goes to the Trash, or nothing would ever take it out
-    /// of that folder. If the Trash refuses it, it still leaves the line.
     /// Moves along a line that holds more than fit, from a scroll gesture.
     func scroll(by delta: CGFloat) {
         let most = CGFloat(max(0, items.count - visibleCount)) * Layout.spacing
@@ -281,6 +278,9 @@ final class Line: ObservableObject {
         scroll = 0
     }
 
+    /// The oldest photo falling off a full line. Like the cross, a file from
+    /// Tendedero's folder goes to the Trash, or nothing would ever take it out
+    /// of that folder. If the Trash refuses it, it still leaves the line.
     private func letGo(_ id: UUID) {
         if isInInbox(id), trash(id, quietly: true, step: nil) { return }
         drop(id, quietly: true)
