@@ -32,10 +32,13 @@ final class MenuBarSpace {
     private static let fallbackClearanceUnit: CGFloat = NSStatusItem.squareLength * 2 + 8
 
     /// How many steps of clearance the idle stretches keep on either side,
-    /// from the menu bar's "Bring the line down" menu. One step, the
-    /// default, is two icons and the space between them.
+    /// from the menu bar's "Bring the line down" menu. One step is two
+    /// icons and the space between them; two, the default, is four.
     static var clearanceSteps: Int {
-        get { min(max(UserDefaults.standard.integer(forKey: "menuBarClearance"), 0), 3) }
+        get {
+            guard let stored = UserDefaults.standard.object(forKey: "menuBarClearance") as? Int else { return 2 }
+            return min(max(stored, 0), 3)
+        }
         set { UserDefaults.standard.set(min(max(newValue, 0), 3), forKey: "menuBarClearance") }
     }
     /// Without a reading, where the menus are assumed to end and where the

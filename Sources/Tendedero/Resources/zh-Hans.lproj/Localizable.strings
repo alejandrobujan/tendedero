@@ -45,6 +45,9 @@
 "Two icons" = "两个图标";
 "Four icons" = "四个图标";
 "Six icons" = "六个图标";
+"Language" = "语言";
+"System" = "跟随系统";
+"Takes effect when Tendedero reopens" = "重新打开 Tendedero 后生效";
 "Hang copied images" = "挂上复制的图片";
 "Images you copy hang on the line too" = "复制的图片也会挂上绳";
 "Tendedero, hanging copied images" = "Tendedero，正在挂上复制的图片";

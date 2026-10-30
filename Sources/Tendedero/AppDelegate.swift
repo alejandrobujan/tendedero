@@ -864,6 +864,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         login.state = SMAppService.mainApp.status == .enabled ? .on : .off
         menu.addItem(login)
 
+        // The language of the menus, with the system's own choice on top.
+        // The names read each in their own tongue. AppleLanguages answers
+        // the next time the app opens.
+        let languageItem = NSMenuItem(title: L("Language"), action: nil, keyEquivalent: "")
+        let languages = NSMenu()
+        let chosen = UserDefaults.standard.stringArray(forKey: "AppleLanguages")?.first
+        let systemItem = ClosureMenuItem(L("System")) {
+            UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+        }
+        systemItem.state = chosen == nil ? .on : .off
+        languages.addItem(systemItem)
+        for (code, name) in [("az", "Azərbaycanca"), ("en", "English"), ("es", "Español"), ("fr", "Français"),
+                             ("gl", "Galego"), ("hi", "हिन्दी"), ("ja", "日本語"), ("ko", "한국어"),
+                             ("pt-BR", "Português (Brasil)"), ("tr", "Türkçe"), ("zh-Hans", "简体中文")] {
+            let item = ClosureMenuItem(name) {
+                UserDefaults.standard.set([code], forKey: "AppleLanguages")
+            }
+            item.state = chosen == code ? .on : .off
+            languages.addItem(item)
+        }
+        languages.addItem(.separator())
+        let note = NSMenuItem(title: L("Takes effect when Tendedero reopens"), action: nil, keyEquivalent: "")
+        note.isEnabled = false
+        languages.addItem(note)
+        languageItem.submenu = languages
+        menu.addItem(languageItem)
+
         // The app never connects to anything, so it cannot tell when a new
         // version is out. The website can: it is opened with this version
         // and language, and says whether there is a newer one.

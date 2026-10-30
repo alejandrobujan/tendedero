@@ -45,6 +45,9 @@
 "Two icons" = "İki simge";
 "Four icons" = "Dört simge";
 "Six icons" = "Altı simge";
+"Language" = "Dil";
+"System" = "Sistem";
+"Takes effect when Tendedero reopens" = "Tendedero yeniden açıldığında uygulanır";
 "Hang copied images" = "Kopyalanan görselleri as";
 "Images you copy hang on the line too" = "Kopyaladığınız görseller de ipe asılır";
 "Tendedero, hanging copied images" = "Tendedero, kopyalanan görselleri asıyor";
