@@ -491,6 +491,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return NSRect(x: screen.frame.minX, y: screen.frame.maxY - h, width: screen.frame.width, height: h)
     }
 
+    /// The part of the menu bar that brings the line down: the middle third,
+    /// so the menus on the left and the icons on the right stay easy to reach.
+    static func revealBand(of screen: NSScreen) -> NSRect {
+        let bar = menuBarBand(of: screen)
+        let width = bar.width / 3
+        return NSRect(x: bar.midX - width / 2, y: bar.minY, width: width, height: bar.height)
+    }
+
     /// A click anywhere in the top bar of any screen, a menu or an icon, puts the line away.
     private func watchMenuBarClicks() {
         let handler: (NSEvent?) -> Void = { [weak self] _ in
@@ -523,17 +531,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let screenUnderPointer = NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) }
         let inMenuBar = screenUnderPointer.map { NSMouseInRect(mouse, Self.menuBarBand(of: $0), false) } ?? false
         if !inMenuBar { menuBarSuppressed = false }
+        let inRevealBand = screenUnderPointer.map { NSMouseInRect(mouse, Self.revealBand(of: $0), false) } ?? false
 
         guard isRevealed else {
             holdPutBackKey(false)
             line.closeGaps()
-            // Resting in the menu bar brings the line down on that screen.
-            // Pushing against the top edge is part of it, and it also works
-            // when another display sits above and the pointer never stops.
+            // Resting in the middle of the menu bar brings the line down on
+            // that screen. Pushing against the top edge is part of it, and it
+            // also works when another display sits above and the pointer
+            // never stops.
             // An empty line stays up there: only the shortcut and the menu
             // bring it down on purpose.
             if line.liveCount > 0, Self.opensFromMenuBar, let screen = screenUnderPointer,
-               inMenuBar, !menuBarSuppressed, !FullScreen.blocksLine(on: screen) {
+               inRevealBand, !menuBarSuppressed, !FullScreen.blocksLine(on: screen) {
                 let since = hotZoneSince ?? now
                 hotZoneSince = since
                 if now.timeIntervalSince(since) >= Self.revealDelay {
