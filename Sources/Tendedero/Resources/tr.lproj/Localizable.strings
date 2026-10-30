@@ -41,6 +41,13 @@
 "When the pointer rests in the menu bar" = "İşaretçi menü çubuğunda durduğunda";
 "When something new hangs" = "Yeni bir şey asıldığında";
 "Over full screen apps" = "Tam ekran uygulamaların üzerinde";
+"Clearance" = "Boşluk";
+"Two icons" = "İki simge";
+"Four icons" = "Dört simge";
+"Six icons" = "Altı simge";
+"Language" = "Dil";
+"System" = "Sistem";
+"Takes effect when Tendedero reopens" = "Tendedero yeniden açıldığında uygulanır";
 "Hang copied images" = "Kopyalanan görselleri as";
 "Images you copy hang on the line too" = "Kopyaladığınız görseller de ipe asılır";
 "Tendedero, hanging copied images" = "Tendedero, kopyalanan görselleri asıyor";

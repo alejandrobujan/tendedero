@@ -41,6 +41,13 @@
 "When the pointer rests in the menu bar" = "ポインタがメニューバーにとどまったとき";
 "When something new hangs" = "新しいものが吊るされたとき";
 "Over full screen apps" = "フルスクリーンのアプリの上にも";
+"Clearance" = "余白";
+"Two icons" = "アイコン2つ";
+"Four icons" = "アイコン4つ";
+"Six icons" = "アイコン6つ";
+"Language" = "言語";
+"System" = "システムに従う";
+"Takes effect when Tendedero reopens" = "Tendedero を開き直すと反映されます";
 "Hang copied images" = "コピーした画像を吊るす";
 "Images you copy hang on the line too" = "コピーした画像もロープに吊るされます";
 "Tendedero, hanging copied images" = "Tendedero、コピーした画像を吊るしています";

@@ -27,7 +27,7 @@
 ## 看不见，却够得着
 
 你每截一张图，它都会挂到屏幕顶上的一根绳上。
-把指针停在菜单栏中间，绳子就滑下来；移开，它就收起。
+把指针停在菜单栏的空白处，绳子就滑下来；移开，它就收起。
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/zh-Hans/demo-dark.gif">
@@ -57,7 +57,7 @@
 | 拖进文件夹 | 存在那儿。原图从绳上取下。 |
 | 拖到废纸篓，或点叉 | 松手丢弃。 |
 | 指针在绳子上时按 <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | 把刚丢掉的挂回去。 |
-| 指针停在菜单栏中间 | 在那一块屏幕上放下绳子。 |
+| 指针停在菜单栏的空白处 | 在那一块屏幕上放下绳子。 |
 | 点击菜单栏任意处 | 把绳子收起来。 |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | 显示或隐藏绳子。可在菜单栏的「快捷键」中更改。 |
 
@@ -134,6 +134,7 @@ open build/Tendedero.app
 |:--|:--|
 | `AppDelegate.swift` | 菜单栏、快捷键、放下与收起绳子 |
 | `LinePanel.swift` | 屏幕顶部那条透明的窄条 |
+| `MenuBarSpace.swift` | 菜单栏上的空白处 |
 | `LineView.swift` | 绳子本身，以及每张照片挂在哪里 |
 | `PeggedView.swift` | 一张照片：玻璃相框、夹子、摇摆与微风 |
 | `GrabArea.swift` | 单击、长按、拖放 |

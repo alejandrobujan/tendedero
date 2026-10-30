@@ -41,6 +41,13 @@
 "When the pointer rests in the menu bar" = "Al dejar el puntero en la barra de menús";
 "When something new hangs" = "Cuando se cuelga algo nuevo";
 "Over full screen apps" = "Sobre apps a pantalla completa";
+"Clearance" = "Margen";
+"Two icons" = "Dos iconos";
+"Four icons" = "Cuatro iconos";
+"Six icons" = "Seis iconos";
+"Language" = "Idioma";
+"System" = "Sistema";
+"Takes effect when Tendedero reopens" = "Se aplica al volver a abrir Tendedero";
 "Hang copied images" = "Colgar imágenes copiadas";
 "Images you copy hang on the line too" = "Las imágenes que copias también se cuelgan";
 "Tendedero, hanging copied images" = "Tendedero, colgando imágenes copiadas";
