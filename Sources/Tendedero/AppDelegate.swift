@@ -769,6 +769,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         fullScreen.state = FullScreen.showLineOver ? .on : .off
         options.addItem(fullScreen)
+        // How much room the idle stretches keep from the menus and icons.
+        let clearanceItem = NSMenuItem(title: L("Clearance"), action: nil, keyEquivalent: "")
+        let clearances = NSMenu()
+        for (steps, title) in [(0, L("None")), (1, L("Two icons")), (2, L("Four icons")), (3, L("Six icons"))] {
+            let item = ClosureMenuItem(title) { MenuBarSpace.clearanceSteps = steps }
+            item.state = MenuBarSpace.clearanceSteps == steps ? .on : .off
+            clearances.addItem(item)
+        }
+        clearanceItem.submenu = clearances
+        options.addItem(clearanceItem)
         bringDown.submenu = options
         menu.addItem(bringDown)
 

@@ -21,12 +21,23 @@ final class MenuBarSpace {
 
     /// A gap has to be this wide to rest the pointer in.
     private static let minimumGap: CGFloat = 32
-    /// Idle space keeps this much distance from the menus and icons on
-    /// either side of it, then room for two status items and the space
-    /// between them, so reaching for the gap without landing exactly in it
-    /// does not bring the line down.
+    /// Idle space always keeps this much distance from the menus and icons
+    /// on either side of it.
     private static let edgeInset: CGFloat = 4
-    private static let iconClearance: CGFloat = NSStatusItem.squareLength * 2 + 8
+    /// One step of the clearance setting until the first sweep answers:
+    /// room for two status items and the space between them, so reaching
+    /// for the gap without landing exactly in it does not bring the line
+    /// down. The sweep then measures the real span, from the leftmost item
+    /// to the third one, and that takes over.
+    private static let fallbackClearanceUnit: CGFloat = NSStatusItem.squareLength * 2 + 8
+
+    /// How many steps of clearance the idle stretches keep on either side,
+    /// from the menu bar's "Bring the line down" menu. One step, the
+    /// default, is two icons and the space between them.
+    static var clearanceSteps: Int {
+        get { min(max(UserDefaults.standard.integer(forKey: "menuBarClearance"), 0), 3) }
+        set { UserDefaults.standard.set(min(max(newValue, 0), 3), forKey: "menuBarClearance") }
+    }
     /// Without a reading, where the menus are assumed to end and where the
     /// status items are assumed to begin, as a fraction of the screen.
     private static let fallbackMenusEdge: CGFloat = 0.45
@@ -50,6 +61,9 @@ final class MenuBarSpace {
     /// The sweep's own reading, kept apart so a wide one wins over a
     /// narrower own item without losing either.
     private var sweptClusterFromRight: CGFloat?
+    /// The sweep's measure of one clearance step: the span from the leftmost
+    /// status item to the third one. nil until a sweep sees three items.
+    private var sweptUnit: CGFloat?
 
     private var lastMenusRead = Date.distantPast
     private var lastMenusApp: pid_t = 0
@@ -110,7 +124,8 @@ final class MenuBarSpace {
             }
         }
 
-        let clearance = Self.edgeInset + Self.iconClearance
+        let unit = sweptUnit ?? Self.fallbackClearanceUnit
+        let clearance = Self.edgeInset + CGFloat(Self.clearanceSteps) * unit
         return zip(merged, merged.dropFirst()).compactMap { before, after in
             let gap = (before.upperBound + clearance) ... (after.lowerBound - clearance)
             return gap.upperBound - gap.lowerBound >= Self.minimumGap ? gap : nil
@@ -129,22 +144,23 @@ final class MenuBarSpace {
             .filter { $0.activationPolicy != .prohibited }
             .map(\.processIdentifier)
         Self.sweepQueue.async {
-            let leftmost = Self.leftmostStatusItemX(pids: pids)
+            let reading = Self.statusItemReading(pids: pids)
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 self.sweepInFlight = false
-                if let leftmost,
-                   let host = NSScreen.screens.first(where: { $0.frame.minX <= leftmost && leftmost < $0.frame.maxX }) {
-                    self.sweptClusterFromRight = host.frame.maxX - leftmost
-                }
+                guard let reading,
+                      let host = NSScreen.screens.first(where: { $0.frame.minX <= reading.leftmost && reading.leftmost < $0.frame.maxX }) else { return }
+                self.sweptClusterFromRight = host.frame.maxX - reading.leftmost
+                if let unit = reading.unit, unit > 0 { self.sweptUnit = unit }
             }
         }
     }
 
     /// The leftmost status item across every running app that owns one, in
-    /// global points, or nil when none can be read.
-    private nonisolated static func leftmostStatusItemX(pids: [pid_t]) -> CGFloat? {
-        var left: CGFloat?
+    /// global points, and the span from it to the third one — two icons and
+    /// the spaces between — or nil when none can be read.
+    private nonisolated static func statusItemReading(pids: [pid_t]) -> (leftmost: CGFloat, unit: CGFloat?)? {
+        var lefts: [CGFloat] = []
         for pid in pids {
             let application = AXUIElementCreateApplication(pid)
             AXUIElementSetMessagingTimeout(application, 0.3)
@@ -153,10 +169,13 @@ final class MenuBarSpace {
                   let extras else { continue }
             for item in statusItems(in: extras) {
                 guard let frame = frame(of: item) else { continue }
-                left = min(left ?? frame.minX, frame.minX)
+                lefts.append(frame.minX)
             }
         }
-        return left
+        guard let leftmost = lefts.min() else { return nil }
+        let sorted = lefts.sorted()
+        let unit = sorted.count >= 3 ? sorted[2] - sorted[0] : nil
+        return (leftmost, unit)
     }
 
     /// AXExtrasMenuBar holds the items directly on older macOS, and

@@ -41,6 +41,10 @@
 "When the pointer rests in the menu bar" = "Quand le pointeur reste dans la barre des menus";
 "When something new hangs" = "Quand une nouvelle capture s’accroche";
 "Over full screen apps" = "Au-dessus des apps en plein écran";
+"Clearance" = "Marge";
+"Two icons" = "Deux icônes";
+"Four icons" = "Quatre icônes";
+"Six icons" = "Six icônes";
 "Hang copied images" = "Accrocher les images copiées";
 "Images you copy hang on the line too" = "Les images copiées s’accrochent aussi à la corde";
 "Tendedero, hanging copied images" = "Tendedero, accroche les images copiées";

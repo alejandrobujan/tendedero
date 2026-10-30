@@ -41,6 +41,10 @@
 "When the pointer rests in the menu bar" = "指针停在菜单栏时";
 "When something new hangs" = "有新内容挂上时";
 "Over full screen apps" = "在全屏 App 上";
+"Clearance" = "预留间距";
+"Two icons" = "两个图标";
+"Four icons" = "四个图标";
+"Six icons" = "六个图标";
 "Hang copied images" = "挂上复制的图片";
 "Images you copy hang on the line too" = "复制的图片也会挂上绳";
 "Tendedero, hanging copied images" = "Tendedero，正在挂上复制的图片";
