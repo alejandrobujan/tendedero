@@ -113,26 +113,24 @@ final class Line: ObservableObject {
         hitRects[id] = nil
         save()
         if !quietly { play("Pop", volume: 0.25) }
-        scheduleSweep()
+        lastFall = Date()
     }
 
-    /// How long the line waits after the last discard before closing the
-    /// gaps. A fallen photo keeps its empty place until then, so the next
-    /// cross stays under the pointer while discarding several in a row.
-    private static let sweepDelay: TimeInterval = 2.5
-    private var sweep: DispatchWorkItem?
+    /// When the last photo started falling. A fallen photo keeps its empty
+    /// place while the pointer stays on the line, so the next cross stays
+    /// under it while discarding several in a row.
+    private var lastFall = Date.distantPast
 
-    private func scheduleSweep() {
-        sweep?.cancel()
-        let work = DispatchWorkItem { [weak self] in self?.sweepFallen() }
-        sweep = work
-        DispatchQueue.main.asyncAfter(deadline: .now() + Self.sweepDelay, execute: work)
+    /// The pointer left the line: the gaps close, once the last photo has
+    /// finished falling.
+    func closeGaps() {
+        guard items.contains(where: { $0.falling }),
+              Date().timeIntervalSince(lastFall) >= 0.6 else { return }
+        sweepFallen()
     }
 
     /// The fallen photos leave their places and the rest close up.
     private func sweepFallen() {
-        sweep?.cancel()
-        sweep = nil
         items.removeAll { $0.falling }
     }
 
