@@ -295,7 +295,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // was taken on. On a full line the oldest photo then falls in view as
         // the new one flies in.
         comeDown(on: screen)
-        guard let id = line.hang(url, flying: from != nil) else {
+        // A screenshot macOS took already played its shutter, so it hangs
+        // without a chime of its own. Copied images and watched folders,
+        // which come with no sound, keep it.
+        guard let id = line.hang(url, quietly: from != nil, flying: from != nil) else {
             // Nothing hung after all, so an empty line goes away again.
             itemsChanged()
             return
