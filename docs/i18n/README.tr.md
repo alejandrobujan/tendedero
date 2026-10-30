@@ -56,6 +56,7 @@ Aldığınız her ekran görüntüsü, ekranınızın hemen üstündeki bir ipe 
 | Uygulamaya sürükle | Bir kopya gönderir. İpte kalmaya devam eder. |
 | Klasöre sürükle | Orada saklar. İpten ayrılır. |
 | Çöp Kutusu'na sürükle ya da çarpıya tıkla | Siler. |
+| İşaretçi ipin üzerindeyken <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | Az önce bıraktığını geri asar. |
 | İşaretçiyi menü çubuğunda bırak | O ekranda ipi aşağı indirir. |
 | Menü çubuğunda herhangi bir yere tıkla | İpi geri kaldırır. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | İpi gösterir ya da gizler. Menü çubuğundaki Kısayol bölümünden değiştirilebilir. |

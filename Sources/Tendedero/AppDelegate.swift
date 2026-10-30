@@ -110,7 +110,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                     // Opened on purpose counts for the Space it was opened on.
                     if name == NSWorkspace.activeSpaceDidChangeNotification { self?.openedOnPurpose = false }
                     self?.refresh()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { self?.refresh() }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                        self?.refresh()
+                        self?.keepOnActiveSpace()
+                    }
                 }
             }
         }
@@ -380,6 +383,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
     }
 
+    /// The line is one window on every Space. After a long time running,
+    /// macOS can leave it bound to a single Space, where ordering it in does
+    /// nothing on the others while captures keep arriving (#80). Quitting and
+    /// opening the app again fixes it because the window is new, so do the
+    /// same here: a fresh window with the same contents, in the same place.
+    private func keepOnActiveSpace() {
+        guard isPresent, isRevealed, panel.isVisible, !panel.isOnActiveSpace else { return }
+        log.notice("The line was not on the active Space; making its window again")
+        let old = panel!
+        let content = old.contentView
+        old.contentView = NSView()
+        old.orderOut(nil)
+        let fresh = LinePanel(content: content ?? NSView())
+        fresh.onScroll = old.onScroll
+        fresh.setFrame(old.frame, display: false)
+        fresh.ignoresMouseEvents = old.ignoresMouseEvents
+        fresh.alphaValue = old.alphaValue
+        panel = fresh
+        fresh.orderFrontRegardless()
+    }
+
     private func reveal(pinned: Bool = false, peekFor seconds: TimeInterval = 0) {
         guard isPresent else { return }
         if pinned { self.pinned = true }
@@ -398,7 +422,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // over the top of the screen would still sit above other apps for
         // anything that checks what is on top, like screen automation.
         if on {
-            if isPresent { panel.orderFrontRegardless() }
+            if isPresent {
+                panel.orderFrontRegardless()
+                DispatchQueue.main.async { [weak self] in self?.keepOnActiveSpace() }
+            }
         } else {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
                 guard let self, !self.isRevealed else { return }
@@ -448,6 +475,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         mouseTimer?.invalidate()
         mouseTimer = nil
         panel.ignoresMouseEvents = true
+        holdPutBackKey(false)
     }
 
     /// How long the cursor rests against the top edge before the line comes
@@ -506,10 +534,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let inRevealBand = screenUnderPointer.map { NSMouseInRect(mouse, Self.revealBand(of: $0), false) } ?? false
 
         guard isRevealed else {
+            holdPutBackKey(false)
+            line.closeGaps()
             // Resting in the middle of the menu bar brings the line down on
-            // that screen.
-            // Pushing against the top edge is part of it, and it also works
-            // when another display sits above and the pointer never stops.
+            // that screen. Pushing against the top edge is part of it, and it
+            // also works when another display sits above and the pointer
+            // never stops.
             // An empty line stays up there: only the shortcut and the menu
             // bring it down on purpose.
             if line.liveCount > 0, Self.opensFromMenuBar, let screen = screenUnderPointer,
@@ -539,6 +569,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if let screen = panel.screen { zone.size.height = screen.frame.maxY - zone.minY }
         let inside = NSMouseInRect(mouse, zone, false)
         if inside && pinned { pinned = false }
+        holdPutBackKey(inside)
+        // Gaps left by discarded photos close once the pointer moves away.
+        if !inside { line.closeGaps() }
 
         let busy = pinned || GrabView.isDragging || GrabView.isShowingMenu
             || line.pressedID != nil || now < peekUntil
@@ -571,6 +604,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if panel.ignoresMouseEvents == overPhoto {
             panel.ignoresMouseEvents = !overPhoto
         }
+    }
+
+    // MARK: Putting back
+
+    /// ⌘Z while the pointer is on the line. The line never takes the
+    /// keyboard, so it only borrows ⌘Z then, as a hot key. Everywhere else
+    /// ⌘Z stays the undo of the app you are in.
+    private var putBackKey: HotKey?
+
+    private func holdPutBackKey(_ hold: Bool) {
+        let hold = hold && line.canPutBack
+        guard hold != (putBackKey != nil) else { return }
+        putBackKey = hold ? HotKey(Shortcut.putBack) { [weak self] in self?.putBack() } : nil
+    }
+
+    /// From the menu the line is usually up, so it comes down for a moment
+    /// to show the photos going back.
+    private func putBack() {
+        if !isRevealed {
+            panel.placeOnScreen()
+            updateCapacity()
+            wanted = true
+            refresh()
+            reveal(peekFor: 2.5)
+        }
+        line.putBack()
     }
 
     // MARK: Shortcut
@@ -670,6 +729,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         clearItem.isEnabled = line.liveCount > 0
         menu.addItem(clearItem)
+
+        let putBackItem = ClosureMenuItem(L("Put back"), key: "z") { [weak self] in
+            self?.putBack()
+        }
+        putBackItem.isEnabled = line.canPutBack
+        menu.addItem(putBackItem)
 
         let inbox = ClosureMenuItem(L("Handle screenshots")) { [weak self] in
             self?.setInbox(!Inbox.isEnabled)
