@@ -23,7 +23,7 @@ final class Markup: NSObject, NSSharingServiceDelegate {
         }
         editing = url
         service.delegate = self
-        placeAnchor(for: url)
+        placeAnchor()
         NSApp.activate(ignoringOtherApps: true)
         service.perform(withItems: [url])
     }
@@ -34,14 +34,14 @@ final class Markup: NSObject, NSSharingServiceDelegate {
     /// host app is the one that writes it over the original file.
     nonisolated func sharingService(_ sharingService: NSSharingService, didShareItems items: [Any]) {
         MainActor.assumeIsolated {
-            anchor.orderOut(nil)
+            closeAnchor()
             self.save(items)
         }
     }
 
     nonisolated func sharingService(_ sharingService: NSSharingService,
                                     didFailToShareItems items: [Any], error: Error) {
-        MainActor.assumeIsolated { anchor.orderOut(nil) }
+        MainActor.assumeIsolated { closeAnchor() }
         log.notice("Markup ended without saving: \(error.localizedDescription, privacy: .public)")
     }
 
@@ -49,8 +49,7 @@ final class Markup: NSObject, NSSharingServiceDelegate {
     /// about its size, when it is given both that window and its frame.
     /// Tendedero has no window to share from, and without one the editor
     /// lands in a corner of whichever screen macOS picks. An invisible window
-    /// shaped like the image, in the middle of the screen under the pointer,
-    /// gives it a place.
+    /// in the middle of the screen under the pointer gives it a place.
     private lazy var anchor: NSWindow = {
         let window = NSWindow(contentRect: .zero, styleMask: .borderless, backing: .buffered, defer: true)
         window.isOpaque = false
@@ -58,24 +57,61 @@ final class Markup: NSObject, NSSharingServiceDelegate {
         window.ignoresMouseEvents = true
         window.isReleasedWhenClosed = false
         window.collectionBehavior = [.transient, .ignoresCycle]
+        // Markup's windows take this level: above the line, so a line that
+        // is down does not cover the editor's toolbar.
+        window.level = NSWindow.Level(rawValue: NSWindow.Level.floating.rawValue + 1)
         return window
     }()
 
-    private func placeAnchor(for url: URL) {
-        guard let screen = LinePanel.screenUnderPointer() else { return }
-        let area = screen.visibleFrame.insetBy(dx: screen.visibleFrame.width * 0.1,
-                                               dy: screen.visibleFrame.height * 0.1)
-        var size = area.size
-        if let source = CGImageSourceCreateWithURL(url as CFURL, nil),
-           let props = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
-           let w = props[kCGImagePropertyPixelWidth] as? CGFloat,
-           let h = props[kCGImagePropertyPixelHeight] as? CGFloat, w > 0, h > 0 {
-            let scale = min(area.width / w, area.height / h)
-            size = CGSize(width: w * scale, height: h * scale)
+    /// Placed this way, Markup draws its blurred backdrop and its shadow
+    /// wider than the editor, which leaves a grey band at its right. While
+    /// the editor is open the backdrop is kept to the editor's frame, which
+    /// also lets the editor move to the middle, and the shadow is hidden. These are Markup's own windows, found by name: if a
+    /// later macOS renames them, the band comes back and nothing else breaks.
+    private var tidying: Timer?
+    private var centred = false
+
+    private func tidyEditor() {
+        tidying?.invalidate()
+        centred = false
+        let timer = Timer(timeInterval: 1.0 / 60, repeats: true) { _ in
+            MainActor.assumeIsolated {
+                guard let editor = NSApp.windows.first(where: { $0.isVisible && $0.className.contains("RemoteWindow") })
+                else { return }
+                // Markup keeps the editor to the left of the space it was
+                // given. Once, as it shows up, it moves to the middle.
+                if !self.centred, let area = editor.screen?.visibleFrame {
+                    self.centred = true
+                    editor.setFrameOrigin(NSPoint(x: (area.midX - editor.frame.width / 2).rounded(),
+                                                  y: (area.midY - editor.frame.height / 2).rounded()))
+                }
+                for window in NSApp.windows where window.isVisible {
+                    if window.className.contains("BlurWindow"), window.frame != editor.frame {
+                        window.setFrame(editor.frame, display: true)
+                    } else if window.className.contains("ShadowWindow"), window.alphaValue > 0 {
+                        window.alphaValue = 0
+                    }
+                }
+            }
         }
-        anchor.setFrame(NSRect(x: area.midX - size.width / 2, y: area.midY - size.height / 2,
-                               width: size.width, height: size.height), display: false)
+        RunLoop.main.add(timer, forMode: .common)
+        tidying = timer
+    }
+
+    private func closeAnchor() {
+        tidying?.invalidate()
+        tidying = nil
+        anchor.orderOut(nil)
+    }
+
+    private func placeAnchor() {
+        guard let screen = LinePanel.screenUnderPointer() else { return }
+        // Shaped like the screen, not like the image: Markup fits the image
+        // inside, and a tall or narrow image gets the same roomy editor.
+        let area = screen.visibleFrame
+        anchor.setFrame(area.insetBy(dx: area.width * 0.1, dy: area.height * 0.1), display: false)
         anchor.orderFront(nil)
+        tidyEditor()
     }
 
     nonisolated func sharingService(_ sharingService: NSSharingService,
