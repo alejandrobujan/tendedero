@@ -23,6 +23,7 @@ final class Markup: NSObject, NSSharingServiceDelegate {
         }
         editing = url
         service.delegate = self
+        placeAnchor(for: url)
         NSApp.activate(ignoringOtherApps: true)
         service.perform(withItems: [url])
     }
@@ -32,12 +33,60 @@ final class Markup: NSObject, NSSharingServiceDelegate {
     /// Done was pressed. The extension hands back the edited image and the
     /// host app is the one that writes it over the original file.
     nonisolated func sharingService(_ sharingService: NSSharingService, didShareItems items: [Any]) {
-        MainActor.assumeIsolated { self.save(items) }
+        MainActor.assumeIsolated {
+            anchor.orderOut(nil)
+            self.save(items)
+        }
     }
 
     nonisolated func sharingService(_ sharingService: NSSharingService,
                                     didFailToShareItems items: [Any], error: Error) {
+        MainActor.assumeIsolated { anchor.orderOut(nil) }
         log.notice("Markup ended without saving: \(error.localizedDescription, privacy: .public)")
+    }
+
+    /// Markup opens its editor over the window it was shared from, and
+    /// about its size, when it is given both that window and its frame.
+    /// Tendedero has no window to share from, and without one the editor
+    /// lands in a corner of whichever screen macOS picks. An invisible window
+    /// shaped like the image, in the middle of the screen under the pointer,
+    /// gives it a place.
+    private lazy var anchor: NSWindow = {
+        let window = NSWindow(contentRect: .zero, styleMask: .borderless, backing: .buffered, defer: true)
+        window.isOpaque = false
+        window.backgroundColor = .clear
+        window.ignoresMouseEvents = true
+        window.isReleasedWhenClosed = false
+        window.collectionBehavior = [.transient, .ignoresCycle]
+        return window
+    }()
+
+    private func placeAnchor(for url: URL) {
+        guard let screen = LinePanel.screenUnderPointer() else { return }
+        let area = screen.visibleFrame.insetBy(dx: screen.visibleFrame.width * 0.1,
+                                               dy: screen.visibleFrame.height * 0.1)
+        var size = area.size
+        if let source = CGImageSourceCreateWithURL(url as CFURL, nil),
+           let props = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
+           let w = props[kCGImagePropertyPixelWidth] as? CGFloat,
+           let h = props[kCGImagePropertyPixelHeight] as? CGFloat, w > 0, h > 0 {
+            let scale = min(area.width / w, area.height / h)
+            size = CGSize(width: w * scale, height: h * scale)
+        }
+        anchor.setFrame(NSRect(x: area.midX - size.width / 2, y: area.midY - size.height / 2,
+                               width: size.width, height: size.height), display: false)
+        anchor.orderFront(nil)
+    }
+
+    nonisolated func sharingService(_ sharingService: NSSharingService,
+                                    sourceWindowForShareItems items: [Any],
+                                    sharingContentScope: UnsafeMutablePointer<NSSharingService.SharingContentScope>) -> NSWindow? {
+        MainActor.assumeIsolated { anchor }
+    }
+
+    nonisolated func sharingService(_ sharingService: NSSharingService,
+                                    sourceFrameOnScreenForShareItem item: Any) -> NSRect {
+        MainActor.assumeIsolated { anchor.frame }
     }
 
     // MARK: Writing back
