@@ -65,3 +65,6 @@
 
 /* PeggedView */
 "Copied" = "コピーしました";
+
+"Remove after dragging to an app" = "Appへドラッグした後に取り外す";
+"Take down after a successful drop; keep the original file" = "ドロップに成功したら取り外し、元のファイルは保持します";
