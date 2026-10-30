@@ -25,7 +25,7 @@
 ## Out of sight. Within reach.
 
 Every screenshot you take hangs on a line just above your screen.
-Rest the pointer in the middle of the menu bar and it glides down. Move away and it's gone.
+Rest the pointer on an empty stretch of the menu bar and it glides down. Move away and it's gone.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/demo-dark.gif">
@@ -55,7 +55,7 @@ Rest the pointer in the middle of the menu bar and it glides down. Move away and
 | Drag into a folder | Keep it there. It leaves the line. |
 | Drag to the Trash, or click the cross | Let it go. |
 | <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> with the pointer on the line | Hang back what you just let go. |
-| Rest the pointer in the middle of the menu bar | Bring the line down on that screen. |
+| Rest the pointer on an empty stretch of the menu bar | Bring the line down on that screen. |
 | Click anything in the menu bar | Put it away. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Show or hide the line. Change it under Shortcut in the menu bar. |
 
@@ -139,6 +139,7 @@ so macOS asks again for access to the Desktop after each rebuild.
 |:--|:--|
 | `AppDelegate.swift` | Menu bar, shortcut, revealing and tucking away the line |
 | `LinePanel.swift` | The transparent strip along the top of the screen |
+| `MenuBarSpace.swift` | The empty stretches of the menu bar |
 | `LineView.swift` | The line and where each photo hangs |
 | `PeggedView.swift` | One photo: glass frame, clip, swing and breeze |
 | `GrabArea.swift` | Click, long press, drag and drop |
