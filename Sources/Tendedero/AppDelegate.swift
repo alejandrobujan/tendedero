@@ -526,6 +526,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         guard isRevealed else {
             holdPutBackKey(false)
+            line.closeGaps()
             // Resting in the menu bar brings the line down on that screen.
             // Pushing against the top edge is part of it, and it also works
             // when another display sits above and the pointer never stops.
@@ -559,6 +560,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let inside = NSMouseInRect(mouse, zone, false)
         if inside && pinned { pinned = false }
         holdPutBackKey(inside)
+        // Gaps left by discarded photos close once the pointer moves away.
+        if !inside { line.closeGaps() }
 
         let busy = pinned || GrabView.isDragging || GrabView.isShowingMenu
             || line.pressedID != nil || now < peekUntil

@@ -81,6 +81,8 @@ final class Line: ObservableObject {
               let thumb = makeThumbnail(url) else { return nil }
         var item = Pegged(url: url, thumb: thumb)
         item.flying = flying
+        // The line moves anyway for a new photo, so the gaps close with it.
+        sweepFallen()
         items.append(item)
         scroll = 0
         // A full line lets the oldest photo fall off the far end. Only one: a
@@ -111,9 +113,25 @@ final class Line: ObservableObject {
         hitRects[id] = nil
         save()
         if !quietly { play("Pop", volume: 0.25) }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
-            self?.items.removeAll { $0.id == id }
-        }
+        lastFall = Date()
+    }
+
+    /// When the last photo started falling. A fallen photo keeps its empty
+    /// place while the pointer stays on the line, so the next cross stays
+    /// under it while discarding several in a row.
+    private var lastFall = Date.distantPast
+
+    /// The pointer left the line: the gaps close, once the last photo has
+    /// finished falling.
+    func closeGaps() {
+        guard items.contains(where: { $0.falling }),
+              Date().timeIntervalSince(lastFall) >= 0.6 else { return }
+        sweepFallen()
+    }
+
+    /// The fallen photos leave their places and the rest close up.
+    private func sweepFallen() {
+        items.removeAll { $0.falling }
     }
 
     /// "Take everything down": every photo goes the way of its corner cross.
