@@ -90,7 +90,8 @@ final class Line: ObservableObject {
             letGo(oldest.id)
         }
         save()
-        if !quietly { play("Tink", volume: 0.35) }
+        // macOS already plays its own capture sound. A chime here made every
+        // screenshot play two sounds back to back.
         return item.id
     }
 
