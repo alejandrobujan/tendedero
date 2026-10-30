@@ -83,6 +83,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         setUpStatusItem()
         watchMenuBarClicks()
+        // The idle stretches of the menu bar are measured before the first
+        // hover, so the pointer does not rest over an icon while the first
+        // sweep is still in flight.
+        MenuBarSpace.shared.refresh(statusItemWindow: statusItem?.button?.window)
 
         Markup.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         Trim.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
@@ -524,23 +528,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if !inMenuBar { menuBarSuppressed = false }
 
         guard isRevealed else {
-            // Resting in the menu bar brings the line down on that screen.
+            // Resting on an empty stretch of the menu bar brings the line
+            // down on that screen; resting over a menu or an icon does not.
             // Pushing against the top edge is part of it, and it also works
             // when another display sits above and the pointer never stops.
             // An empty line stays up there: only the shortcut and the menu
             // bring it down on purpose.
             if line.liveCount > 0, Self.opensFromMenuBar, let screen = screenUnderPointer,
                inMenuBar, !menuBarSuppressed, !FullScreen.blocksLine(on: screen) {
-                let since = hotZoneSince ?? now
-                hotZoneSince = since
-                if now.timeIntervalSince(since) >= Self.revealDelay {
-                    hotZoneSince = nil
-                    if panel.screen != screen {
-                        panel.placeOnScreen()
-                        updateCapacity()
+                MenuBarSpace.shared.refresh(statusItemWindow: statusItem?.button?.window)
+                let x = mouse.x - screen.frame.minX
+                if MenuBarSpace.shared.idleRanges(width: screen.frame.width).contains(where: { $0.contains(x) }) {
+                    let since = hotZoneSince ?? now
+                    hotZoneSince = since
+                    if now.timeIntervalSince(since) >= Self.revealDelay {
+                        hotZoneSince = nil
+                        if panel.screen != screen {
+                            panel.placeOnScreen()
+                            updateCapacity()
+                        }
+                        refresh()
+                        reveal()
                     }
-                    refresh()
-                    reveal()
+                } else {
+                    hotZoneSince = nil
                 }
             } else {
                 hotZoneSince = nil

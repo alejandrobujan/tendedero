@@ -27,7 +27,7 @@
 ## Fuera de la vista. Siempre a mano.
 
 Cada captura que haces queda colgada en una cuerda justo encima de la pantalla.
-Lleva el puntero a la barra de menús y la cuerda baja. Apártalo y desaparece.
+Lleva el puntero a un tramo libre de la barra de menús y la cuerda baja. Apártalo y desaparece.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/es/demo-dark.gif">
@@ -56,7 +56,7 @@ Lleva el puntero a la barra de menús y la cuerda baja. Apártalo y desaparece.
 | Arrastrar a una app | Envía una copia, y la captura sigue colgada. |
 | Arrastrar a una carpeta | Se queda ahí y sale de la cuerda. |
 | Arrastrar a la Papelera o hacer clic en la cruz | Te deshaces de ella. |
-| Dejar el puntero en la barra de menús | Baja la cuerda en esa pantalla. |
+| Dejar el puntero en un tramo libre de la barra de menús | Baja la cuerda en esa pantalla. |
 | Hacer clic en cualquier sitio de la barra de menús | Recoge la cuerda. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Muestra u oculta la cuerda. Se cambia en Atajo, en la barra de menús. |
 
@@ -143,6 +143,7 @@ vuelve a pedir acceso al Escritorio cada vez que recompilas.
 |:--|:--|
 | `AppDelegate.swift` | La barra de menús, el atajo, y bajar y recoger la cuerda |
 | `LinePanel.swift` | La franja transparente del borde superior de la pantalla |
+| `MenuBarSpace.swift` | Los tramos libres de la barra de menús |
 | `LineView.swift` | La cuerda y dónde cuelga cada foto |
 | `PeggedView.swift` | Cada foto: marco de cristal, pinza, balanceo y brisa |
 | `GrabArea.swift` | Clic, pulsación larga, y arrastrar y soltar |
