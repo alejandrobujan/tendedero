@@ -65,3 +65,11 @@
 
 /* PeggedView */
 "Copied" = "已复制";
+
+/* Pinning and holding photos */
+"Pin" = "固定";
+"Unpin" = "取消固定";
+"Hold" = "拿在手上";
+"Hang back" = "放回绳上";
+"Hang everything back" = "全部放回绳上";
+"Actual Size" = "实际大小";

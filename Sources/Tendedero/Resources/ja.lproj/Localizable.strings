@@ -65,3 +65,11 @@
 
 /* PeggedView */
 "Copied" = "コピーしました";
+
+/* Pinning and holding photos */
+"Pin" = "ピン留め";
+"Unpin" = "ピン留めを外す";
+"Hold" = "手に取る";
+"Hang back" = "ロープに戻す";
+"Hang everything back" = "すべてロープに戻す";
+"Actual Size" = "実際のサイズ";

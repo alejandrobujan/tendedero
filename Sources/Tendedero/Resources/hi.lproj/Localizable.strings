@@ -67,3 +67,11 @@
 
 /* PeggedView */
 "Copied" = "कॉपी हो गया";
+
+/* Pinning and holding photos */
+"Pin" = "पिन करें";
+"Unpin" = "पिन हटाएँ";
+"Hold" = "हाथ में लें";
+"Hang back" = "रस्सी पर लौटाएँ";
+"Hang everything back" = "सब रस्सी पर लौटाएँ";
+"Actual Size" = "असली आकार";

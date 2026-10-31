@@ -67,3 +67,11 @@
 
 /* PeggedView */
 "Copied" = "Kopyalandı";
+
+/* Pinning and holding photos */
+"Pin" = "Bərkit";
+"Unpin" = "Bərkitməni götür";
+"Hold" = "Əldə saxla";
+"Hang back" = "İpə qaytar";
+"Hang everything back" = "Hamısını ipə qaytar";
+"Actual Size" = "Həqiqi ölçü";

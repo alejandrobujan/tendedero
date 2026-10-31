@@ -65,3 +65,11 @@
 
 /* PeggedView */
 "Copied" = "Copiado";
+
+/* Pinning and holding photos */
+"Pin" = "Fixar";
+"Unpin" = "Deixar de fixar";
+"Hold" = "Suxeitar";
+"Hang back" = "Devolver á corda";
+"Hang everything back" = "Devolver todo á corda";
+"Actual Size" = "Tamaño real";

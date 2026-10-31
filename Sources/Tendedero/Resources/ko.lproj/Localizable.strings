@@ -65,3 +65,11 @@
 
 /* PeggedView */
 "Copied" = "복사됨";
+
+/* Pinning and holding photos */
+"Pin" = "고정하기";
+"Unpin" = "고정 해제";
+"Hold" = "손에 들기";
+"Hang back" = "줄에 돌려놓기";
+"Hang everything back" = "모두 줄에 돌려놓기";
+"Actual Size" = "실제 크기";

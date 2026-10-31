@@ -73,9 +73,15 @@ final class CaptureFlight {
     /// A discarded card falling off the line, drawn over the whole screen so
     /// it is never cut by the line's strip. Same motion as the app always had:
     /// 520 points down, tilting further, fading, 0.55 s ease in.
-    static func fall(image: CGImage, card: CGRect, tilt: CGFloat, on screen: NSScreen) {
+    static func fall(image: CGImage, card: CGRect, tilt: CGFloat, pinned: Bool = false, on screen: NSScreen) {
         let flight = CaptureFlight(image: image, from: card, to: card, tilt: tilt, screen: screen)
         flight.falling = true
+        // A pinned photo falls with its space grey clip, as it hung.
+        if pinned {
+            flight.clip.colors = [NSColor(white: 0.30, alpha: 1).cgColor, NSColor(white: 0.47, alpha: 1).cgColor,
+                                  NSColor(white: 0.38, alpha: 1).cgColor, NSColor(white: 0.24, alpha: 1).cgColor]
+            flight.clip.borderColor = NSColor(white: 1, alpha: 0.35).cgColor
+        }
         flight.duration = 0.55
         current.append(flight)
         flight.completion = { [weak flight] in current.removeAll { $0 === flight } }

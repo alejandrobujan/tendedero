@@ -15,11 +15,19 @@ struct Pegged: Identifiable, Equatable {
     var falling = false
     /// Still flying in from where it was captured; the card waits hidden.
     var flying = false
+    /// Pinned, left of the knot: it stays until you take it down.
+    var kept = false
+    /// Taken off the line to hold in front of you. Its clip waits empty
+    /// until it comes back.
+    var held = false
+    /// Hung from another app with Hang on Tendedero, rather than pinned
+    /// from the photos that came and went. Always pinned.
+    var byHand = false
     /// A screen recording rather than a screenshot.
     var isRecording: Bool { Tendedero.isRecording(url) }
 
     static func == (a: Pegged, b: Pegged) -> Bool {
-        a.id == b.id && a.falling == b.falling && a.flying == b.flying && a.thumb === b.thumb
+        a.id == b.id && a.falling == b.falling && a.flying == b.flying && a.kept == b.kept && a.byHand == b.byHand && a.held == b.held && a.thumb === b.thumb
     }
 }
 
@@ -66,6 +74,13 @@ final class Line: ObservableObject {
 
     var liveCount: Int { items.filter { !$0.falling }.count }
 
+    /// Photos hung by hand. They hang together at the left end of the line,
+    /// before the knot, and never fall to make room.
+    var keptCount: Int { items.filter { !$0.falling && $0.kept }.count }
+
+    /// The oldest photo that can fall: the first one past the knot.
+    private var oldestLoose: Pegged? { items.first { !$0.falling && !$0.kept && !$0.held } }
+
     private let storeKey = "pegged"
 
     init() {
@@ -88,7 +103,7 @@ final class Line: ObservableObject {
         // A full line lets the oldest photo fall off the far end. Only one: a
         // line hung on a wider screen keeps its length here instead of losing
         // several photos to a single capture.
-        if liveCount > maxItems, let oldest = items.first(where: { !$0.falling }) {
+        if liveCount > maxItems, let oldest = oldestLoose {
             letGo(oldest.id)
         }
         save()
@@ -105,6 +120,11 @@ final class Line: ObservableObject {
     /// Called just before a photo starts falling, so the fall can be drawn
     /// over the whole screen.
     var onFall: ((Pegged) -> Void)?
+
+    /// Hold, from a photo's menu: the app takes it off the line.
+    var onHold: ((UUID) -> Void)?
+    /// A click on a held photo's faded trace: it comes back.
+    var onHangBack: ((UUID) -> Void)?
 
     func drop(_ id: UUID, quietly: Bool = false) {
         guard let i = items.firstIndex(where: { $0.id == id }), !items[i].falling else { return }
@@ -134,16 +154,17 @@ final class Line: ObservableObject {
         items.removeAll { $0.falling }
     }
 
-    /// "Take everything down": every photo goes the way of its corner cross.
+    /// "Take everything down": every photo past the knot goes the way of its
+    /// corner cross. What you hung by hand stays.
     func clear() {
-        takeDown(items.filter { !$0.falling })
+        takeDown(items.filter { !$0.falling && !$0.kept && !$0.held })
     }
 
     /// The photos hung before (left) or after (right) this one.
     func neighbours(of id: UUID, toTheLeft: Bool) -> [Pegged] {
         let live = items.filter { !$0.falling }
         guard let i = live.firstIndex(where: { $0.id == id }) else { return [] }
-        return toTheLeft ? Array(live[..<i]) : Array(live[(i + 1)...])
+        return (toTheLeft ? Array(live[..<i]) : Array(live[(i + 1)...])).filter { !$0.kept && !$0.held }
     }
 
     /// Takes down everything on one side of a photo. Each one goes the way
@@ -230,7 +251,7 @@ final class Line: ObservableObject {
             if soundOn && !quietly { Line.trashSound?.play() }
             drop(id, quietly: true)
             if let step, let index {
-                remember(TakenDown(url: item.url, index: index, trashed: trashed as URL?), in: step)
+                remember(TakenDown(url: item.url, index: index, trashed: trashed as URL?, kept: item.kept, byHand: item.byHand), in: step)
             }
             return true
         } catch {
@@ -252,13 +273,35 @@ final class Line: ObservableObject {
         return item.url.standardizedFileURL.path.hasPrefix(Inbox.folder.standardizedFileURL.path + "/")
     }
 
-    /// The corner cross and "Take down" both end up here.
+    /// What the button in a photo's corner does.
+    enum Corner {
+        /// A file in Tendedero's folder: to the Trash.
+        case trash
+        /// A file anywhere else, or hung by hand: off the line, file untouched.
+        case hide
+        /// Pinned from the photos that come and go: back among them.
+        case unpin
+    }
+
+    func corner(of id: UUID) -> Corner {
+        guard let item = items.first(where: { $0.id == id }) else { return .hide }
+        if item.kept { return item.byHand ? .hide : .unpin }
+        return isInInbox(id) ? .trash : .hide
+    }
+
+    /// The button in the corner.
+    func pressCorner(_ id: UUID) {
+        if corner(of: id) == .unpin { unpin(id) } else { discard(id) }
+    }
+
+    /// The corner cross and "Take down" both end up here. A pinned photo is
+    /// never sent to the Trash: it only leaves the line.
     func discard(_ id: UUID, quietly: Bool = false, step: UUID = UUID()) {
-        if isInInbox(id) {
+        if isInInbox(id), items.first(where: { $0.id == id })?.kept == false {
             trash(id, quietly: quietly, step: step)
         } else if let item = items.first(where: { $0.id == id && !$0.falling }), let index = liveIndex(of: id) {
             drop(id, quietly: quietly)
-            remember(TakenDown(url: item.url, index: index, trashed: nil), in: step)
+            remember(TakenDown(url: item.url, index: index, trashed: nil, kept: item.kept, byHand: item.byHand), in: step)
         }
     }
 
@@ -272,7 +315,7 @@ final class Line: ObservableObject {
     /// After Keep on line is lowered, the oldest photos past it go the way
     /// of a full line.
     func trim() {
-        while liveCount > maxItems, let oldest = items.first(where: { !$0.falling }) {
+        while liveCount > maxItems, let oldest = oldestLoose {
             letGo(oldest.id)
         }
         scroll = 0
@@ -358,6 +401,8 @@ final class Line: ObservableObject {
         let url: URL
         let index: Int
         let trashed: URL?
+        var kept = false
+        var byHand = false
     }
 
     /// What was taken down, the latest last. A step holds everything one
@@ -385,7 +430,9 @@ final class Line: ObservableObject {
         for photo in step.photos.reversed() {
             guard let url = restore(photo), !items.contains(where: { $0.url == url && !$0.falling }),
                   let thumb = makeThumbnail(url) else { continue }
-            let item = Pegged(url: url, thumb: thumb)
+            var item = Pegged(url: url, thumb: thumb)
+            item.kept = photo.kept
+            item.byHand = photo.byHand
             let live = items.filter { !$0.falling }
             if let gap = items.firstIndex(where: { $0.falling && $0.url == photo.url }) {
                 // Its empty place is still on the line: it hangs back there.
@@ -403,9 +450,10 @@ final class Line: ObservableObject {
         }
         // As when something new hangs, a full line lets its oldest photo go,
         // never one that just came back.
-        while liveCount > maxItems, let oldest = items.first(where: { !$0.falling && !back.contains($0.id) }) {
+        while liveCount > maxItems, let oldest = items.first(where: { !$0.falling && !$0.kept && !back.contains($0.id) }) {
             letGo(oldest.id)
         }
+        keepKeptFirst()
         save()
         play("Tink", volume: 0.35)
     }
@@ -433,6 +481,67 @@ final class Line: ObservableObject {
         items.filter { !$0.falling }.firstIndex { $0.id == id }
     }
 
+    // MARK: Hanging by hand
+
+    /// Kept photos hang left of the knot, the rest after it, each side in
+    /// its own order.
+    private func keepKeptFirst() {
+        let kept = items.filter { $0.kept && !$0.falling }
+        if items.prefix(kept.count).map(\.id) != kept.map(\.id) {
+            items = kept + items.filter { !($0.kept && !$0.falling) }
+        }
+    }
+
+    /// Pin: the photo joins the kept ones at the left end of the line.
+    func pin(_ id: UUID) {
+        guard let i = items.firstIndex(where: { $0.id == id && !$0.falling && !$0.kept }) else { return }
+        var item = items.remove(at: i)
+        item.kept = true
+        items.insert(item, at: keptCount)
+        save()
+        play("Tink", volume: 0.35)
+    }
+
+    /// Unpin: it hangs loose again, first past the kept ones, so it is the
+    /// next to fall from a full line.
+    func unpin(_ id: UUID) {
+        guard let i = items.firstIndex(where: { $0.id == id && !$0.falling && $0.kept && !$0.byHand }) else { return }
+        var item = items.remove(at: i)
+        item.kept = false
+        items.insert(item, at: keptCount)
+        save()
+    }
+
+    /// An image hung from another app, with Hang on Tendedero. Like a
+    /// photo from a watched folder, the line only shows the file where it
+    /// is: taking it down leaves the file alone. What you hang yourself is
+    /// pinned.
+    @discardableResult
+    func hangKept(_ url: URL) -> Bool {
+        // Already on the line: it is pinned where it is.
+        if let hanging = items.first(where: { $0.url.standardizedFileURL == url.standardizedFileURL && !$0.falling }) {
+            pin(hanging.id)
+            return true
+        }
+        guard let id = hang(url),
+              let i = items.firstIndex(where: { $0.id == id }) else { return false }
+        var item = items.remove(at: i)
+        item.kept = true
+        item.byHand = true
+        items.insert(item, at: keptCount)
+        save()
+        return true
+    }
+
+    // MARK: Holding
+
+    /// Off the line and into your hand, or back onto its clip.
+    func setHeld(_ id: UUID, _ held: Bool) {
+        guard let i = items.firstIndex(where: { $0.id == id && !$0.falling }) else { return }
+        items[i].held = held
+        if !held { items[i].flying = true }
+    }
+
     // MARK: Breeze
 
     /// Every so often a little wind moves the line. It is the detail that
@@ -447,9 +556,14 @@ final class Line: ObservableObject {
 
     // MARK: Persistence
 
+    private let keptKey = "kept"
+    private let byHandKey = "byHand"
+
     private func save() {
-        let paths = items.filter { !$0.falling }.map(\.url.path)
-        UserDefaults.standard.set(paths, forKey: storeKey)
+        let live = items.filter { !$0.falling }
+        UserDefaults.standard.set(live.map(\.url.path), forKey: storeKey)
+        UserDefaults.standard.set(live.filter(\.kept).map(\.url.path), forKey: keptKey)
+        UserDefaults.standard.set(live.filter(\.byHand).map(\.url.path), forKey: byHandKey)
     }
 
     /// Everything comes back as it was. This runs before the line knows its
@@ -457,11 +571,17 @@ final class Line: ObservableObject {
     /// `hang` would let photos fall off a wide screen's line at every launch.
     private func restore() {
         let paths = UserDefaults.standard.stringArray(forKey: storeKey) ?? []
+        let kept = Set(UserDefaults.standard.stringArray(forKey: keptKey) ?? [])
+        let byHand = Set(UserDefaults.standard.stringArray(forKey: byHandKey) ?? [])
         for path in paths where FileManager.default.fileExists(atPath: path) {
             let url = URL(fileURLWithPath: path)
             guard !items.contains(where: { $0.url == url }), let thumb = makeThumbnail(url) else { continue }
-            items.append(Pegged(url: url, thumb: thumb))
+            var item = Pegged(url: url, thumb: thumb)
+            item.byHand = byHand.contains(path)
+            item.kept = kept.contains(path) || item.byHand
+            items.append(item)
         }
+        keepKeptFirst()
     }
 
     // MARK: Helpers
