@@ -27,7 +27,7 @@
 ## Hors de vue. À portée de main.
 
 Chaque capture d’écran que vous prenez s’accroche à une corde juste au-dessus de l’écran.
-Posez le pointeur dans la barre des menus et la corde descend. Éloignez-le et elle disparaît.
+Posez le pointeur au milieu de la barre des menus et la corde descend. Éloignez-le et elle disparaît.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/fr/demo-dark.gif">
@@ -56,7 +56,8 @@ Posez le pointeur dans la barre des menus et la corde descend. Éloignez-le et e
 | Glisser dans une app | Envoie une copie. Elle reste sur la corde. |
 | Glisser dans un dossier | Elle y reste. Elle quitte la corde. |
 | Glisser dans la corbeille, ou cliquer sur la croix | Laissez-la filer. |
-| Poser le pointeur dans la barre des menus | Fait descendre la corde sur cet écran. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd>, le pointeur sur la corde | Raccroche ce que vous venez de laisser filer. |
+| Poser le pointeur au milieu de la barre des menus | Fait descendre la corde sur cet écran. |
 | Cliquer n’importe où dans la barre des menus | La range. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Affiche ou masque la corde. Modifiable dans Raccourci, dans la barre des menus. |
 

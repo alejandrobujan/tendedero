@@ -73,9 +73,11 @@ final class ClipboardWatcher {
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             let png = ClipboardWatcher.png(from: data, type: type)
             DispatchQueue.main.async {
-                // Copied over again in the meantime: that copy is the one that counts.
-                guard let png, NSPasteboard.general.changeCount == count else { return }
-                self?.save(png)
+                // Copied over again in the meantime: that copy is the one that
+                // counts. Turned off in the meantime: nothing hangs.
+                guard let png, NSPasteboard.general.changeCount == count,
+                      let self, self.timer != nil else { return }
+                self.save(png)
             }
         }
     }

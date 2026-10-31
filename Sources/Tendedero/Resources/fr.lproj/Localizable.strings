@@ -8,6 +8,7 @@
 "Hide line" = "Masquer la corde";
 "Show line" = "Afficher la corde";
 "Take everything down" = "Tout décrocher";
+"Put back" = "Raccrocher";
 "Handle screenshots" = "Gérer les captures d’écran";
 "Screenshots hang instantly and skip the Desktop" = "Les captures s’accrochent aussitôt et évitent le bureau";
 "Open screenshots folder" = "Ouvrir le dossier des captures";
@@ -43,6 +44,8 @@
 "Hang copied images" = "Accrocher les images copiées";
 "Images you copy hang on the line too" = "Les images copiées s’accrochent aussi à la corde";
 "Tendedero, hanging copied images" = "Tendedero, accroche les images copiées";
+"The line is empty" = "La corde est vide";
+"%d on the line" = "%d sur la corde";
 
 /* GrabArea */
 "Copy" = "Copier";

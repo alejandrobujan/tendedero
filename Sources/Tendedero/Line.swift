@@ -81,6 +81,8 @@ final class Line: ObservableObject {
               let thumb = makeThumbnail(url) else { return nil }
         var item = Pegged(url: url, thumb: thumb)
         item.flying = flying
+        // The line moves anyway for a new photo, so the gaps close with it.
+        sweepFallen()
         items.append(item)
         scroll = 0
         // A full line lets the oldest photo fall off the far end. Only one: a
@@ -111,9 +113,25 @@ final class Line: ObservableObject {
         hitRects[id] = nil
         save()
         if !quietly { play("Pop", volume: 0.25) }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
-            self?.items.removeAll { $0.id == id }
-        }
+        lastFall = Date()
+    }
+
+    /// When the last photo started falling. A fallen photo keeps its empty
+    /// place while the pointer stays on the line, so the next cross stays
+    /// under it while discarding several in a row.
+    private var lastFall = Date.distantPast
+
+    /// The pointer left the line: the gaps close, once the last photo has
+    /// finished falling.
+    func closeGaps() {
+        guard items.contains(where: { $0.falling }),
+              Date().timeIntervalSince(lastFall) >= 0.6 else { return }
+        sweepFallen()
+    }
+
+    /// The fallen photos leave their places and the rest close up.
+    private func sweepFallen() {
+        items.removeAll { $0.falling }
     }
 
     /// "Take everything down": every photo goes the way of its corner cross.
@@ -135,11 +153,13 @@ final class Line: ObservableObject {
         takeDown(neighbours(of: id, toTheLeft: toTheLeft))
     }
 
-    /// One after another, and only the first makes a sound.
+    /// One after another, and only the first makes a sound. They are one
+    /// step, so Put back brings them all back at once.
     private func takeDown(_ live: [Pegged]) {
+        let step = UUID()
         for (n, item) in live.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.06 * Double(n)) { [weak self] in
-                self?.discard(item.id, quietly: n > 0)
+                self?.discard(item.id, quietly: n > 0, step: step)
             }
         }
     }
@@ -155,18 +175,36 @@ final class Line: ObservableObject {
 
     func copy(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
-        let entry = NSPasteboardItem()
-        // A recording is copied as the file, which apps paste as the video.
-        if !item.isRecording, let png = pngData(item.url) { entry.setData(png, forType: .png) }
-        entry.setString(item.url.absoluteString, forType: .fileURL)
-        let pb = NSPasteboard.general
-        pb.clearContents()
-        pb.writeObjects([entry])
+        putOnClipboard(item.url)
 
         copiedID = id
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
             if self?.copiedID == id { self?.copiedID = nil }
         }
+    }
+
+    /// The file last put on the clipboard, and the clipboard's change count
+    /// right after. While the count is the same, nothing else has been copied.
+    private var onClipboard: (url: URL, change: Int)?
+
+    private func putOnClipboard(_ url: URL) {
+        let entry = NSPasteboardItem()
+        // A recording is copied as the file, which apps paste as the video.
+        if !isRecording(url), let png = pngData(url) { entry.setData(png, forType: .png) }
+        entry.setString(url.absoluteString, forType: .fileURL)
+        let pb = NSPasteboard.general
+        pb.clearContents()
+        pb.writeObjects([entry])
+        onClipboard = (url, pb.changeCount)
+    }
+
+    /// Apps like Finder or a chat window paste the copied file rather than the
+    /// picture. When the file moves after a copy, to the Trash or the Desktop,
+    /// the clipboard follows it, or those apps would find nothing to paste.
+    private func clipboardFollows(_ url: URL, to moved: URL) {
+        guard let onClipboard, onClipboard.url == url,
+              onClipboard.change == NSPasteboard.general.changeCount else { return }
+        putOnClipboard(moved)
     }
 
     func open(_ id: UUID) {
@@ -177,14 +215,23 @@ final class Line: ObservableObject {
     /// Moves the file to the Trash and takes the photo off the line. When a
     /// drag ends on the Dock's Trash, macOS only reports it: deleting the file
     /// is the source app's job, as Finder does.
+    ///
+    /// `step` is what Put back brings it back with. Nil when the line lets
+    /// a photo go by itself, which is not undone.
     @discardableResult
-    func trash(_ id: UUID, quietly: Bool = false) -> Bool {
+    func trash(_ id: UUID, quietly: Bool = false, step: UUID? = UUID()) -> Bool {
         guard let item = items.first(where: { $0.id == id }) else { return false }
+        let index = liveIndex(of: id)
         do {
-            try FileManager.default.trashItem(at: item.url, resultingItemURL: nil)
+            var trashed: NSURL?
+            try FileManager.default.trashItem(at: item.url, resultingItemURL: &trashed)
+            if let trashed { clipboardFollows(item.url, to: trashed as URL) }
             log.notice("Trashed \(item.url.lastPathComponent, privacy: .public)")
             if soundOn && !quietly { Line.trashSound?.play() }
             drop(id, quietly: true)
+            if let step, let index {
+                remember(TakenDown(url: item.url, index: index, trashed: trashed as URL?), in: step)
+            }
             return true
         } catch {
             log.error("Could not trash \(item.url.path, privacy: .public): \(error.localizedDescription, privacy: .public)")
@@ -206,13 +253,15 @@ final class Line: ObservableObject {
     }
 
     /// The corner cross and "Take down" both end up here.
-    func discard(_ id: UUID, quietly: Bool = false) {
-        if isInInbox(id) { trash(id, quietly: quietly) } else { drop(id, quietly: quietly) }
+    func discard(_ id: UUID, quietly: Bool = false, step: UUID = UUID()) {
+        if isInInbox(id) {
+            trash(id, quietly: quietly, step: step)
+        } else if let item = items.first(where: { $0.id == id && !$0.falling }), let index = liveIndex(of: id) {
+            drop(id, quietly: quietly)
+            remember(TakenDown(url: item.url, index: index, trashed: nil), in: step)
+        }
     }
 
-    /// The oldest photo falling off a full line. Like the cross, a file from
-    /// Tendedero's folder goes to the Trash, or nothing would ever take it out
-    /// of that folder. If the Trash refuses it, it still leaves the line.
     /// Moves along a line that holds more than fit, from a scroll gesture.
     func scroll(by delta: CGFloat) {
         let most = CGFloat(max(0, items.count - visibleCount)) * Layout.spacing
@@ -229,8 +278,11 @@ final class Line: ObservableObject {
         scroll = 0
     }
 
+    /// The oldest photo falling off a full line. Like the cross, a file from
+    /// Tendedero's folder goes to the Trash, or nothing would ever take it out
+    /// of that folder. If the Trash refuses it, it still leaves the line.
     private func letGo(_ id: UUID) {
-        if isInInbox(id), trash(id, quietly: true) { return }
+        if isInInbox(id), trash(id, quietly: true, step: nil) { return }
         drop(id, quietly: true)
     }
 
@@ -241,6 +293,7 @@ final class Line: ObservableObject {
         let target = uniqueURL(in: desktop, for: item.url.lastPathComponent)
         do {
             try FileManager.default.moveItem(at: item.url, to: target)
+            clipboardFollows(item.url, to: target)
             drop(id, quietly: true)
         } catch {
             log.error("Could not save to Desktop: \(error.localizedDescription, privacy: .public)")
@@ -301,6 +354,89 @@ final class Line: ObservableObject {
     func reveal(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
         NSWorkspace.shared.activateFileViewerSelecting([item.url])
+    }
+
+    // MARK: Putting back
+
+    /// A photo taken down by hand: its file, where it hung among the photos
+    /// still on the line, and where the file went if it went to the Trash.
+    private struct TakenDown {
+        let url: URL
+        let index: Int
+        let trashed: URL?
+    }
+
+    /// What was taken down, the latest last. A step holds everything one
+    /// action took down. Only kept while the app runs.
+    private var steps: [(id: UUID, photos: [TakenDown])] = []
+    private static let maxSteps = 20
+
+    var canPutBack: Bool { !steps.isEmpty }
+
+    private func remember(_ photo: TakenDown, in step: UUID) {
+        if let i = steps.lastIndex(where: { $0.id == step }) {
+            steps[i].photos.append(photo)
+        } else {
+            steps.append((step, [photo]))
+            if steps.count > Self.maxSteps { steps.removeFirst() }
+        }
+    }
+
+    /// Put back, or ⌘Z over the line: what was taken down last hangs again
+    /// where it was, and a file sent to the Trash comes back out of it.
+    func putBack() {
+        guard let step = steps.popLast() else { return }
+        var back: Set<UUID> = []
+        // The last one taken down goes back first, so each finds its place.
+        for photo in step.photos.reversed() {
+            guard let url = restore(photo), !items.contains(where: { $0.url == url && !$0.falling }),
+                  let thumb = makeThumbnail(url) else { continue }
+            let item = Pegged(url: url, thumb: thumb)
+            let live = items.filter { !$0.falling }
+            if let gap = items.firstIndex(where: { $0.falling && $0.url == photo.url }) {
+                // Its empty place is still on the line: it hangs back there.
+                items[gap] = item
+            } else if photo.index < live.count, let i = items.firstIndex(where: { $0.id == live[photo.index].id }) {
+                items.insert(item, at: i)
+            } else {
+                items.append(item)
+            }
+            back.insert(item.id)
+        }
+        guard !back.isEmpty else {
+            NSSound.beep()
+            return
+        }
+        // As when something new hangs, a full line lets its oldest photo go,
+        // never one that just came back.
+        while liveCount > maxItems, let oldest = items.first(where: { !$0.falling && !back.contains($0.id) }) {
+            letGo(oldest.id)
+        }
+        save()
+        play("Tink", volume: 0.35)
+    }
+
+    /// The photo's file, where it was before. Nil when it is gone: the Trash
+    /// was emptied, or the file was moved or deleted since.
+    private func restore(_ photo: TakenDown) -> URL? {
+        guard let trashed = photo.trashed else {
+            return FileManager.default.fileExists(atPath: photo.url.path) ? photo.url : nil
+        }
+        let url = uniqueURL(in: photo.url.deletingLastPathComponent(), for: photo.url.lastPathComponent)
+        do {
+            try FileManager.default.moveItem(at: trashed, to: url)
+            clipboardFollows(trashed, to: url)
+            log.notice("Put back \(url.lastPathComponent, privacy: .public)")
+            return url
+        } catch {
+            log.error("Could not put back \(trashed.path, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            return nil
+        }
+    }
+
+    /// Where a photo hangs, counting only the photos still on the line.
+    private func liveIndex(of id: UUID) -> Int? {
+        items.filter { !$0.falling }.firstIndex { $0.id == id }
     }
 
     // MARK: Breeze

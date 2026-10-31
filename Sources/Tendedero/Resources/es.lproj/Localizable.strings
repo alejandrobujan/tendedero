@@ -8,6 +8,7 @@
 "Hide line" = "Ocultar tendedero";
 "Show line" = "Mostrar tendedero";
 "Take everything down" = "Descolgar todo";
+"Put back" = "Volver a colgar";
 "Handle screenshots" = "Encargarse de las capturas";
 "Screenshots hang instantly and skip the Desktop" = "Las capturas se cuelgan al instante y no pasan por el Escritorio";
 "Open screenshots folder" = "Abrir carpeta de capturas";
@@ -43,6 +44,8 @@
 "Hang copied images" = "Colgar imágenes copiadas";
 "Images you copy hang on the line too" = "Las imágenes que copias también se cuelgan";
 "Tendedero, hanging copied images" = "Tendedero, colgando imágenes copiadas";
+"The line is empty" = "La cuerda está vacía";
+"%d on the line" = "%d en la cuerda";
 
 /* GrabArea */
 "Copy" = "Copiar";

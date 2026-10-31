@@ -8,6 +8,7 @@
 "Hide line" = "İpi gizle";
 "Show line" = "İpi göster";
 "Take everything down" = "Hepsini indir";
+"Put back" = "Geri as";
 "Handle screenshots" = "Ekran görüntülerini yönet";
 "Screenshots hang instantly and skip the Desktop" = "Ekran görüntüleri anında asılır ve Masaüstünü atlar";
 "Open screenshots folder" = "Ekran görüntüleri klasörünü aç";
@@ -43,6 +44,8 @@
 "Hang copied images" = "Kopyalanan görselleri as";
 "Images you copy hang on the line too" = "Kopyaladığınız görseller de ipe asılır";
 "Tendedero, hanging copied images" = "Tendedero, kopyalanan görselleri asıyor";
+"The line is empty" = "İp boş";
+"%d on the line" = "İpte %d tane";
 
 /* GrabArea */
 "Copy" = "Kopyala";
