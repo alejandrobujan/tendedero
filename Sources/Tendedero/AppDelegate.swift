@@ -84,6 +84,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         setUpStatusItem()
         watchMenuBarClicks()
 
+        // Hang on Tendedero, in the menu of images in Finder and other apps.
+        NSApp.servicesProvider = self
+        NSUpdateDynamicServices()
+
         Markup.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         Trim.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         panel.onScroll = { [weak self] event in
@@ -93,6 +97,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             self?.line.scroll(by: event.hasPreciseScrollingDeltas ? delta : delta * 12)
         }
         line.onFall = { [weak self] item in self?.fall(item) }
+        line.onHold = { [weak self] id in self?.hold(id) }
+        line.onHangBack = { id in Held.hangBack(id) }
 
         line.$items
             .receive(on: RunLoop.main)
@@ -264,6 +270,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// An empty line goes away, unless it was opened on purpose.
     private func itemsChanged() {
         updateStatusIcon()
+        Held.forget(except: Set(line.items.filter { !$0.falling && $0.held }.map(\.id)))
         guard line.liveCount == 0, !keepOpen else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [weak self] in
             guard let self, self.line.liveCount == 0, !self.keepOpen else { return }
@@ -340,7 +347,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard isPresent, isRevealed, !item.flying, !Self.reducesMotion, let screen = panel.screen,
               let card = cardFrame(for: item.id),
               let image = item.thumb.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return }
-        CaptureFlight.fall(image: image, card: card, tilt: CGFloat(item.tilt), on: screen)
+        CaptureFlight.fall(image: image, card: card, tilt: CGFloat(item.tilt), pinned: item.kept, on: screen)
     }
 
     /// Where a card will hang, in screen coordinates, using the same layout
@@ -614,6 +621,40 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
     }
 
+    // MARK: Holding
+
+    /// Takes a photo off the line to hold in front of you. The line goes
+    /// up, so it is out of the way of the photo you are looking at.
+    private func hold(_ id: UUID) {
+        guard let item = line.items.first(where: { $0.id == id && !$0.falling && !$0.held }) else { return }
+        line.setHeld(id, true)
+        Held.show(id, url: item.url, line: line) { [weak self] id, frame in self?.hangBack(id, from: frame) }
+    }
+
+    /// Back onto its clip: the line comes down and the photo flies home.
+    private func hangBack(_ id: UUID, from frame: CGRect) {
+        line.setHeld(id, false)
+        comeDown(on: NSScreen.screens.first { $0.frame.intersects(frame) })
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) { [weak self] in
+            self?.fly(id, from: frame)
+        }
+    }
+
+    // MARK: Hang on Tendedero
+
+    /// The service macOS lists for images in Finder and elsewhere. What
+    /// you hang yourself is pinned, and the line comes down to show it.
+    @objc func hangOnLine(_ pasteboard: NSPasteboard, userData: String?,
+                          error: AutoreleasingUnsafeMutablePointer<NSString?>) {
+        let urls = pasteboard.readObjects(forClasses: [NSURL.self],
+                                          options: [.urlReadingFileURLsOnly: true]) as? [URL] ?? []
+        guard !urls.isEmpty else { return }
+        comeDown(on: nil)
+        var any = false
+        for url in urls where line.hangKept(url) { any = true }
+        if !any { NSSound.beep() }
+    }
+
     // MARK: Putting back
 
     /// ⌘Z while the pointer is on the line. The line never takes the
@@ -752,6 +793,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         putBackItem.isEnabled = line.canPutBack
         menu.addItem(putBackItem)
+
+        if !Held.heldIDs.isEmpty {
+            menu.addItem(ClosureMenuItem(L("Hang everything back")) { Held.hangEverythingBack() })
+        }
 
         let inbox = ClosureMenuItem(L("Handle screenshots")) { [weak self] in
             self?.setInbox(!Inbox.isEnabled)

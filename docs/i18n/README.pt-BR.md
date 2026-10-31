@@ -57,6 +57,9 @@ Pare o ponteiro no meio da barra de menus e o varal desce. Afaste-o e ele some.
 | Arrastar para uma pasta | Guarda a imagem ali. Ela sai do varal. |
 | Arrastar para o Lixo, ou clicar no X | Desapegue. |
 | <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> com o ponteiro no varal | Pendura de volta o que você acabou de soltar. |
+| Clique com o botão direito e Fixar | Guarde-a: fica à esquerda do nó com um prendedor cinza-espacial, e nenhuma captura nova a empurra. |
+| Clique com o botão direito e Segurar | Tire-a do varal e mantenha-a à sua frente enquanto trabalha. |
+| No Finder, clique com o botão direito numa imagem e Pendurar no Tendedero | Pendure qualquer imagem no varal, fixada. |
 | Parar o ponteiro no meio da barra de menus | Baixa o varal naquela tela. |
 | Clicar em qualquer lugar da barra de menus | Recolhe o varal. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Mostra ou oculta o varal. Altere em Atalho, na barra de menus. |

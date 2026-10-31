@@ -51,9 +51,6 @@
 "Copy" = "コピー";
 "Open" = "開く";
 "Quick Look" = "クイックルック";
-"Pin on Top" = "最前面に固定";
-"Actual Size" = "実際のサイズ";
-"Close" = "閉じる";
 "Markup" = "マークアップ";
 "Show in Finder" = "Finderで表示";
 "Save to Desktop" = "デスクトップに保存";
@@ -68,3 +65,11 @@
 
 /* PeggedView */
 "Copied" = "コピーしました";
+
+/* Pinning and holding photos */
+"Pin" = "ピン留め";
+"Unpin" = "ピン留めを外す";
+"Hold" = "手に取る";
+"Hang back" = "ロープに戻す";
+"Hang everything back" = "すべてロープに戻す";
+"Actual Size" = "実際のサイズ";

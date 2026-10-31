@@ -51,9 +51,6 @@
 "Copy" = "Copier";
 "Open" = "Ouvrir";
 "Quick Look" = "Coup d’œil";
-"Pin on Top" = "Épingler au premier plan";
-"Actual Size" = "Taille réelle";
-"Close" = "Fermer";
 "Markup" = "Annotation";
 "Show in Finder" = "Afficher dans le Finder";
 "Save to Desktop" = "Enregistrer sur le bureau";
@@ -68,3 +65,11 @@
 
 /* PeggedView */
 "Copied" = "Copié";
+
+/* Pinning and holding photos */
+"Pin" = "Épingler";
+"Unpin" = "Désépingler";
+"Hold" = "Garder en main";
+"Hang back" = "Remettre sur la corde";
+"Hang everything back" = "Tout remettre sur la corde";
+"Actual Size" = "Taille réelle";

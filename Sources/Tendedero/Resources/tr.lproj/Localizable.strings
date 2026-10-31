@@ -51,9 +51,6 @@
 "Copy" = "Kopyala";
 "Open" = "Aç";
 "Quick Look" = "Hızlı Bakış";
-"Pin on Top" = "Üstte sabitle";
-"Actual Size" = "Gerçek Boyut";
-"Close" = "Kapat";
 "Markup" = "İşaretle";
 "Show in Finder" = "Finder'da göster";
 "Save to Desktop" = "Masaüstüne kaydet";
@@ -68,3 +65,11 @@
 
 /* PeggedView */
 "Copied" = "Kopyalandı";
+
+/* Pinning and holding photos */
+"Pin" = "Sabitle";
+"Unpin" = "Sabitlemeyi kaldır";
+"Hold" = "Elinde tut";
+"Hang back" = "İpe geri koy";
+"Hang everything back" = "Hepsini ipe geri koy";
+"Actual Size" = "Gerçek boyut";

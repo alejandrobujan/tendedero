@@ -53,9 +53,6 @@
 "Copy" = "कॉपी करें";
 "Open" = "खोलें";
 "Quick Look" = "क्विक लुक";
-"Pin on Top" = "सबसे ऊपर पिन करें";
-"Actual Size" = "असली आकार";
-"Close" = "बंद करें";
 "Markup" = "मार्कअप";
 "Show in Finder" = "Finder में दिखाएँ";
 "Save to Desktop" = "डेस्कटॉप पर सेव करें";
@@ -70,3 +67,11 @@
 
 /* PeggedView */
 "Copied" = "कॉपी हो गया";
+
+/* Pinning and holding photos */
+"Pin" = "पिन करें";
+"Unpin" = "पिन हटाएँ";
+"Hold" = "हाथ में लें";
+"Hang back" = "रस्सी पर लौटाएँ";
+"Hang everything back" = "सब रस्सी पर लौटाएँ";
+"Actual Size" = "असली आकार";

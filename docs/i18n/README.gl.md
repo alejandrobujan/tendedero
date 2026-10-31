@@ -57,6 +57,9 @@ Leva o punteiro ao centro da barra de menús e a corda baixa. Apártao e desapar
 | Arrastrar a un cartafol | Queda alí e sae da corda. |
 | Arrastrar á Papeleira ou facer clic na cruz | Desfaste dela. |
 | <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> co punteiro na corda | Volve colgar o que acabas de soltar. |
+| Clic dereito e Fixar | Gárdaa: pendura á esquerda do nó cunha pinza gris espacial e ningunha captura nova a empurra. |
+| Clic dereito e Suxeitar | Quítaa da corda e tena diante mentres traballas. |
+| No Finder, clic dereito nunha imaxe e Pendurar en Tendedero | Pendura calquera imaxe na corda, fixada. |
 | Deixar o punteiro no centro da barra de menús | Baixa a corda nesa pantalla. |
 | Facer clic en calquera sitio da barra de menús | Recolle a corda. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Amosa ou oculta a corda. Cámbiase en Atallo, na barra de menús. |

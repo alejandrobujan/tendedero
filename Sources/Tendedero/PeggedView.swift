@@ -12,13 +12,25 @@ struct PeggedView: View {
 
     private var copied: Bool { line.copiedID == item.id }
     private var dragging: Bool { line.draggingID == item.id }
+
+    private var cornerSymbol: String {
+        switch line.corner(of: item.id) {
+        case .trash: "xmark"
+        case .hide: "eye.slash"
+        case .unpin: "pin.slash"
+        }
+    }
     private var pressed: Bool { line.pressedID == item.id }
 
     var body: some View {
         VStack(spacing: -12) {
-            Clothespin()
+            Clothespin(pinned: item.kept)
                 .zIndex(1)
+            // Held in your hand: a faded trace of it waits on its clip.
             card
+                .saturation(item.held ? 0 : 1)
+                .opacity(item.held ? 0.3 : 1)
+                .animation(.easeOut(duration: 0.25), value: item.held)
         }
         .rotationEffect(.degrees(swing + item.tilt), anchor: .top)
         .offset(y: arrived ? 0 : -46)
@@ -87,14 +99,15 @@ struct PeggedView: View {
             .overlay(alignment: .topLeading) {
                 // Drawn here, clicked through GrabView, which sits on top. A
                 // cross sends a file in Tendedero's folder to the Trash; for a
-                // file anywhere else it only hides it from the line.
-                Image(systemName: line.isInInbox(item.id) ? "xmark" : "eye.slash")
+                // file anywhere else, or one hung by hand, it only hides it
+                // from the line. A pinned photo is unpinned instead.
+                Image(systemName: cornerSymbol)
                     .font(.system(size: 8, weight: .bold))
                     .foregroundStyle(.primary)
                     .frame(width: 20, height: 20)
                     .glassFrame(circle: true)
                     .padding(3)
-                    .opacity(hovering && !dragging ? 1 : 0)
+                    .opacity(hovering && !dragging && !item.held ? 1 : 0)
                     .scaleEffect(hovering ? 1 : 0.6)
                     .allowsHitTesting(false)
             }
@@ -182,6 +195,10 @@ extension View {
 /// A minimal aluminium clip: a brushed metal pill with a slot where it
 /// grips the line, and a soft shadow so it reads on any background.
 struct Clothespin: View {
+    /// Silver for what comes and goes, space grey for what you pinned, the
+    /// way Macs come in both: what stays on the line reads at a glance.
+    var pinned = false
+
     private let metal = LinearGradient(
         stops: [
             .init(color: Color(white: 0.70), location: 0),
@@ -191,20 +208,29 @@ struct Clothespin: View {
         ],
         startPoint: .leading, endPoint: .trailing)
 
+    private let spaceGrey = LinearGradient(
+        stops: [
+            .init(color: Color(white: 0.30), location: 0),
+            .init(color: Color(white: 0.47), location: 0.35),
+            .init(color: Color(white: 0.38), location: 0.65),
+            .init(color: Color(white: 0.24), location: 1),
+        ],
+        startPoint: .leading, endPoint: .trailing)
+
     var body: some View {
         RoundedRectangle(cornerRadius: 3.5, style: .continuous)
-            .fill(metal)
+            .fill(pinned ? spaceGrey : metal)
             .frame(width: 9, height: 26)
             .overlay(
                 RoundedRectangle(cornerRadius: 3.5, style: .continuous)
-                    .stroke(LinearGradient(colors: [Color.white.opacity(0.9), Color.black.opacity(0.18)],
+                    .stroke(LinearGradient(colors: [Color.white.opacity(pinned ? 0.45 : 0.9), Color.black.opacity(0.18)],
                                            startPoint: .top, endPoint: .bottom),
                             lineWidth: 0.6)
             )
             .overlay(alignment: .top) {
                 // The slot the line passes through.
                 Capsule()
-                    .fill(Color.black.opacity(0.32))
+                    .fill(Color.black.opacity(pinned ? 0.55 : 0.32))
                     .frame(width: 5, height: 1.4)
                     .padding(.top, 8.5)
             }

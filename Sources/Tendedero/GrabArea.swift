@@ -31,6 +31,8 @@ struct GrabArea: NSViewRepresentable {
         let isRecording = item.isRecording
         view.url = item.url
         view.dragImage = item.thumb
+        view.isHeld = item.held
+        view.onHangBack = { line.onHangBack?(id) }
         view.onClick = { line.copy(id) }
         view.onDoubleClick = { line.open(id) }
         view.onDragStart = { line.draggingID = id }
@@ -40,7 +42,7 @@ struct GrabArea: NSViewRepresentable {
             line.prune()
         }
         view.onTrash = { line.trash(id) }
-        view.onDiscard = { line.discard(id) }
+        view.onDiscard = { line.pressCorner(id) }
         view.onLongPress = { line.markup(id) }
         view.onForceClick = { line.quickLook(id) }
         view.onPressChange = { pressed in line.pressedID = pressed ? id : nil }
@@ -52,16 +54,31 @@ struct GrabArea: NSViewRepresentable {
             menu.addItem(ClosureMenuItem(L("Open")) { line.open(id) })
             menu.addItem(ClosureMenuItem(L("Quick Look")) { line.quickLook(id) })
             if !isRecording {
+                menu.addItem(ClosureMenuItem(L("Hold")) { line.onHold?(id) })
+            }
+            if !isRecording {
                 menu.addItem(ClosureMenuItem(L("Markup")) { line.markup(id) })
-                menu.addItem(ClosureMenuItem(L("Pin on Top")) { line.pin(id) })
             }
             menu.addItem(ClosureMenuItem(L("Show in Finder")) { line.reveal(id) })
+            let item = line.items.first(where: { $0.id == id })
+            let kept = item?.kept == true
+            if !kept {
+                menu.addItem(ClosureMenuItem(L("Pin")) { line.pin(id) })
+            } else if item?.byHand == false {
+                menu.addItem(ClosureMenuItem(L("Unpin")) { line.unpin(id) })
+            }
             let inInbox = line.isInInbox(id)
             if inInbox {
                 menu.addItem(ClosureMenuItem(L("Save to Desktop")) { line.saveToDesktop(id) })
             }
             menu.addItem(.separator())
-            if inInbox {
+            if kept {
+                // A pinned photo never goes to the Trash from here. One hung
+                // by hand comes down; one pinned from the line is unpinned above.
+                if item?.byHand == true {
+                    menu.addItem(ClosureMenuItem(L("Take down")) { line.discard(id) })
+                }
+            } else if inInbox {
                 menu.addItem(ClosureMenuItem(L("Discard")) { line.discard(id) })
             } else {
                 menu.addItem(ClosureMenuItem(L("Take down")) { line.discard(id) })
@@ -85,6 +102,10 @@ final class GrabView: NSView, NSDraggingSource {
 
     var url: URL?
     var dragImage: NSImage?
+    /// Held in your hand: only its faded trace is on the line, and a click
+    /// on it is all it answers, to bring the photo back.
+    var isHeld = false
+    var onHangBack: () -> Void = {}
     var onClick: () -> Void = {}
     var onDoubleClick: () -> Void = {}
     var onDragStart: () -> Void = {}
@@ -122,6 +143,11 @@ final class GrabView: NSView, NSDraggingSource {
     }
 
     override func mouseDown(with event: NSEvent) {
+        if isHeld {
+            downPoint = nil
+            onHangBack()
+            return
+        }
         if event.clickCount > 1 {
             clickTimer?.invalidate()
             clickTimer = nil
@@ -204,6 +230,7 @@ final class GrabView: NSView, NSDraggingSource {
     }
 
     override func rightMouseDown(with event: NSEvent) {
+        guard !isHeld else { return }
         // The menu runs until it closes, and the line stays down meanwhile.
         GrabView.isShowingMenu = true
         NSMenu.popUpContextMenu(menuProvider(), with: event, for: self)

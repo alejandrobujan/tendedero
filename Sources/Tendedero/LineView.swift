@@ -68,6 +68,12 @@ struct LineView: View {
                         .transition(.opacity)
                 }
 
+                if let x = knotX(width: width) {
+                    Knot()
+                        .position(x: x, y: Layout.ropeY(x: x, width: width) + 0.5)
+                        .transition(.opacity)
+                }
+
                 ForEach(Array(line.items.enumerated()), id: \.element.id) { index, item in
                     let x = Layout.x(index: index, count: line.items.count, width: width,
                                      visible: line.visibleCount, scroll: line.scroll)
@@ -81,6 +87,7 @@ struct LineView: View {
             }
             .animation(.spring(response: 0.55, dampingFraction: 0.78), value: line.items.map(\.id))
             .animation(.easeInOut(duration: 0.3), value: line.items.isEmpty)
+            .animation(.spring(response: 0.55, dampingFraction: 0.78), value: line.items.map(\.kept))
             // Tucked away, the whole line waits above the top edge and slides
             // out from under the menu bar, the way an auto-hiding Dock does.
             .offset(y: line.revealed ? 0 : -(Layout.panelHeight + 12))
@@ -90,6 +97,40 @@ struct LineView: View {
         .onPreferenceChange(HitRectsKey.self) { rects in
             line.hitRects = rects
         }
+    }
+
+    /// Halfway between the last pinned photo and the next one, or half a
+    /// step past it when nothing hangs loose. The empty place a pinned photo
+    /// leaves still counts, so the knot stays put until the gaps close.
+    private func knotX(width: CGFloat) -> CGFloat? {
+        guard let last = line.items.lastIndex(where: \.kept) else { return nil }
+        let x = { (i: Int) in Layout.x(index: i, count: line.items.count, width: width,
+                                       visible: line.visibleCount, scroll: line.scroll) }
+        let next = last + 1 < line.items.count ? x(last + 1) : x(last) + Layout.spacing
+        return (x(last) + next) / 2
+    }
+}
+
+/// Where the line is tied: what hangs left of it is pinned and stays.
+private struct Knot: View {
+    var body: some View {
+        ZStack {
+            Ellipse()
+                .fill(Color(white: 0.5))
+                .frame(width: 7, height: 5.5)
+                .shadow(color: .black.opacity(0.25), radius: 1, y: 1)
+            // Two short loose ends hanging from it.
+            Path { p in
+                p.move(to: CGPoint(x: 3.5, y: 3))
+                p.addQuadCurve(to: CGPoint(x: 1.5, y: 11), control: CGPoint(x: 3.8, y: 7))
+                p.move(to: CGPoint(x: 4, y: 3))
+                p.addQuadCurve(to: CGPoint(x: 6.5, y: 10), control: CGPoint(x: 4.5, y: 7))
+            }
+            .stroke(Color(white: 0.55), style: StrokeStyle(lineWidth: 1, lineCap: .round))
+            .frame(width: 8, height: 12)
+            .offset(y: 5)
+        }
+        .allowsHitTesting(false)
     }
 }
 
