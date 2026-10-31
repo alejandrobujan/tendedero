@@ -102,7 +102,7 @@ Tendedero tamamen Mac'inizde çalışır ve ekran görüntüleriniz hiçbir zama
 | | |
 |:--|:--|
 | **Uyumluluk** | macOS 14 Sonoma veya sonrası, Apple silicon ve Intel. macOS 27 için tasarlandı. |
-| **Boyut** | 1,7 MB |
+| **Boyut** | 3,5 MB |
 | **Diller** | İngilizce, İspanyolca, Galiçyaca, Fransızca, Portekizce (Brezilya), Japonca, Korece, Basitleştirilmiş Çince, Türkçe, Azerice, Hintçe |
 | **Yapıldığı teknolojiler** | Swift, AppKit ve SwiftUI |
 | **Ağ erişimi** | Yok |

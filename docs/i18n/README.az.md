@@ -104,7 +104,7 @@ Tendedero tamamilə Mac-inizdə işləyir və ekran şəkilləriniz oradan heç 
 | | |
 |:--|:--|
 | **Uyğunluq** | macOS 14 Sonoma və ya sonrakı, Apple silicon və Intel Mac-lərdə. macOS 27 üçün hazırlanıb. |
-| **Həcm** | 1,7 MB |
+| **Həcm** | 3,5 MB |
 | **Dillər** | İngilis, ispan, qalisiya, fransız, portuqal (Braziliya), yapon, koreya, sadələşdirilmiş Çin, türk, Azərbaycan və hind dili |
 | **Nə ilə yazılıb** | Swift, AppKit və SwiftUI |
 | **İnternet bağlantısı** | İstifadə etmir |

@@ -103,7 +103,7 @@ Tendedero funciona só no teu Mac, e as túas capturas nunca saen del.
 | | |
 |:--|:--|
 | **Compatibilidade** | macOS 14 Sonoma ou posterior, en Mac con Apple silicon ou Intel. Pensado para macOS 27. |
-| **Tamaño** | 1,7 MB |
+| **Tamaño** | 3,5 MB |
 | **Idiomas** | Inglés, español, galego, francés, portugués do Brasil, xaponés, coreano, chinés simplificado, turco, acerbaixano e hindi |
 | **Feito con** | Swift, AppKit e SwiftUI |
 | **Conexión a internet** | Non a usa |
