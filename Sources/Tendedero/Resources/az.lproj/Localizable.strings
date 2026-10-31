@@ -67,3 +67,6 @@
 
 /* PeggedView */
 "Copied" = "Kopyalandı";
+
+"Hang copied text" = "Hang copied text";
+"Text you copy hangs on the line too" = "Text you copy hangs on the line too";

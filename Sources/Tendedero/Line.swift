@@ -189,6 +189,23 @@ final class Line: ObservableObject {
 
     private func putOnClipboard(_ url: URL) {
         let entry = NSPasteboardItem()
+        if isText(url) {
+            if url.pathExtension.lowercased() == "rtf", let data = try? Data(contentsOf: url) {
+                let data = lightPageRTF(data)
+                entry.setData(data, forType: .rtf)
+                if let plain = NSAttributedString(rtf: data, documentAttributes: nil)?.string {
+                    entry.setString(plain, forType: .string)
+                }
+            } else if let text = try? String(contentsOf: url, encoding: .utf8) {
+                entry.setString(text, forType: .string)
+            }
+            entry.setData(Data(), forType: selfCopyType)
+            let pb = NSPasteboard.general
+            pb.clearContents()
+            pb.writeObjects([entry])
+            onClipboard = (url, pb.changeCount)
+            return
+        }
         // A recording is copied as the file, which apps paste as the video.
         if !isRecording(url), let png = pngData(url) { entry.setData(png, forType: .png) }
         entry.setString(url.absoluteString, forType: .fileURL)
@@ -317,7 +334,9 @@ final class Line: ObservableObject {
     /// not edit video, so a recording opens in the trimming editor instead.
     func markup(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
-        if item.isRecording {
+        if isText(item.url) {
+            NSWorkspace.shared.open(item.url)
+        } else if item.isRecording {
             Trim.shared.edit(item.url, size: item.thumb.size)
         } else {
             Markup.shared.edit(item.url)
@@ -485,10 +504,106 @@ func isRecording(_ url: URL) -> Bool {
     ["mov", "mp4"].contains(url.pathExtension.lowercased())
 }
 
+/// Copied text: plain text is saved as .txt, styled text as .rtf.
+func isText(_ url: URL) -> Bool {
+    ["txt", "rtf"].contains(url.pathExtension.lowercased())
+}
+
+/// Text copied in dark mode carries dark backgrounds and light ink, which look
+/// wrong on a white page. Dark backgrounds are dropped, light grey or white ink
+/// goes back to the default, and light coloured ink is darkened to stay
+/// readable. Bold, italic, fonts, links and light highlights are kept.
+func lightPageStyled(_ source: NSAttributedString) -> NSAttributedString {
+    let m = NSMutableAttributedString(attributedString: source)
+    let full = NSRange(location: 0, length: m.length)
+    var edits: [(NSRange, NSAttributedString.Key, NSColor?)] = []
+    m.enumerateAttribute(.backgroundColor, in: full) { v, r, _ in
+        guard let c = v as? NSColor else { return }
+        if let rgb = c.usingColorSpace(.deviceRGB), rgb.alphaComponent > 0.05, rgb.brightnessComponent >= 0.5 { return }
+        edits.append((r, .backgroundColor, nil))
+    }
+    m.enumerateAttribute(.foregroundColor, in: full) { v, r, _ in
+        guard let c = v as? NSColor else { return }
+        guard let rgb = c.usingColorSpace(.deviceRGB) else { edits.append((r, .foregroundColor, nil)); return }
+        if rgb.brightnessComponent <= 0.6 { return }
+        if rgb.saturationComponent < 0.25 {
+            edits.append((r, .foregroundColor, nil))
+        } else {
+            edits.append((r, .foregroundColor, NSColor(deviceHue: rgb.hueComponent, saturation: min(1, rgb.saturationComponent + 0.2),
+                                                       brightness: 0.55, alpha: 1)))
+        }
+    }
+    for (r, key, color) in edits {
+        if let color { m.addAttribute(key, value: color, range: r) } else { m.removeAttribute(key, range: r) }
+    }
+    return m
+}
+
+/// RTF bytes, cleaned as above.
+func lightPageRTF(_ data: Data) -> Data {
+    guard let a = NSAttributedString(rtf: data, documentAttributes: nil) else { return data }
+    let clean = lightPageStyled(a)
+    return (try? clean.data(from: NSRange(location: 0, length: clean.length),
+                            documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf])) ?? data
+}
+
+/// Marks a pasteboard written by the line itself, so copying a note off the
+/// line does not hang it again.
+let selfCopyType = NSPasteboard.PasteboardType("app.tendedero.SelfCopy")
+
+/// A note card: the first lines of the text on warm paper. Styled text keeps
+/// its fonts, bold, italic, colours and highlights, scaled to fit the card.
+private func noteCard(_ url: URL, maxPixels: Int) -> NSImage? {
+    let w = CGFloat(maxPixels), h = CGFloat(maxPixels) * 0.7
+    let base = w * 0.095
+    let ink = NSColor(calibratedWhite: 0.15, alpha: 1)
+    let body: NSAttributedString
+    if url.pathExtension.lowercased() == "rtf",
+       let data = try? Data(contentsOf: url),
+       let rich = NSAttributedString(rtf: data, documentAttributes: nil) {
+        let m = NSMutableAttributedString(attributedString: lightPageStyled(rich.attributedSubstring(
+            from: NSRange(location: 0, length: min(rich.length, 4000)))))
+        let full = NSRange(location: 0, length: m.length)
+        var ref: CGFloat = 0
+        m.enumerateAttribute(.font, in: full) { v, _, stop in
+            if let f = v as? NSFont { ref = f.pointSize; stop.pointee = true }
+        }
+        let k = base / (ref > 0 ? ref : 12)
+        var fonts: [(NSRange, NSFont)] = []
+        m.enumerateAttribute(.font, in: full) { v, r, _ in
+            let f = (v as? NSFont) ?? NSFont.systemFont(ofSize: 12)
+            fonts.append((r, NSFontManager.shared.convert(f, toSize: max(4, f.pointSize * k))))
+        }
+        for (r, f) in fonts { m.addAttribute(.font, value: f, range: r) }
+        body = m
+    } else {
+        guard let data = try? Data(contentsOf: url),
+              let text = String(data: data.prefix(4000), encoding: .utf8) else { return nil }
+        let style = NSMutableParagraphStyle()
+        style.lineBreakMode = .byCharWrapping
+        style.lineSpacing = w * 0.012
+        body = NSAttributedString(string: text, attributes: [
+            .font: NSFont.systemFont(ofSize: base),
+            .foregroundColor: ink,
+            .paragraphStyle: style,
+        ])
+    }
+    let image = NSImage(size: NSSize(width: w, height: h))
+    image.lockFocus()
+    NSColor(calibratedRed: 1.0, green: 0.97, blue: 0.80, alpha: 1).setFill()
+    NSRect(x: 0, y: 0, width: w, height: h).fill()
+    let pad = w * 0.07
+    body.draw(with: NSRect(x: pad, y: pad, width: w - 2 * pad, height: h - 2 * pad),
+              options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine])
+    image.unlockFocus()
+    return image
+}
+
 /// The default size covers a card at twice its size in points, as on a
 /// Retina screen, and no more: every photo on the line keeps one in memory.
 func makeThumbnail(_ url: URL, maxPixels: Int = Int(320 * Layout.size.scale)) -> NSImage? {
     if isRecording(url) { return firstFrame(url, maxPixels: maxPixels) }
+    if isText(url) { return noteCard(url, maxPixels: maxPixels) }
     guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
     let options: [CFString: Any] = [
         kCGImageSourceCreateThumbnailFromImageAlways: true,

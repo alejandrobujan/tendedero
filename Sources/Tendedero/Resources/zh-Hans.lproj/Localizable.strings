@@ -65,3 +65,6 @@
 
 /* PeggedView */
 "Copied" = "已复制";
+
+"Hang copied text" = "挂上复制的文字";
+"Text you copy hangs on the line too" = "复制的文字也会挂在绳子上";

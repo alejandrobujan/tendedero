@@ -238,9 +238,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     /// Watching the clipboard is opt in, from the menu bar only.
-    private func setClipboard(_ on: Bool) {
-        ClipboardWatcher.isEnabled = on
-        if on { clipboardWatcher.start() } else { clipboardWatcher.stop() }
+    private func refreshClipboardWatcher() {
+        if ClipboardWatcher.isEnabled { clipboardWatcher.start() } else { clipboardWatcher.stop() }
         updateStatusIcon()
     }
 
@@ -760,12 +759,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         inbox.toolTip = L("Screenshots hang instantly and skip the Desktop")
         menu.addItem(inbox)
 
-        let clipboard = ClosureMenuItem(L("Hang copied images")) { [weak self] in
-            self?.setClipboard(!ClipboardWatcher.isEnabled)
+        let clipboardImages = ClosureMenuItem(L("Hang copied images")) { [weak self] in
+            ClipboardWatcher.imagesEnabled.toggle()
+            self?.refreshClipboardWatcher()
         }
-        clipboard.state = ClipboardWatcher.isEnabled ? .on : .off
-        clipboard.toolTip = L("Images you copy hang on the line too")
-        menu.addItem(clipboard)
+        clipboardImages.state = ClipboardWatcher.imagesEnabled ? .on : .off
+        clipboardImages.toolTip = L("Images you copy hang on the line too")
+        menu.addItem(clipboardImages)
+
+        let clipboardText = ClosureMenuItem(L("Hang copied text")) { [weak self] in
+            ClipboardWatcher.textEnabled.toggle()
+            self?.refreshClipboardWatcher()
+        }
+        clipboardText.state = ClipboardWatcher.textEnabled ? .on : .off
+        clipboardText.toolTip = L("Text you copy hangs on the line too")
+        menu.addItem(clipboardText)
 
         let bringDown = NSMenuItem(title: L("Bring the line down"), action: nil, keyEquivalent: "")
         let options = NSMenu()
