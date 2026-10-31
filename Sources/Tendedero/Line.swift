@@ -78,6 +78,10 @@ final class Line: ObservableObject {
     /// before the knot, and never fall to make room.
     var keptCount: Int { items.filter { !$0.falling && $0.kept }.count }
 
+    /// How many photos at the start of the line are pinned, the empty
+    /// places of pinned ones that just came down included.
+    var pinnedLead: Int { items.prefix { $0.kept }.count }
+
     /// The oldest photo that can fall: the first one past the knot.
     private var oldestLoose: Pegged? { items.first { !$0.falling && !$0.kept && !$0.held } }
 
