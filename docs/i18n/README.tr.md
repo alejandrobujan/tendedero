@@ -57,6 +57,8 @@ Aldığınız her ekran görüntüsü, ekranınızın hemen üstündeki bir ipe 
 | Klasöre sürükle | Orada saklar. İpten ayrılır. |
 | Çöp Kutusu'na sürükle ya da çarpıya tıkla | Siler. |
 | İşaretçi ipin üzerindeyken <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | Az önce bıraktığını geri asar. |
+| İşaretçi bir fotoğrafın üzerindeyken <kbd>Boşluk</kbd> | Hızlıca bak. |
+| İşaretçi bir fotoğrafın üzerindeyken <kbd>⌫</kbd> | Köşedeki düğmesi gibi bırak. |
 | Sağ tıkla, Sabitle | Sakla: düğümün solunda uzay grisi bir mandalla asılı kalır, yeni ekran görüntüleri onu itmez. |
 | Sağ tıkla, Elinde tut | İpten al ve çalışırken önünde tut. |
 | Finder’da bir görsele sağ tıkla, Tendedero’ya as | Herhangi bir görseli ipe sabitlenmiş olarak as. |

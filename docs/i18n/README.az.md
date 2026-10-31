@@ -57,6 +57,8 @@ Göstəricini menyu panelinin ortasında saxlayın, ip aşağı enir. Uzaqlaşd�
 | Qovluğa sürükləmək | Orada saxlanır və ipdən çıxır. |
 | Zibil qutusuna sürükləmək və ya çarpaza klik | Ondan qurtulursunuz. |
 | Göstərici ipin üstündəykən <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | Atdığınızı ipə geri asır. |
+| Göstərici şəklin üstündəykən <kbd>Boşluq</kbd> | Tez baxın. |
+| Göstərici şəklin üstündəykən <kbd>⌫</kbd> | Küncdəki düyməsi kimi buraxın. |
 | Sağ klik, Bərkit | Saxlayın: düyünün solunda kosmik boz sancaqla asılır və yeni ekran şəkilləri onu itələmir. |
 | Sağ klik, Əldə saxla | İpdən götürün və işləyərkən qarşınızda saxlayın. |
 | Finder-də şəklə sağ klik, Tendedero-ya as | İstənilən şəkli ipə bərkidilmiş halda asın. |

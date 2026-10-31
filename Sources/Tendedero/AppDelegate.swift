@@ -491,6 +491,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         mouseTimer = nil
         panel.ignoresMouseEvents = true
         holdPutBackKey(false)
+        holdPhotoKeys(over: nil)
     }
 
     /// How long the cursor rests against the top edge before the line comes
@@ -550,6 +551,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         guard isRevealed else {
             holdPutBackKey(false)
+            holdPhotoKeys(over: nil)
             line.closeGaps()
             // Resting in the middle of the menu bar brings the line down on
             // that screen. Pushing against the top edge is part of it, and it
@@ -585,6 +587,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let inside = NSMouseInRect(mouse, zone, false)
         if inside && pinned { pinned = false }
         holdPutBackKey(inside)
+        holdPhotoKeys(over: inside ? photo(under: mouse) : nil)
         // Gaps left by discarded photos close once the pointer moves away.
         if !inside { line.closeGaps() }
 
@@ -653,6 +656,47 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         var any = false
         for url in urls where line.hangKept(url) { any = true }
         if !any { NSSound.beep() }
+    }
+
+    // MARK: Keys over a photo
+
+    /// Delete and Space while the pointer rests on a photo: Delete does what
+    /// its corner button does, Space takes a quick look, as in Finder. Like
+    /// ⌘Z, they are borrowed as hot keys only then, so every other app keeps
+    /// them.
+    private var photoKeys: [HotKey] = []
+    private var photoKeysFor: UUID?
+
+    private func holdPhotoKeys(over id: UUID?) {
+        let id = id.flatMap { id in line.items.first { $0.id == id && !$0.falling && !$0.held }?.id }
+        guard id != photoKeysFor else { return }
+        photoKeysFor = id
+        photoKeys = []
+        guard let id else { return }
+        photoKeys = [
+            HotKey(Shortcut(keyCode: kVK_Delete, modifiers: [], key: "\u{8}")) { [weak self] in
+                self?.line.pressCorner(id)
+            },
+            HotKey(Shortcut(keyCode: kVK_Space, modifiers: [], key: " ")) { [weak self] in
+                self?.quickLookToggle(id)
+            },
+        ].compactMap { $0 }
+    }
+
+    /// The photo whose card is under the pointer, if any.
+    private func photo(under mouse: NSPoint) -> UUID? {
+        let local = panel.convertPoint(fromScreen: mouse)
+        let flipped = CGPoint(x: local.x, y: panel.frame.height - local.y)
+        return line.hitRects.first { $0.value.contains(flipped) }?.key
+    }
+
+    /// Space opens Quick Look, and closes it again if it is already open.
+    private func quickLookToggle(_ id: UUID) {
+        if QLPreviewPanel.sharedPreviewPanelExists(), let panel = QLPreviewPanel.shared(), panel.isVisible {
+            panel.orderOut(nil)
+        } else {
+            line.quickLook(id)
+        }
     }
 
     // MARK: Putting back
@@ -971,3 +1015,4 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
 }
+

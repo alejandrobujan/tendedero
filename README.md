@@ -55,6 +55,8 @@ Rest the pointer in the middle of the menu bar and it glides down. Move away and
 | Drag into a folder | Keep it there. It leaves the line. |
 | Drag to the Trash, or click the cross | Let it go. |
 | <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> with the pointer on the line | Hang back what you just let go. |
+| <kbd>Space</kbd> with the pointer on a photo | Take a quick look. |
+| <kbd>⌫</kbd> with the pointer on a photo | Let it go, as its corner button does. |
 | Right click, then Pin | Keep it: it hangs left of the knot on a space grey clip, and no new screenshot pushes it off. |
 | Right click, then Hold | Take it off the line and keep it in front of you while you work. |
 | In Finder, right click an image, then Hang on Tendedero | Hang any image on the line, pinned. |

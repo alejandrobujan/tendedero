@@ -57,6 +57,8 @@ Lleva el puntero al centro de la barra de menús y la cuerda baja. Apártalo y d
 | Arrastrar a una carpeta | Se queda ahí y sale de la cuerda. |
 | Arrastrar a la Papelera o hacer clic en la cruz | Te deshaces de ella. |
 | <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> con el puntero en la cuerda | Vuelve a colgar lo que acabas de soltar. |
+| <kbd>Espacio</kbd> con el puntero en una foto | Échale un vistazo. |
+| <kbd>⌫</kbd> con el puntero en una foto | Suéltala, como su botón de la esquina. |
 | Clic derecho y Fijar | Guárdala: cuelga a la izquierda del nudo con una pinza gris espacial y ninguna captura nueva la empuja. |
 | Clic derecho y Sostener | Quítala de la cuerda y tenla delante mientras trabajas. |
 | En el Finder, clic derecho en una imagen y Colgar en Tendedero | Cuelga cualquier imagen en la cuerda, fijada. |
