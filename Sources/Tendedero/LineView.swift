@@ -103,10 +103,12 @@ struct LineView: View {
                     let bounds = index >= line.pinnedLead ? scrollBounds(width: width) : nil
                     let cardLeft = x - Layout.cardWidth / 2, cardRight = x + Layout.cardWidth / 2
                     let out = bounds.map { cardLeft < $0.lowerBound || cardRight > $0.upperBound } == true
-                    // On the left it fades gradually: from a little before the
-                    // limit until it has gone halfway behind it.
-                    let fadeIn = bounds.map {
-                        min(1, max(0, (cardLeft - ($0.lowerBound - Layout.cardWidth / 2)) / (Layout.cardWidth / 2 + 60)))
+                    // On the left it fades gradually: whole in the first place,
+                    // gone once halfway behind the limit.
+                    let fadeIn = bounds.map { bounds -> CGFloat in
+                        let gone = bounds.lowerBound - Layout.cardWidth / 2
+                        let rest = firstLooseX(width: width) - Layout.cardWidth / 2
+                        return min(1, max(0, (cardLeft - gone) / max(1, rest - gone)))
                     } ?? 1
                     let ropeY = Layout.ropeY(x: x, width: width)
                     PeggedView(item: item, line: line)
@@ -132,6 +134,15 @@ struct LineView: View {
         .onPreferenceChange(HitRectsKey.self) { rects in
             line.hitRects = rects
         }
+    }
+
+    /// Where the first photo past the pinned ones hangs at rest on a
+    /// scrolling line: the first place, or the one just past the knot.
+    private func firstLooseX(width: CGFloat) -> CGFloat {
+        let newest = width / 2 + CGFloat(line.visibleCount - 1) * Layout.spacing / 2
+        let first = newest - CGFloat(line.visibleCount - 1) * Layout.spacing
+        let pinned = Layout.anchorsPinned(line.pinnedLead, visible: line.visibleCount) ? line.pinnedLead : 0
+        return first + CGFloat(pinned) * Layout.spacing
     }
 
     /// Where a photo on a scrolling line stops being whole in view: the
