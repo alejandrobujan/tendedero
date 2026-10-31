@@ -50,7 +50,8 @@ Lleva el puntero al centro de la barra de menús y la cuerda baja. Apártalo y d
 | | |
 |:--|:--|
 | Clic | Copia la imagen. |
-| Mantener pulsado | La abre en Marcación. |
+| Mantener pulsado | Muestra una vista previa en el centro de la pantalla. Suelta para cerrarla. |
+| Deslizar a la derecha y soltar | Abre la imagen en Marcación. |
 | Doble clic | La abre en Vista Previa. |
 | Clic fuerte | Le echa un vistazo con Vista Rápida. |
 | Arrastrar a una app | Envía una copia, y la captura sigue colgada. |

@@ -9,8 +9,8 @@ import SwiftUI
 /// - The Trash discards it.
 /// - Nowhere that accepts it: the photo flies back to the line.
 ///
-/// Click copies, double click opens, press and hold opens Markup, the corner
-/// cross discards.
+/// Click copies, hold previews, slide right and release opens Markup.
+/// Recordings keep their long-press shortcut to the trimming editor.
 struct GrabArea: NSViewRepresentable {
     let item: Pegged
     let line: Line
@@ -45,6 +45,8 @@ struct GrabArea: NSViewRepresentable {
         view.onDiscard = { line.pressCorner(id) }
         view.onLongPress = { line.markup(id) }
         view.onForceClick = { line.quickLook(id) }
+        view.previewsPhoto = !isRecording
+        view.onMarkup = { line.markup(id, preview: $0) }
         view.onPressChange = { pressed in line.pressedID = pressed ? id : nil }
         view.menuProvider = {
             let menu = NSMenu()
@@ -114,6 +116,8 @@ final class GrabView: NSView, NSDraggingSource {
     var onDiscard: () -> Void = {}
     var onLongPress: () -> Void = {}
     var onForceClick: () -> Void = {}
+    var previewsPhoto = true
+    var onMarkup: (PhotoPreview) -> Void = { $0.dismiss() }
     var onPressChange: (Bool) -> Void = { _ in }
     var menuProvider: () -> NSMenu = { NSMenu() }
 
@@ -124,8 +128,10 @@ final class GrabView: NSView, NSDraggingSource {
     /// A click copies only once it is clear it is not the first half of a
     /// double click, which opens the photo and must leave the clipboard alone.
     private var clickTimer: Timer?
+    private var preview: PhotoPreview?
+    private var previewStart: NSPoint?
 
-    /// How long you hold before Markup opens. Long enough not to fire on a
+    /// How long you hold before the photo lifts up. Long enough not to fire on a
     /// slow click, short enough to feel deliberate.
     private static let holdDuration: TimeInterval = 0.45
 
@@ -167,14 +173,26 @@ final class GrabView: NSView, NSDraggingSource {
         didLongPress = false
         onPressChange(true)
         holdTimer?.invalidate()
-        holdTimer = Timer.scheduledTimer(withTimeInterval: Self.holdDuration, repeats: false) { [weak self] _ in
+        let timer = Timer(timeInterval: Self.holdDuration, repeats: false) { [weak self] _ in
             MainActor.assumeIsolated {
-                guard let self, self.downPoint != nil, !self.startedDrag else { return }
+                guard let self, let point = self.downPoint, !self.startedDrag else { return }
+                if !self.previewsPhoto {
+                    self.didLongPress = true
+                    self.endPress()
+                    self.onLongPress()
+                    return
+                }
+                guard let window = self.window,
+                      let url = self.url, let screen = window.screen ?? LinePanel.screenUnderPointer(),
+                      let preview = PhotoPreview(url: url, fallback: self.dragImage, on: screen) else { return }
                 self.didLongPress = true
-                self.onPressChange(false)
-                self.onLongPress()
+                self.previewStart = window.convertPoint(toScreen: point)
+                self.preview = preview
+                preview.show()
             }
         }
+        holdTimer = timer
+        RunLoop.main.add(timer, forMode: .common)
     }
 
     /// A force click on a trackpad opens Quick Look, as it does in Finder.
@@ -193,6 +211,12 @@ final class GrabView: NSView, NSDraggingSource {
     }
 
     override func mouseDragged(with event: NSEvent) {
+        if didLongPress {
+            guard let preview, let start = previewStart, let window else { return }
+            let point = window.convertPoint(toScreen: event.locationInWindow)
+            preview.updateSlide(point.x - start.x)
+            return
+        }
         guard let start = downPoint, !startedDrag, let url else { return }
         let p = event.locationInWindow
         guard hypot(p.x - start.x, p.y - start.y) > 4, !didLongPress else { return }
@@ -209,6 +233,15 @@ final class GrabView: NSView, NSDraggingSource {
     }
 
     override func mouseUp(with event: NSEvent) {
+        let heldPreview = preview
+        var opensMarkup = false
+        if heldPreview != nil, let start = previewStart, let window {
+            let point = window.convertPoint(toScreen: event.locationInWindow)
+            let dx = point.x - start.x, dy = point.y - start.y
+            opensMarkup = dx >= PhotoPreview.slideDistance && abs(dy) <= dx
+        }
+        preview = nil
+        previewStart = nil
         endPress()
         if downPoint != nil && !startedDrag && !didLongPress && event.clickCount == 1 {
             // Waits as long as the system lets a second click count as a double click.
@@ -227,6 +260,25 @@ final class GrabView: NSView, NSDraggingSource {
         }
         downPoint = nil
         didLongPress = false
+        if let heldPreview {
+            if opensMarkup {
+                heldPreview.prepareForMarkup()
+                onMarkup(heldPreview)
+            } else {
+                heldPreview.dismiss()
+            }
+        }
+    }
+
+    override func viewWillMove(toWindow newWindow: NSWindow?) {
+        if newWindow == nil {
+            preview?.dismiss()
+            preview = nil
+            previewStart = nil
+            downPoint = nil
+            endPress()
+        }
+        super.viewWillMove(toWindow: newWindow)
     }
 
     override func rightMouseDown(with event: NSEvent) {

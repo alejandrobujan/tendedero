@@ -50,7 +50,8 @@ Aldığınız her ekran görüntüsü, ekranınızın hemen üstündeki bir ipe 
 | | |
 |:--|:--|
 | Tıkla | Görüntüyü kopyalar. |
-| Basılı tut | İşaretle'de açar. |
+| Basılı tut | Ekranın ortasında önizleme gösterir. Kapatmak için bırakın. |
+| Sağa kaydır ve bırak | Önizlemedeki görüntüyü İşaretle'de açar. |
 | Çift tıkla | Önizleme'de açar. |
 | Kuvvetli tıkla | Hızlı Bakış ile önizler. |
 | Uygulamaya sürükle | Bir kopya gönderir. İpte kalmaya devam eder. |
