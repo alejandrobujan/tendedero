@@ -53,6 +53,9 @@ struct GrabArea: NSViewRepresentable {
             menu.addItem(ClosureMenuItem(L("Copy")) { line.copy(id) })
             menu.addItem(ClosureMenuItem(L("Open")) { line.open(id) })
             menu.addItem(ClosureMenuItem(L("Quick Look")) { line.quickLook(id) })
+            let airDrop = ClosureMenuItem(L("AirDrop…")) { line.airDrop(id) }
+            airDrop.isEnabled = line.canAirDrop(id)
+            menu.addItem(airDrop)
             if !isRecording {
                 menu.addItem(ClosureMenuItem(L("Hold")) { line.onHold?(id) })
             }
