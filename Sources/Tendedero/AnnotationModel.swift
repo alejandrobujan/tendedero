@@ -2,12 +2,14 @@ import AppKit
 import CoreImage
 
 enum AnnotationTool: CaseIterable {
-    case rectangle, ellipse, line, arrow, pen, highlighter, mosaic, text, eraser
+    case select, rectangle, ellipse, line, arrow, pen, highlighter, mosaic, text, eraser
 }
 
 /// One mark on the picture. Points are in image pixels, y growing downward,
 /// so a mark means the same thing in the editor window and in the saved file.
 struct Annotation {
+    let id = UUID()
+
     enum Kind { case rectangle, ellipse, line, arrow, pen, highlighter, mosaic, text }
 
     var kind: Kind
@@ -18,6 +20,10 @@ struct Annotation {
     var filled = false
     var text = ""
     var fontSize: CGFloat = 0
+
+    mutating func translate(by delta: CGPoint) {
+        points = points.map { CGPoint(x: $0.x + delta.x, y: $0.y + delta.y) }
+    }
 }
 
 /// The picture being marked up, the marks on it, and their history.
@@ -41,6 +47,8 @@ final class AnnotationDocument {
     var canUndo: Bool { !undoStack.isEmpty }
     var canRedo: Bool { !redoStack.isEmpty }
     var hasMarks: Bool { !items.isEmpty }
+
+    func index(of id: UUID) -> Int? { items.firstIndex { $0.id == id } }
 
     /// The three stroke widths, and the text size that goes with each.
     var widths: [CGFloat] { [2 * unit, 4 * unit, 7 * unit] }
@@ -120,7 +128,7 @@ final class AnnotationDocument {
 
     /// Draws the picture and the marks into a context whose origin is the
     /// picture's top left corner and whose units are image pixels.
-    func draw(in graphics: NSGraphicsContext, extra: Annotation? = nil) {
+    func draw(in graphics: NSGraphicsContext, extra: Annotation? = nil, hiding: UUID? = nil) {
         let cg = graphics.cgContext
         let height = pixelSize.height
         NSGraphicsContext.saveGraphicsState()
@@ -133,7 +141,7 @@ final class AnnotationDocument {
         cg.draw(image, in: CGRect(origin: .zero, size: pixelSize))
         cg.restoreGState()
 
-        for item in items + (extra.map { [$0] } ?? []) {
+        for item in items + (extra.map { [$0] } ?? []) where item.id != hiding {
             draw(item, in: graphics)
         }
     }

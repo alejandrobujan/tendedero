@@ -2,9 +2,25 @@ import SwiftUI
 
 extension AnnotationTool {
     /// Whether the tool draws with a chosen width. For text it is the size.
-    var usesWidth: Bool { self != .mosaic && self != .eraser }
+    var usesWidth: Bool { self != .mosaic && self != .eraser && self != .select }
     var usesFill: Bool { self == .rectangle || self == .ellipse }
     var usesColor: Bool { usesWidth }
+}
+
+extension Annotation.Kind {
+    /// The tool that draws this kind of mark, whose options it shares.
+    var tool: AnnotationTool {
+        switch self {
+        case .rectangle: return .rectangle
+        case .ellipse: return .ellipse
+        case .line: return .line
+        case .arrow: return .arrow
+        case .pen: return .pen
+        case .highlighter: return .highlighter
+        case .mosaic: return .mosaic
+        case .text: return .text
+        }
+    }
 }
 
 /// The tools, in a panel of their own beside the picture. Width, fill and
@@ -22,16 +38,22 @@ struct AnnotationToolbar: View {
     }
 
     private let rows: [[Entry]] = [
-        [Entry(tool: .rectangle, symbol: "rectangle", title: L("Rectangle")),
-         Entry(tool: .ellipse, symbol: "circle", title: L("Ellipse")),
-         Entry(tool: .line, symbol: "line.diagonal", title: L("Line"))],
-        [Entry(tool: .arrow, symbol: "arrow.up.right", title: L("Arrow")),
-         Entry(tool: .pen, symbol: "pencil", title: L("Pen")),
-         Entry(tool: .highlighter, symbol: "highlighter", title: L("Highlighter"))],
-        [Entry(tool: .mosaic, symbol: "checkerboard.rectangle", title: L("Mosaic")),
-         Entry(tool: .text, symbol: "textformat", title: L("Text")),
-         Entry(tool: .eraser, symbol: "eraser", title: L("Eraser"))],
+        [Entry(tool: .select, symbol: "cursorarrow", title: L("Select")),
+         Entry(tool: .rectangle, symbol: "rectangle", title: L("Rectangle")),
+         Entry(tool: .ellipse, symbol: "circle", title: L("Ellipse"))],
+        [Entry(tool: .line, symbol: "line.diagonal", title: L("Line")),
+         Entry(tool: .arrow, symbol: "arrow.up.right", title: L("Arrow")),
+         Entry(tool: .pen, symbol: "pencil", title: L("Pen"))],
+        [Entry(tool: .highlighter, symbol: "highlighter", title: L("Highlighter")),
+         Entry(tool: .mosaic, symbol: "checkerboard.rectangle", title: L("Mosaic")),
+         Entry(tool: .text, symbol: "textformat", title: L("Text"))],
     ]
+
+    /// Whose options are showing: the chosen tool's, or, with Select, those
+    /// of the mark that is selected.
+    private var optionsTool: AnnotationTool? {
+        state.tool == .select ? state.selection?.tool : state.tool
+    }
 
     private let dots: [CGFloat] = [3, 6, 10]
 
@@ -55,17 +77,19 @@ struct AnnotationToolbar: View {
                     }
                 }
                 HStack(spacing: 4) {
+                    iconButton("eraser", selected: state.tool == .eraser, help: L("Eraser")) {
+                        state.tool = .eraser
+                    }
                     iconButton("arrow.uturn.backward", selected: false, help: L("Undo"), enabled: state.canUndo) {
                         state.onUndo()
                     }
                     iconButton("arrow.uturn.forward", selected: false, help: L("Redo"), enabled: state.canRedo) {
                         state.onRedo()
                     }
-                    Spacer(minLength: 0)
                 }
             }
 
-            if state.tool.usesWidth {
+            if optionsTool?.usesWidth == true {
                 Divider()
                 HStack(spacing: 4) {
                     ForEach(0..<3, id: \.self) { index in
@@ -80,7 +104,7 @@ struct AnnotationToolbar: View {
                         .help(L("Width"))
                     }
                 }
-                if state.tool.usesFill {
+                if optionsTool?.usesFill == true {
                     HStack(spacing: 4) {
                         iconButton("square.fill", selected: state.filled, help: L("Fill")) {
                             state.filled.toggle()
@@ -90,7 +114,7 @@ struct AnnotationToolbar: View {
                 }
             }
 
-            if state.tool.usesColor {
+            if optionsTool?.usesColor == true {
                 VStack(spacing: 4) {
                     ForEach(0..<Self.palette.count, id: \.self) { row in
                         HStack(spacing: 4) {

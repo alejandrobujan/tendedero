@@ -48,7 +48,7 @@ Rest the pointer in the middle of the menu bar and it glides down. Move away and
 | | |
 |:--|:--|
 | Click | Copy the image. |
-| Press and hold | Mark it up in the built-in editor, or in the system Markup if you turn the built-in one off in the menu bar. Closing the window, or Escape, saves it. |
+| Press and hold | Mark it up in the built-in editor, or in the system Markup if you turn the built-in one off in the menu bar. Click a mark to select, move or reshape it, and press Delete to remove it. Closing the window, or Escape, saves it. |
 | Double click | Open it in Preview. |
 | Force click | Take a quick look. |
 | Drag into an app | Send a copy. It stays on the line. |

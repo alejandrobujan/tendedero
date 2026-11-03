@@ -5,6 +5,8 @@ import Combine
 @MainActor
 final class EditorState: ObservableObject {
     @Published var tool: AnnotationTool = .rectangle
+    /// The kind of mark that is selected, if one is.
+    @Published var selection: Annotation.Kind?
     @Published var color: NSColor = EditorState.color(0xFF0000)
     @Published var widthIndex = 1
     @Published var filled = false
@@ -33,7 +35,21 @@ final class AnnotationCanvas: NSView, NSTextFieldDelegate {
     private var erasing = false
     private var field: NSTextField?
     private var fieldOrigin: CGPoint = .zero
-    private var watching: AnyCancellable?
+    private var watchers = Set<AnyCancellable>()
+
+    /// The selected mark, and what the pointer is doing to it.
+    private var selectedID: UUID?
+    private enum Drag {
+        case move(last: CGPoint)
+        case resize(handle: Int, anchor: CGPoint)
+    }
+    private var drag: Drag?
+    private var dragStarted = false
+    /// Set while the toolbar is being brought in line with a selection, so
+    /// that does not count as the user changing the mark.
+    private var syncing = false
+    /// The text being edited again, which is not drawn under its own field.
+    private var editingID: UUID?
 
     override var isFlipped: Bool { true }
     override var acceptsFirstResponder: Bool { true }
@@ -46,12 +62,15 @@ final class AnnotationCanvas: NSView, NSTextFieldDelegate {
         clipsToBounds = true
         state.onUndo = { [weak self] in self?.undo() }
         state.onRedo = { [weak self] in self?.redo() }
-        watching = state.$tool.sink { [weak self] _ in
-            DispatchQueue.main.async {
-                guard let self else { return }
-                self.window?.invalidateCursorRects(for: self)
-            }
-        }
+        state.$tool.sink { [weak self] tool in
+            guard let self else { return }
+            if tool != .select, self.selectedID != nil { self.selectMark(nil) }
+            DispatchQueue.main.async { self.window?.invalidateCursorRects(for: self) }
+        }.store(in: &watchers)
+        // The toolbar's colour, width and fill act on the selected mark.
+        state.$color.sink { [weak self] in self?.restyle(color: $0) }.store(in: &watchers)
+        state.$widthIndex.sink { [weak self] in self?.restyle(widthIndex: $0) }.store(in: &watchers)
+        state.$filled.sink { [weak self] in self?.restyle(filled: $0) }.store(in: &watchers)
     }
 
     required init?(coder: NSCoder) { fatalError() }
@@ -99,15 +118,24 @@ final class AnnotationCanvas: NSView, NSTextFieldDelegate {
         graphics.cgContext.translateBy(x: rect.minX, y: rect.minY)
         graphics.cgContext.scaleBy(x: scale, y: scale)
         graphics.cgContext.interpolationQuality = .high
-        document.draw(in: graphics, extra: draft)
+        document.draw(in: graphics, extra: draft, hiding: editingID)
         graphics.cgContext.restoreGState()
+        drawSelection()
     }
 
     override func resetCursorRects() {
-        addCursorRect(bounds, cursor: state.tool == .text ? .iBeam : .crosshair)
+        let cursor: NSCursor
+        switch state.tool {
+        case .select: cursor = .arrow
+        case .text: cursor = .iBeam
+        default: cursor = .crosshair
+        }
+        addCursorRect(bounds, cursor: cursor)
     }
 
     private func refreshState() {
+        // Undo can take away the mark that was selected.
+        if let id = selectedID, document.index(of: id) == nil { selectMark(nil) }
         state.canUndo = document.canUndo
         state.canRedo = document.canRedo
         needsDisplay = true
@@ -121,11 +149,14 @@ final class AnnotationCanvas: NSView, NSTextFieldDelegate {
         let wasTyping = field != nil
         finishText()
 
-        let point = imagePoint(convert(event.locationInWindow, from: nil))
+        let viewLocation = convert(event.locationInWindow, from: nil)
+        let point = imagePoint(viewLocation)
         let width = document.widths[state.widthIndex]
         let color = state.color
 
         switch state.tool {
+        case .select:
+            beginSelecting(at: point, viewLocation: viewLocation, clickCount: event.clickCount)
         case .rectangle:
             draft = Annotation(kind: .rectangle, points: [point, point], color: color, width: width, filled: state.filled)
         case .ellipse:
@@ -142,7 +173,9 @@ final class AnnotationCanvas: NSView, NSTextFieldDelegate {
             draft = Annotation(kind: .mosaic, points: [point, point], color: color, width: width)
         case .text:
             // The click that ended one piece of text does not start another.
-            if !wasTyping { beginText(at: point) }
+            if !wasTyping {
+                if let existing = textMark(at: point) { beginText(editing: existing) } else { beginText(at: point) }
+            }
         case .eraser:
             erasing = false
             erase(at: point)
@@ -154,6 +187,10 @@ final class AnnotationCanvas: NSView, NSTextFieldDelegate {
         let point = imagePoint(convert(event.locationInWindow, from: nil))
         if state.tool == .eraser {
             erase(at: point)
+            return
+        }
+        if state.tool == .select {
+            dragSelection(to: point)
             return
         }
         guard var draft else { return }
@@ -170,12 +207,31 @@ final class AnnotationCanvas: NSView, NSTextFieldDelegate {
 
     override func mouseUp(with event: NSEvent) {
         erasing = false
+        if state.tool == .select {
+            drag = nil
+            if dragStarted { dragStarted = false; refreshState() }
+            return
+        }
         guard let finished = draft else { return }
         draft = nil
+        // A click on a mark, with a drawing tool, selects it instead.
+        if isClick(finished), let start = finished.points.first,
+           let hit = document.topmost(at: start, tolerance: 6 / max(scale, 0.01)) {
+            state.tool = .select
+            selectMark(document.items[hit].id)
+            needsDisplay = true
+            return
+        }
         if isWorthKeeping(finished) {
             document.change { $0.append(finished) }
         }
         refreshState()
+    }
+
+    /// A press that hardly moved.
+    private func isClick(_ a: Annotation) -> Bool {
+        let box = a.bounds(unit: document.unit)
+        return hypot(box.width, box.height) < 3 * document.unit
     }
 
     /// A click without a drag leaves no shape behind, except a dot of pen.
@@ -206,24 +262,37 @@ final class AnnotationCanvas: NSView, NSTextFieldDelegate {
 
     // MARK: Text
 
-    private func beginText(at point: CGPoint) {
-        let size = document.fontSizes[state.widthIndex]
+    /// The text mark under a point, if any.
+    private func textMark(at point: CGPoint) -> Annotation? {
+        let tolerance = 6 / max(scale, 0.01)
+        return document.items.last { $0.kind == .text && $0.hits(point, tolerance: tolerance, unit: document.unit) }
+    }
+
+    private func beginText(at point: CGPoint, editing existing: Annotation? = nil) {
+        let size = existing?.fontSize ?? document.fontSizes[state.widthIndex]
         let font = NSFont.systemFont(ofSize: size * scale, weight: .medium)
-        let origin = viewPoint(point)
+        let origin = viewPoint(existing?.points.first ?? point)
         let field = NSTextField(frame: NSRect(x: origin.x, y: origin.y, width: 80, height: font.boundingRectForFont.height + 4))
         field.isBordered = false
         field.drawsBackground = false
         field.focusRingType = .none
         field.font = font
-        field.textColor = state.color
+        field.textColor = existing?.color ?? state.color
+        field.stringValue = existing?.text ?? ""
         field.placeholderString = ""
         field.cell?.isScrollable = true
         field.cell?.wraps = false
         field.delegate = self
         addSubview(field)
         self.field = field
-        fieldOrigin = point
+        fieldOrigin = existing?.points.first ?? point
+        if let existing {
+            selectMark(nil)
+            editingID = existing.id
+            needsDisplay = true
+        }
         window?.makeFirstResponder(field)
+        if existing != nil { controlTextDidChange(Notification(name: NSControl.textDidChangeNotification)) }
     }
 
     private func finishText() {
@@ -233,6 +302,19 @@ final class AnnotationCanvas: NSView, NSTextFieldDelegate {
         field.delegate = nil
         field.removeFromSuperview()
         window?.makeFirstResponder(self)
+        // Text edited again replaces what it was, or goes if it is emptied.
+        if let id = editingID {
+            editingID = nil
+            if let i = document.index(of: id) {
+                if text.isEmpty {
+                    document.change { $0.remove(at: i) }
+                } else if text != document.items[i].text {
+                    document.change { $0[i].text = text }
+                }
+            }
+            refreshState()
+            return
+        }
         guard !text.isEmpty else { return }
         let mark = Annotation(kind: .text, points: [fieldOrigin], color: state.color, width: 0,
                               text: text, fontSize: document.fontSizes[state.widthIndex])
@@ -267,7 +349,11 @@ final class AnnotationCanvas: NSView, NSTextFieldDelegate {
     // MARK: Keys
 
     /// Escape arrives as cancelOperation only once keys are interpreted.
-    override func keyDown(with event: NSEvent) { interpretKeyEvents([event]) }
+    override func keyDown(with event: NSEvent) {
+        // Delete and forward delete take away the selected mark.
+        if (event.keyCode == 51 || event.keyCode == 117), deleteSelection() { return }
+        interpretKeyEvents([event])
+    }
 
     override func cancelOperation(_ sender: Any?) { onFinish() }
 
@@ -296,5 +382,172 @@ final class AnnotationCanvas: NSView, NSTextFieldDelegate {
         finishText()
         document.redo()
         refreshState()
+    }
+
+    // MARK: Selection
+
+    private func selectMark(_ id: UUID?) {
+        selectedID = id
+        drag = nil
+        if let id, let i = document.index(of: id) {
+            let mark = document.items[i]
+            state.selection = mark.kind
+            // The toolbar shows the mark's own colour, width and fill.
+            syncing = true
+            state.color = mark.color
+            if mark.kind == .text {
+                state.widthIndex = Self.nearest(document.fontSizes, to: mark.fontSize)
+            } else if mark.kind != .mosaic {
+                state.widthIndex = Self.nearest(document.widths, to: mark.width)
+            }
+            state.filled = mark.filled
+            syncing = false
+        } else {
+            selectedID = nil
+            state.selection = nil
+        }
+        needsDisplay = true
+    }
+
+    private static func nearest(_ values: [CGFloat], to value: CGFloat) -> Int {
+        values.indices.min { abs(values[$0] - value) < abs(values[$1] - value) } ?? 0
+    }
+
+    private func beginSelecting(at point: CGPoint, viewLocation: CGPoint, clickCount: Int) {
+        dragStarted = false
+        if clickCount == 2, let text = textMark(at: point) {
+            beginText(editing: text)
+            return
+        }
+        // A grip of the selected mark takes the pointer first.
+        if let id = selectedID, let i = document.index(of: id),
+           let handle = handle(at: viewLocation, of: document.items[i]) {
+            let mark = document.items[i]
+            let points = Self.handlePoints(of: mark)
+            var anchor = points[handle]
+            if mark.kind == .rectangle || mark.kind == .ellipse || mark.kind == .mosaic {
+                // The corner across from the one held stays where it is.
+                anchor = points[3 - handle]
+            }
+            drag = .resize(handle: handle, anchor: anchor)
+            return
+        }
+        if let hit = document.topmost(at: point, tolerance: 6 / max(scale, 0.01)) {
+            selectMark(document.items[hit].id)
+            drag = .move(last: point)
+        } else {
+            selectMark(nil)
+        }
+    }
+
+    private func dragSelection(to point: CGPoint) {
+        guard let drag, let id = selectedID, let i = document.index(of: id) else { return }
+        // The first movement is what makes a step to undo, not the click.
+        if !dragStarted {
+            dragStarted = true
+            document.change { _ in }
+        }
+        switch drag {
+        case .move(let last):
+            let delta = CGPoint(x: point.x - last.x, y: point.y - last.y)
+            document.amend { $0[i].translate(by: delta) }
+            self.drag = .move(last: point)
+        case .resize(let handle, let anchor):
+            document.amend {
+                switch $0[i].kind {
+                case .rectangle, .ellipse, .mosaic:
+                    $0[i].points = [point, anchor]
+                case .line, .arrow:
+                    $0[i].points[handle] = point
+                default:
+                    break
+                }
+            }
+        }
+        needsDisplay = true
+    }
+
+    @discardableResult
+    private func deleteSelection() -> Bool {
+        guard let id = selectedID, let i = document.index(of: id) else { return false }
+        document.change { $0.remove(at: i) }
+        selectMark(nil)
+        refreshState()
+        return true
+    }
+
+    /// Applies what the toolbar now says to the selected mark.
+    private func restyle(color: NSColor? = nil, widthIndex: Int? = nil, filled: Bool? = nil) {
+        guard !syncing, let id = selectedID, let i = document.index(of: id) else { return }
+        let before = document.items[i]
+        var after = before
+        if let color, before.kind != .mosaic { after.color = color }
+        if let widthIndex {
+            if before.kind == .text {
+                after.fontSize = document.fontSizes[widthIndex]
+            } else if before.kind != .mosaic {
+                after.width = document.widths[widthIndex]
+            }
+        }
+        if let filled, before.kind == .rectangle || before.kind == .ellipse { after.filled = filled }
+        guard after.color != before.color || after.width != before.width
+                || after.fontSize != before.fontSize || after.filled != before.filled else { return }
+        document.change { $0[i] = after }
+        refreshState()
+    }
+
+    // MARK: Grips
+
+    /// Where a mark can be held to reshape it: the corners of a box, in the
+    /// order top left, top right, bottom left, bottom right; or the two ends
+    /// of a line. Other marks can be moved but not reshaped.
+    private static func handlePoints(of a: Annotation) -> [CGPoint] {
+        switch a.kind {
+        case .rectangle, .ellipse, .mosaic:
+            guard a.points.count >= 2 else { return [] }
+            let r = Annotation.rect(a.points[0], a.points[1])
+            return [CGPoint(x: r.minX, y: r.minY), CGPoint(x: r.maxX, y: r.minY),
+                    CGPoint(x: r.minX, y: r.maxY), CGPoint(x: r.maxX, y: r.maxY)]
+        case .line, .arrow:
+            return Array(a.points.prefix(2))
+        default:
+            return []
+        }
+    }
+
+    private func handle(at viewLocation: CGPoint, of mark: Annotation) -> Int? {
+        Self.handlePoints(of: mark).indices.first {
+            let p = viewPoint(Self.handlePoints(of: mark)[$0])
+            return hypot(p.x - viewLocation.x, p.y - viewLocation.y) <= 9
+        }
+    }
+
+    /// A dashed box round the selected mark, with grips where it has them.
+    /// Drawn over the picture in the editor only; the saved file has none.
+    private func drawSelection() {
+        guard let id = selectedID, let i = document.index(of: id) else { return }
+        let mark = document.items[i]
+        let box = mark.bounds(unit: document.unit)
+        guard !box.isNull else { return }
+        let reach = (mark.kind == .highlighter ? mark.width * 1.5 : mark.width / 2) * scale
+        let origin = viewPoint(box.origin)
+        let rect = CGRect(x: origin.x, y: origin.y, width: box.width * scale, height: box.height * scale)
+            .insetBy(dx: -(reach + 4), dy: -(reach + 4))
+
+        let outline = NSBezierPath(rect: rect)
+        outline.lineWidth = 1.5
+        outline.setLineDash([5, 3], count: 2, phase: 0)
+        NSColor.controlAccentColor.setStroke()
+        outline.stroke()
+
+        for point in Self.handlePoints(of: mark) {
+            let p = viewPoint(point)
+            let grip = NSBezierPath(rect: CGRect(x: p.x - 4.5, y: p.y - 4.5, width: 9, height: 9))
+            NSColor.white.setFill()
+            grip.fill()
+            grip.lineWidth = 1.5
+            NSColor.controlAccentColor.setStroke()
+            grip.stroke()
+        }
     }
 }
