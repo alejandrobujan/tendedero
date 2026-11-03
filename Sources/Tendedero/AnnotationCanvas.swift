@@ -37,6 +37,8 @@ final class AnnotationCanvas: NSView, NSTextFieldDelegate {
         self.document = document
         self.state = state
         super.init(frame: .zero)
+        // Since macOS 14 a view's drawing is no longer cut off at its edge.
+        clipsToBounds = true
         state.onUndo = { [weak self] in self?.undo() }
         state.onRedo = { [weak self] in self?.redo() }
         watching = state.$tool.sink { [weak self] _ in
@@ -84,11 +86,11 @@ final class AnnotationCanvas: NSView, NSTextFieldDelegate {
 
     override func draw(_ dirtyRect: NSRect) {
         NSColor.windowBackgroundColor.setFill()
-        dirtyRect.fill()
+        bounds.fill()
         guard let graphics = NSGraphicsContext.current else { return }
         let rect = imageRect
         graphics.cgContext.saveGState()
-        graphics.cgContext.clip(to: rect)
+        graphics.cgContext.clip(to: rect.intersection(bounds))
         graphics.cgContext.translateBy(x: rect.minX, y: rect.minY)
         graphics.cgContext.scaleBy(x: scale, y: scale)
         graphics.cgContext.interpolationQuality = .high
