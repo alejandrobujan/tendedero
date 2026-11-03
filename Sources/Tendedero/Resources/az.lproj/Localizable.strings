@@ -75,3 +75,20 @@
 "Hang back" = "İpə qaytar";
 "Hang everything back" = "Hamısını ipə qaytar";
 "Actual Size" = "Həqiqi ölçü";
+
+/* Annotate */
+"Built-in markup editor" = "Daxili işarələmə redaktoru";
+"Off uses the system Markup" = "Söndürüldükdə sistemin Markup aləti istifadə olunur";
+"Rectangle" = "Düzbucaqlı";
+"Ellipse" = "Ellips";
+"Line" = "Xətt";
+"Arrow" = "Ox";
+"Pen" = "Qələm";
+"Highlighter" = "Marker";
+"Mosaic" = "Mozaika";
+"Text" = "Mətn";
+"Eraser" = "Pozan";
+"Undo" = "Geri al";
+"Redo" = "Yenidən et";
+"Width" = "Qalınlıq";
+"Fill" = "Doldurma";

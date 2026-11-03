@@ -73,3 +73,20 @@
 "Hang back" = "放回绳上";
 "Hang everything back" = "全部放回绳上";
 "Actual Size" = "实际大小";
+
+/* Annotate */
+"Built-in markup editor" = "内置标记编辑器";
+"Off uses the system Markup" = "关闭后使用系统“标记”";
+"Rectangle" = "矩形";
+"Ellipse" = "椭圆";
+"Line" = "直线";
+"Arrow" = "箭头";
+"Pen" = "画笔";
+"Highlighter" = "荧光笔";
+"Mosaic" = "马赛克";
+"Text" = "文字";
+"Eraser" = "橡皮擦";
+"Undo" = "撤销";
+"Redo" = "重做";
+"Width" = "粗细";
+"Fill" = "填充";

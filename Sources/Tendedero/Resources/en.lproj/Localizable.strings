@@ -75,3 +75,20 @@
 "Hang back" = "Hang back";
 "Hang everything back" = "Hang everything back";
 "Actual Size" = "Actual Size";
+
+/* Annotate */
+"Built-in markup editor" = "Built-in markup editor";
+"Off uses the system Markup" = "Off uses the system Markup";
+"Rectangle" = "Rectangle";
+"Ellipse" = "Ellipse";
+"Line" = "Line";
+"Arrow" = "Arrow";
+"Pen" = "Pen";
+"Highlighter" = "Highlighter";
+"Mosaic" = "Mosaic";
+"Text" = "Text";
+"Eraser" = "Eraser";
+"Undo" = "Undo";
+"Redo" = "Redo";
+"Width" = "Width";
+"Fill" = "Fill";

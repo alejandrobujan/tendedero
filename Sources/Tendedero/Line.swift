@@ -360,12 +360,15 @@ final class Line: ObservableObject {
         return candidate
     }
 
-    /// Long press: open the photo in the system Markup editor. Markup does
+    /// Long press: open the photo in the marking editor, Tendedero's own or
+    /// the system Markup, as chosen in the menu. Markup does
     /// not edit video, so a recording opens in the trimming editor instead.
     func markup(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
         if item.isRecording {
             Trim.shared.edit(item.url, size: item.thumb.size)
+        } else if Annotate.isEnabled {
+            Annotate.shared.edit(item.url)
         } else {
             Markup.shared.edit(item.url)
         }

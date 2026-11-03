@@ -73,3 +73,20 @@
 "Hang back" = "ロープに戻す";
 "Hang everything back" = "すべてロープに戻す";
 "Actual Size" = "実際のサイズ";
+
+/* Annotate */
+"Built-in markup editor" = "内蔵マークアップエディタ";
+"Off uses the system Markup" = "オフにするとシステムのマークアップを使用";
+"Rectangle" = "長方形";
+"Ellipse" = "楕円";
+"Line" = "線";
+"Arrow" = "矢印";
+"Pen" = "ペン";
+"Highlighter" = "蛍光ペン";
+"Mosaic" = "モザイク";
+"Text" = "テキスト";
+"Eraser" = "消しゴム";
+"Undo" = "取り消す";
+"Redo" = "やり直す";
+"Width" = "太さ";
+"Fill" = "塗りつぶし";

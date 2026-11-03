@@ -89,6 +89,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NSUpdateDynamicServices()
 
         Markup.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
+        Annotate.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         Trim.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         panel.onScroll = { [weak self] event in
             // Sideways on a trackpad, or the wheel of a mouse.
@@ -153,6 +154,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        // An editor still open saves its marks.
+        Annotate.shared.finish()
         if Inbox.isEnabled { Inbox.restore() }
     }
 
@@ -860,6 +863,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         clipboard.state = ClipboardWatcher.isEnabled ? .on : .off
         clipboard.toolTip = L("Images you copy hang on the line too")
         menu.addItem(clipboard)
+
+        let editor = ClosureMenuItem(L("Built-in markup editor")) {
+            Annotate.isEnabled.toggle()
+        }
+        editor.state = Annotate.isEnabled ? .on : .off
+        editor.toolTip = L("Off uses the system Markup")
+        menu.addItem(editor)
 
         let bringDown = NSMenuItem(title: L("Bring the line down"), action: nil, keyEquivalent: "")
         let options = NSMenu()

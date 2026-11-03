@@ -73,3 +73,20 @@
 "Hang back" = "Remettre sur la corde";
 "Hang everything back" = "Tout remettre sur la corde";
 "Actual Size" = "Taille réelle";
+
+/* Annotate */
+"Built-in markup editor" = "Éditeur d’annotation intégré";
+"Off uses the system Markup" = "Désactivé, utilise le Markup du système";
+"Rectangle" = "Rectangle";
+"Ellipse" = "Ellipse";
+"Line" = "Ligne";
+"Arrow" = "Flèche";
+"Pen" = "Crayon";
+"Highlighter" = "Surligneur";
+"Mosaic" = "Mosaïque";
+"Text" = "Texte";
+"Eraser" = "Gomme";
+"Undo" = "Annuler";
+"Redo" = "Rétablir";
+"Width" = "Épaisseur";
+"Fill" = "Remplissage";

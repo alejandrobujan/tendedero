@@ -48,7 +48,7 @@ Rest the pointer in the middle of the menu bar and it glides down. Move away and
 | | |
 |:--|:--|
 | Click | Copy the image. |
-| Press and hold | Open it in Markup. |
+| Press and hold | Mark it up in the built-in editor, or in the system Markup if you turn the built-in one off in the menu bar. Closing the window, or Escape, saves it. |
 | Double click | Open it in Preview. |
 | Force click | Take a quick look. |
 | Drag into an app | Send a copy. It stays on the line. |
@@ -153,6 +153,10 @@ Want to help? Read [CONTRIBUTING.md](CONTRIBUTING.md) first.
 | `ClipboardWatcher.swift` | Notices images copied to the clipboard |
 | `Inbox.swift` | Takes over screenshot settings and puts them back |
 | `Markup.swift` | Opens the system Markup editor and saves the result |
+| `Annotate.swift` | The built-in markup editor: window, saving |
+| `AnnotationModel.swift` | The marks, their history and how they are drawn and flattened |
+| `AnnotationCanvas.swift` | The picture and the pointer: drawing, eraser, text |
+| `AnnotationToolbar.swift` | The tools, widths and colours |
 | `Trim.swift` | Trims a screen recording and saves the result |
 | `FullScreen.swift` | Knows when to stay hidden |
 | `Line.swift` | What is hanging, and what you can do with it |

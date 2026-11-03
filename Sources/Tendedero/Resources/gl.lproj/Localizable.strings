@@ -73,3 +73,20 @@
 "Hang back" = "Devolver á corda";
 "Hang everything back" = "Devolver todo á corda";
 "Actual Size" = "Tamaño real";
+
+/* Annotate */
+"Built-in markup editor" = "Editor de marcado integrado";
+"Off uses the system Markup" = "Desactivado usa o Markup do sistema";
+"Rectangle" = "Rectángulo";
+"Ellipse" = "Elipse";
+"Line" = "Liña";
+"Arrow" = "Frecha";
+"Pen" = "Lapis";
+"Highlighter" = "Marcador";
+"Mosaic" = "Mosaico";
+"Text" = "Texto";
+"Eraser" = "Goma";
+"Undo" = "Desfacer";
+"Redo" = "Refacer";
+"Width" = "Grosor";
+"Fill" = "Recheo";
