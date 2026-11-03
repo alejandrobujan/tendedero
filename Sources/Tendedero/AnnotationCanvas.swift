@@ -268,7 +268,7 @@ final class AnnotationCanvas: NSView, NSTextFieldDelegate {
         return document.items.last { $0.kind == .text && $0.hits(point, tolerance: tolerance, unit: document.unit) }
     }
 
-    private func beginText(at point: CGPoint, editing existing: Annotation? = nil) {
+    private func beginText(at point: CGPoint = .zero, editing existing: Annotation? = nil) {
         let size = existing?.fontSize ?? document.fontSizes[state.widthIndex]
         let font = NSFont.systemFont(ofSize: size * scale, weight: .medium)
         let origin = viewPoint(existing?.points.first ?? point)
