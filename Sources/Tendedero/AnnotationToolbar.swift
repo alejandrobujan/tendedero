@@ -113,3 +113,25 @@ struct AnnotationToolbar: View {
         .buttonStyle(.plain)
     }
 }
+
+/// The editor's whole content: the toolbar over the canvas. SwiftUI lays
+/// both out, so the canvas, an AppKit view, takes what the toolbar leaves.
+struct AnnotationEditor: View {
+    let state: EditorState
+    let canvas: AnnotationCanvas
+
+    var body: some View {
+        VStack(spacing: 0) {
+            AnnotationToolbar(state: state)
+            CanvasHost(canvas: canvas)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+}
+
+private struct CanvasHost: NSViewRepresentable {
+    let canvas: AnnotationCanvas
+
+    func makeNSView(context: Context) -> AnnotationCanvas { canvas }
+    func updateNSView(_ view: AnnotationCanvas, context: Context) {}
+}

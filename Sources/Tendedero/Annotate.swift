@@ -43,28 +43,17 @@ final class Annotate: NSObject, NSWindowDelegate {
 
         let state = EditorState()
         let canvas = AnnotationCanvas(document: document, state: state)
-        let toolbar = NSHostingView(rootView: AnnotationToolbar(state: state))
 
-        let container = NSView()
-        for view in [toolbar, canvas] as [NSView] {
-            view.translatesAutoresizingMaskIntoConstraints = false
-            container.addSubview(view)
-        }
-        NSLayoutConstraint.activate([
-            toolbar.topAnchor.constraint(equalTo: container.topAnchor),
-            toolbar.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-            toolbar.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-            toolbar.heightAnchor.constraint(equalToConstant: AnnotationToolbar.height),
-            canvas.topAnchor.constraint(equalTo: toolbar.bottomAnchor),
-            canvas.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-            canvas.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-            canvas.bottomAnchor.constraint(equalTo: container.bottomAnchor),
-        ])
+        let size = Self.windowSize(for: document)
+        let content = NSHostingController(rootView: AnnotationEditor(state: state, canvas: canvas))
+        // The window is sized here, not by what the content would like.
+        content.sizingOptions = []
 
-        let window = NSWindow(contentRect: NSRect(origin: .zero, size: Self.windowSize(for: document)),
+        let window = NSWindow(contentRect: NSRect(origin: .zero, size: size),
                               styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false)
         window.title = url.lastPathComponent
-        window.contentView = container
+        window.contentViewController = content
+        window.setContentSize(size)
         window.contentMinSize = NSSize(width: Self.minWidth, height: AnnotationToolbar.height + 200)
         window.isReleasedWhenClosed = false
         window.delegate = self
