@@ -5,11 +5,16 @@ import Combine
 @MainActor
 final class EditorState: ObservableObject {
     @Published var tool: AnnotationTool = .rectangle
-    @Published var color: NSColor = .systemRed
+    @Published var color: NSColor = EditorState.color(0xFF0000)
     @Published var widthIndex = 1
     @Published var filled = false
     @Published var canUndo = false
     @Published var canRedo = false
+
+    static func color(_ hex: UInt32) -> NSColor {
+        NSColor(srgbRed: CGFloat((hex >> 16) & 0xFF) / 255, green: CGFloat((hex >> 8) & 0xFF) / 255,
+                blue: CGFloat(hex & 0xFF) / 255, alpha: 1)
+    }
 
     var onUndo: () -> Void = {}
     var onRedo: () -> Void = {}

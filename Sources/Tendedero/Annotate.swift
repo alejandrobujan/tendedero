@@ -1,4 +1,5 @@
 import AppKit
+import Combine
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -22,6 +23,8 @@ final class Annotate: NSObject, NSWindowDelegate {
     var onSaved: (URL) -> Void = { _ in }
 
     private var window: NSWindow?
+    private var panel: NSPanel?
+    private var toolWatch: AnyCancellable?
     private var canvas: AnnotationCanvas?
     private var document: AnnotationDocument?
     private var target: URL?
@@ -44,46 +47,95 @@ final class Annotate: NSObject, NSWindowDelegate {
         let state = EditorState()
         let canvas = AnnotationCanvas(document: document, state: state)
 
-        let size = Self.windowSize(for: document)
-        let content = NSHostingController(rootView: AnnotationEditor(state: state, canvas: canvas))
-        // The window is sized here, not by what the content would like.
-        content.sizingOptions = []
-
+        let panel = Self.makePanel(state: state)
+        let size = Self.windowSize(for: document, panelWidth: panel.frame.width)
         let window = NSWindow(contentRect: NSRect(origin: .zero, size: size),
                               styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false)
         window.title = url.lastPathComponent
-        window.contentViewController = content
-        window.setContentSize(size)
-        window.contentMinSize = NSSize(width: Self.minWidth, height: AnnotationToolbar.height + 200)
+        window.contentView = canvas
+        window.contentMinSize = NSSize(width: 240, height: 160)
         window.isReleasedWhenClosed = false
         window.delegate = self
-        window.center()
+        Self.place(window, with: panel)
 
         canvas.onFinish = { [weak window] in window?.close() }
 
         self.window = window
+        self.panel = panel
+        // The panel is a child of the picture's window, so it goes where the
+        // window goes. It grows and shrinks with the tool's options.
+        toolWatch = state.$tool.sink { [weak self] _ in
+            DispatchQueue.main.async { self?.fitPanel() }
+        }
         self.canvas = canvas
         self.document = document
         self.target = url
 
         NSApp.activate(ignoringOtherApps: true)
         window.makeKeyAndOrderFront(nil)
+        window.addChildWindow(panel, ordered: .above)
         window.makeFirstResponder(canvas)
     }
 
-    /// Wide enough for the second row of the toolbar.
-    private static let minWidth: CGFloat = 520
+    private static let gap: CGFloat = 8
 
-    /// The picture at its natural size on this screen, or smaller to fit.
-    private static func windowSize(for document: AnnotationDocument) -> NSSize {
+    /// The tools in a panel of their own, with no title bar. It never takes
+    /// the keyboard, so the picture's window stays the one that is typed into.
+    private static func makePanel(state: EditorState) -> NSPanel {
+        let hosting = NSHostingView(rootView: AnnotationToolbar(state: state))
+        hosting.sizingOptions = [.intrinsicContentSize]
+        hosting.wantsLayer = true
+        hosting.layer?.cornerRadius = 12
+        hosting.layer?.masksToBounds = true
+        let panel = NSPanel(contentRect: NSRect(origin: .zero, size: hosting.fittingSize),
+                            styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
+        panel.contentView = hosting
+        panel.isOpaque = false
+        panel.backgroundColor = .clear
+        panel.hasShadow = true
+        panel.isMovableByWindowBackground = true
+        panel.isReleasedWhenClosed = false
+        panel.hidesOnDeactivate = false
+        return panel
+    }
+
+    /// Fits the panel to the options of the chosen tool, its top edge staying put.
+    private func fitPanel() {
+        guard let panel, let hosting = panel.contentView else { return }
+        let size = hosting.fittingSize
+        guard size.width > 0, size.height > 0 else { return }
+        var frame = panel.frame
+        let top = frame.maxY
+        frame.size = panel.frameRect(forContentRect: NSRect(origin: .zero, size: size)).size
+        frame.origin.y = top - frame.height
+        panel.setFrame(frame, display: true)
+        panel.invalidateShadow()
+    }
+
+    /// The picture at its natural size on this screen, or smaller to fit,
+    /// with room beside it for the panel.
+    private static func windowSize(for document: AnnotationDocument, panelWidth: CGFloat) -> NSSize {
         let screen = LinePanel.screenUnderPointer()
         let area = screen?.visibleFrame.size ?? NSSize(width: 1440, height: 900)
         let density = screen?.backingScaleFactor ?? 2
         let natural = NSSize(width: document.pixelSize.width / density, height: document.pixelSize.height / density)
-        let room = NSSize(width: area.width * 0.85, height: area.height * 0.85 - AnnotationToolbar.height)
+        let room = NSSize(width: area.width * 0.9 - panelWidth - gap, height: area.height * 0.85)
         let scale = min(1, room.width / max(natural.width, 1), room.height / max(natural.height, 1))
-        return NSSize(width: max(minWidth, (natural.width * scale).rounded()),
-                      height: max(200, (natural.height * scale).rounded()) + AnnotationToolbar.height)
+        return NSSize(width: max(240, (natural.width * scale).rounded()),
+                      height: max(160, (natural.height * scale).rounded()))
+    }
+
+    /// The window and its panel as one group, centred on the screen, the
+    /// panel against the window's right edge and level with its top.
+    private static func place(_ window: NSWindow, with panel: NSPanel) {
+        let area = (LinePanel.screenUnderPointer() ?? NSScreen.main)?.visibleFrame
+            ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
+        let frame = window.frame
+        let total = frame.width + gap + panel.frame.width
+        let x = (area.midX - total / 2).rounded()
+        let y = (area.midY - frame.height / 2).rounded()
+        window.setFrameOrigin(NSPoint(x: x, y: y))
+        panel.setFrameOrigin(NSPoint(x: x + frame.width + gap, y: y + frame.height - panel.frame.height))
     }
 
     /// Closes the editor, which saves what is on it. For when Tendedero quits.
@@ -94,8 +146,14 @@ final class Annotate: NSObject, NSWindowDelegate {
     func windowWillClose(_ notification: Notification) {
         guard (notification.object as? NSWindow) === window else { return }
         canvas?.commitPendingText()
+        if let window, let panel {
+            window.removeChildWindow(panel)
+            panel.orderOut(nil)
+        }
         if let document, let target, document.hasMarks { save(document, to: target) }
+        toolWatch = nil
         window = nil
+        panel = nil
         canvas = nil
         document = nil
         target = nil
