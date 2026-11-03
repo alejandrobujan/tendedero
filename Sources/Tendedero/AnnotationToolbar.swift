@@ -74,6 +74,7 @@ struct AnnotationToolbar: View {
                                 .frame(width: 36, height: 28)
                                 .background(state.widthIndex == index ? Color.accentColor.opacity(0.25) : Color.clear)
                                 .clipShape(RoundedRectangle(cornerRadius: 5))
+                                .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
                         .help(L("Width"))
@@ -101,7 +102,6 @@ struct AnnotationToolbar: View {
         }
         .padding(10)
         .frame(width: Self.width)
-        .background(.regularMaterial)
     }
 
     private func iconButton(_ symbol: String, selected: Bool, help: String, enabled: Bool = true,
@@ -113,6 +113,7 @@ struct AnnotationToolbar: View {
                 .background(selected ? Color.accentColor.opacity(0.25) : Color.clear)
                 .clipShape(RoundedRectangle(cornerRadius: 5))
                 .opacity(enabled ? 1 : 0.35)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .disabled(!enabled)
@@ -128,5 +129,23 @@ struct AnnotationToolbar: View {
                 .overlay(Rectangle().stroke(Color.accentColor, lineWidth: state.color == color ? 2 : 0))
         }
         .buttonStyle(.plain)
+    }
+}
+
+/// What the panel's window shows: the toolbar as a rounded card at the top
+/// of a window made tall enough for every tool's options, so the window
+/// never has to change size when the tool does.
+struct AnnotationPanelView: View {
+    @ObservedObject var state: EditorState
+
+    static let margin: CGFloat = 12
+
+    var body: some View {
+        AnnotationToolbar(state: state)
+            .background(.regularMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .shadow(color: .black.opacity(0.25), radius: 6, y: 2)
+            .padding(Self.margin)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }

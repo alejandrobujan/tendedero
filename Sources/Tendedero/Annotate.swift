@@ -1,5 +1,4 @@
 import AppKit
-import Combine
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -24,7 +23,6 @@ final class Annotate: NSObject, NSWindowDelegate {
 
     private var window: NSWindow?
     private var panel: NSPanel?
-    private var toolWatch: AnyCancellable?
     private var canvas: AnnotationCanvas?
     private var document: AnnotationDocument?
     private var target: URL?
@@ -48,7 +46,7 @@ final class Annotate: NSObject, NSWindowDelegate {
         let canvas = AnnotationCanvas(document: document, state: state)
 
         let panel = Self.makePanel(state: state)
-        let size = Self.windowSize(for: document, panelWidth: panel.frame.width)
+        let size = Self.windowSize(for: document, panelWidth: panel.frame.width - 2 * AnnotationPanelView.margin)
         let window = NSWindow(contentRect: NSRect(origin: .zero, size: size),
                               styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false)
         window.title = url.lastPathComponent
@@ -62,11 +60,6 @@ final class Annotate: NSObject, NSWindowDelegate {
 
         self.window = window
         self.panel = panel
-        // The panel is a child of the picture's window, so it goes where the
-        // window goes. It grows and shrinks with the tool's options.
-        toolWatch = state.$tool.sink { [weak self] _ in
-            DispatchQueue.main.async { self?.fitPanel() }
-        }
         self.canvas = canvas
         self.document = document
         self.target = url
@@ -82,34 +75,26 @@ final class Annotate: NSObject, NSWindowDelegate {
     /// The tools in a panel of their own, with no title bar. It never takes
     /// the keyboard, so the picture's window stays the one that is typed into.
     private static func makePanel(state: EditorState) -> NSPanel {
-        let hosting = NSHostingView(rootView: AnnotationToolbar(state: state))
-        hosting.sizingOptions = [.intrinsicContentSize]
-        hosting.wantsLayer = true
-        hosting.layer?.cornerRadius = 12
-        hosting.layer?.masksToBounds = true
-        let panel = NSPanel(contentRect: NSRect(origin: .zero, size: hosting.fittingSize),
+        // Measured with the tool that shows the most options, rectangle,
+        // which is how a new editor starts. The window keeps this size.
+        let tallest = NSHostingView(rootView: AnnotationToolbar(state: state)).fittingSize
+        let margin = AnnotationPanelView.margin
+        let size = NSSize(width: tallest.width + 2 * margin, height: tallest.height + 2 * margin)
+
+        let hosting = NSHostingView(rootView: AnnotationPanelView(state: state))
+        hosting.sizingOptions = []
+        let panel = NSPanel(contentRect: NSRect(origin: .zero, size: size),
                             styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
         panel.contentView = hosting
+        panel.setContentSize(size)
         panel.isOpaque = false
         panel.backgroundColor = .clear
-        panel.hasShadow = true
+        // The card draws its own shadow.
+        panel.hasShadow = false
         panel.isMovableByWindowBackground = true
         panel.isReleasedWhenClosed = false
         panel.hidesOnDeactivate = false
         return panel
-    }
-
-    /// Fits the panel to the options of the chosen tool, its top edge staying put.
-    private func fitPanel() {
-        guard let panel, let hosting = panel.contentView else { return }
-        let size = hosting.fittingSize
-        guard size.width > 0, size.height > 0 else { return }
-        var frame = panel.frame
-        let top = frame.maxY
-        frame.size = panel.frameRect(forContentRect: NSRect(origin: .zero, size: size)).size
-        frame.origin.y = top - frame.height
-        panel.setFrame(frame, display: true)
-        panel.invalidateShadow()
     }
 
     /// The picture at its natural size on this screen, or smaller to fit,
@@ -131,11 +116,14 @@ final class Annotate: NSObject, NSWindowDelegate {
         let area = (LinePanel.screenUnderPointer() ?? NSScreen.main)?.visibleFrame
             ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
         let frame = window.frame
-        let total = frame.width + gap + panel.frame.width
+        let margin = AnnotationPanelView.margin
+        let total = frame.width + gap + panel.frame.width - 2 * margin
         let x = (area.midX - total / 2).rounded()
         let y = (area.midY - frame.height / 2).rounded()
         window.setFrameOrigin(NSPoint(x: x, y: y))
-        panel.setFrameOrigin(NSPoint(x: x + frame.width + gap, y: y + frame.height - panel.frame.height))
+        // The card sits inside the panel's margin, so the panel starts a margin early.
+        panel.setFrameOrigin(NSPoint(x: x + frame.width + gap - margin,
+                                     y: y + frame.height - panel.frame.height + margin))
     }
 
     /// Closes the editor, which saves what is on it. For when Tendedero quits.
@@ -151,7 +139,6 @@ final class Annotate: NSObject, NSWindowDelegate {
             panel.orderOut(nil)
         }
         if let document, let target, document.hasMarks { save(document, to: target) }
-        toolWatch = nil
         window = nil
         panel = nil
         canvas = nil
