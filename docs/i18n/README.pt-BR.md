@@ -59,7 +59,7 @@ Pare o ponteiro no meio da barra de menus e o varal desce. Afaste-o e ele some.
 | <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> com o ponteiro no varal | Pendura de volta o que você acabou de soltar. |
 | <kbd>Espaço</kbd> com o ponteiro numa foto | Dê uma olhada rápida. |
 | <kbd>⌫</kbd> com o ponteiro numa foto | Solte-a, como o botão do canto dela. |
-| Clique com o botão direito e AirDrop… | Envie uma cópia para um dispositivo Apple próximo. O original continua no varal. |
+| Clique com o botão direito e Compartilhar | Envia por AirDrop, Mensagens, Mail e mais. Ela continua no varal. |
 | Clique com o botão direito e Fixar | Guarde-a: fica à esquerda do nó com um prendedor cinza-espacial, e nenhuma captura nova a empurra. |
 | Clique com o botão direito e Segurar | Tire-a do varal e mantenha-a à sua frente enquanto trabalha. |
 | No Finder, clique com o botão direito numa imagem e Pendurar no Tendedero | Pendure qualquer imagem no varal, fixada. |
@@ -94,8 +94,8 @@ de senhas marcar como privado, fica de fora.
 
 ## Privado por princípio.
 
-Sem conta. Sem estatísticas.
-O Tendedero roda inteiramente no seu Mac. Suas capturas ficam nele, a menos que você escolha compartilhá-las. O macOS cuida das transferências por AirDrop.
+Sem conta. Sem rede. Sem estatísticas.
+O Tendedero roda inteiramente no seu Mac, e suas capturas nunca saem dele.
 
 <br>
 

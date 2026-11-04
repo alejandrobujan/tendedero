@@ -397,17 +397,6 @@ final class Line: ObservableObject {
         NSWorkspace.shared.activateFileViewerSelecting([item.url])
     }
 
-    func canAirDrop(_ id: UUID) -> Bool {
-        guard let item = items.first(where: { $0.id == id && !$0.falling }) else { return false }
-        return AirDrop.shared.canSend(item.url)
-    }
-
-    /// AirDrop sends the original file, leaving its place on the line alone.
-    func airDrop(_ id: UUID) {
-        guard let item = items.first(where: { $0.id == id && !$0.falling }) else { return }
-        AirDrop.shared.send(item.url)
-    }
-
     // MARK: Putting back
 
     /// A photo taken down by hand: its file, where it hung among the photos

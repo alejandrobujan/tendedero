@@ -57,7 +57,7 @@ Rest the pointer in the middle of the menu bar and it glides down. Move away and
 | <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> with the pointer on the line | Hang back what you just let go. |
 | <kbd>Space</kbd> with the pointer on a photo | Take a quick look. |
 | <kbd>⌫</kbd> with the pointer on a photo | Let it go, as its corner button does. |
-| Right click, then AirDrop… | Send a copy to a nearby Apple device. The original stays on the line. |
+| Right click, then Share | Send it with AirDrop, Messages, Mail and more. It stays on the line. |
 | Right click, then Pin | Keep it: it hangs left of the knot on a space grey clip, and no new screenshot pushes it off. |
 | Right click, then Hold | Take it off the line and keep it in front of you while you work. |
 | In Finder, right click an image, then Hang on Tendedero | Hang any image on the line, pinned. |
@@ -92,8 +92,8 @@ left alone.
 
 ## Private by design.
 
-No account. No analytics.
-Tendedero runs entirely on your Mac. Your screenshots stay there unless you choose to share them. macOS handles AirDrop transfers.
+No account. No network. No analytics.
+Tendedero runs entirely on your Mac, and your screenshots never leave it.
 
 <br>
 

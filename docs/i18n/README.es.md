@@ -59,7 +59,7 @@ Lleva el puntero al centro de la barra de menús y la cuerda baja. Apártalo y d
 | <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> con el puntero en la cuerda | Vuelve a colgar lo que acabas de soltar. |
 | <kbd>Espacio</kbd> con el puntero en una foto | Échale un vistazo. |
 | <kbd>⌫</kbd> con el puntero en una foto | Suéltala, como su botón de la esquina. |
-| Clic derecho y AirDrop… | Envía una copia a un dispositivo Apple cercano. El original sigue en la cuerda. |
+| Clic derecho y Compartir | Envíala por AirDrop, Mensajes, Mail y más, y la captura sigue colgada. |
 | Clic derecho y Fijar | Guárdala: cuelga a la izquierda del nudo con una pinza gris espacial y ninguna captura nueva la empuja. |
 | Clic derecho y Sostener | Quítala de la cuerda y tenla delante mientras trabajas. |
 | En el Finder, clic derecho en una imagen y Colgar en Tendedero | Cuelga cualquier imagen en la cuerda, fijada. |
@@ -94,8 +94,8 @@ como privado, se deja tal cual.
 
 ## Privacidad de serie.
 
-Sin cuentas, sin analíticas.
-Tendedero funciona solo en tu Mac. Tus capturas se quedan ahí salvo que decidas compartirlas. macOS se encarga de las transferencias por AirDrop.
+Sin cuentas, sin conexión a internet, sin analíticas.
+Tendedero funciona solo en tu Mac, y tus capturas nunca salen de él.
 
 <br>
 

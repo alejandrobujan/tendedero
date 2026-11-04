@@ -46,16 +46,13 @@ struct GrabArea: NSViewRepresentable {
         view.onLongPress = { line.markup(id) }
         view.onForceClick = { line.quickLook(id) }
         view.onPressChange = { pressed in line.pressedID = pressed ? id : nil }
-        view.menuProvider = {
+        view.menuProvider = { [weak view] in
             let menu = NSMenu()
             // Items say themselves whether they can be used.
             menu.autoenablesItems = false
             menu.addItem(ClosureMenuItem(L("Copy")) { line.copy(id) })
             menu.addItem(ClosureMenuItem(L("Open")) { line.open(id) })
             menu.addItem(ClosureMenuItem(L("Quick Look")) { line.quickLook(id) })
-            let airDrop = ClosureMenuItem(L("AirDrop…")) { line.airDrop(id) }
-            airDrop.isEnabled = line.canAirDrop(id)
-            menu.addItem(airDrop)
             if !isRecording {
                 menu.addItem(ClosureMenuItem(L("Hold")) { line.onHold?(id) })
             }
@@ -63,6 +60,19 @@ struct GrabArea: NSViewRepresentable {
                 menu.addItem(ClosureMenuItem(L("Markup")) { line.markup(id) })
             }
             menu.addItem(ClosureMenuItem(L("Show in Finder")) { line.reveal(id) })
+            if let view, let url = view.url, let window = view.window {
+                // Sending it away is a section of its own.
+                menu.addItem(.separator())
+                let card = window.convertToScreen(view.convert(view.bounds, to: nil))
+                // Once the menu has closed, so the panel opens on its own.
+                let share = ClosureMenuItem(L("Share…")) {
+                    DispatchQueue.main.async { Share.shared.show(url, from: card) }
+                }
+                // The icon macOS uses for Share everywhere.
+                share.image = NSImage(systemSymbolName: "square.and.arrow.up", accessibilityDescription: nil)
+                menu.addItem(share)
+                menu.addItem(.separator())
+            }
             let item = line.items.first(where: { $0.id == id })
             let kept = item?.kept == true
             if !kept {

@@ -59,7 +59,7 @@ Aldığınız her ekran görüntüsü, ekranınızın hemen üstündeki bir ipe 
 | İşaretçi ipin üzerindeyken <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | Az önce bıraktığını geri asar. |
 | İşaretçi bir fotoğrafın üzerindeyken <kbd>Boşluk</kbd> | Hızlıca bak. |
 | İşaretçi bir fotoğrafın üzerindeyken <kbd>⌫</kbd> | Köşedeki düğmesi gibi bırak. |
-| Sağ tıkla, ardından AirDrop… | Yakındaki bir Apple aygıtına kopyasını gönderir. Aslı ipte kalır. |
+| Sağ tıkla, Paylaş | AirDrop, Mesajlar, Mail ve diğerleriyle gönderir. İpte kalmaya devam eder. |
 | Sağ tıkla, Sabitle | Sakla: düğümün solunda uzay grisi bir mandalla asılı kalır, yeni ekran görüntüleri onu itmez. |
 | Sağ tıkla, Elinde tut | İpten al ve çalışırken önünde tut. |
 | Finder’da bir görsele sağ tıkla, Tendedero’ya as | Herhangi bir görseli ipe sabitlenmiş olarak as. |
@@ -93,8 +93,8 @@ içerik ve bir şifre yöneticisinin özel olarak işaretlediği her şey olduğ
 
 ## Tasarımdan gelen gizlilik.
 
-Hesap yok. Analitik yok.
-Tendedero tamamen Mac'inizde çalışır. Paylaşmayı seçmediğiniz sürece ekran görüntüleriniz Mac'inizde kalır. AirDrop aktarımlarını macOS gerçekleştirir.
+Hesap yok. Ağ erişimi yok. Analitik yok.
+Tendedero tamamen Mac'inizde çalışır ve ekran görüntüleriniz hiçbir zaman oradan ayrılmaz.
 
 <br>
 
