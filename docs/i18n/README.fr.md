@@ -59,6 +59,7 @@ Posez le pointeur au milieu de la barre des menus et la corde descend. Éloignez
 | <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd>, le pointeur sur la corde | Raccroche ce que vous venez de laisser filer. |
 | <kbd>Espace</kbd>, le pointeur sur une photo | Jetez-y un coup d’œil. |
 | <kbd>⌫</kbd>, le pointeur sur une photo | Laissez-la filer, comme son bouton d’angle. |
+| Clic droit, puis Partager | L’envoie par AirDrop, Messages, Mail et plus. Elle reste sur la corde. |
 | Clic droit, puis Épingler | Gardez-la : elle pend à gauche du nœud avec une pince gris sidéral, et aucune nouvelle capture ne la pousse. |
 | Clic droit, puis Garder en main | Décrochez-la et gardez-la devant vous pendant que vous travaillez. |
 | Dans le Finder, clic droit sur une image, puis Accrocher dans Tendedero | Accrochez n’importe quelle image à la corde, épinglée. |

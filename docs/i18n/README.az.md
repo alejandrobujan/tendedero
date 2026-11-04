@@ -59,6 +59,7 @@ Göstəricini menyu panelinin ortasında saxlayın, ip aşağı enir. Uzaqlaşd�
 | Göstərici ipin üstündəykən <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | Atdığınızı ipə geri asır. |
 | Göstərici şəklin üstündəykən <kbd>Boşluq</kbd> | Tez baxın. |
 | Göstərici şəklin üstündəykən <kbd>⌫</kbd> | Küncdəki düyməsi kimi buraxın. |
+| Sağ klik, Paylaş | AirDrop, Mesajlar, Mail və digərləri ilə göndərir. Şəkil ipdə qalır. |
 | Sağ klik, Bərkit | Saxlayın: düyünün solunda kosmik boz sancaqla asılır və yeni ekran şəkilləri onu itələmir. |
 | Sağ klik, Əldə saxla | İpdən götürün və işləyərkən qarşınızda saxlayın. |
 | Finder-də şəklə sağ klik, Tendedero-ya as | İstənilən şəkli ipə bərkidilmiş halda asın. |
