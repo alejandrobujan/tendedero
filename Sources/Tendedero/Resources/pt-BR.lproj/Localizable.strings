@@ -75,3 +75,11 @@
 "Hang back" = "Devolver ao varal";
 "Hang everything back" = "Devolver tudo ao varal";
 "Actual Size" = "Tamanho real";
+
+/* Trim */
+"How should the trimmed recording be saved?" = "Como salvar a gravação aparada?";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place, and the parts you cut can't be brought back." = "Salvar como nova a pendura no varal e deixa a original como está. Substituir a coloca no lugar da original, e as partes cortadas não podem ser recuperadas.";
+"Save as New" = "Salvar como nova";
+"Replace" = "Substituir";
+"Cancel" = "Cancelar";
+"trimmed" = "aparada";

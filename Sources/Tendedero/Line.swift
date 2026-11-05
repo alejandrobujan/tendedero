@@ -48,6 +48,10 @@ final class Line: ObservableObject {
     var hitRects: [UUID: CGRect] = [:]
 
     var maxItems = 8
+    /// Room beyond `maxItems`, made by a trimmed recording saved as new so
+    /// that nothing has to fall for it. The photos move closer together, or
+    /// the line scrolls further. It goes once the line no longer needs it.
+    private var squeezed = 0
     /// How many photos fit across the screen. With Keep on line set, the
     /// line can hold more, and the rest are reached by scrolling.
     var visibleCount = 8
@@ -95,19 +99,21 @@ final class Line: ObservableObject {
     // MARK: Hanging and dropping
 
     @discardableResult
-    func hang(_ url: URL, quietly: Bool = false, flying: Bool = false) -> UUID? {
+    func hang(_ url: URL, quietly: Bool = false, flying: Bool = false, squeezing: Bool = false) -> UUID? {
         guard !items.contains(where: { $0.url == url && !$0.falling }),
               let thumb = makeThumbnail(url) else { return nil }
         var item = Pegged(url: url, thumb: thumb)
         item.flying = flying
         // The line moves anyway for a new photo, so the gaps close with it.
         sweepFallen()
+        squeezed = min(squeezed, max(0, liveCount - maxItems))
         items.append(item)
         scroll = 0
+        if squeezing { squeezed = max(squeezed, liveCount - maxItems) }
         // A full line lets the oldest photo fall off the far end. Only one: a
         // line hung on a wider screen keeps its length here instead of losing
         // several photos to a single capture.
-        if liveCount > maxItems, let oldest = oldestLoose {
+        if liveCount > maxItems + squeezed, let oldest = oldestLoose {
             letGo(oldest.id)
         }
         save()
@@ -319,6 +325,7 @@ final class Line: ObservableObject {
     /// After Keep on line is lowered, the oldest photos past it go the way
     /// of a full line.
     func trim() {
+        squeezed = 0
         while liveCount > maxItems, let oldest = oldestLoose {
             letGo(oldest.id)
         }
@@ -346,18 +353,6 @@ final class Line: ObservableObject {
             log.error("Could not save to Desktop: \(error.localizedDescription, privacy: .public)")
             NSSound.beep()
         }
-    }
-
-    private func uniqueURL(in folder: URL, for name: String) -> URL {
-        let base = (name as NSString).deletingPathExtension
-        let ext = (name as NSString).pathExtension
-        var candidate = folder.appendingPathComponent(name)
-        var n = 2
-        while FileManager.default.fileExists(atPath: candidate.path) {
-            candidate = folder.appendingPathComponent("\(base) \(n)").appendingPathExtension(ext)
-            n += 1
-        }
-        return candidate
     }
 
     /// Long press: open the photo in the system Markup editor. Markup does
@@ -454,7 +449,7 @@ final class Line: ObservableObject {
         }
         // As when something new hangs, a full line lets its oldest photo go,
         // never one that just came back.
-        while liveCount > maxItems, let oldest = items.first(where: { !$0.falling && !$0.kept && !back.contains($0.id) }) {
+        while liveCount > maxItems + squeezed, let oldest = items.first(where: { !$0.falling && !$0.kept && !back.contains($0.id) }) {
             letGo(oldest.id)
         }
         keepKeptFirst()
@@ -562,12 +557,14 @@ final class Line: ObservableObject {
 
     private let keptKey = "kept"
     private let byHandKey = "byHand"
+    private let squeezedKey = "squeezed"
 
     private func save() {
         let live = items.filter { !$0.falling }
         UserDefaults.standard.set(live.map(\.url.path), forKey: storeKey)
         UserDefaults.standard.set(live.filter(\.kept).map(\.url.path), forKey: keptKey)
         UserDefaults.standard.set(live.filter(\.byHand).map(\.url.path), forKey: byHandKey)
+        UserDefaults.standard.set(squeezed, forKey: squeezedKey)
     }
 
     /// Everything comes back as it was. This runs before the line knows its
@@ -577,6 +574,7 @@ final class Line: ObservableObject {
         let paths = UserDefaults.standard.stringArray(forKey: storeKey) ?? []
         let kept = Set(UserDefaults.standard.stringArray(forKey: keptKey) ?? [])
         let byHand = Set(UserDefaults.standard.stringArray(forKey: byHandKey) ?? [])
+        squeezed = UserDefaults.standard.integer(forKey: squeezedKey)
         for path in paths where FileManager.default.fileExists(atPath: path) {
             let url = URL(fileURLWithPath: path)
             guard !items.contains(where: { $0.url == url }), let thumb = makeThumbnail(url) else { continue }
@@ -602,6 +600,19 @@ final class Line: ObservableObject {
               let rep = NSBitmapImageRep(data: tiff) else { return nil }
         return rep.representation(using: .png, properties: [:])
     }
+}
+
+/// The name itself if nothing in the folder has it, otherwise with a number.
+func uniqueURL(in folder: URL, for name: String) -> URL {
+    let base = (name as NSString).deletingPathExtension
+    let ext = (name as NSString).pathExtension
+    var candidate = folder.appendingPathComponent(name)
+    var n = 2
+    while FileManager.default.fileExists(atPath: candidate.path) {
+        candidate = folder.appendingPathComponent("\(base) \(n)").appendingPathExtension(ext)
+        n += 1
+    }
+    return candidate
 }
 
 /// Screen recordings, as macOS saves them.

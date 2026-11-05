@@ -75,3 +75,11 @@
 "Hang back" = "Devolver á corda";
 "Hang everything back" = "Devolver todo á corda";
 "Actual Size" = "Tamaño real";
+
+/* Trim */
+"How should the trimmed recording be saved?" = "Como queres gardar a gravación recortada?";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place, and the parts you cut can't be brought back." = "Gardar como nova pendúraa na corda e deixa a orixinal como está. Substituír ponna no lugar da orixinal, e as partes cortadas non se poden recuperar.";
+"Save as New" = "Gardar como nova";
+"Replace" = "Substituír";
+"Cancel" = "Cancelar";
+"trimmed" = "recortada";

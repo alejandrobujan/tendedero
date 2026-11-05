@@ -75,3 +75,11 @@
 "Hang back" = "줄에 돌려놓기";
 "Hang everything back" = "모두 줄에 돌려놓기";
 "Actual Size" = "실제 크기";
+
+/* Trim */
+"How should the trimmed recording be saved?" = "다듬은 녹화를 어떻게 저장할까요?";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place, and the parts you cut can't be brought back." = "'새로 저장'은 빨랫줄에 걸고 원본은 그대로 둡니다. '대치'는 원본을 대신하며, 잘라낸 부분은 되돌릴 수 없습니다.";
+"Save as New" = "새로 저장";
+"Replace" = "대치";
+"Cancel" = "취소";
+"trimmed" = "다듬음";

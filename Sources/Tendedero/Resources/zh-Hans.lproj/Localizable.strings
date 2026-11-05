@@ -75,3 +75,11 @@
 "Hang back" = "放回绳上";
 "Hang everything back" = "全部放回绳上";
 "Actual Size" = "实际大小";
+
+/* Trim */
+"How should the trimmed recording be saved?" = "要怎么存储修剪后的录屏？";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place, and the parts you cut can't be brought back." = "另存会把它挂到晾衣绳上，原来的录屏不变。覆盖会替换原来的录屏，剪掉的部分无法恢复。";
+"Save as New" = "另存";
+"Replace" = "覆盖";
+"Cancel" = "取消";
+"trimmed" = "已修剪";

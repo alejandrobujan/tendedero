@@ -75,3 +75,11 @@
 "Hang back" = "Remettre sur la corde";
 "Hang everything back" = "Tout remettre sur la corde";
 "Actual Size" = "Taille réelle";
+
+/* Trim */
+"How should the trimmed recording be saved?" = "Comment enregistrer la vidéo raccourcie ?";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place, and the parts you cut can't be brought back." = "Enregistrer comme nouvelle l'accroche à la corde et laisse l'originale telle quelle. Remplacer la met à la place de l'originale, et les parties coupées ne peuvent pas être récupérées.";
+"Save as New" = "Enregistrer comme nouvelle";
+"Replace" = "Remplacer";
+"Cancel" = "Annuler";
+"trimmed" = "raccourcie";
