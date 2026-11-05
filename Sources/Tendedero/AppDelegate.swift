@@ -94,8 +94,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             self?.line.rememberReplaced(url, original: original)
             self?.replaceOnLine(url, from: from, lengths: lengths)
         }
-        Trim.shared.onSavedAsNew = { [weak self] url, from in
-            self?.hangCapture(url, squeezing: true, trimmedFrom: from)
+        Trim.shared.onSavedAsNew = { [weak self] url, original, from in
+            self?.hangCapture(url, squeezing: true, trimmedFrom: from, after: original)
             self?.line.rememberSavedAsNew(url)
         }
         panel.onScroll = { [weak self] event in
@@ -303,7 +303,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     /// A new screenshot lifts off from where it was taken and flies to its
     /// place on the line. Without a known capture area it simply drops in.
-    private func hangCapture(_ url: URL, squeezing: Bool = false, trimmedFrom: CGRect? = nil) {
+    private func hangCapture(_ url: URL, squeezing: Bool = false, trimmedFrom: CGRect? = nil, after: URL? = nil) {
         // Already hanging: a photo put back with ⌘Z comes out of the Trash
         // into the folder, and the watcher sees it arrive. It must not pull
         // the line over to the screen it was first taken on.
@@ -319,7 +319,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // A screenshot macOS took already played its shutter, so it hangs
         // without a chime of its own. Copied images and watched folders,
         // which come with no sound, keep it.
-        guard let id = line.hang(url, quietly: from != nil && trimmedFrom == nil, flying: from != nil, squeezing: squeezing) else {
+        guard let id = line.hang(url, quietly: from != nil && trimmedFrom == nil, flying: from != nil, squeezing: squeezing, after: after) else {
             // Nothing hung after all, so an empty line goes away again.
             itemsChanged()
             return

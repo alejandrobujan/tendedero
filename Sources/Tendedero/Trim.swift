@@ -14,8 +14,8 @@ final class Trim: NSObject, NSWindowDelegate {
     /// and how its length changed.
     var onSaved: (URL, CGRect, URL, String) -> Void = { _, _, _, _ in }
     /// Called with the new file once the trimmed recording is saved beside
-    /// the original, and where on screen the editor showed it.
-    var onSavedAsNew: (URL, CGRect) -> Void = { _, _ in }
+    /// the original, the original, and where on screen the editor showed it.
+    var onSavedAsNew: (URL, URL, CGRect) -> Void = { _, _, _ in }
 
     private var window: NSWindow?
     private var ready: AnyCancellable?
@@ -125,7 +125,7 @@ final class Trim: NSObject, NSWindowDelegate {
             let finished = export.status == .completed
             if finished, asNew, (try? FileManager.default.moveItem(at: temp, to: target)) != nil {
                 log.notice("Trimmed \(target.lastPathComponent, privacy: .public)")
-                onSavedAsNew(target, frame)
+                onSavedAsNew(target, original, frame)
             } else if finished, !asNew, let trashed = try? swapIn(temp, at: target) {
                 log.notice("Trimmed \(target.lastPathComponent, privacy: .public)")
                 onSaved(target, frame, trashed, Self.lengths(from: item.duration, to: end - start))

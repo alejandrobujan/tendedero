@@ -109,7 +109,7 @@ final class Line: ObservableObject {
     // MARK: Hanging and dropping
 
     @discardableResult
-    func hang(_ url: URL, quietly: Bool = false, flying: Bool = false, squeezing: Bool = false) -> UUID? {
+    func hang(_ url: URL, quietly: Bool = false, flying: Bool = false, squeezing: Bool = false, after: URL? = nil) -> UUID? {
         guard !items.contains(where: { $0.url == url && !$0.falling }),
               let thumb = makeThumbnail(url) else { return nil }
         var item = Pegged(url: url, thumb: thumb)
@@ -117,8 +117,14 @@ final class Line: ObservableObject {
         // The line moves anyway for a new photo, so the gaps close with it.
         sweepFallen()
         squeezed = min(squeezed, max(0, liveCount - maxItems))
-        items.append(item)
-        scroll = 0
+        // Next to the photo it came from, past the pinned ones if that is pinned.
+        if let after, let i = items.lastIndex(where: { $0.url == after && !$0.falling }) {
+            items.insert(item, at: max(i + 1, items.lastIndex(where: \.kept).map { $0 + 1 } ?? 0))
+            bringIntoView(item.id)
+        } else {
+            items.append(item)
+            scroll = 0
+        }
         if squeezing { squeezed = max(squeezed, liveCount - maxItems) }
         // A full line lets the oldest photo fall off the far end. Only one: a
         // line hung on a wider screen keeps its length here instead of losing
