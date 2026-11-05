@@ -402,7 +402,11 @@ final class Line: ObservableObject {
         let trashed: URL?
         var kept = false
         var byHand = false
+        /// A trim, not a take down: `url` holds the trimmed recording.
+        var trim: TrimStep?
     }
+
+    private enum TrimStep { case replaced, savedAsNew }
 
     /// What was taken down, the latest last. A step holds everything one
     /// action took down. Only kept while the app runs.
@@ -424,6 +428,13 @@ final class Line: ObservableObject {
     /// where it was, and a file sent to the Trash comes back out of it.
     func putBack() {
         guard let step = steps.popLast() else { return }
+        if let photo = step.photos.first, let trim = photo.trim {
+            switch trim {
+            case .replaced: undoReplace(photo)
+            case .savedAsNew: undoSaveAsNew(photo)
+            }
+            return
+        }
         var back: Set<UUID> = []
         // The last one taken down goes back first, so each finds its place.
         for photo in step.photos.reversed() {
@@ -534,6 +545,45 @@ final class Line: ObservableObject {
 
     // MARK: Replacing
 
+    /// ⌘Z can bring the original back from the Trash.
+    func rememberReplaced(_ url: URL, original: URL) {
+        steps.append((UUID(), [TakenDown(url: url, index: 0, trashed: original, trim: .replaced)]))
+        if steps.count > Self.maxSteps { steps.removeFirst() }
+    }
+
+    /// ⌘Z can take the new recording down again.
+    func rememberSavedAsNew(_ url: URL) {
+        steps.append((UUID(), [TakenDown(url: url, index: 0, trashed: nil, trim: .savedAsNew)]))
+        if steps.count > Self.maxSteps { steps.removeFirst() }
+    }
+
+    /// The trimmed version falls and the original is back on the clip. The
+    /// trimmed version goes to the Trash, so nothing is lost this way either.
+    private func undoReplace(_ photo: TakenDown) {
+        guard let i = items.firstIndex(where: { $0.url == photo.url && !$0.falling }),
+              let original = photo.trashed,
+              (try? swapIn(original, at: photo.url)) != nil,
+              let thumb = makeThumbnail(photo.url) else {
+            NSSound.beep()
+            return
+        }
+        let id = items[i].id
+        onFall?(items[i])
+        items[i].thumb = thumb
+        items[i].flying = true
+        play("Tink", volume: 0.35)
+        // A moment hidden, so the original lands once the trimmed one has left.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in self?.land(id) }
+    }
+
+    private func undoSaveAsNew(_ photo: TakenDown) {
+        guard let item = items.first(where: { $0.url == photo.url && !$0.falling }),
+              trash(item.id, step: nil) else {
+            NSSound.beep()
+            return
+        }
+    }
+
     /// The old version of a replaced recording is knocked off its clip.
     func knockOff(_ id: UUID) {
         guard let i = items.firstIndex(where: { $0.id == id && !$0.falling }) else { return }
@@ -623,6 +673,26 @@ final class Line: ObservableObject {
               let rep = NSBitmapImageRep(data: tiff) else { return nil }
         return rep.representation(using: .png, properties: [:])
     }
+}
+
+/// Puts `replacement` where `url` is, and a copy of what was there in the
+/// Trash, returning where. The copy goes first and the swap is atomic, so at no
+/// point is the file missing or the original gone. Nothing changes if the Trash
+/// refuses it.
+func swapIn(_ replacement: URL, at url: URL) throws -> URL {
+    let fm = FileManager.default
+    // In a hidden folder so the watcher ignores it, under its own name so it
+    // can be recognised in the Trash.
+    let holding = url.deletingLastPathComponent().appendingPathComponent(".replacing-\(UUID().uuidString)")
+    try fm.createDirectory(at: holding, withIntermediateDirectories: false)
+    defer { try? fm.removeItem(at: holding) }
+    let copy = holding.appendingPathComponent(url.lastPathComponent)
+    try fm.copyItem(at: url, to: copy)
+    var trashed: NSURL?
+    try fm.trashItem(at: copy, resultingItemURL: &trashed)
+    _ = try fm.replaceItemAt(url, withItemAt: replacement)
+    guard let trashed = trashed as URL? else { throw CocoaError(.fileNoSuchFile) }
+    return trashed
 }
 
 /// The name itself if nothing in the folder has it, otherwise with a number.

@@ -80,7 +80,7 @@
 
 /* Trim */
 "How should the trimmed recording be saved?" = "Kəsilmiş yazı necə saxlanılsın?";
-"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place, and the parts you cut can't be brought back." = "Yeni kimi saxla onu ipə asır və orijinalı olduğu kimi saxlayır. Əvəz et onu orijinalın yerinə qoyur və kəsilmiş hissələri geri qaytarmaq olmur.";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back." = "Yeni kimi saxla onu ipə asır və orijinalı olduğu kimi saxlayır. Əvəz et onu orijinalın yerinə qoyur və orijinalı Zibil qutusuna göndərir. ⌘Z onu geri qaytarır.";
 "Save as New" = "Yeni kimi saxla";
 "Replace" = "Əvəz et";
 "Cancel" = "Ləğv et";

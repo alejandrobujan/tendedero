@@ -9,9 +9,9 @@ import Combine
 final class Trim: NSObject, NSWindowDelegate {
     static let shared = Trim()
 
-    /// Called with the file once the trimmed recording has replaced it, and
-    /// where on screen the editor showed it.
-    var onSaved: (URL, CGRect) -> Void = { _, _ in }
+    /// Called with the file once the trimmed recording has replaced it, where
+    /// on screen the editor showed it, and where the original went in the Trash.
+    var onSaved: (URL, CGRect, URL) -> Void = { _, _, _ in }
     /// Called with the new file once the trimmed recording is saved beside
     /// the original, and where on screen the editor showed it.
     var onSavedAsNew: (URL, CGRect) -> Void = { _, _ in }
@@ -79,7 +79,7 @@ final class Trim: NSObject, NSWindowDelegate {
         guard let window else { return }
         let alert = NSAlert()
         alert.messageText = L("How should the trimmed recording be saved?")
-        alert.informativeText = L("Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place, and the parts you cut can't be brought back.")
+        alert.informativeText = L("Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back.")
         alert.addButton(withTitle: L("Save as New"))
         alert.addButton(withTitle: L("Replace"))
         alert.addButton(withTitle: L("Cancel"))
@@ -120,9 +120,13 @@ final class Trim: NSObject, NSWindowDelegate {
         Task {
             await export.export()
             editor?.close()
-            if export.status == .completed, Self.place(temp, at: target, asNew: asNew) {
+            let finished = export.status == .completed
+            if finished, asNew, (try? FileManager.default.moveItem(at: temp, to: target)) != nil {
                 log.notice("Trimmed \(target.lastPathComponent, privacy: .public)")
-                if asNew { onSavedAsNew(target, frame) } else { onSaved(target, frame) }
+                onSavedAsNew(target, frame)
+            } else if finished, !asNew, let trashed = try? swapIn(temp, at: target) {
+                log.notice("Trimmed \(target.lastPathComponent, privacy: .public)")
+                onSaved(target, frame, trashed)
             } else {
                 log.error("Could not trim \(target.lastPathComponent, privacy: .public): \(export.error?.localizedDescription ?? "", privacy: .public)")
                 try? FileManager.default.removeItem(at: temp)
@@ -131,13 +135,10 @@ final class Trim: NSObject, NSWindowDelegate {
         }
     }
 
-    private static func place(_ temp: URL, at target: URL, asNew: Bool) -> Bool {
-        if asNew { return (try? FileManager.default.moveItem(at: temp, to: target)) != nil }
-        return (try? FileManager.default.replaceItemAt(target, withItemAt: temp)) != nil
-    }
-
     private static func newName(for original: URL) -> String {
         let base = original.deletingPathExtension().lastPathComponent
-        return "\(base) \(L("trimmed")).\(original.pathExtension)"
+        // Trimming a trimmed recording again doesn't say so twice.
+        let suffix = " \(L("trimmed"))"
+        return "\(base.hasSuffix(suffix) ? base : base + suffix).\(original.pathExtension)"
     }
 }

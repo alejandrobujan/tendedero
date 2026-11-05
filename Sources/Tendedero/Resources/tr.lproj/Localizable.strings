@@ -78,7 +78,7 @@
 
 /* Trim */
 "How should the trimmed recording be saved?" = "Kırpılan kayıt nasıl kaydedilsin?";
-"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place, and the parts you cut can't be brought back." = "Yeni Olarak Kaydet onu ipe asar ve aslını olduğu gibi bırakır. Değiştir onu aslının yerine koyar ve kesilen kısımlar geri getirilemez.";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back." = "Yeni Olarak Kaydet onu ipe asar ve aslını olduğu gibi bırakır. Değiştir onu aslının yerine koyar ve aslını Çöp Sepeti'ne gönderir. ⌘Z geri getirir.";
 "Save as New" = "Yeni Olarak Kaydet";
 "Replace" = "Değiştir";
 "Cancel" = "Vazgeç";

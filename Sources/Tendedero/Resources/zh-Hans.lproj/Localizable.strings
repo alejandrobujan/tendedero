@@ -78,7 +78,7 @@
 
 /* Trim */
 "How should the trimmed recording be saved?" = "要怎么存储修剪后的录屏？";
-"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place, and the parts you cut can't be brought back." = "另存会把它挂到晾衣绳上，原来的录屏不变。覆盖会替换原来的录屏，剪掉的部分无法恢复。";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back." = "另存会把它挂到晾衣绳上，原来的录屏不变。覆盖会替换原来的录屏，并把原片移到废纸篓，按 ⌘Z 可以恢复。";
 "Save as New" = "另存";
 "Replace" = "覆盖";
 "Cancel" = "取消";

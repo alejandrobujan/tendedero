@@ -80,7 +80,7 @@
 
 /* Trim */
 "How should the trimmed recording be saved?" = "How should the trimmed recording be saved?";
-"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place, and the parts you cut can't be brought back." = "Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place, and the parts you cut can't be brought back.";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back." = "Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back.";
 "Save as New" = "Save as New";
 "Replace" = "Replace";
 "Cancel" = "Cancel";

@@ -90,8 +90,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         Markup.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         Share.shared.clearAll()
-        Trim.shared.onSaved = { [weak self] url, from in self?.replaceOnLine(url, from: from) }
-        Trim.shared.onSavedAsNew = { [weak self] url, from in self?.hangCapture(url, squeezing: true, trimmedFrom: from) }
+        Trim.shared.onSaved = { [weak self] url, from, original in
+            self?.line.rememberReplaced(url, original: original)
+            self?.replaceOnLine(url, from: from)
+        }
+        Trim.shared.onSavedAsNew = { [weak self] url, from in
+            self?.hangCapture(url, squeezing: true, trimmedFrom: from)
+            self?.line.rememberSavedAsNew(url)
+        }
         panel.onScroll = { [weak self] event in
             // Sideways on a trackpad, or the wheel of a mouse.
             let delta = abs(event.scrollingDeltaX) >= abs(event.scrollingDeltaY)

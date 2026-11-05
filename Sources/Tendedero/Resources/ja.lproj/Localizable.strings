@@ -78,7 +78,7 @@
 
 /* Trim */
 "How should the trimmed recording be saved?" = "トリムした収録をどのように保存しますか？";
-"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place, and the parts you cut can't be brought back." = "「新規保存」はロープに吊るし、元の収録はそのまま残します。「置き換え」は元の収録と入れ替え、切り取った部分は元に戻せません。";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back." = "「新規保存」はロープに吊るし、元の収録はそのまま残します。「置き換え」は元の収録と入れ替え、元の収録をゴミ箱に入れます。⌘Zで元に戻せます。";
 "Save as New" = "新規保存";
 "Replace" = "置き換え";
 "Cancel" = "キャンセル";

@@ -78,7 +78,7 @@
 
 /* Trim */
 "How should the trimmed recording be saved?" = "¿Cómo quieres guardar la grabación recortada?";
-"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place, and the parts you cut can't be brought back." = "Guardar como nueva la cuelga en el tendedero y deja la original como está. Reemplazar la pone en lugar de la original, y las partes cortadas no se pueden recuperar.";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back." = "Guardar como nueva la cuelga en el tendedero y deja la original como está. Reemplazar la pone en lugar de la original y envía la original a la Papelera. ⌘Z la recupera.";
 "Save as New" = "Guardar como nueva";
 "Replace" = "Reemplazar";
 "Cancel" = "Cancelar";
