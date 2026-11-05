@@ -532,6 +532,29 @@ final class Line: ObservableObject {
         return true
     }
 
+    // MARK: Replacing
+
+    /// The old version of a replaced recording is knocked off its clip.
+    func knockOff(_ id: UUID) {
+        guard let i = items.firstIndex(where: { $0.id == id && !$0.falling }) else { return }
+        items[i].flying = true
+        play("Pop", volume: 0.25)
+    }
+
+    /// The new version takes the clip.
+    func takeClip(_ id: UUID) {
+        guard let i = items.firstIndex(where: { $0.id == id && !$0.falling }) else { return }
+        reloadThumbnail(for: items[i].url)
+        items[i].flying = false
+        play("Tink", volume: 0.35)
+    }
+
+    /// On a line that scrolls, far enough for this photo to be in view.
+    func bringIntoView(_ id: UUID) {
+        guard let index = items.firstIndex(where: { $0.id == id }) else { return }
+        scroll = CGFloat(max(0, items.count - index - visibleCount)) * Layout.spacing
+    }
+
     // MARK: Holding
 
     /// Off the line and into your hand, or back onto its clip.

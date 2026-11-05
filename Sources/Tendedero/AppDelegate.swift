@@ -90,8 +90,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         Markup.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         Share.shared.clearAll()
-        Trim.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
-        Trim.shared.onSavedAsNew = { [weak self] url in self?.hangCapture(url, squeezing: true) }
+        Trim.shared.onSaved = { [weak self] url, from in self?.replaceOnLine(url, from: from) }
+        Trim.shared.onSavedAsNew = { [weak self] url, from in self?.hangCapture(url, squeezing: true, trimmedFrom: from) }
         panel.onScroll = { [weak self] event in
             // Sideways on a trackpad, or the wheel of a mouse.
             let delta = abs(event.scrollingDeltaX) >= abs(event.scrollingDeltaY)
@@ -284,36 +284,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     /// The line comes down on that screen for a moment, then tucks away.
     /// Without a screen, it uses the one under the pointer.
-    private func comeDown(on screen: NSScreen?) {
+    private func comeDown(on screen: NSScreen?, whateverTheSetting: Bool = false) {
         panel.placeOnScreen(screen)
         updateCapacity()
         wanted = true
         refresh()
-        if Self.peeksAtNew { reveal(peekFor: 2.5) }
+        if Self.peeksAtNew || whateverTheSetting { reveal(peekFor: 2.5) }
     }
 
     // MARK: The capture flying to the line
 
     /// A new screenshot lifts off from where it was taken and flies to its
     /// place on the line. Without a known capture area it simply drops in.
-    private func hangCapture(_ url: URL, squeezing: Bool = false) {
+    private func hangCapture(_ url: URL, squeezing: Bool = false, trimmedFrom: CGRect? = nil) {
         // Already hanging: a photo put back with ⌘Z comes out of the Trash
         // into the folder, and the watcher sees it arrive. It must not pull
         // the line over to the screen it was first taken on.
         guard !line.items.contains(where: { $0.url.standardizedFileURL == url.standardizedFileURL && !$0.falling })
         else { return }
-        let from = captureRect(of: url)
-        let screen = from.flatMap { from in
-            NSScreen.screens.first { NSMouseInRect(CGPoint(x: from.midX, y: from.midY), $0.frame, false) }
-        }
+        let from = trimmedFrom ?? captureRect(of: url)
+        let screen = from.flatMap(Self.screen(of:))
         // Every capture brings the line down before it hangs, on the screen it
         // was taken on. On a full line the oldest photo then falls in view as
         // the new one flies in.
-        comeDown(on: screen)
+        comeDown(on: screen, whateverTheSetting: trimmedFrom != nil)
         // A screenshot macOS took already played its shutter, so it hangs
         // without a chime of its own. Copied images and watched folders,
         // which come with no sound, keep it.
-        guard let id = line.hang(url, quietly: from != nil, flying: from != nil, squeezing: squeezing) else {
+        guard let id = line.hang(url, quietly: from != nil && trimmedFrom == nil, flying: from != nil, squeezing: squeezing) else {
             // Nothing hung after all, so an empty line goes away again.
             itemsChanged()
             return
@@ -326,24 +324,53 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     private func fly(_ id: UUID, from: CGRect) {
-        guard isPresent, isRevealed, !Self.reducesMotion, CaptureFlight.flightsInProgress < 2,
-              let screen = panel.screen,
-              let to = cardFrame(for: id),
-              let item = line.items.first(where: { $0.id == id }) else {
+        guard let item = line.items.first(where: { $0.id == id }),
+              launch(item, from: from, landed: { [weak self] in self?.line.land(id) }) else {
             line.land(id)
             return
         }
+    }
+
+    /// Sends a photo flying to its card, if it can fly right now.
+    private func launch(_ item: Pegged, from: CGRect, landed: @escaping () -> Void) -> Bool {
+        guard isPresent, isRevealed, !Self.reducesMotion, CaptureFlight.flightsInProgress < 2,
+              let screen = panel.screen,
+              let to = cardFrame(for: item.id) else { return false }
         // Sharp enough while it starts out at the captured size, which a
         // full Retina screen would otherwise take at full resolution.
         let pixels = Int(max(from.width, from.height) * screen.backingScaleFactor)
         guard let image = makeThumbnail(item.url, maxPixels: min(1500, max(400, pixels)))?
-            .cgImage(forProposedRect: nil, context: nil, hints: nil) else {
-            line.land(id)
-            return
+            .cgImage(forProposedRect: nil, context: nil, hints: nil) else { return false }
+        CaptureFlight.fly(image: image, from: from, to: to, tilt: CGFloat(item.tilt), on: screen, completion: landed)
+        return true
+    }
+
+    /// A recording replaced by its trimmed version: the new one flies up and
+    /// knocks the old one off its clip just before it lands there, so it
+    /// can't be mistaken for a new photo hanging.
+    private func replaceOnLine(_ url: URL, from: CGRect) {
+        guard let old = line.items.first(where: { $0.url == url && !$0.falling }) else { return }
+        comeDown(on: Self.screen(of: from), whateverTheSetting: true)
+        line.bringIntoView(old.id)
+        // Let the line come down and lay out before measuring the landing spot.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) { [weak self] in
+            guard let self else { return }
+            let flew = self.launch(old, from: from) { [weak self] in self?.line.takeClip(old.id) }
+            guard flew else {
+                self.fall(old)
+                self.line.knockOff(old.id)
+                self.line.takeClip(old.id)
+                return
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + CaptureFlight.duration * 0.7) { [weak self] in
+                self?.fall(old)
+                self?.line.knockOff(old.id)
+            }
         }
-        CaptureFlight.fly(image: image, from: from, to: to, tilt: CGFloat(item.tilt), on: screen) { [weak self] in
-            self?.line.land(id)
-        }
+    }
+
+    private static func screen(of rect: CGRect) -> NSScreen? {
+        NSScreen.screens.first { NSMouseInRect(CGPoint(x: rect.midX, y: rect.midY), $0.frame, false) }
     }
 
     /// A discarded card falls over the whole screen, from where it hangs.

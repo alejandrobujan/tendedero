@@ -9,11 +9,12 @@ import Combine
 final class Trim: NSObject, NSWindowDelegate {
     static let shared = Trim()
 
-    /// Called with the file once the trimmed recording has replaced it.
-    var onSaved: (URL) -> Void = { _ in }
+    /// Called with the file once the trimmed recording has replaced it, and
+    /// where on screen the editor showed it.
+    var onSaved: (URL, CGRect) -> Void = { _, _ in }
     /// Called with the new file once the trimmed recording is saved beside
-    /// the original.
-    var onSavedAsNew: (URL) -> Void = { _ in }
+    /// the original, and where on screen the editor showed it.
+    var onSavedAsNew: (URL, CGRect) -> Void = { _, _ in }
 
     private var window: NSWindow?
     private var ready: AnyCancellable?
@@ -86,9 +87,8 @@ final class Trim: NSObject, NSWindowDelegate {
             switch response {
             case .alertFirstButtonReturn: self.save(item, to: url, asNew: true)
             case .alertSecondButtonReturn: self.save(item, to: url, asNew: false)
-            default: break
+            default: self.window?.close()
             }
-            self.window?.close()
         }
     }
 
@@ -96,11 +96,16 @@ final class Trim: NSObject, NSWindowDelegate {
 
     /// Copies the kept part without re-encoding, to a hidden file next to the
     /// original so the watcher ignores it, then moves it beside the original
-    /// or swaps it in.
+    /// or swaps it in. The editor stays open until then, so the recording
+    /// leaves for the line from where you were looking at it.
     private func save(_ item: AVPlayerItem, to original: URL, asNew: Bool) {
+        let editor = window
+        let frame = editor.map { $0.convertToScreen($0.contentLayoutRect) } ?? .zero
+        (editor?.contentView as? AVPlayerView)?.player?.pause()
         let start = item.reversePlaybackEndTime.isValid ? item.reversePlaybackEndTime : .zero
         let end = item.forwardPlaybackEndTime.isValid ? item.forwardPlaybackEndTime : item.duration
         guard let export = AVAssetExportSession(asset: item.asset, presetName: AVAssetExportPresetPassthrough) else {
+            editor?.close()
             NSSound.beep()
             return
         }
@@ -114,9 +119,10 @@ final class Trim: NSObject, NSWindowDelegate {
         export.timeRange = CMTimeRange(start: start, end: end)
         Task {
             await export.export()
+            editor?.close()
             if export.status == .completed, Self.place(temp, at: target, asNew: asNew) {
                 log.notice("Trimmed \(target.lastPathComponent, privacy: .public)")
-                if asNew { onSavedAsNew(target) } else { onSaved(target) }
+                if asNew { onSavedAsNew(target, frame) } else { onSaved(target, frame) }
             } else {
                 log.error("Could not trim \(target.lastPathComponent, privacy: .public): \(export.error?.localizedDescription ?? "", privacy: .public)")
                 try? FileManager.default.removeItem(at: temp)
