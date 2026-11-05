@@ -56,7 +56,9 @@ struct GrabArea: NSViewRepresentable {
             if !isRecording {
                 menu.addItem(ClosureMenuItem(L("Hold")) { line.onHold?(id) })
             }
-            if !isRecording {
+            if isRecording {
+                menu.addItem(ClosureMenuItem(L("Trim")) { line.markup(id) })
+            } else {
                 menu.addItem(ClosureMenuItem(L("Markup")) { line.markup(id) })
             }
             menu.addItem(ClosureMenuItem(L("Show in Finder")) { line.reveal(id) })
