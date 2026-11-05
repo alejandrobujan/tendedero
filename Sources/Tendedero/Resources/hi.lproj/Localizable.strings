@@ -80,7 +80,7 @@
 
 /* Trim */
 "How should the trimmed recording be saved?" = "ट्रिम की गई रिकॉर्डिंग कैसे सेव करें?";
-"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back." = "नई के रूप में सेव करें इसे रस्सी पर टांगता है और मूल को वैसा ही रखता है। बदलें इसे मूल की जगह रखता है और मूल को ट्रैश में भेजता है। ⌘Z उसे वापस लाता है।";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back." = "नई के रूप में सेव करें इसे रस्सी पर टाँगता है और मूल को वैसा ही रखता है। बदलें इसे मूल की जगह रखता है और मूल को ट्रैश में ले जाता है। ⌘Z उसे वापस लाता है।";
 "Save as New" = "नई के रूप में सेव करें";
 "Replace" = "बदलें";
 "Cancel" = "रद्द करें";

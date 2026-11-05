@@ -52,7 +52,7 @@
 "Open" = "開く";
 "Quick Look" = "クイックルック";
 "Markup" = "マークアップ";
-"Trim" = "トリム";
+"Trim" = "トリミング";
 "Show in Finder" = "Finderで表示";
 "Share…" = "共有…";
 "Save to Desktop" = "デスクトップに保存";
@@ -77,9 +77,9 @@
 "Actual Size" = "実際のサイズ";
 
 /* Trim */
-"How should the trimmed recording be saved?" = "トリムした収録をどのように保存しますか？";
-"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back." = "「新規保存」はロープに吊るし、元の収録はそのまま残します。「置き換え」は元の収録と入れ替え、元の収録をゴミ箱に入れます。⌘Zで元に戻せます。";
+"How should the trimmed recording be saved?" = "トリミングした画面収録をどのように保存しますか？";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back." = "「新規保存」はロープに掛け、元の画面収録はそのまま残します。「置き換え」は元の画面収録と入れ替え、元の画面収録をゴミ箱に入れます。⌘Zで元に戻せます。";
 "Save as New" = "新規保存";
 "Replace" = "置き換え";
 "Cancel" = "キャンセル";
-"trimmed" = "トリム済み";
+"trimmed" = "トリミング済み";

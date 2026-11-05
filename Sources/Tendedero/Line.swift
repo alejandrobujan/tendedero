@@ -37,6 +37,16 @@ struct Pegged: Identifiable, Equatable {
 final class Line: ObservableObject {
     @Published private(set) var items: [Pegged] = []
     @Published private(set) var gust = 0
+    /// The photo last struck by a recording replacing it, and how far it swings.
+    @Published private(set) var struck: Struck?
+    struct Struck: Equatable {
+        let id: UUID
+        let degrees: Double
+        /// What changed, shown on the photo for a moment.
+        var note: String?
+        /// Every blow counts, even the same one twice on the same photo.
+        let blow = UUID()
+    }
     @Published var copiedID: UUID?
     @Published var draggingID: UUID?
     @Published var pressedID: UUID?
@@ -130,6 +140,9 @@ final class Line: ObservableObject {
     /// Called just before a photo starts falling, so the fall can be drawn
     /// over the whole screen.
     var onFall: ((Pegged) -> Void)?
+    /// The original of a replaced recording is coming back to this photo's
+    /// clip, with its thumbnail. Until it arrives, the photo hangs as it was.
+    var onOriginalBack: ((Pegged, NSImage) -> Void)?
 
     /// Hold, from a photo's menu: the app takes it off the line.
     var onHold: ((UUID) -> Void)?
@@ -557,23 +570,23 @@ final class Line: ObservableObject {
         if steps.count > Self.maxSteps { steps.removeFirst() }
     }
 
-    /// The trimmed version falls and the original is back on the clip. The
-    /// trimmed version goes to the Trash, so nothing is lost this way either.
+    /// The original comes back and strikes the trimmed version off its clip,
+    /// the way the trimmed version took its place. The trimmed version goes to
+    /// the Trash, so nothing is lost this way either.
     private func undoReplace(_ photo: TakenDown) {
-        guard let i = items.firstIndex(where: { $0.url == photo.url && !$0.falling }),
+        guard let item = items.first(where: { $0.url == photo.url && !$0.falling }),
               let original = photo.trashed,
               (try? swapIn(original, at: photo.url)) != nil,
               let thumb = makeThumbnail(photo.url) else {
             NSSound.beep()
             return
         }
-        let id = items[i].id
-        onFall?(items[i])
-        items[i].thumb = thumb
-        items[i].flying = true
-        play("Tink", volume: 0.35)
-        // A moment hidden, so the original lands once the trimmed one has left.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in self?.land(id) }
+        bringIntoView(item.id)
+        if let onOriginalBack {
+            onOriginalBack(item, thumb)
+        } else {
+            takeClip(item.id, thumb: thumb)
+        }
     }
 
     private func undoSaveAsNew(_ photo: TakenDown) {
@@ -584,18 +597,16 @@ final class Line: ObservableObject {
         }
     }
 
-    /// The old version of a replaced recording is knocked off its clip.
-    func knockOff(_ id: UUID) {
+    /// What now fills the file takes the clip, its thumbnail made beforehand so
+    /// the blow doesn't stall on decoding it. With `degrees` it lands hard and the
+    /// line feels it, unless the system asks for less motion.
+    func takeClip(_ id: UUID, thumb: NSImage, struck degrees: Double? = nil, note: String? = nil) {
         guard let i = items.firstIndex(where: { $0.id == id && !$0.falling }) else { return }
-        items[i].flying = true
-        play("Pop", volume: 0.25)
-    }
-
-    /// The new version takes the clip.
-    func takeClip(_ id: UUID) {
-        guard let i = items.firstIndex(where: { $0.id == id && !$0.falling }) else { return }
-        reloadThumbnail(for: items[i].url)
-        items[i].flying = false
+        items[i].thumb = thumb
+        if let degrees {
+            struck = Struck(id: id, degrees: degrees, note: note)
+            play("Pop", volume: 0.25)
+        }
         play("Tink", volume: 0.35)
     }
 

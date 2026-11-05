@@ -10,8 +10,9 @@ final class Trim: NSObject, NSWindowDelegate {
     static let shared = Trim()
 
     /// Called with the file once the trimmed recording has replaced it, where
-    /// on screen the editor showed it, and where the original went in the Trash.
-    var onSaved: (URL, CGRect, URL) -> Void = { _, _, _ in }
+    /// on screen the editor showed it, where the original went in the Trash,
+    /// and how its length changed.
+    var onSaved: (URL, CGRect, URL, String) -> Void = { _, _, _, _ in }
     /// Called with the new file once the trimmed recording is saved beside
     /// the original, and where on screen the editor showed it.
     var onSavedAsNew: (URL, CGRect) -> Void = { _, _ in }
@@ -119,20 +120,31 @@ final class Trim: NSObject, NSWindowDelegate {
         export.timeRange = CMTimeRange(start: start, end: end)
         Task {
             await export.export()
-            editor?.close()
+            // Once the images for the flight are made, so nothing is left blank.
+            defer { editor?.close() }
             let finished = export.status == .completed
             if finished, asNew, (try? FileManager.default.moveItem(at: temp, to: target)) != nil {
                 log.notice("Trimmed \(target.lastPathComponent, privacy: .public)")
                 onSavedAsNew(target, frame)
             } else if finished, !asNew, let trashed = try? swapIn(temp, at: target) {
                 log.notice("Trimmed \(target.lastPathComponent, privacy: .public)")
-                onSaved(target, frame, trashed)
+                onSaved(target, frame, trashed, Self.lengths(from: item.duration, to: end - start))
             } else {
                 log.error("Could not trim \(target.lastPathComponent, privacy: .public): \(export.error?.localizedDescription ?? "", privacy: .public)")
                 try? FileManager.default.removeItem(at: temp)
                 NSSound.beep()
             }
         }
+    }
+
+    /// "0:31 → 0:05". Digits and an arrow read the same in every language.
+    private static func lengths(from before: CMTime, to after: CMTime) -> String {
+        func clock(_ time: CMTime) -> String {
+            let total = time.seconds.isFinite ? Int(time.seconds.rounded()) : 0
+            let (h, m, s) = (total / 3600, total / 60 % 60, total % 60)
+            return h > 0 ? String(format: "%d:%02d:%02d", h, m, s) : String(format: "%d:%02d", m, s)
+        }
+        return "\(clock(before)) → \(clock(after))"
     }
 
     private static func newName(for original: URL) -> String {

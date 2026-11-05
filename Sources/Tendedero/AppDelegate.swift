@@ -90,9 +90,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         Markup.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         Share.shared.clearAll()
-        Trim.shared.onSaved = { [weak self] url, from, original in
+        Trim.shared.onSaved = { [weak self] url, from, original, lengths in
             self?.line.rememberReplaced(url, original: original)
-            self?.replaceOnLine(url, from: from)
+            self?.replaceOnLine(url, from: from, lengths: lengths)
         }
         Trim.shared.onSavedAsNew = { [weak self] url, from in
             self?.hangCapture(url, squeezing: true, trimmedFrom: from)
@@ -104,6 +104,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 ? event.scrollingDeltaX : event.scrollingDeltaY
             self?.line.scroll(by: event.hasPreciseScrollingDeltas ? delta : delta * 12)
         }
+        line.onOriginalBack = { [weak self] trimmed, thumb in self?.originalBack(replacing: trimmed, thumb: thumb) }
         line.onFall = { [weak self] item in self?.fall(item) }
         line.onHold = { [weak self] id in self?.hold(id) }
         line.onHangBack = { id in Held.hangBack(id) }
@@ -309,6 +310,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard !line.items.contains(where: { $0.url.standardizedFileURL == url.standardizedFileURL && !$0.falling })
         else { return }
         let from = trimmedFrom ?? captureRect(of: url)
+        let prepared = trimmedFrom.flatMap { Self.flightImage(of: url, from: $0) }
         let screen = from.flatMap(Self.screen(of:))
         // Every capture brings the line down before it hangs, on the screen it
         // was taken on. On a full line the oldest photo then falls in view as
@@ -325,54 +327,85 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard let from else { return }
         // Let the line come down and lay out before measuring the landing spot.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) { [weak self] in
-            self?.fly(id, from: from)
+            self?.fly(id, from: from, prepared: prepared)
         }
     }
 
-    private func fly(_ id: UUID, from: CGRect) {
+    private func fly(_ id: UUID, from: CGRect, prepared: CGImage? = nil) {
         guard let item = line.items.first(where: { $0.id == id }),
-              launch(item, from: from, landed: { [weak self] in self?.line.land(id) }) else {
+              launch(item, from: from, prepared: prepared, landed: { [weak self] in self?.line.land(id) }) else {
             line.land(id)
             return
         }
     }
 
     /// Sends a photo flying to its card, if it can fly right now.
-    private func launch(_ item: Pegged, from: CGRect, landed: @escaping () -> Void) -> Bool {
+    private func launch(_ item: Pegged, from: CGRect, prepared: CGImage? = nil, strikes: Bool = false,
+                        landed: @escaping () -> Void) -> Bool {
         guard isPresent, isRevealed, !Self.reducesMotion, CaptureFlight.flightsInProgress < 2,
               let screen = panel.screen,
-              let to = cardFrame(for: item.id) else { return false }
-        // Sharp enough while it starts out at the captured size, which a
-        // full Retina screen would otherwise take at full resolution.
-        let pixels = Int(max(from.width, from.height) * screen.backingScaleFactor)
-        guard let image = makeThumbnail(item.url, maxPixels: min(1500, max(400, pixels)))?
-            .cgImage(forProposedRect: nil, context: nil, hints: nil) else { return false }
-        CaptureFlight.fly(image: image, from: from, to: to, tilt: CGFloat(item.tilt), on: screen, completion: landed)
+              let to = cardFrame(for: item.id),
+              let image = prepared ?? Self.flightImage(of: item.url, from: from) else { return false }
+        CaptureFlight.fly(image: image, from: from, to: to, tilt: CGFloat(item.tilt), strikes: strikes, on: screen, completion: landed)
         return true
     }
 
-    /// A recording replaced by its trimmed version: the new one flies up and
-    /// knocks the old one off its clip just before it lands there, so it
-    /// can't be mistaken for a new photo hanging.
-    private func replaceOnLine(_ url: URL, from: CGRect) {
-        guard let old = line.items.first(where: { $0.url == url && !$0.falling }) else { return }
+    /// Sharp enough while it starts out at the captured size, which a full
+    /// Retina screen would otherwise take at full resolution.
+    private static func flightImage(of url: URL, from: CGRect) -> CGImage? {
+        let scale = screen(of: from)?.backingScaleFactor ?? 2
+        let pixels = Int(max(from.width, from.height) * scale)
+        return makeThumbnail(url, maxPixels: min(1500, max(400, pixels)))?
+            .cgImage(forProposedRect: nil, context: nil, hints: nil)
+    }
+
+    /// A recording replaced by its trimmed version: the new one speeds up to
+    /// the old one's clip and knocks it off, so it can't be mistaken for a new
+    /// photo hanging.
+    private func replaceOnLine(_ url: URL, from: CGRect, lengths: String) {
+        guard let old = line.items.first(where: { $0.url == url && !$0.falling }),
+              let thumb = makeThumbnail(url) else { return }
+        let image = Self.flightImage(of: url, from: from)
         comeDown(on: Self.screen(of: from), whateverTheSetting: true)
         line.bringIntoView(old.id)
         // Let the line come down and lay out before measuring the landing spot.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) { [weak self] in
             guard let self else { return }
-            let flew = self.launch(old, from: from) { [weak self] in self?.line.takeClip(old.id) }
-            guard flew else {
-                self.fall(old)
-                self.line.knockOff(old.id)
-                self.line.takeClip(old.id)
-                return
+            let flew = self.launch(old, from: from, prepared: image, strikes: true) { [weak self] in
+                guard let self else { return }
+                let card = self.cardFrame(for: old.id)
+                // Hit towards the right, the card's bottom swings to the right,
+                // which SwiftUI counts as turning anticlockwise.
+                let direction: CGFloat = (card?.midX ?? 0) >= from.midX ? 1 : -1
+                self.knock(old, direction: direction, greyed: true)
+                self.line.takeClip(old.id, thumb: thumb, struck: -14 * Double(direction), note: lengths)
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + CaptureFlight.duration * 0.7) { [weak self] in
-                self?.fall(old)
-                self?.line.knockOff(old.id)
-            }
+            if !flew { self.line.takeClip(old.id, thumb: thumb) }
         }
+    }
+
+    /// ⌘Z on a replaced recording: the same blow the other way round. The
+    /// original rises from where it fell and knocks the trimmed version off.
+    private func originalBack(replacing trimmed: Pegged, thumb: NSImage) {
+        guard isPresent, isRevealed, !Self.reducesMotion, let screen = panel.screen,
+              let card = cardFrame(for: trimmed.id),
+              let image = thumb.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+            line.takeClip(trimmed.id, thumb: thumb)
+            return
+        }
+        // It rises on the side with the most room, and hits the other way.
+        let fellTo: CGFloat = card.midX > panel.frame.midX ? -1 : 1
+        CaptureFlight.comeBack(image: image, to: card, tilt: CGFloat(trimmed.tilt), direction: fellTo, on: screen) { [weak self] in
+            self?.knock(trimmed, direction: -fellTo)
+            self?.line.takeClip(trimmed.id, thumb: thumb, struck: 14 * Double(fellTo))
+        }
+    }
+
+    private func knock(_ item: Pegged, direction: CGFloat, greyed: Bool = false) {
+        guard isPresent, isRevealed, !Self.reducesMotion, let screen = panel.screen,
+              let card = cardFrame(for: item.id),
+              let image = item.thumb.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return }
+        CaptureFlight.knock(image: image, card: card, tilt: CGFloat(item.tilt), direction: direction, greyed: greyed, behind: panel, on: screen)
     }
 
     private static func screen(of rect: CGRect) -> NSScreen? {
