@@ -118,7 +118,7 @@ Tendedero tamamen Mac'inizde çalışır ve ekran görüntüleriniz hiçbir zama
 Uygulamalar'a sürükleyin. Ya da Homebrew ile yükleyin:
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 Tendedero, Developer ID ile imzalı ve Apple tarafından onaylıdır; diğer uygulamalar gibi açılır.

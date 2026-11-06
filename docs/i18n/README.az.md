@@ -120,7 +120,7 @@ Disk şəklini [son buraxılışdan](../../../../releases/latest) yükləyin,
 açın və Tendedero-nu Applications qovluğuna sürükləyin. Və ya Homebrew ilə quraşdırın:
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 Tendedero Developer ID ilə imzalanıb və Apple tərəfindən notarizasiya olunub,

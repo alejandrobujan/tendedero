@@ -118,7 +118,7 @@ Tendedero पूरी तरह आपके Mac पर चलता है, �
 और Tendedero को Applications में खींच दें। या Homebrew से इंस्टॉल करें:
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 Tendedero पर Developer ID से साइन है और Apple ने इसे नोटराइज़ किया है, इसलिए यह

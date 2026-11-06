@@ -115,7 +115,7 @@ Tendederoは完全にMac上で動作し、スクリーンショットがMacの�
 [最新リリース](../../../../releases/latest)からディスクイメージをダウンロードして開き、Tendederoを「アプリケーション」フォルダにドラッグします。Homebrewでもインストールできます：
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 TendederoはDeveloper IDで署名され、Appleによる公証を受けているため、ほかのアプリと同じように開けます。

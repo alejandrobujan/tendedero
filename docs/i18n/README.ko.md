@@ -118,7 +118,7 @@ Tendedero는 전적으로 Mac에서만 실행되며, 스크린샷은 절대 Mac 
 Tendedero를 응용 프로그램 폴더로 드래그하세요. Homebrew로 설치할 수도 있어요.
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 Tendedero는 Developer ID로 서명되고 Apple의 공증을 받았기 때문에

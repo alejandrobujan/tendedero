@@ -119,7 +119,7 @@ Descarga la imagen de disco desde la [última versión](../../../../releases/lat
 ábrela y arrastra Tendedero a Aplicaciones. También puedes instalarlo con Homebrew:
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 Tendedero está firmado con un Developer ID y notarizado por Apple, así que se

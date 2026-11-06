@@ -119,7 +119,7 @@ Baixe a imagem de disco da [versão mais recente](../../../../releases/latest),
 abra-a e arraste o Tendedero para Aplicativos. Ou instale com o Homebrew:
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 O Tendedero é assinado com um Developer ID e notarizado pela Apple, então abre

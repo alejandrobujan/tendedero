@@ -117,7 +117,7 @@ Download the disk image from the [latest release](../../releases/latest),
 open it and drag Tendedero to Applications. Or install it with Homebrew:
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 Tendedero is signed with a Developer ID and notarized by Apple, so it opens

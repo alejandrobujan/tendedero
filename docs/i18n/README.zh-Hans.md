@@ -114,7 +114,7 @@ Tendedero 完全在你的 Mac 上运行，截图不会离开这台电脑。
 从[最新发布](../../../../releases/latest)下载磁盘映像，打开后把 Tendedero 拖进「应用程序」。也可以用 Homebrew 安装：
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 Tendedero 已使用 Developer ID 签名并通过 Apple 公证，打开方式和其他 App 一样。
