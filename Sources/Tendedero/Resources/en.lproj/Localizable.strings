@@ -54,6 +54,7 @@
 "Open" = "Open";
 "Quick Look" = "Quick Look";
 "Markup" = "Markup";
+"Trim" = "Trim";
 "Show in Finder" = "Show in Finder";
 "Share…" = "Share…";
 "Save to Desktop" = "Save to Desktop";
@@ -76,3 +77,11 @@
 "Hang back" = "Hang back";
 "Hang everything back" = "Hang everything back";
 "Actual Size" = "Actual Size";
+
+/* Trim */
+"How should the trimmed recording be saved?" = "How should the trimmed recording be saved?";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back." = "Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back.";
+"Save as New" = "Save as New";
+"Replace" = "Replace";
+"Cancel" = "Cancel";
+"trimmed" = "trimmed";

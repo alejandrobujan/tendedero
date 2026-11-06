@@ -52,6 +52,7 @@
 "Open" = "Aç";
 "Quick Look" = "Hızlı Bakış";
 "Markup" = "İşaretle";
+"Trim" = "Kırp";
 "Show in Finder" = "Finder'da göster";
 "Share…" = "Paylaş…";
 "Save to Desktop" = "Masaüstüne kaydet";
@@ -74,3 +75,11 @@
 "Hang back" = "İpe geri koy";
 "Hang everything back" = "Hepsini ipe geri koy";
 "Actual Size" = "Gerçek boyut";
+
+/* Trim */
+"How should the trimmed recording be saved?" = "Kırpılan kayıt nasıl kaydedilsin?";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back." = "Yeni Olarak Kaydet onu ipe asar ve aslını olduğu gibi bırakır. Değiştir onu aslının yerine koyar ve aslını Çöp Kutusu'na taşır. ⌘Z geri getirir.";
+"Save as New" = "Yeni Olarak Kaydet";
+"Replace" = "Değiştir";
+"Cancel" = "Vazgeç";
+"trimmed" = "kırpıldı";

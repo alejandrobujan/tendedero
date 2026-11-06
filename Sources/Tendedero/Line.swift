@@ -37,6 +37,16 @@ struct Pegged: Identifiable, Equatable {
 final class Line: ObservableObject {
     @Published private(set) var items: [Pegged] = []
     @Published private(set) var gust = 0
+    /// The photo last struck by a recording replacing it, and how far it swings.
+    @Published private(set) var struck: Struck?
+    struct Struck: Equatable {
+        let id: UUID
+        let degrees: Double
+        /// What changed, shown on the photo for a moment.
+        var note: String?
+        /// Every blow counts, even the same one twice on the same photo.
+        let blow = UUID()
+    }
     @Published var copiedID: UUID?
     @Published var draggingID: UUID?
     @Published var pressedID: UUID?
@@ -48,6 +58,10 @@ final class Line: ObservableObject {
     var hitRects: [UUID: CGRect] = [:]
 
     var maxItems = 8
+    /// Room beyond `maxItems`, made by a trimmed recording saved as new so
+    /// that nothing has to fall for it. The photos move closer together, or
+    /// the line scrolls further. It goes once the line no longer needs it.
+    private var squeezed = 0
     /// How many photos fit across the screen. With Keep on line set, the
     /// line can hold more, and the rest are reached by scrolling.
     var visibleCount = 8
@@ -95,19 +109,27 @@ final class Line: ObservableObject {
     // MARK: Hanging and dropping
 
     @discardableResult
-    func hang(_ url: URL, quietly: Bool = false, flying: Bool = false) -> UUID? {
+    func hang(_ url: URL, quietly: Bool = false, flying: Bool = false, squeezing: Bool = false, after: URL? = nil) -> UUID? {
         guard !items.contains(where: { $0.url == url && !$0.falling }),
               let thumb = makeThumbnail(url) else { return nil }
         var item = Pegged(url: url, thumb: thumb)
         item.flying = flying
         // The line moves anyway for a new photo, so the gaps close with it.
         sweepFallen()
-        items.append(item)
-        scroll = 0
+        squeezed = min(squeezed, max(0, liveCount - maxItems))
+        // Next to the photo it came from, past the pinned ones if that is pinned.
+        if let after, let i = items.lastIndex(where: { $0.url == after && !$0.falling }) {
+            items.insert(item, at: max(i + 1, items.lastIndex(where: \.kept).map { $0 + 1 } ?? 0))
+            bringIntoView(item.id)
+        } else {
+            items.append(item)
+            scroll = 0
+        }
+        if squeezing { squeezed = max(squeezed, liveCount - maxItems) }
         // A full line lets the oldest photo fall off the far end. Only one: a
         // line hung on a wider screen keeps its length here instead of losing
         // several photos to a single capture.
-        if liveCount > maxItems, let oldest = oldestLoose {
+        if liveCount > maxItems + squeezed, let oldest = oldestLoose {
             letGo(oldest.id)
         }
         save()
@@ -124,6 +146,9 @@ final class Line: ObservableObject {
     /// Called just before a photo starts falling, so the fall can be drawn
     /// over the whole screen.
     var onFall: ((Pegged) -> Void)?
+    /// The original of a replaced recording is coming back to this photo's
+    /// clip, with its thumbnail. Until it arrives, the photo hangs as it was.
+    var onOriginalBack: ((Pegged, NSImage) -> Void)?
 
     /// Hold, from a photo's menu: the app takes it off the line.
     var onHold: ((UUID) -> Void)?
@@ -319,6 +344,7 @@ final class Line: ObservableObject {
     /// After Keep on line is lowered, the oldest photos past it go the way
     /// of a full line.
     func trim() {
+        squeezed = 0
         while liveCount > maxItems, let oldest = oldestLoose {
             letGo(oldest.id)
         }
@@ -346,18 +372,6 @@ final class Line: ObservableObject {
             log.error("Could not save to Desktop: \(error.localizedDescription, privacy: .public)")
             NSSound.beep()
         }
-    }
-
-    private func uniqueURL(in folder: URL, for name: String) -> URL {
-        let base = (name as NSString).deletingPathExtension
-        let ext = (name as NSString).pathExtension
-        var candidate = folder.appendingPathComponent(name)
-        var n = 2
-        while FileManager.default.fileExists(atPath: candidate.path) {
-            candidate = folder.appendingPathComponent("\(base) \(n)").appendingPathExtension(ext)
-            n += 1
-        }
-        return candidate
     }
 
     /// Long press: open the photo in the system Markup editor. Markup does
@@ -407,7 +421,11 @@ final class Line: ObservableObject {
         let trashed: URL?
         var kept = false
         var byHand = false
+        /// A trim, not a take down: `url` holds the trimmed recording.
+        var trim: TrimStep?
     }
+
+    private enum TrimStep { case replaced, savedAsNew }
 
     /// What was taken down, the latest last. A step holds everything one
     /// action took down. Only kept while the app runs.
@@ -429,6 +447,13 @@ final class Line: ObservableObject {
     /// where it was, and a file sent to the Trash comes back out of it.
     func putBack() {
         guard let step = steps.popLast() else { return }
+        if let photo = step.photos.first, let trim = photo.trim {
+            switch trim {
+            case .replaced: undoReplace(photo)
+            case .savedAsNew: undoSaveAsNew(photo)
+            }
+            return
+        }
         var back: Set<UUID> = []
         // The last one taken down goes back first, so each finds its place.
         for photo in step.photos.reversed() {
@@ -454,7 +479,7 @@ final class Line: ObservableObject {
         }
         // As when something new hangs, a full line lets its oldest photo go,
         // never one that just came back.
-        while liveCount > maxItems, let oldest = items.first(where: { !$0.falling && !$0.kept && !back.contains($0.id) }) {
+        while liveCount > maxItems + squeezed, let oldest = items.first(where: { !$0.falling && !$0.kept && !back.contains($0.id) }) {
             letGo(oldest.id)
         }
         keepKeptFirst()
@@ -537,6 +562,66 @@ final class Line: ObservableObject {
         return true
     }
 
+    // MARK: Replacing
+
+    /// ⌘Z can bring the original back from the Trash.
+    func rememberReplaced(_ url: URL, original: URL) {
+        steps.append((UUID(), [TakenDown(url: url, index: 0, trashed: original, trim: .replaced)]))
+        if steps.count > Self.maxSteps { steps.removeFirst() }
+    }
+
+    /// ⌘Z can take the new recording down again.
+    func rememberSavedAsNew(_ url: URL) {
+        steps.append((UUID(), [TakenDown(url: url, index: 0, trashed: nil, trim: .savedAsNew)]))
+        if steps.count > Self.maxSteps { steps.removeFirst() }
+    }
+
+    /// The original comes back and strikes the trimmed version off its clip,
+    /// the way the trimmed version took its place. The trimmed version goes to
+    /// the Trash, so nothing is lost this way either.
+    private func undoReplace(_ photo: TakenDown) {
+        guard let item = items.first(where: { $0.url == photo.url && !$0.falling }),
+              let original = photo.trashed,
+              (try? swapIn(original, at: photo.url)) != nil,
+              let thumb = makeThumbnail(photo.url) else {
+            NSSound.beep()
+            return
+        }
+        bringIntoView(item.id)
+        if let onOriginalBack {
+            onOriginalBack(item, thumb)
+        } else {
+            takeClip(item.id, thumb: thumb)
+        }
+    }
+
+    private func undoSaveAsNew(_ photo: TakenDown) {
+        guard let item = items.first(where: { $0.url == photo.url && !$0.falling }),
+              trash(item.id, step: nil) else {
+            NSSound.beep()
+            return
+        }
+    }
+
+    /// What now fills the file takes the clip, its thumbnail made beforehand so
+    /// the blow doesn't stall on decoding it. With `degrees` it lands hard and the
+    /// line feels it, unless the system asks for less motion.
+    func takeClip(_ id: UUID, thumb: NSImage, struck degrees: Double? = nil, note: String? = nil) {
+        guard let i = items.firstIndex(where: { $0.id == id && !$0.falling }) else { return }
+        items[i].thumb = thumb
+        if let degrees {
+            struck = Struck(id: id, degrees: degrees, note: note)
+            play("Pop", volume: 0.25)
+        }
+        play("Tink", volume: 0.35)
+    }
+
+    /// On a line that scrolls, far enough for this photo to be in view.
+    func bringIntoView(_ id: UUID) {
+        guard let index = items.firstIndex(where: { $0.id == id }) else { return }
+        scroll = CGFloat(max(0, items.count - index - visibleCount)) * Layout.spacing
+    }
+
     // MARK: Holding
 
     /// Off the line and into your hand, or back onto its clip.
@@ -562,12 +647,14 @@ final class Line: ObservableObject {
 
     private let keptKey = "kept"
     private let byHandKey = "byHand"
+    private let squeezedKey = "squeezed"
 
     private func save() {
         let live = items.filter { !$0.falling }
         UserDefaults.standard.set(live.map(\.url.path), forKey: storeKey)
         UserDefaults.standard.set(live.filter(\.kept).map(\.url.path), forKey: keptKey)
         UserDefaults.standard.set(live.filter(\.byHand).map(\.url.path), forKey: byHandKey)
+        UserDefaults.standard.set(squeezed, forKey: squeezedKey)
     }
 
     /// Everything comes back as it was. This runs before the line knows its
@@ -577,6 +664,7 @@ final class Line: ObservableObject {
         let paths = UserDefaults.standard.stringArray(forKey: storeKey) ?? []
         let kept = Set(UserDefaults.standard.stringArray(forKey: keptKey) ?? [])
         let byHand = Set(UserDefaults.standard.stringArray(forKey: byHandKey) ?? [])
+        squeezed = UserDefaults.standard.integer(forKey: squeezedKey)
         for path in paths where FileManager.default.fileExists(atPath: path) {
             let url = URL(fileURLWithPath: path)
             guard !items.contains(where: { $0.url == url }), let thumb = makeThumbnail(url) else { continue }
@@ -602,6 +690,39 @@ final class Line: ObservableObject {
               let rep = NSBitmapImageRep(data: tiff) else { return nil }
         return rep.representation(using: .png, properties: [:])
     }
+}
+
+/// Puts `replacement` where `url` is, and a copy of what was there in the
+/// Trash, returning where. The copy goes first and the swap is atomic, so at no
+/// point is the file missing or the original gone. Nothing changes if the Trash
+/// refuses it.
+func swapIn(_ replacement: URL, at url: URL) throws -> URL {
+    let fm = FileManager.default
+    // In a hidden folder so the watcher ignores it, under its own name so it
+    // can be recognised in the Trash.
+    let holding = url.deletingLastPathComponent().appendingPathComponent(".replacing-\(UUID().uuidString)")
+    try fm.createDirectory(at: holding, withIntermediateDirectories: false)
+    defer { try? fm.removeItem(at: holding) }
+    let copy = holding.appendingPathComponent(url.lastPathComponent)
+    try fm.copyItem(at: url, to: copy)
+    var trashed: NSURL?
+    try fm.trashItem(at: copy, resultingItemURL: &trashed)
+    _ = try fm.replaceItemAt(url, withItemAt: replacement)
+    guard let trashed = trashed as URL? else { throw CocoaError(.fileNoSuchFile) }
+    return trashed
+}
+
+/// The name itself if nothing in the folder has it, otherwise with a number.
+func uniqueURL(in folder: URL, for name: String) -> URL {
+    let base = (name as NSString).deletingPathExtension
+    let ext = (name as NSString).pathExtension
+    var candidate = folder.appendingPathComponent(name)
+    var n = 2
+    while FileManager.default.fileExists(atPath: candidate.path) {
+        candidate = folder.appendingPathComponent("\(base) \(n)").appendingPathExtension(ext)
+        n += 1
+    }
+    return candidate
 }
 
 /// Screen recordings, as macOS saves them.
