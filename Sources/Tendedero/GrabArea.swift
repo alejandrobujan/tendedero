@@ -32,6 +32,9 @@ struct GrabArea: NSViewRepresentable {
         view.url = item.url
         view.dragImage = item.thumb
         view.isHeld = item.held
+        view.toolTip = L("Shift-click to select photos")
+        view.onSelect = { line.toggleSelection(id) }
+        view.onPlainPress = { line.clearSelection() }
         view.onHangBack = { line.onHangBack?(id) }
         view.onClick = { line.copy(id) }
         view.onDoubleClick = { line.open(id) }
@@ -47,6 +50,10 @@ struct GrabArea: NSViewRepresentable {
         view.onForceClick = { line.quickLook(id) }
         view.onPressChange = { pressed in line.pressedID = pressed ? id : nil }
         view.menuProvider = { [weak view] in
+            if line.selectedIDs.contains(id) {
+                return selectionMenu(line.selectedItems, from: view)
+            }
+            line.clearSelection()
             let menu = NSMenu()
             // Items say themselves whether they can be used.
             menu.autoenablesItems = false
@@ -106,6 +113,46 @@ struct GrabArea: NSViewRepresentable {
             return menu
         }
     }
+
+    /// A menu captures the selection when it opens. New photos arriving
+    /// while it is open cannot become part of an action by accident.
+    private func selectionMenu(_ photos: [Pegged], from view: GrabView?) -> NSMenu {
+        let ids = photos.map(\.id)
+        let menu = NSMenu()
+        menu.autoenablesItems = false
+        let count = NSMenuItem(title: String(format: L("%d selected"), photos.count), action: nil, keyEquivalent: "")
+        count.isEnabled = false
+        menu.addItem(count)
+        menu.addItem(.separator())
+        menu.addItem(ClosureMenuItem(L("Copy")) { line.copy(ids) })
+        menu.addItem(ClosureMenuItem(L("Open")) { line.open(ids) })
+        menu.addItem(ClosureMenuItem(L("Show in Finder")) { line.reveal(ids) })
+        if let view, let window = view.window {
+            let card = window.convertToScreen(view.convert(view.bounds, to: nil))
+            menu.addItem(.separator())
+            let share = ClosureMenuItem(L("Share…")) {
+                DispatchQueue.main.async { Share.shared.show(photos.map(\.url), from: card) }
+            }
+            share.image = NSImage(systemSymbolName: "square.and.arrow.up", accessibilityDescription: nil)
+            menu.addItem(share)
+        }
+        menu.addItem(.separator())
+        if photos.contains(where: { !$0.kept }) {
+            menu.addItem(ClosureMenuItem(L("Pin")) { line.pin(ids) })
+        }
+        if photos.contains(where: { $0.kept && !$0.byHand }) {
+            menu.addItem(ClosureMenuItem(L("Unpin")) { line.unpin(ids) })
+        }
+        let save = ClosureMenuItem(L("Save to Desktop")) { line.saveToDesktop(ids) }
+        save.isEnabled = !photos.isEmpty && photos.allSatisfy { line.isInInbox($0.id) }
+        menu.addItem(save)
+        menu.addItem(.separator())
+        let inInbox = photos.allSatisfy { !$0.kept && line.isInInbox($0.id) }
+        let discard = ClosureMenuItem(inInbox ? L("Discard") : L("Take down")) { line.discard(ids) }
+        discard.isEnabled = line.canDiscard(ids)
+        menu.addItem(discard)
+        return menu
+    }
 }
 
 final class GrabView: NSView, NSDraggingSource {
@@ -119,6 +166,8 @@ final class GrabView: NSView, NSDraggingSource {
     /// on it is all it answers, to bring the photo back.
     var isHeld = false
     var onHangBack: () -> Void = {}
+    var onSelect: () -> Void = {}
+    var onPlainPress: () -> Void = {}
     var onClick: () -> Void = {}
     var onDoubleClick: () -> Void = {}
     var onDragStart: () -> Void = {}
@@ -136,7 +185,7 @@ final class GrabView: NSView, NSDraggingSource {
     private var didLongPress = false
     /// A click copies only once it is clear it is not the first half of a
     /// double click, which opens the photo and must leave the clipboard alone.
-    private var clickTimer: Timer?
+    private static var clickTimer: Timer?
 
     /// How long you hold before Markup opens. Long enough not to fire on a
     /// slow click, short enough to feel deliberate.
@@ -156,14 +205,19 @@ final class GrabView: NSView, NSDraggingSource {
     }
 
     override func mouseDown(with event: NSEvent) {
+        Self.clickTimer?.invalidate()
+        Self.clickTimer = nil
+        if event.modifierFlags.contains(.shift) {
+            downPoint = nil
+            endPress()
+            if !isHeld { onSelect() }
+            return
+        }
+        onPlainPress()
         if isHeld {
             downPoint = nil
             onHangBack()
             return
-        }
-        if event.clickCount > 1 {
-            clickTimer?.invalidate()
-            clickTimer = nil
         }
         if isInCross(event) {
             downPoint = nil
@@ -225,18 +279,18 @@ final class GrabView: NSView, NSDraggingSource {
         endPress()
         if downPoint != nil && !startedDrag && !didLongPress && event.clickCount == 1 {
             // Waits as long as the system lets a second click count as a double click.
-            clickTimer?.invalidate()
+            Self.clickTimer?.invalidate()
             // The copy goes ahead even if the line redraws this view meanwhile.
             let copy = onClick
-            let timer = Timer(timeInterval: NSEvent.doubleClickInterval, repeats: false) { [weak self] _ in
+            let timer = Timer(timeInterval: NSEvent.doubleClickInterval, repeats: false) { _ in
                 MainActor.assumeIsolated {
-                    self?.clickTimer = nil
+                    Self.clickTimer = nil
                     copy()
                 }
             }
             // Keeps time while a menu or a drag runs the loop in another mode.
             RunLoop.main.add(timer, forMode: .common)
-            clickTimer = timer
+            Self.clickTimer = timer
         }
         downPoint = nil
         didLongPress = false
@@ -244,6 +298,9 @@ final class GrabView: NSView, NSDraggingSource {
 
     override func rightMouseDown(with event: NSEvent) {
         guard !isHeld else { return }
+        Self.clickTimer?.invalidate()
+        Self.clickTimer = nil
+        endPress()
         // The menu runs until it closes, and the line stays down meanwhile.
         GrabView.isShowingMenu = true
         NSMenu.popUpContextMenu(menuProvider(), with: event, for: self)

@@ -76,3 +76,7 @@
 "Hang back" = "İpə qaytar";
 "Hang everything back" = "Hamısını ipə qaytar";
 "Actual Size" = "Həqiqi ölçü";
+
+/* Selecting photos */
+"%d selected" = "%d foto seçilib";
+"Shift-click to select photos" = "Fotoları seçmək üçün Shift düyməsini basılı saxlayıb klikləyin";

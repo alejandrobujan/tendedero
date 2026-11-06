@@ -47,6 +47,9 @@ Rest the pointer in the middle of the menu bar and it glides down. Move away and
 
 | | |
 |:--|:--|
+| Shift-click | Add or remove a photo from the selection. Releasing Shift keeps it selected. |
+| Right-click a selected photo | Copy, open, show in Finder, share, pin/unpin, save to Desktop or take down the selection. The menu shows the count; each action keeps its existing file and pin rules. |
+| With a selection, pointer on the line | ⌘C copies the selection; ⌫ over a photo takes it down in one undo step; Esc clears the selection. An ordinary click or hiding the line also clears it. |
 | Click | Copy the image. |
 | Press and hold | Open it in Markup. |
 | Double click | Open it in Preview. |

@@ -49,6 +49,9 @@ Göstəricini menyu panelinin ortasında saxlayın, ip aşağı enir. Uzaqlaşd�
 
 | | |
 |:--|:--|
+| Shift ilə klik | Fotonu seçimə əlavə edir və ya seçimdən çıxarır. Shift buraxıldıqda seçim qalır. |
+| Seçilmiş fotoya sağ klik | Seçimi kopyalayın, açın, Finder-də göstərin, paylaşın, bərkidin/bərkitməni ləğv edin, İş masasına saxlayın və ya ipdən götürün. Menyu seçilənlərin sayını göstərir; fayl və bərkitmə qaydaları dəyişmir. |
+| Seçim olduqda göstərici ipin üzərində | ⌘C seçimi kopyalayır; foto üzərində ⌫ seçimi bir geri qaytarma addımı ilə götürür; Esc seçimi təmizləyir. Adi klik və ya ipin gizlədilməsi də seçimi təmizləyir. |
 | Klik | Şəkli kopyalayır. |
 | Basıb saxlamaq | Markup-da açır. |
 | İki dəfə klik | Preview-da açır. |

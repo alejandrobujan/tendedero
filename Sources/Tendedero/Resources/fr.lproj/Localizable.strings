@@ -74,3 +74,7 @@
 "Hang back" = "Remettre sur la corde";
 "Hang everything back" = "Tout remettre sur la corde";
 "Actual Size" = "Taille réelle";
+
+/* Selecting photos */
+"%d selected" = "%d sélectionnées";
+"Shift-click to select photos" = "Maj-clic pour sélectionner des photos";

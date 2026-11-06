@@ -49,6 +49,9 @@ Leva o punteiro ao centro da barra de menús e a corda baixa. Apártao e desapar
 
 | | |
 |:--|:--|
+| Maiús-clic | Engade ou quita unha foto da selección. Ao soltar Maiús, a selección mantense. |
+| Clic dereito nunha foto seleccionada | Copia, abre, amosa no Finder, comparte, fixa/desfixa, garda no Escritorio ou descolga a selección. O menú indica cantas fotos hai e mantén as regras dos ficheiros e das fotos fixadas. |
+| Cunha selección e o punteiro na corda | ⌘C copia a selección; ⌫ sobre unha foto descólgaa nun único paso que se pode desfacer; Esc limpa a selección. Un clic normal ou agochar a corda tamén a limpa. |
 | Clic | Copia a imaxe. |
 | Manter premido | Ábrea en Marcación. |
 | Dobre clic | Ábrea en Vista Previa. |

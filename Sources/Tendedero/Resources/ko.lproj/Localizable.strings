@@ -74,3 +74,7 @@
 "Hang back" = "줄에 돌려놓기";
 "Hang everything back" = "모두 줄에 돌려놓기";
 "Actual Size" = "실제 크기";
+
+/* Selecting photos */
+"%d selected" = "%d개 선택됨";
+"Shift-click to select photos" = "Shift 키를 누른 채 클릭하여 사진 선택";

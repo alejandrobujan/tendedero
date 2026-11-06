@@ -74,3 +74,7 @@
 "Hang back" = "ロープに戻す";
 "Hang everything back" = "すべてロープに戻す";
 "Actual Size" = "実際のサイズ";
+
+/* Selecting photos */
+"%d selected" = "%d枚選択中";
+"Shift-click to select photos" = "Shiftキーを押しながらクリックして写真を選択";

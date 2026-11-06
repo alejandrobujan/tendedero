@@ -37,7 +37,9 @@ struct Pegged: Identifiable, Equatable {
 final class Line: ObservableObject {
     @Published private(set) var items: [Pegged] = []
     @Published private(set) var gust = 0
-    @Published var copiedID: UUID?
+    @Published private(set) var copiedIDs: Set<UUID> = []
+    @Published private(set) var selectedIDs: Set<UUID> = []
+    private var copyGeneration = 0
     @Published var draggingID: UUID?
     @Published var pressedID: UUID?
     /// Whether the line has slid down into view.
@@ -86,8 +88,10 @@ final class Line: ObservableObject {
     private var oldestLoose: Pegged? { items.first { !$0.falling && !$0.kept && !$0.held } }
 
     private let storeKey = "pegged"
+    private let pasteboard: NSPasteboard
 
-    init() {
+    init(pasteboard: NSPasteboard = .general) {
+        self.pasteboard = pasteboard
         restore()
         scheduleGust()
     }
@@ -132,6 +136,7 @@ final class Line: ObservableObject {
 
     func drop(_ id: UUID, quietly: Bool = false) {
         guard let i = items.firstIndex(where: { $0.id == id }), !items[i].falling else { return }
+        selectedIDs.remove(id)
         onFall?(items[i])
         items[i].falling = true
         hitRects[id] = nil
@@ -196,45 +201,115 @@ final class Line: ObservableObject {
         }
     }
 
-    // MARK: Actions on one photo
+    // MARK: Selecting photos
+
+    /// A selection follows the line's order, not the order of the clicks.
+    var selectedItems: [Pegged] { actionItems(Array(selectedIDs)) }
+
+    private func actionItems(_ ids: [UUID]) -> [Pegged] {
+        let ids = Set(ids)
+        return items.filter { ids.contains($0.id) && !$0.falling && !$0.held }
+    }
+
+    func toggleSelection(_ id: UUID) {
+        guard !actionItems([id]).isEmpty else { return }
+        if !selectedIDs.insert(id).inserted { selectedIDs.remove(id) }
+    }
+
+    func clearSelection() { selectedIDs.removeAll() }
+
+    // MARK: Actions on photos
 
     func copy(_ id: UUID) {
-        guard let item = items.first(where: { $0.id == id }) else { return }
-        putOnClipboard(item.url)
+        guard let item = items.first(where: { $0.id == id && !$0.falling }) else { return }
+        copyPhotos([item])
+    }
 
-        copiedID = id
+    func copy(_ ids: [UUID]) {
+        copyPhotos(actionItems(ids))
+    }
+
+    private func copyPhotos(_ photos: [Pegged]) {
+        guard !photos.isEmpty else { return }
+        putOnClipboard(photos.map(\.url))
+
+        copiedIDs = Set(photos.map(\.id))
+        copyGeneration += 1
+        let generation = copyGeneration
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
-            if self?.copiedID == id { self?.copiedID = nil }
+            if self?.copyGeneration == generation { self?.copiedIDs = [] }
         }
     }
 
-    /// The file last put on the clipboard, and the clipboard's change count
+    /// The files last put on the clipboard, and the clipboard's change count
     /// right after. While the count is the same, nothing else has been copied.
-    private var onClipboard: (url: URL, change: Int)?
+    private var onClipboard: (urls: [URL], change: Int)?
 
-    private func putOnClipboard(_ url: URL) {
-        let entry = NSPasteboardItem()
-        // A recording is copied as the file, which apps paste as the video.
-        if !isRecording(url), let png = pngData(url) { entry.setData(png, forType: .png) }
-        entry.setString(url.absoluteString, forType: .fileURL)
-        let pb = NSPasteboard.general
+    private func putOnClipboard(_ urls: [URL]) {
+        let entries = urls.map { url in
+            let entry = NSPasteboardItem()
+            // Each photo has its own image and file representation. Apps
+            // that accept several files can paste the whole selection.
+            if !isRecording(url), let png = pngData(url) { entry.setData(png, forType: .png) }
+            entry.setString(url.absoluteString, forType: .fileURL)
+            return entry
+        }
+        let pb = pasteboard
         pb.clearContents()
-        pb.writeObjects([entry])
-        onClipboard = (url, pb.changeCount)
+        pb.writeObjects(entries)
+        onClipboard = (urls, pb.changeCount)
     }
 
     /// Apps like Finder or a chat window paste the copied file rather than the
     /// picture. When the file moves after a copy, to the Trash or the Desktop,
     /// the clipboard follows it, or those apps would find nothing to paste.
     private func clipboardFollows(_ url: URL, to moved: URL) {
-        guard let onClipboard, onClipboard.url == url,
-              onClipboard.change == NSPasteboard.general.changeCount else { return }
-        putOnClipboard(moved)
+        guard let onClipboard, onClipboard.urls.contains(url),
+              onClipboard.change == pasteboard.changeCount else { return }
+        putOnClipboard(onClipboard.urls.map { $0 == url ? moved : $0 })
     }
 
     func open(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
         NSWorkspace.shared.open(item.url)
+    }
+
+    func open(_ ids: [UUID]) {
+        for item in actionItems(ids) { NSWorkspace.shared.open(item.url) }
+    }
+
+    /// Pinned screenshots must be unpinned first, just as in their own menu.
+    func canDiscard(_ ids: [UUID]) -> Bool {
+        let photos = actionItems(ids)
+        return !photos.isEmpty && photos.allSatisfy { !$0.kept || $0.byHand }
+    }
+
+    func discard(_ ids: [UUID]) {
+        guard canDiscard(ids) else { NSSound.beep(); return }
+        let photos = actionItems(ids)
+        let step = UUID()
+        // Finish the whole action before an undo can run. New arrivals are
+        // not part of this snapshot, and failed removals stay selected.
+        for (n, item) in photos.enumerated() {
+            discard(item.id, quietly: n > 0, step: step)
+        }
+    }
+
+    func pin(_ ids: [UUID]) {
+        for (n, item) in actionItems(ids).filter({ !$0.kept }).enumerated() {
+            pin(item.id, quietly: n > 0)
+        }
+    }
+
+    func unpin(_ ids: [UUID]) {
+        // Each photo joins the front of the loose ones, so work backwards.
+        for item in actionItems(ids).reversed() { unpin(item.id) }
+    }
+
+    func saveToDesktop(_ ids: [UUID]) {
+        let photos = actionItems(ids)
+        guard !photos.isEmpty, photos.allSatisfy({ isInInbox($0.id) }) else { return }
+        for item in photos { saveToDesktop(item.id) }
     }
 
     /// Moves the file to the Trash and takes the photo off the line. When a
@@ -397,6 +472,12 @@ final class Line: ObservableObject {
         NSWorkspace.shared.activateFileViewerSelecting([item.url])
     }
 
+    func reveal(_ ids: [UUID]) {
+        let urls = actionItems(ids).map(\.url)
+        guard !urls.isEmpty else { return }
+        NSWorkspace.shared.activateFileViewerSelecting(urls)
+    }
+
     // MARK: Putting back
 
     /// A photo taken down by hand: its file, where it hung among the photos
@@ -497,13 +578,13 @@ final class Line: ObservableObject {
     }
 
     /// Pin: the photo joins the kept ones at the left end of the line.
-    func pin(_ id: UUID) {
+    func pin(_ id: UUID, quietly: Bool = false) {
         guard let i = items.firstIndex(where: { $0.id == id && !$0.falling && !$0.kept }) else { return }
         var item = items.remove(at: i)
         item.kept = true
         items.insert(item, at: keptCount)
         save()
-        play("Tink", volume: 0.35)
+        if !quietly { play("Tink", volume: 0.35) }
     }
 
     /// Unpin: it hangs loose again, first past the kept ones, so it is the
@@ -542,6 +623,7 @@ final class Line: ObservableObject {
     /// Off the line and into your hand, or back onto its clip.
     func setHeld(_ id: UUID, _ held: Bool) {
         guard let i = items.firstIndex(where: { $0.id == id && !$0.falling }) else { return }
+        if held { selectedIDs.remove(id) }
         items[i].held = held
         if !held { items[i].flying = true }
     }

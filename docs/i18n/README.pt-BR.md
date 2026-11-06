@@ -49,6 +49,9 @@ Pare o ponteiro no meio da barra de menus e o varal desce. Afaste-o e ele some.
 
 | | |
 |:--|:--|
+| Shift + clique | Adiciona ou remove uma foto da seleção. Soltar Shift mantém a seleção. |
+| Clique direito em uma foto selecionada | Copia, abre, mostra no Finder, compartilha, fixa/desafixa, salva na Mesa ou retira a seleção. O menu mostra a quantidade e mantém as regras de arquivos e fotos fixadas. |
+| Com uma seleção e o cursor no varal | ⌘C copia a seleção; ⌫ sobre uma foto retira o grupo em uma única etapa de desfazer; Esc limpa a seleção. Um clique normal ou ocultar o varal também limpa a seleção. |
 | Clicar | Copia a imagem. |
 | Clicar e segurar | Abre na Marcação. |
 | Clicar duas vezes | Abre no Pré-Visualização. |

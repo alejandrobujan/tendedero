@@ -49,6 +49,9 @@ Posez le pointeur au milieu de la barre des menus et la corde descend. Éloignez
 
 | | |
 |:--|:--|
+| Maj-clic | Ajoute ou retire une photo de la sélection. Relâcher Maj conserve la sélection. |
+| Clic droit sur une photo sélectionnée | Copie, ouvre, affiche dans le Finder, partage, épingle/désépingle, enregistre sur le Bureau ou décroche la sélection. Le menu indique le nombre de photos et conserve les règles des fichiers et des photos épinglées. |
+| Avec une sélection, pointeur sur le fil | ⌘C copie la sélection ; ⌫ sur une photo la décroche en une seule étape annulable ; Échap efface la sélection. Un clic normal ou masquer le fil l’efface aussi. |
 | Clic | Copie l’image. |
 | Clic maintenu | L’ouvre dans Annotation. |
 | Double-clic | L’ouvre dans Aperçu. |

@@ -455,6 +455,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
         }
         if !on {
+            line.clearSelection()
+            holdSelectionKeys(false)
             pinned = false
             peekUntil = .distantPast
             panel.ignoresMouseEvents = true
@@ -499,6 +501,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         panel.ignoresMouseEvents = true
         holdPutBackKey(false)
         holdPhotoKeys(over: nil)
+        holdSelectionKeys(false)
     }
 
     /// How long the cursor rests against the top edge before the line comes
@@ -559,6 +562,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard isRevealed else {
             holdPutBackKey(false)
             holdPhotoKeys(over: nil)
+            holdSelectionKeys(false)
             line.closeGaps()
             // Resting in the middle of the menu bar brings the line down on
             // that screen. Pushing against the top edge is part of it, and it
@@ -595,6 +599,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if inside && pinned { pinned = false }
         holdPutBackKey(inside)
         holdPhotoKeys(over: inside ? photo(under: mouse) : nil)
+        holdSelectionKeys(inside && !GrabView.isShowingMenu && !Share.shared.isOpen)
         // Gaps left by discarded photos close once the pointer moves away.
         if !inside { line.closeGaps() }
 
@@ -682,10 +687,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard let id else { return }
         photoKeys = [
             HotKey(Shortcut(keyCode: kVK_Delete, modifiers: [], key: "\u{8}")) { [weak self] in
-                self?.line.pressCorner(id)
+                guard let line = self?.line else { return }
+                let ids = line.selectedItems.map(\.id)
+                if ids.isEmpty { line.pressCorner(id) } else { line.discard(ids) }
             },
             HotKey(Shortcut(keyCode: kVK_Space, modifiers: [], key: " ")) { [weak self] in
                 self?.quickLookToggle(id)
+            },
+        ].compactMap { $0 }
+    }
+
+    /// Like Delete and undo, these belong to the line only while the
+    /// pointer is over it. Selection never takes focus from another app.
+    private var selectionKeys: [HotKey] = []
+    private var selectionKeysHeld = false
+
+    private func holdSelectionKeys(_ hold: Bool) {
+        let hold = hold && !line.selectedIDs.isEmpty
+        guard hold != selectionKeysHeld else { return }
+        selectionKeysHeld = hold
+        selectionKeys = []
+        guard hold else { return }
+        selectionKeys = [
+            HotKey(Shortcut(keyCode: kVK_Escape, modifiers: [], key: "\u{1b}")) { [weak self] in
+                self?.line.clearSelection()
+            },
+            HotKey(Shortcut(keyCode: kVK_ANSI_C, modifiers: [.command], key: "c")) { [weak self] in
+                guard let line = self?.line else { return }
+                line.copy(line.selectedItems.map(\.id))
             },
         ].compactMap { $0 }
     }

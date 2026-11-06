@@ -49,6 +49,9 @@ Aldığınız her ekran görüntüsü, ekranınızın hemen üstündeki bir ipe 
 
 | | |
 |:--|:--|
+| Shift tuşuyla tıklama | Bir fotoğrafı seçime ekler veya seçimden çıkarır. Shift bırakıldığında seçim korunur. |
+| Seçili fotoğrafa sağ tıklama | Seçimi kopyalayın, açın, Finder’da gösterin, paylaşın, sabitleyin/sabitlemeyi kaldırın, Masaüstü’ne kaydedin veya ipten indirin. Menü seçili sayısını gösterir; dosya ve sabitleme kuralları korunur. |
+| Seçim varken işaretçi ipin üzerinde | ⌘C seçimi kopyalar; fotoğraf üzerinde ⌫ seçimi tek bir geri alma adımıyla indirir; Esc seçimi temizler. Normal tıklama veya ipi gizlemek de seçimi temizler. |
 | Tıkla | Görüntüyü kopyalar. |
 | Basılı tut | İşaretle'de açar. |
 | Çift tıkla | Önizleme'de açar. |
