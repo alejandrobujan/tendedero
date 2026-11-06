@@ -63,6 +63,7 @@ Göstəricini menyu panelinin ortasında saxlayın, ip aşağı enir. Uzaqlaşd�
 | Sağ klik, Bərkit | Saxlayın: düyünün solunda kosmik boz sancaqla asılır və yeni ekran şəkilləri onu itələmir. |
 | Sağ klik, Əldə saxla | İpdən götürün və işləyərkən qarşınızda saxlayın. |
 | Finder-də şəklə sağ klik, Tendedero-ya as | İstənilən şəkli ipə bərkidilmiş halda asın. |
+| Şəkli ipin üstünə sürükləmək | Onu ipə bərkidilmiş halda asır. |
 | Göstəricini menyu panelinin ortasında saxlamaq | İpi həmin ekranda endirir. |
 | Menyu panelində istənilən yerə klik | İpi yığır. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | İpi göstərir və ya gizlədir. Menyu panelində Qısayol bölməsindən dəyişdirmək olar. |

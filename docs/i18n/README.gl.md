@@ -63,6 +63,7 @@ Leva o punteiro ao centro da barra de menús e a corda baixa. Apártao e desapar
 | Clic dereito e Fixar | Gárdaa: pendura á esquerda do nó cunha pinza gris espacial e ningunha captura nova a empurra. |
 | Clic dereito e Suxeitar | Quítaa da corda e tena diante mentres traballas. |
 | No Finder, clic dereito nunha imaxe e Pendurar en Tendedero | Pendura calquera imaxe na corda, fixada. |
+| Arrastrar unha imaxe á corda | Pendúraa aí, fixada. |
 | Deixar o punteiro no centro da barra de menús | Baixa a corda nesa pantalla. |
 | Facer clic en calquera sitio da barra de menús | Recolle a corda. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Amosa ou oculta a corda. Cámbiase en Atallo, na barra de menús. |
