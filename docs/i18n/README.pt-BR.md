@@ -59,7 +59,7 @@ Pare o ponteiro no meio da barra de menus e o varal desce. Afaste-o e ele some.
 | Arrastar para um app | Envia uma cópia. Ela continua no varal. |
 | Arrastar para uma pasta | Guarda a imagem ali. Ela sai do varal. |
 | Arrastar para o Lixo, ou clicar no X | Desapegue. |
-| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> com o ponteiro no varal | Pendura de volta o que você acabou de soltar. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> no varal ou onde o menu acabou de fechar | Desfaz o último descarte, fixação/desafixação ou salvamento na Mesa, incluindo toda a seleção. Afaste o ponteiro ou clique fora para devolver Desfazer ao outro app. |
 | <kbd>Espaço</kbd> com o ponteiro numa foto | Dê uma olhada rápida. |
 | <kbd>⌫</kbd> com o ponteiro numa foto | Solte-a, como o botão do canto dela. |
 | Clique com o botão direito e Compartilhar | Envia por AirDrop, Mensagens, Mail e mais. Ela continua no varal. |

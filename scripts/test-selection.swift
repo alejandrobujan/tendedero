@@ -43,7 +43,9 @@ struct CheckFailed: Error { let message: String }
     func line() -> Line {
         UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
         UserDefaults.standard.set(true, forKey: "soundOff")
-        let line = Line(pasteboard: pasteboard)
+        let desktop = root.appendingPathComponent("desktop", isDirectory: true)
+        try! FileManager.default.createDirectory(at: desktop, withIntermediateDirectories: true)
+        let line = Line(pasteboard: pasteboard, desktop: desktop)
         line.maxItems = 100
         line.visibleCount = 8
         line.revealed = true
@@ -172,10 +174,16 @@ struct CheckFailed: Error { let message: String }
         try check(line.selectedIDs.isEmpty, "Removed photos leave the selection immediately")
         line.putBack()
         try check(line.items.filter { !$0.falling }.map(\.url) == [a, c, b, d], "One undo restores the whole batch in its original order")
-        try check(!line.canPutBack, "The batch consumes only one undo step")
+        try check(line.canPutBack, "Undoing removal leaves the earlier pin actions available")
 
         let restored = Line(pasteboard: pasteboard)
         try check(restored.selectedIDs.isEmpty && restored.items.map(\.url) == [a, c, b, d], "Order persists but transient selection does not")
+        line.putBack()
+        try check(line.items.filter(\.kept).map(\.url) == [a, c], "One undo restores the whole batch's pinned state")
+        line.putBack()
+        try check(line.keptCount == 0 && line.items.filter { !$0.falling }.map(\.url) == [a, b, c, d],
+                  "Undoing batch pin restores positions after a later discard and undo")
+        try check(!line.canPutBack, "Each batch uses one undo step")
         line.clearSelection()
         line.toggleSelection(bID)
         _ = try grab(d).menuProvider()
@@ -194,7 +202,10 @@ struct CheckFailed: Error { let message: String }
         ids.forEach(trashLine.toggleSelection)
         trashLine.copy(ids)
         let originalData = [try Data(contentsOf: i1), try Data(contentsOf: i2)]
+        var undoActions = 0
+        trashLine.onUndoableAction = { undoActions += 1 }
         trashLine.discard(ids)
+        try check(undoActions == 1, "A batch acquires the undo interaction once, not again for each file")
         try check(!FileManager.default.fileExists(atPath: i1.path) && !FileManager.default.fileExists(atPath: i2.path)
                   && FileManager.default.fileExists(atPath: a.path), "Mixed removal trashes inbox copies and preserves external originals")
         try check(copiedURLs.count == 3 && copiedURLs.allSatisfy { FileManager.default.fileExists(atPath: $0.path) },
@@ -202,6 +213,55 @@ struct CheckFailed: Error { let message: String }
         trashLine.putBack()
         try check(try Data(contentsOf: i1) == originalData[0] && Data(contentsOf: i2) == originalData[1], "Undo restores both trashed files byte for byte")
         try check(copiedURLs == [i1, i2, a] && trashLine.items.filter { !$0.falling }.map(\.url) == [i1, i2, a], "Undo restores batch clipboard URLs and order")
+
+        let saveLine = self.line()
+        let s1 = try png("Save 1.png", in: Inbox.folder), s2 = try png("Save 2.png", in: Inbox.folder)
+        let s1ID = saveLine.hang(s1, quietly: true)!, s2ID = saveLine.hang(s2, quietly: true)!
+        _ = saveLine.hang(a, quietly: true)
+        saveLine.pin(s1ID)
+        let savedBytes = [try Data(contentsOf: s1), try Data(contentsOf: s2)]
+        let desktop = root.appendingPathComponent("desktop", isDirectory: true)
+        let saved1 = desktop.appendingPathComponent(s1.lastPathComponent)
+        let saved2 = desktop.appendingPathComponent(s2.lastPathComponent)
+        // An unrelated namesake on the Desktop must never be overwritten.
+        let unrelated = Data("already on Desktop".utf8)
+        try unrelated.write(to: saved1)
+        let renamed1 = desktop.appendingPathComponent("Save 1 2.png")
+        saveLine.copy([s1ID, s2ID])
+        saveLine.saveToDesktop([s1ID, s2ID])
+        try check(saveLine.liveCount == 1 && copiedURLs == [renamed1, saved2], "Batch save records the actual destinations and updates clipboard URLs")
+        try check(try Data(contentsOf: saved1) == unrelated, "Saving never overwrites an existing Desktop file")
+        // Simulate the Desktop watcher noticing the moved screenshot.
+        _ = saveLine.hang(renamed1, quietly: true)
+        saveLine.putBack()
+        try check(try Data(contentsOf: s1) == savedBytes[0] && Data(contentsOf: s2) == savedBytes[1],
+                  "One undo moves both saved files back byte for byte")
+        try check(saveLine.items.filter { !$0.falling }.map(\.url) == [s1, s2, a] && saveLine.keptCount == 1,
+                  "Undoing save restores pin state and order without a duplicate Desktop card")
+        try check(copiedURLs == [s1, s2] && !FileManager.default.fileExists(atPath: renamed1.path)
+                  && !FileManager.default.fileExists(atPath: saved2.path), "Undoing save removes only the moved copies and repairs clipboard URLs")
+        saveLine.putBack()
+        try check(!saveLine.canPutBack && saveLine.keptCount == 0, "Undo history continues to the pin action before saving")
+
+        let singleID = saveLine.items.first { $0.url == s2 && !$0.falling }!.id
+        saveLine.pin(singleID)
+        saveLine.saveToDesktop(singleID)
+        let replacement = try png("Save 2.png", in: Inbox.folder, red: 0.1)
+        let replacementBytes = try Data(contentsOf: replacement)
+        saveLine.putBack()
+        let restored2 = Inbox.folder.appendingPathComponent("Save 2 2.png")
+        try check(try Data(contentsOf: replacement) == replacementBytes && Data(contentsOf: restored2) == savedBytes[1],
+                  "Undoing a single save preserves a newer file at the original path")
+        try check(saveLine.canPutBack && saveLine.liveCount == 3, "Single save also creates exactly one undo step")
+        saveLine.putBack()
+        try check(!saveLine.canPutBack && saveLine.keptCount == 0,
+                  "Earlier pin undo follows a restored file's new name without touching its namesake")
+
+        let noChange = self.line()
+        let noChangeID = noChange.hang(a, quietly: true)!
+        noChange.unpin([noChangeID])
+        noChange.saveToDesktop([noChangeID])
+        try check(!noChange.canPutBack, "Disabled and no-op batch actions do not create undo records")
 
         let handLine = self.line()
         _ = handLine.hangKept(a)

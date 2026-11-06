@@ -89,9 +89,12 @@ final class Line: ObservableObject {
 
     private let storeKey = "pegged"
     private let pasteboard: NSPasteboard
+    private let desktop: URL
 
-    init(pasteboard: NSPasteboard = .general) {
+    init(pasteboard: NSPasteboard = .general,
+         desktop: URL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")) {
         self.pasteboard = pasteboard
+        self.desktop = desktop
         restore()
         scheduleGust()
     }
@@ -296,20 +299,23 @@ final class Line: ObservableObject {
     }
 
     func pin(_ ids: [UUID]) {
+        let step = UUID()
         for (n, item) in actionItems(ids).filter({ !$0.kept }).enumerated() {
-            pin(item.id, quietly: n > 0)
+            pin(item.id, quietly: n > 0, step: step)
         }
     }
 
     func unpin(_ ids: [UUID]) {
+        let step = UUID()
         // Each photo joins the front of the loose ones, so work backwards.
-        for item in actionItems(ids).reversed() { unpin(item.id) }
+        for item in actionItems(ids).reversed() { unpin(item.id, step: step) }
     }
 
     func saveToDesktop(_ ids: [UUID]) {
         let photos = actionItems(ids)
         guard !photos.isEmpty, photos.allSatisfy({ isInInbox($0.id) }) else { return }
-        for item in photos { saveToDesktop(item.id) }
+        let step = UUID()
+        for item in photos { saveToDesktop(item.id, step: step) }
     }
 
     /// Moves the file to the Trash and takes the photo off the line. When a
@@ -409,14 +415,16 @@ final class Line: ObservableObject {
     }
 
     /// Inbox mode: keep a screenshot by moving it to the Desktop.
-    func saveToDesktop(_ id: UUID) {
-        guard let item = items.first(where: { $0.id == id }) else { return }
-        let desktop = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
+    func saveToDesktop(_ id: UUID, step: UUID = UUID()) {
+        guard let item = items.first(where: { $0.id == id && !$0.falling }),
+              let index = liveIndex(of: id) else { return }
         let target = uniqueURL(in: desktop, for: item.url.lastPathComponent)
         do {
             try FileManager.default.moveItem(at: item.url, to: target)
             clipboardFollows(item.url, to: target)
             drop(id, quietly: true)
+            remember(TakenDown(url: item.url, index: index, trashed: nil,
+                               kept: item.kept, byHand: item.byHand, moved: target), in: step)
         } catch {
             log.error("Could not save to Desktop: \(error.localizedDescription, privacy: .public)")
             NSSound.beep()
@@ -480,14 +488,16 @@ final class Line: ObservableObject {
 
     // MARK: Putting back
 
-    /// A photo taken down by hand: its file, where it hung among the photos
-    /// still on the line, and where the file went if it went to the Trash.
+    /// A photo before an undoable action: its file, position, pin state,
+    /// and where the file went if it was moved.
     private struct TakenDown {
-        let url: URL
+        var url: URL
         let index: Int
         let trashed: URL?
         var kept = false
         var byHand = false
+        var moved: URL?
+        var pinChange = false
     }
 
     /// What was taken down, the latest last. A step holds everything one
@@ -496,6 +506,9 @@ final class Line: ObservableObject {
     private static let maxSteps = 20
 
     var canPutBack: Bool { !steps.isEmpty }
+    /// Keeps undo reachable where a menu action just finished, even below
+    /// the photo band or after the last photo has been taken down.
+    var onUndoableAction: (() -> Void)?
 
     private func remember(_ photo: TakenDown, in step: UUID) {
         if let i = steps.lastIndex(where: { $0.id == step }) {
@@ -503,29 +516,40 @@ final class Line: ObservableObject {
         } else {
             steps.append((step, [photo]))
             if steps.count > Self.maxSteps { steps.removeFirst() }
+            onUndoableAction?()
         }
     }
 
-    /// Put back, or ⌘Z over the line: what was taken down last hangs again
-    /// where it was, and a file sent to the Trash comes back out of it.
+    /// Put back, or ⌘Z: restore the previous positions and pin states, and
+    /// bring files back from the Trash or Desktop if they were moved.
     func putBack() {
         guard let step = steps.popLast() else { return }
         var back: Set<UUID> = []
         // The last one taken down goes back first, so each finds its place.
         for photo in step.photos.reversed() {
+            if photo.pinChange {
+                guard let index = items.firstIndex(where: { $0.url == photo.url && !$0.falling }) else { continue }
+                var item = items.remove(at: index)
+                item.kept = photo.kept
+                insert(item, atLiveIndex: photo.index)
+                back.insert(item.id)
+                continue
+            }
             guard let url = restore(photo), !items.contains(where: { $0.url == url && !$0.falling }),
                   let thumb = makeThumbnail(url) else { continue }
+            // The Desktop watcher may have hung the saved copy meanwhile.
+            // It now lives back in the inbox, so its old card must go too.
+            if let moved = photo.moved {
+                for item in items where item.url == moved && !item.falling { drop(item.id, quietly: true) }
+            }
             var item = Pegged(url: url, thumb: thumb)
             item.kept = photo.kept
             item.byHand = photo.byHand
-            let live = items.filter { !$0.falling }
             if let gap = items.firstIndex(where: { $0.falling && $0.url == photo.url }) {
                 // Its empty place is still on the line: it hangs back there.
                 items[gap] = item
-            } else if photo.index < live.count, let i = items.firstIndex(where: { $0.id == live[photo.index].id }) {
-                items.insert(item, at: i)
             } else {
-                items.append(item)
+                insert(item, atLiveIndex: photo.index)
             }
             back.insert(item.id)
         }
@@ -543,20 +567,38 @@ final class Line: ObservableObject {
         play("Tink", volume: 0.35)
     }
 
+    private func insert(_ item: Pegged, atLiveIndex index: Int) {
+        let live = items.filter { !$0.falling }
+        if index < live.count, let i = items.firstIndex(where: { $0.id == live[index].id }) {
+            items.insert(item, at: i)
+        } else {
+            items.append(item)
+        }
+    }
+
     /// The photo's file, where it was before. Nil when it is gone: the Trash
     /// was emptied, or the file was moved or deleted since.
     private func restore(_ photo: TakenDown) -> URL? {
-        guard let trashed = photo.trashed else {
+        guard let moved = photo.moved ?? photo.trashed else {
             return FileManager.default.fileExists(atPath: photo.url.path) ? photo.url : nil
         }
         let url = uniqueURL(in: photo.url.deletingLastPathComponent(), for: photo.url.lastPathComponent)
         do {
-            try FileManager.default.moveItem(at: trashed, to: url)
-            clipboardFollows(trashed, to: url)
+            try FileManager.default.moveItem(at: moved, to: url)
+            clipboardFollows(moved, to: url)
+            // A newer namesake may force a different filename. Earlier
+            // actions, such as pinning this photo, must follow that name.
+            if url != photo.url {
+                for step in steps.indices {
+                    for i in steps[step].photos.indices where steps[step].photos[i].url == photo.url {
+                        steps[step].photos[i].url = url
+                    }
+                }
+            }
             log.notice("Put back \(url.lastPathComponent, privacy: .public)")
             return url
         } catch {
-            log.error("Could not put back \(trashed.path, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            log.error("Could not put back \(moved.path, privacy: .public): \(error.localizedDescription, privacy: .public)")
             return nil
         }
     }
@@ -578,23 +620,31 @@ final class Line: ObservableObject {
     }
 
     /// Pin: the photo joins the kept ones at the left end of the line.
-    func pin(_ id: UUID, quietly: Bool = false) {
-        guard let i = items.firstIndex(where: { $0.id == id && !$0.falling && !$0.kept }) else { return }
+    func pin(_ id: UUID, quietly: Bool = false, step: UUID = UUID()) {
+        guard let i = items.firstIndex(where: { $0.id == id && !$0.falling && !$0.kept }),
+              let index = liveIndex(of: id) else { return }
         var item = items.remove(at: i)
+        let before = TakenDown(url: item.url, index: index, trashed: nil,
+                               kept: item.kept, byHand: item.byHand, pinChange: true)
         item.kept = true
         items.insert(item, at: keptCount)
         save()
+        remember(before, in: step)
         if !quietly { play("Tink", volume: 0.35) }
     }
 
     /// Unpin: it hangs loose again, first past the kept ones, so it is the
     /// next to fall from a full line.
-    func unpin(_ id: UUID) {
-        guard let i = items.firstIndex(where: { $0.id == id && !$0.falling && $0.kept && !$0.byHand }) else { return }
+    func unpin(_ id: UUID, step: UUID = UUID()) {
+        guard let i = items.firstIndex(where: { $0.id == id && !$0.falling && $0.kept && !$0.byHand }),
+              let index = liveIndex(of: id) else { return }
         var item = items.remove(at: i)
+        let before = TakenDown(url: item.url, index: index, trashed: nil,
+                               kept: item.kept, byHand: item.byHand, pinChange: true)
         item.kept = false
         items.insert(item, at: keptCount)
         save()
+        remember(before, in: step)
     }
 
     /// An image hung from another app, with Hang on Tendedero. Like a

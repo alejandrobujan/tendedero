@@ -59,7 +59,7 @@ Göstəricini menyu panelinin ortasında saxlayın, ip aşağı enir. Uzaqlaşd�
 | Proqrama sürükləmək | Surətini göndərir. Şəkil ipdə qalır. |
 | Qovluğa sürükləmək | Orada saxlanır və ipdən çıxır. |
 | Zibil qutusuna sürükləmək və ya çarpaza klik | Ondan qurtulursunuz. |
-| Göstərici ipin üstündəykən <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | Atdığınızı ipə geri asır. |
+| Göstərici ipin üzərində və ya menyunun indicə bağlandığı yerdəykən <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | Son atma, bərkitmə/bərkitməni ləğv etmə və ya İş masasına saxlama əməlini bütün seçim üçün geri qaytarır. Göstəricini uzaqlaşdırmaq və ya başqa yerə klikləmək geri qaytarmanı digər tətbiqə verir. |
 | Göstərici şəklin üstündəykən <kbd>Boşluq</kbd> | Tez baxın. |
 | Göstərici şəklin üstündəykən <kbd>⌫</kbd> | Küncdəki düyməsi kimi buraxın. |
 | Sağ klik, Paylaş | AirDrop, Mesajlar, Mail və digərləri ilə göndərir. Şəkil ipdə qalır. |

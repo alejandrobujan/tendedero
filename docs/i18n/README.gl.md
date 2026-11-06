@@ -59,7 +59,7 @@ Leva o punteiro ao centro da barra de menús e a corda baixa. Apártao e desapar
 | Arrastrar a unha app | Envía unha copia, e a captura segue pendurada. |
 | Arrastrar a un cartafol | Queda alí e sae da corda. |
 | Arrastrar á Papeleira ou facer clic na cruz | Desfaste dela. |
-| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> co punteiro na corda | Volve colgar o que acabas de soltar. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> sobre a corda ou onde acaba de pecharse o menú | Desfai o último descarte, fixado/desfixado ou gardado no Escritorio, incluída toda a selección. Afasta o punteiro ou preme fóra para devolver Desfacer á outra app. |
 | <kbd>Espazo</kbd> co punteiro nunha foto | Bótalle unha ollada. |
 | <kbd>⌫</kbd> co punteiro nunha foto | Sóltaa, como o seu botón da esquina. |
 | Clic dereito e Compartir | Envíaa por AirDrop, Mensaxes, Mail e máis, e a captura segue pendurada. |

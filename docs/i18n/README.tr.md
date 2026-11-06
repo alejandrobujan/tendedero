@@ -59,7 +59,7 @@ Aldığınız her ekran görüntüsü, ekranınızın hemen üstündeki bir ipe 
 | Uygulamaya sürükle | Bir kopya gönderir. İpte kalmaya devam eder. |
 | Klasöre sürükle | Orada saklar. İpten ayrılır. |
 | Çöp Kutusu'na sürükle ya da çarpıya tıkla | Siler. |
-| İşaretçi ipin üzerindeyken <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | Az önce bıraktığını geri asar. |
+| İşaretçi ipin üzerindeyken veya menünün az önce kapandığı yerdeyken <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | Son atma, sabitleme/sabitlemeyi kaldırma veya Masaüstüne kaydetme işlemini tüm seçim için geri alır. İşaretçiyi uzaklaştırmak veya başka yere tıklamak geri almayı diğer uygulamaya bırakır. |
 | İşaretçi bir fotoğrafın üzerindeyken <kbd>Boşluk</kbd> | Hızlıca bak. |
 | İşaretçi bir fotoğrafın üzerindeyken <kbd>⌫</kbd> | Köşedeki düğmesi gibi bırak. |
 | Sağ tıkla, Paylaş | AirDrop, Mesajlar, Mail ve diğerleriyle gönderir. İpte kalmaya devam eder. |
