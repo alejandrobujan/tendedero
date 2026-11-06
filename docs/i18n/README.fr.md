@@ -63,6 +63,7 @@ Posez le pointeur au milieu de la barre des menus et la corde descend. Éloignez
 | Clic droit, puis Épingler | Gardez-la : elle pend à gauche du nœud avec une pince gris sidéral, et aucune nouvelle capture ne la pousse. |
 | Clic droit, puis Garder en main | Décrochez-la et gardez-la devant vous pendant que vous travaillez. |
 | Dans le Finder, clic droit sur une image, puis Accrocher dans Tendedero | Accrochez n’importe quelle image à la corde, épinglée. |
+| Glisser une image sur la corde | L’y accroche, épinglée. |
 | Poser le pointeur au milieu de la barre des menus | Fait descendre la corde sur cet écran. |
 | Cliquer n’importe où dans la barre des menus | La range. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Affiche ou masque la corde. Modifiable dans Raccourci, dans la barre des menus. |
