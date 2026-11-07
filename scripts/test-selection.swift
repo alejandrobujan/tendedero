@@ -263,6 +263,42 @@ struct CheckFailed: Error { let message: String }
         noChange.saveToDesktop([noChangeID])
         try check(!noChange.canPutBack, "Disabled and no-op batch actions do not create undo records")
 
+        let mixed = self.line()
+        let m1 = try png("Mixed inbox 1.png", in: Inbox.folder)
+        let m2 = try png("Mixed inbox 2.png", in: Inbox.folder)
+        let alreadySaved = try png("Already on Desktop.png", in: desktop)
+        let mixedURLs = [m1, alreadySaved, m2, b]
+        let mixedBytes = try mixedURLs.map { try Data(contentsOf: $0) }
+        let mixedIDs = mixedURLs.map { mixed.hang($0, quietly: true)! }
+        mixedIDs.forEach(mixed.toggleSelection)
+        show(mixed)
+        let mixedMenu = try grab(m1).menuProvider()
+        try check(mixedMenu.items.first { $0.title == "Save to Desktop" }?.isEnabled == true,
+                  "Desktop and external photos do not disable saving selected inbox photos")
+        mixed.copy(mixedIDs)
+        try fire("Save to Desktop", in: mixedMenu)
+        let moved1 = desktop.appendingPathComponent(m1.lastPathComponent)
+        let moved2 = desktop.appendingPathComponent(m2.lastPathComponent)
+        try check(mixed.items.filter { !$0.falling }.map(\.url) == [alreadySaved, b]
+                  && copiedURLs == [moved1, alreadySaved, moved2, b],
+                  "Mixed save moves only inbox photos and keeps other selected originals in place")
+        try check(try Data(contentsOf: alreadySaved) == mixedBytes[1] && Data(contentsOf: b) == mixedBytes[3]
+                  && !FileManager.default.fileExists(atPath: desktop.appendingPathComponent("Already on Desktop 2.png").path),
+                  "Mixed save neither moves external originals nor duplicates a photo already on Desktop")
+        mixed.putBack()
+        try check(try mixedURLs.map { try Data(contentsOf: $0) } == mixedBytes
+                  && mixed.items.filter { !$0.falling }.map(\.url) == mixedURLs && !mixed.canPutBack,
+                  "One undo restores the mixed save's moved files, bytes and order")
+        mixed.clearSelection()
+        mixed.toggleSelection(mixedIDs[1])
+        mixed.toggleSelection(mixedIDs[3])
+        let savedOnlyMenu = try grab(alreadySaved).menuProvider()
+        mixed.saveToDesktop([mixedIDs[1], mixedIDs[3]])
+        mixed.saveToDesktop(mixedIDs[1])
+        try check(savedOnlyMenu.items.first { $0.title == "Save to Desktop" }?.isEnabled == false
+                  && !mixed.canPutBack && copiedURLs == mixedURLs,
+                  "A selection with no inbox photos is a no-op and preserves clipboard URLs")
+
         let handLine = self.line()
         _ = handLine.hangKept(a)
         let hand = handLine.items[0].id

@@ -311,9 +311,15 @@ final class Line: ObservableObject {
         for item in actionItems(ids).reversed() { unpin(item.id, step: step) }
     }
 
+    func canSaveToDesktop(_ ids: [UUID]) -> Bool {
+        actionItems(ids).contains { isInInbox($0.id) }
+    }
+
     func saveToDesktop(_ ids: [UUID]) {
-        let photos = actionItems(ids)
-        guard !photos.isEmpty, photos.allSatisfy({ isInInbox($0.id) }) else { return }
+        // Photos already on the Desktop, or shown from another folder,
+        // keep their originals. They must not block saving the inbox photos.
+        let photos = actionItems(ids).filter { isInInbox($0.id) }
+        guard !photos.isEmpty else { return }
         let step = UUID()
         for item in photos { saveToDesktop(item.id, step: step) }
     }
@@ -416,7 +422,8 @@ final class Line: ObservableObject {
 
     /// Inbox mode: keep a screenshot by moving it to the Desktop.
     func saveToDesktop(_ id: UUID, step: UUID = UUID()) {
-        guard let item = items.first(where: { $0.id == id && !$0.falling }),
+        guard isInInbox(id),
+              let item = items.first(where: { $0.id == id && !$0.falling }),
               let index = liveIndex(of: id) else { return }
         let target = uniqueURL(in: desktop, for: item.url.lastPathComponent)
         do {

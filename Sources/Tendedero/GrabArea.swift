@@ -144,7 +144,7 @@ struct GrabArea: NSViewRepresentable {
             menu.addItem(ClosureMenuItem(L("Unpin")) { line.unpin(ids) })
         }
         let save = ClosureMenuItem(L("Save to Desktop")) { line.saveToDesktop(ids) }
-        save.isEnabled = !photos.isEmpty && photos.allSatisfy { line.isInInbox($0.id) }
+        save.isEnabled = line.canSaveToDesktop(ids)
         menu.addItem(save)
         menu.addItem(.separator())
         let inInbox = photos.allSatisfy { !$0.kept && line.isInInbox($0.id) }
