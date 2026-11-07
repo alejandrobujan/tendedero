@@ -49,6 +49,9 @@ Aldığınız her ekran görüntüsü, ekranınızın hemen üstündeki bir ipe 
 
 | | |
 |:--|:--|
+| Shift tuşuyla tıklama | Bir fotoğrafı seçime ekler veya seçimden çıkarır. Shift bırakıldığında seçim korunur. |
+| Seçili fotoğrafa sağ tıklama | Seçimi kopyalayın, açın, Finder’da gösterin, paylaşın, sabitleyin/sabitlemeyi kaldırın, Masaüstü’ne kaydedin veya ipten indirin. Menü seçili sayısını gösterir; dosya ve sabitleme kuralları korunur. |
+| Seçim varken işaretçi ipin üzerinde | ⌘C seçimi kopyalar; fotoğraf üzerinde ⌫ seçimi tek bir geri alma adımıyla indirir; Esc seçimi temizler. Normal tıklama veya ipi gizlemek de seçimi temizler. |
 | Tıkla | Görüntüyü kopyalar. |
 | Basılı tut | İşaretle'de açar. |
 | Çift tıkla | Önizleme'de açar. |
@@ -56,7 +59,7 @@ Aldığınız her ekran görüntüsü, ekranınızın hemen üstündeki bir ipe 
 | Uygulamaya sürükle | Bir kopya gönderir. İpte kalmaya devam eder. |
 | Klasöre sürükle | Orada saklar. İpten ayrılır. |
 | Çöp Kutusu'na sürükle ya da çarpıya tıkla | Siler. |
-| İşaretçi ipin üzerindeyken <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | Az önce bıraktığını geri asar. |
+| İşaretçi ipin üzerindeyken veya menünün az önce kapandığı yerdeyken <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | Son atma, sabitleme/sabitlemeyi kaldırma veya Masaüstüne kaydetme işlemini tüm seçim için geri alır. İşaretçiyi uzaklaştırmak veya başka yere tıklamak geri almayı diğer uygulamaya bırakır. |
 | İşaretçi bir fotoğrafın üzerindeyken <kbd>Boşluk</kbd> | Hızlıca bak. |
 | İşaretçi bir fotoğrafın üzerindeyken <kbd>⌫</kbd> | Köşedeki düğmesi gibi bırak. |
 | Sağ tıkla, Paylaş | AirDrop, Mesajlar, Mail ve diğerleriyle gönderir. İpte kalmaya devam eder. |

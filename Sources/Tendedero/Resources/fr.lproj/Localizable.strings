@@ -74,3 +74,9 @@
 "Hang back" = "Remettre sur la corde";
 "Hang everything back" = "Tout remettre sur la corde";
 "Actual Size" = "Taille réelle";
+
+/* Selecting photos */
+"%d selected" = "Sélection : %d";
+"Shift-click to select photos" = "Maj-clic pour sélectionner des photos";
+// Save availability
+"Save to Desktop (inbox or Desktop only)" = "Enregistrer sur le bureau (dossier Tendedero ou bureau uniquement)";

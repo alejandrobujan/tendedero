@@ -74,3 +74,9 @@
 "Hang back" = "İpe geri koy";
 "Hang everything back" = "Hepsini ipe geri koy";
 "Actual Size" = "Gerçek boyut";
+
+/* Selecting photos */
+"%d selected" = "%d fotoğraf seçildi";
+"Shift-click to select photos" = "Fotoğraf seçmek için Shift tuşunu basılı tutarak tıklayın";
+// Save availability
+"Save to Desktop (inbox or Desktop only)" = "Masaüstüne kaydet (yalnızca Tendedero klasörü veya masaüstü)";

@@ -49,6 +49,9 @@ Leva o punteiro ao centro da barra de menús e a corda baixa. Apártao e desapar
 
 | | |
 |:--|:--|
+| Maiús-clic | Engade ou quita unha foto da selección. Ao soltar Maiús, a selección mantense. |
+| Clic dereito nunha foto seleccionada | Copia, abre, amosa no Finder, comparte, fixa/desfixa, garda no Escritorio ou descolga a selección. O menú indica cantas fotos hai e mantén as regras dos ficheiros e das fotos fixadas. |
+| Cunha selección e o punteiro na corda | ⌘C copia a selección; ⌫ sobre unha foto descólgaa nun único paso que se pode desfacer; Esc limpa a selección. Un clic normal ou agochar a corda tamén a limpa. |
 | Clic | Copia a imaxe. |
 | Manter premido | Ábrea en Marcación. |
 | Dobre clic | Ábrea en Vista Previa. |
@@ -56,7 +59,7 @@ Leva o punteiro ao centro da barra de menús e a corda baixa. Apártao e desapar
 | Arrastrar a unha app | Envía unha copia, e a captura segue pendurada. |
 | Arrastrar a un cartafol | Queda alí e sae da corda. |
 | Arrastrar á Papeleira ou facer clic na cruz | Desfaste dela. |
-| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> co punteiro na corda | Volve colgar o que acabas de soltar. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> sobre a corda ou onde acaba de pecharse o menú | Desfai o último descarte, fixado/desfixado ou gardado no Escritorio, incluída toda a selección. Afasta o punteiro ou preme fóra para devolver Desfacer á outra app. |
 | <kbd>Espazo</kbd> co punteiro nunha foto | Bótalle unha ollada. |
 | <kbd>⌫</kbd> co punteiro nunha foto | Sóltaa, como o seu botón da esquina. |
 | Clic dereito e Compartir | Envíaa por AirDrop, Mensaxes, Mail e máis, e a captura segue pendurada. |

@@ -83,6 +83,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         setUpStatusItem()
         watchMenuBarClicks()
+        watchPutBackKey()
 
         // Hang on Tendedero, in the menu of images in Finder and other apps.
         NSApp.servicesProvider = self
@@ -100,6 +101,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         line.onFall = { [weak self] item in self?.fall(item) }
         line.onHold = { [weak self] id in self?.hold(id) }
         line.onHangBack = { id in Held.hangBack(id) }
+        line.onUndoableAction = { [weak self] in self?.keepUndoAtPointer() }
 
         line.$items
             .receive(on: RunLoop.main)
@@ -273,9 +275,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func itemsChanged() {
         updateStatusIcon()
         Held.forget(except: Set(line.items.filter { !$0.falling && $0.held }.map(\.id)))
-        guard line.liveCount == 0, !keepOpen else { return }
+        guard line.liveCount == 0, !keepOpen, undoAnchor == nil else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [weak self] in
-            guard let self, self.line.liveCount == 0, !self.keepOpen else { return }
+            guard let self, self.line.liveCount == 0, !self.keepOpen, self.undoAnchor == nil else { return }
             self.wanted = false
             self.refresh()
         }
@@ -296,6 +298,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// A new screenshot lifts off from where it was taken and flies to its
     /// place on the line. Without a known capture area it simply drops in.
     private func hangCapture(_ url: URL) {
+        // Several watchers may report a file we just saved. Keep ignoring
+        // that same file after either a move or a copy.
+        guard !line.isDesktopSave(url) else { return }
         // Already hanging: a photo put back with ⌘Z comes out of the Trash
         // into the folder, and the watcher sees it arrive. It must not pull
         // the line over to the screen it was first taken on.
@@ -455,6 +460,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
         }
         if !on {
+            undoAnchor = nil
+            holdPutBackKey(false)
+            line.clearSelection()
+            holdSelectionKeys(false)
             pinned = false
             peekUntil = .distantPast
             panel.ignoresMouseEvents = true
@@ -499,6 +508,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         panel.ignoresMouseEvents = true
         holdPutBackKey(false)
         holdPhotoKeys(over: nil)
+        holdSelectionKeys(false)
     }
 
     /// How long the cursor rests against the top edge before the line comes
@@ -527,6 +537,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let handler: (NSEvent?) -> Void = { [weak self] _ in
             MainActor.assumeIsolated {
                 guard let self else { return }
+                // A new click ends the previous menu interaction. If this
+                // click performs another undoable action it gets a new anchor.
+                self.releaseUndoAnchor()
                 let p = NSEvent.mouseLocation
                 guard NSScreen.screens.contains(where: { NSMouseInRect(p, Self.menuBarBand(of: $0), false) }) else { return }
                 self.menuBarSuppressed = true
@@ -559,6 +572,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard isRevealed else {
             holdPutBackKey(false)
             holdPhotoKeys(over: nil)
+            holdSelectionKeys(false)
             line.closeGaps()
             // Resting in the middle of the menu bar brings the line down on
             // that screen. Pushing against the top edge is part of it, and it
@@ -592,13 +606,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         var zone = panel.frame
         if let screen = panel.screen { zone.size.height = screen.frame.maxY - zone.minY }
         let inside = NSMouseInRect(mouse, zone, false)
+        let atUndoAnchor = isAtUndoAnchor(mouse)
         if inside && pinned { pinned = false }
-        holdPutBackKey(inside)
+        holdPutBackKey((inside || atUndoAnchor) && !GrabView.isShowingMenu && !Share.shared.isOpen)
         holdPhotoKeys(over: inside ? photo(under: mouse) : nil)
+        holdSelectionKeys(inside && !GrabView.isShowingMenu && !Share.shared.isOpen)
         // Gaps left by discarded photos close once the pointer moves away.
         if !inside { line.closeGaps() }
 
-        let busy = pinned || GrabView.isDragging || GrabView.isShowingMenu || Share.shared.isOpen
+        let busy = pinned || atUndoAnchor || GrabView.isDragging || GrabView.isShowingMenu || Share.shared.isOpen
             || line.pressedID != nil || now < peekUntil
         if inside || busy {
             awaySince = nil
@@ -682,10 +698,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard let id else { return }
         photoKeys = [
             HotKey(Shortcut(keyCode: kVK_Delete, modifiers: [], key: "\u{8}")) { [weak self] in
-                self?.line.pressCorner(id)
+                guard let line = self?.line else { return }
+                let ids = line.selectedItems.map(\.id)
+                if ids.isEmpty { line.pressCorner(id) } else { line.discard(ids) }
             },
             HotKey(Shortcut(keyCode: kVK_Space, modifiers: [], key: " ")) { [weak self] in
                 self?.quickLookToggle(id)
+            },
+        ].compactMap { $0 }
+    }
+
+    /// Like Delete and undo, these belong to the line only while the
+    /// pointer is over it. Selection never takes focus from another app.
+    private var selectionKeys: [HotKey] = []
+    private var selectionKeysHeld = false
+
+    private func holdSelectionKeys(_ hold: Bool) {
+        let hold = hold && !line.selectedIDs.isEmpty
+        guard hold != selectionKeysHeld else { return }
+        selectionKeysHeld = hold
+        selectionKeys = []
+        guard hold else { return }
+        selectionKeys = [
+            HotKey(Shortcut(keyCode: kVK_Escape, modifiers: [], key: "\u{1b}")) { [weak self] in
+                self?.line.clearSelection()
+            },
+            HotKey(Shortcut(keyCode: kVK_ANSI_C, modifiers: [.command], key: "c")) { [weak self] in
+                guard let line = self?.line else { return }
+                line.copy(line.selectedItems.map(\.id))
             },
         ].compactMap { $0 }
     }
@@ -708,10 +748,54 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     // MARK: Putting back
 
-    /// ⌘Z while the pointer is on the line. The line never takes the
-    /// keyboard, so it only borrows ⌘Z then, as a hot key. Everywhere else
+    /// ⌘Z while the pointer is on the line or where its menu just closed.
+    /// The line never takes the keyboard, so it only borrows ⌘Z then as a
+    /// hot key. Everywhere else
     /// ⌘Z stays the undo of the app you are in.
     private var putBackKey: HotKey?
+    private var putBackMonitor: Any?
+    private var undoAnchor: (point: NSPoint, application: pid_t?)?
+
+    /// Key events delivered to Tendedero itself also need a route to undo,
+    /// such as after a menu activates it. The global hot key covers other
+    /// apps; this consumes only a local key in the same narrow undo scope.
+    private func watchPutBackKey() {
+        putBackMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self, self.putBackKey != nil,
+                  !GrabView.isShowingMenu, !Share.shared.isOpen,
+                  Int(event.keyCode) == Shortcut.putBack.keyCode,
+                  event.modifierFlags.intersection([.command, .control, .option, .shift]) == .command else { return event }
+            self.putBack()
+            return nil
+        }
+    }
+
+    private func keepUndoAtPointer() {
+        guard isRevealed else { return }
+        undoAnchor = (NSEvent.mouseLocation, NSWorkspace.shared.frontmostApplication?.processIdentifier)
+        holdPutBackKey(true)
+    }
+
+    /// A context menu can end below the photo band. Keep that spot part of
+    /// the undo interaction until the pointer moves, another app is chosen,
+    /// or a new click starts something else. Other apps keep their own undo.
+    private func isAtUndoAnchor(_ point: NSPoint) -> Bool {
+        guard let anchor = undoAnchor else { return false }
+        guard line.canPutBack,
+              abs(point.x - anchor.point.x) <= 12, abs(point.y - anchor.point.y) <= 12,
+              NSWorkspace.shared.frontmostApplication?.processIdentifier == anchor.application else {
+            releaseUndoAnchor()
+            return false
+        }
+        return true
+    }
+
+    private func releaseUndoAnchor() {
+        guard undoAnchor != nil else { return }
+        undoAnchor = nil
+        holdPutBackKey(false)
+        itemsChanged()
+    }
 
     /// Set when another app holds ⌘Z, so it is not asked for again on every
     /// tick, only the next time the pointer comes to the line.

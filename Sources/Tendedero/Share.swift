@@ -42,6 +42,11 @@ final class Share: NSObject, NSSharingServicePickerDelegate, NSSharingServiceDel
     /// Shows the share panel for the photo at `url`, whose card is at
     /// `cardFrame` on screen.
     func show(_ url: URL, from cardFrame: NSRect) {
+        show([url], from: cardFrame)
+    }
+
+    func show(_ urls: [URL], from cardFrame: NSRect) {
+        guard !urls.isEmpty else { return }
         clear(olderThan: 3600)
         isOpen = true
         safety?.invalidate()
@@ -56,7 +61,7 @@ final class Share: NSObject, NSSharingServicePickerDelegate, NSSharingServiceDel
         // windows services open belong to Tendedero, and answer only if
         // Tendedero is in front.
         NSApp.activate(ignoringOtherApps: true)
-        let picker = NSSharingServicePicker(items: [snapshot(of: url)])
+        let picker = NSSharingServicePicker(items: urls.map { snapshot(of: $0) })
         picker.delegate = self
         self.picker = picker
         guard let view = anchor.contentView else { return }

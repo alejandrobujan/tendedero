@@ -74,3 +74,9 @@
 "Hang back" = "放回绳上";
 "Hang everything back" = "全部放回绳上";
 "Actual Size" = "实际大小";
+
+/* Selecting photos */
+"%d selected" = "已选择 %d 张";
+"Shift-click to select photos" = "按住 Shift 点击以选择图片";
+// Save availability
+"Save to Desktop (inbox or Desktop only)" = "存储到桌面（仅收纳目录或桌面）";

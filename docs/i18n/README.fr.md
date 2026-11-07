@@ -49,6 +49,9 @@ Posez le pointeur au milieu de la barre des menus et la corde descend. Éloignez
 
 | | |
 |:--|:--|
+| Maj-clic | Ajoute ou retire une photo de la sélection. Relâcher Maj conserve la sélection. |
+| Clic droit sur une photo sélectionnée | Copie, ouvre, affiche dans le Finder, partage, épingle/désépingle, enregistre sur le Bureau ou décroche la sélection. Le menu indique le nombre de photos et conserve les règles des fichiers et des photos épinglées. |
+| Avec une sélection, pointeur sur le fil | ⌘C copie la sélection ; ⌫ sur une photo la décroche en une seule étape annulable ; Échap efface la sélection. Un clic normal ou masquer le fil l’efface aussi. |
 | Clic | Copie l’image. |
 | Clic maintenu | L’ouvre dans Annotation. |
 | Double-clic | L’ouvre dans Aperçu. |
@@ -56,7 +59,7 @@ Posez le pointeur au milieu de la barre des menus et la corde descend. Éloignez
 | Glisser dans une app | Envoie une copie. Elle reste sur la corde. |
 | Glisser dans un dossier | Elle y reste. Elle quitte la corde. |
 | Glisser dans la corbeille, ou cliquer sur la croix | Laissez-la filer. |
-| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd>, le pointeur sur la corde | Raccroche ce que vous venez de laisser filer. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> sur le fil ou à l’endroit où son menu vient de se fermer | Annule le dernier retrait, épinglage/désépinglage ou enregistrement sur le Bureau, pour toute la sélection. Éloignez le pointeur ou cliquez ailleurs pour rendre Annuler à l’autre app. |
 | <kbd>Espace</kbd>, le pointeur sur une photo | Jetez-y un coup d’œil. |
 | <kbd>⌫</kbd>, le pointeur sur une photo | Laissez-la filer, comme son bouton d’angle. |
 | Clic droit, puis Partager | L’envoie par AirDrop, Messages, Mail et plus. Elle reste sur la corde. |

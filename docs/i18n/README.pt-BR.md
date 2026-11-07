@@ -49,6 +49,9 @@ Pare o ponteiro no meio da barra de menus e o varal desce. Afaste-o e ele some.
 
 | | |
 |:--|:--|
+| Shift + clique | Adiciona ou remove uma foto da seleção. Soltar Shift mantém a seleção. |
+| Clique direito em uma foto selecionada | Copia, abre, mostra no Finder, compartilha, fixa/desafixa, salva na Mesa ou retira a seleção. O menu mostra a quantidade e mantém as regras de arquivos e fotos fixadas. |
+| Com uma seleção e o cursor no varal | ⌘C copia a seleção; ⌫ sobre uma foto retira o grupo em uma única etapa de desfazer; Esc limpa a seleção. Um clique normal ou ocultar o varal também limpa a seleção. |
 | Clicar | Copia a imagem. |
 | Clicar e segurar | Abre na Marcação. |
 | Clicar duas vezes | Abre no Pré-Visualização. |
@@ -56,7 +59,7 @@ Pare o ponteiro no meio da barra de menus e o varal desce. Afaste-o e ele some.
 | Arrastar para um app | Envia uma cópia. Ela continua no varal. |
 | Arrastar para uma pasta | Guarda a imagem ali. Ela sai do varal. |
 | Arrastar para o Lixo, ou clicar no X | Desapegue. |
-| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> com o ponteiro no varal | Pendura de volta o que você acabou de soltar. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> no varal ou onde o menu acabou de fechar | Desfaz o último descarte, fixação/desafixação ou salvamento na Mesa, incluindo toda a seleção. Afaste o ponteiro ou clique fora para devolver Desfazer ao outro app. |
 | <kbd>Espaço</kbd> com o ponteiro numa foto | Dê uma olhada rápida. |
 | <kbd>⌫</kbd> com o ponteiro numa foto | Solte-a, como o botão do canto dela. |
 | Clique com o botão direito e Compartilhar | Envia por AirDrop, Mensagens, Mail e mais. Ela continua no varal. |
