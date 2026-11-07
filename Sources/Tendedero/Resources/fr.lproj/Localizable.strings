@@ -76,7 +76,7 @@
 "Actual Size" = "Taille réelle";
 
 /* Selecting photos */
-"%d selected" = "%d sélectionnées";
+"%d selected" = "Sélection : %d";
 "Shift-click to select photos" = "Maj-clic pour sélectionner des photos";
 // Save availability
 "Save to Desktop (inbox or Desktop only)" = "Enregistrer sur le bureau (dossier Tendedero ou bureau uniquement)";

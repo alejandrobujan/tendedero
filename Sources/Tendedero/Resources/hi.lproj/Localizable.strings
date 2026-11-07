@@ -78,7 +78,7 @@
 "Actual Size" = "असली आकार";
 
 /* Selecting photos */
-"%d selected" = "%d चुने गए";
+"%d selected" = "चयनित: %d";
 "Shift-click to select photos" = "फ़ोटो चुनने के लिए Shift दबाकर क्लिक करें";
 // Save availability
 "Save to Desktop (inbox or Desktop only)" = "डेस्कटॉप पर सहेजें (केवल Tendedero फ़ोल्डर या डेस्कटॉप)";
