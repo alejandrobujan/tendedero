@@ -48,7 +48,8 @@ Rest the pointer in the middle of the menu bar and it glides down. Move away and
 | | |
 |:--|:--|
 | Click | Copy the image. |
-| Press and hold | Open it in Markup. |
+| Press and hold | Preview it in the center of the screen. Release to dismiss. |
+| Slide right and release | Open the previewed image in Markup. |
 | Double click | Open it in Preview. |
 | Force click | Take a quick look. |
 | Drag into an app | Send a copy. It stays on the line. |
@@ -150,6 +151,7 @@ Want to help? Read [CONTRIBUTING.md](CONTRIBUTING.md) first.
 | `LineView.swift` | The line and where each photo hangs |
 | `PeggedView.swift` | One photo: glass frame, clip, swing and breeze |
 | `GrabArea.swift` | Click, long press, drag and drop |
+| `PhotoPreview.swift` | Floating photo preview and the slide-to-Markup hint |
 | `ScreenshotWatcher.swift` | Notices new screenshots |
 | `ClipboardWatcher.swift` | Notices images copied to the clipboard |
 | `Inbox.swift` | Takes over screenshot settings and puts them back |

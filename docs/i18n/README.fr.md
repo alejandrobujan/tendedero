@@ -50,7 +50,8 @@ Posez le pointeur au milieu de la barre des menus et la corde descend. Éloignez
 | | |
 |:--|:--|
 | Clic | Copie l’image. |
-| Clic maintenu | L’ouvre dans Annotation. |
+| Clic maintenu | Affiche un aperçu au centre de l’écran. Relâchez pour le fermer. |
+| Glisser vers la droite puis relâcher | Ouvre l’image de l’aperçu dans Annotation. |
 | Double-clic | L’ouvre dans Aperçu. |
 | Clic forcé | Un Coup d’œil rapide. |
 | Glisser dans une app | Envoie une copie. Elle reste sur la corde. |

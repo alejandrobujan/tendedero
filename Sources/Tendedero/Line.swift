@@ -360,14 +360,20 @@ final class Line: ObservableObject {
         return candidate
     }
 
-    /// Long press: open the photo in the system Markup editor. Markup does
-    /// not edit video, so a recording opens in the trimming editor instead.
-    func markup(_ id: UUID) {
-        guard let item = items.first(where: { $0.id == id }) else { return }
+    /// Sliding out of the held preview, or the menu, opens system Markup.
+    /// Recordings keep their trimming editor.
+    func markup(_ id: UUID, preview: PhotoPreview? = nil) {
+        guard let item = items.first(where: { $0.id == id }) else {
+            preview?.dismiss()
+            return
+        }
         if item.isRecording {
+            preview?.dismiss()
             Trim.shared.edit(item.url, size: item.thumb.size)
         } else {
-            Markup.shared.edit(item.url)
+            Markup.shared.edit(item.url, on: preview?.screen, sourceFrame: preview?.imageFrame) {
+                preview?.dismiss()
+            }
         }
     }
 

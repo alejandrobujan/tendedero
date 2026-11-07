@@ -50,7 +50,8 @@ Leva o punteiro ao centro da barra de menús e a corda baixa. Apártao e desapar
 | | |
 |:--|:--|
 | Clic | Copia a imaxe. |
-| Manter premido | Ábrea en Marcación. |
+| Manter premido | Amosa unha vista previa no centro da pantalla. Solta para pechala. |
+| Deslizar á dereita e soltar | Abre a imaxe da vista previa en Marcación. |
 | Dobre clic | Ábrea en Vista Previa. |
 | Clic forte | Bótalle unha ollada con Vista Rápida. |
 | Arrastrar a unha app | Envía unha copia, e a captura segue pendurada. |

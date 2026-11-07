@@ -50,7 +50,8 @@ Pare o ponteiro no meio da barra de menus e o varal desce. Afaste-o e ele some.
 | | |
 |:--|:--|
 | Clicar | Copia a imagem. |
-| Clicar e segurar | Abre na Marcação. |
+| Clicar e segurar | Mostra uma prévia no centro da tela. Solte para fechar. |
+| Deslizar para a direita e soltar | Abre a imagem da prévia na Marcação. |
 | Clicar duas vezes | Abre no Pré-Visualização. |
 | Clique forte | Abre na Visualização Rápida. |
 | Arrastar para um app | Envia uma cópia. Ela continua no varal. |

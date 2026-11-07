@@ -50,7 +50,8 @@ Göstəricini menyu panelinin ortasında saxlayın, ip aşağı enir. Uzaqlaşd�
 | | |
 |:--|:--|
 | Klik | Şəkli kopyalayır. |
-| Basıb saxlamaq | Markup-da açır. |
+| Basıb saxlamaq | Ekranın mərkəzində önizləmə göstərir. Bağlamaq üçün buraxın. |
+| Sağa sürüşdürüb buraxmaq | Önizlənən şəkli Markup-da açır. |
 | İki dəfə klik | Preview-da açır. |
 | Güclü klik | Quick Look ilə tez baxış. |
 | Proqrama sürükləmək | Surətini göndərir. Şəkil ipdə qalır. |

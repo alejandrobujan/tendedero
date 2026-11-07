@@ -12,125 +12,148 @@ final class Markup: NSObject, NSSharingServiceDelegate {
     var onSaved: (URL) -> Void = { _ in }
 
     private var editing: URL?
+    private var service: NSSharingService?
+    private var sourceWindow: NSWindow?
+    private var editorWindow: NSWindow?
+    private var remoteWindow: NSWindow?
+    private var sourceFrame = NSRect.zero
+    private var targetArea = NSRect.zero
+    private var presentationTimer: Timer?
+    private var presentationTimeout: DispatchWorkItem?
+    private var onPresented: (() -> Void)?
     private static let serviceName = NSSharingService.Name("com.apple.MarkupUI.Markup")
 
-    func edit(_ url: URL) {
+    func edit(_ url: URL, on screen: NSScreen? = nil, sourceFrame: NSRect? = nil,
+              onPresented: @escaping () -> Void = {}) {
+        guard editing == nil else {
+            NSApp.activate(ignoringOtherApps: true)
+            editorWindow?.makeKeyAndOrderFront(nil)
+            onPresented()
+            return
+        }
         guard let service = NSSharingService(named: Markup.serviceName),
-              service.canPerform(withItems: [url]) else {
+              service.canPerform(withItems: [url]),
+              let screen = screen ?? LinePanel.screenUnderPointer() else {
             // Without the extension, Preview is the closest thing.
             NSWorkspace.shared.open(url)
+            onPresented()
             return
         }
         editing = url
+        self.service = service
+        self.onPresented = onPresented
+        targetArea = screen.visibleFrame
+        let size = NSSize(width: min(900, targetArea.width * 0.74),
+                          height: min(650, targetArea.height * 0.78))
+        self.sourceFrame = sourceFrame ?? NSRect(
+            x: targetArea.midX - size.width / 2, y: targetArea.midY - size.height / 2,
+            width: size.width, height: size.height)
+        // Markup initially attaches its editor and dimming layers to this host.
+        // Once ready, its content moves into a regular, draggable AppKit window.
+        let host = NSWindow(contentRect: self.sourceFrame, styleMask: .borderless,
+                            backing: .buffered, defer: false)
+        host.isOpaque = false
+        host.backgroundColor = .clear
+        host.hasShadow = false
+        host.ignoresMouseEvents = true
+        host.isReleasedWhenClosed = false
+        host.level = NSWindow.Level(rawValue: NSWindow.Level.floating.rawValue + 2)
+        host.contentView = NSView(frame: NSRect(origin: .zero, size: self.sourceFrame.size))
+        sourceWindow = host
+        host.orderFrontRegardless()
+        // The extension can be visible before it gets keyboard focus. Wait for
+        // its actual window, rather than making the handoff depend on activation.
+        let timer = Timer(timeInterval: 1.0 / 60.0, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self, let host = self.sourceWindow,
+                      let remote = host.childWindows?.first(where: { $0.isVisible && $0.canBecomeKey }),
+                      let content = remote.contentView else { return }
+                self.remoteWindow = remote
+                host.removeChildWindow(remote)
+                remote.contentView = nil
+                let editor = NSWindow(contentRect: NSRect(origin: .zero, size: content.bounds.size),
+                                      styleMask: .titled, backing: .buffered, defer: false)
+                editor.title = L("Markup")
+                editor.isReleasedWhenClosed = false
+                editor.level = host.level
+                editor.contentView = content
+                self.editorWindow = editor
+                // These layers shade the source document during modal editing.
+                // Our source is empty; leaving them up creates a floating dark slab.
+                host.childWindows?.forEach { $0.orderOut(nil) }
+                remote.orderOut(nil)
+                host.orderOut(nil)
+                // A native title bar supplies a drag region without taking
+                // mouse drags away from the extension's annotation canvas.
+                editor.isMovable = true
+                editor.isMovableByWindowBackground = false
+                editor.setFrameOrigin(NSPoint(x: self.targetArea.midX - editor.frame.width / 2,
+                                              y: self.targetArea.midY - editor.frame.height / 2))
+                editor.makeKeyAndOrderFront(nil)
+                self.finishPresentation()
+            }
+        }
+        presentationTimer = timer
+        RunLoop.main.add(timer, forMode: .common)
+        // A service that fails to present must never leave the held photo stuck.
+        let timeout = DispatchWorkItem { [weak self] in self?.finishEditing() }
+        presentationTimeout = timeout
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10, execute: timeout)
         service.delegate = self
-        placeAnchor()
         NSApp.activate(ignoringOtherApps: true)
         service.perform(withItems: [url])
     }
 
     // MARK: NSSharingServiceDelegate
 
+    func sharingService(_ sharingService: NSSharingService, sourceWindowForShareItems items: [Any],
+                        sharingContentScope: UnsafeMutablePointer<NSSharingService.SharingContentScope>) -> NSWindow? {
+        sourceWindow
+    }
+
+    func sharingService(_ sharingService: NSSharingService, sourceFrameOnScreenForShareItem item: Any) -> NSRect {
+        sourceFrame
+    }
+
     /// Done was pressed. The extension hands back the edited image and the
     /// host app is the one that writes it over the original file.
     nonisolated func sharingService(_ sharingService: NSSharingService, didShareItems items: [Any]) {
-        MainActor.assumeIsolated { self.save(items) }
+        MainActor.assumeIsolated {
+            self.save(items)
+            self.finishEditing()
+        }
     }
 
     nonisolated func sharingService(_ sharingService: NSSharingService,
                                     didFailToShareItems items: [Any], error: Error) {
         log.notice("Markup ended without saving: \(error.localizedDescription, privacy: .public)")
+        MainActor.assumeIsolated { self.finishEditing() }
     }
 
-    /// Markup opens its editor over the window it was shared from, and
-    /// about its size, when it is given both that window and its frame.
-    /// Tendedero has no window to share from, and without one the editor
-    /// lands in a corner of whichever screen macOS picks. An invisible window
-    /// in the middle of the screen under the pointer gives it a place.
-    private lazy var anchor: NSWindow = {
-        let window = NSWindow(contentRect: .zero, styleMask: .borderless, backing: .buffered, defer: true)
-        window.isOpaque = false
-        window.backgroundColor = .clear
-        window.ignoresMouseEvents = true
-        window.isReleasedWhenClosed = false
-        window.collectionBehavior = [.transient, .ignoresCycle]
-        // Markup's windows take this level: above the line, so a line that
-        // is down does not cover the editor's toolbar.
-        window.level = NSWindow.Level(rawValue: NSWindow.Level.floating.rawValue + 1)
-        return window
-    }()
-
-    /// Placed this way, Markup draws its blurred backdrop and its shadow
-    /// wider than the editor, which leaves a grey band at its right. While
-    /// the editor is open the backdrop is kept to the editor's frame, which
-    /// also lets the editor move to the middle, and the shadow is hidden. These are Markup's own windows, found by name: if a
-    /// later macOS renames them, the band comes back and nothing else breaks.
-    private var tidying: Timer?
-    private var centred = false
-
-    private func tidyEditor() {
-        tidying?.invalidate()
-        centred = false
-        let start = Date()
-        var shown = false
-        var gone: Date?
-        let timer = Timer(timeInterval: 1.0 / 60, repeats: true) { timer in
-            MainActor.assumeIsolated {
-                guard let editor = NSApp.windows.first(where: { $0.isVisible && $0.className.contains("RemoteWindow") })
-                else {
-                    // Closed, or it never came. AppKit brings the window it
-                    // was shared from back to the front as the editor closes,
-                    // so the anchor is kept out of sight a moment longer.
-                    guard shown || Date().timeIntervalSince(start) > 10 else { return }
-                    self.anchor.orderOut(nil)
-                    let since = gone ?? Date()
-                    gone = since
-                    if Date().timeIntervalSince(since) > 0.5 {
-                        timer.invalidate()
-                        self.tidying = nil
-                    }
-                    return
-                }
-                shown = true
-                gone = nil
-                // Markup keeps the editor to the left of the space it was
-                // given. Once, as it shows up, it moves to the middle.
-                if !self.centred, let area = editor.screen?.visibleFrame {
-                    self.centred = true
-                    editor.setFrameOrigin(NSPoint(x: (area.midX - editor.frame.width / 2).rounded(),
-                                                  y: (area.midY - editor.frame.height / 2).rounded()))
-                }
-                for window in NSApp.windows where window.isVisible {
-                    if window.className.contains("BlurWindow"), window.frame != editor.frame {
-                        window.setFrame(editor.frame, display: true)
-                    } else if window.className.contains("ShadowWindow"), window.alphaValue > 0 {
-                        window.alphaValue = 0
-                    }
-                }
-            }
-        }
-        RunLoop.main.add(timer, forMode: .common)
-        tidying = timer
+    private func finishPresentation() {
+        presentationTimer?.invalidate()
+        presentationTimer = nil
+        presentationTimeout?.cancel()
+        presentationTimeout = nil
+        let completion = onPresented
+        onPresented = nil
+        completion?()
     }
 
-    private func placeAnchor() {
-        guard let screen = LinePanel.screenUnderPointer() else { return }
-        // Shaped like the screen, not like the image: Markup fits the image
-        // inside, and a tall or narrow image gets the same roomy editor.
-        let area = screen.visibleFrame
-        anchor.setFrame(area.insetBy(dx: area.width * 0.1, dy: area.height * 0.1), display: false)
-        anchor.orderFront(nil)
-        tidyEditor()
-    }
-
-    nonisolated func sharingService(_ sharingService: NSSharingService,
-                                    sourceWindowForShareItems items: [Any],
-                                    sharingContentScope: UnsafeMutablePointer<NSSharingService.SharingContentScope>) -> NSWindow? {
-        MainActor.assumeIsolated { anchor }
-    }
-
-    nonisolated func sharingService(_ sharingService: NSSharingService,
-                                    sourceFrameOnScreenForShareItem item: Any) -> NSRect {
-        MainActor.assumeIsolated { anchor.frame }
+    private func finishEditing() {
+        finishPresentation()
+        let host = sourceWindow
+        let editor = editorWindow
+        let remote = remoteWindow
+        sourceWindow = nil
+        editorWindow = nil
+        remoteWindow = nil
+        service?.delegate = nil
+        service = nil
+        editing = nil
+        editor?.orderOut(nil)
+        remote?.orderOut(nil)
+        host?.orderOut(nil)
     }
 
     // MARK: Writing back
