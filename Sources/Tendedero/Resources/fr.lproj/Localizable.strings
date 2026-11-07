@@ -78,3 +78,6 @@
 /* Selecting photos */
 "%d selected" = "%d sélectionnées";
 "Shift-click to select photos" = "Maj-clic pour sélectionner des photos";
+// Save availability
+"Save to Desktop (already there)" = "Enregistrer sur le bureau (déjà présent)";
+"Save to Desktop (inbox only)" = "Enregistrer sur le bureau (dossier Tendedero uniquement)";

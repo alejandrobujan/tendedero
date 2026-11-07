@@ -88,9 +88,7 @@ struct GrabArea: NSViewRepresentable {
                 menu.addItem(ClosureMenuItem(L("Unpin")) { line.unpin(id) })
             }
             let inInbox = line.isInInbox(id)
-            if inInbox {
-                menu.addItem(ClosureMenuItem(L("Save to Desktop")) { line.saveToDesktop(id) })
-            }
+            menu.addItem(saveToDesktopItem([id]))
             menu.addItem(.separator())
             if kept {
                 // A pinned photo never goes to the Trash from here. One hung
@@ -143,15 +141,34 @@ struct GrabArea: NSViewRepresentable {
         if photos.contains(where: { $0.kept && !$0.byHand }) {
             menu.addItem(ClosureMenuItem(L("Unpin")) { line.unpin(ids) })
         }
-        let save = ClosureMenuItem(L("Save to Desktop")) { line.saveToDesktop(ids) }
-        save.isEnabled = line.canSaveToDesktop(ids)
-        menu.addItem(save)
+        menu.addItem(saveToDesktopItem(ids))
         menu.addItem(.separator())
         let inInbox = photos.allSatisfy { !$0.kept && line.isInInbox($0.id) }
         let discard = ClosureMenuItem(inInbox ? L("Discard") : L("Take down")) { line.discard(ids) }
         discard.isEnabled = line.canDiscard(ids)
         menu.addItem(discard)
         return menu
+    }
+
+    /// Keep the action discoverable for a single photo too, and explain
+    /// why it cannot move files that are already outside the inbox.
+    private func saveToDesktopItem(_ ids: [UUID]) -> NSMenuItem {
+        // Preserve the single-photo action, including a photo held in hand.
+        let single = ids.count == 1 ? ids.first : nil
+        let enabled = single.map { line.isInInbox($0) } ?? line.canSaveToDesktop(ids)
+        let title: String
+        if enabled {
+            title = L("Save to Desktop")
+        } else if !ids.isEmpty && ids.allSatisfy({ line.isOnDesktop($0) }) {
+            title = L("Save to Desktop (already there)")
+        } else {
+            title = L("Save to Desktop (inbox only)")
+        }
+        let item = ClosureMenuItem(title) {
+            if let single { line.saveToDesktop(single) } else { line.saveToDesktop(ids) }
+        }
+        item.isEnabled = enabled
+        return item
     }
 }
 

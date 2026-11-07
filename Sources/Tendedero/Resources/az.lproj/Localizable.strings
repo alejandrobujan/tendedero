@@ -80,3 +80,6 @@
 /* Selecting photos */
 "%d selected" = "%d foto seçilib";
 "Shift-click to select photos" = "Fotoları seçmək üçün Shift düyməsini basılı saxlayıb klikləyin";
+// Save availability
+"Save to Desktop (already there)" = "İş masasına saxla (artıq oradadır)";
+"Save to Desktop (inbox only)" = "İş masasına saxla (yalnız Tendedero qovluğu)";

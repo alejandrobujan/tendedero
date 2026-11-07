@@ -80,3 +80,6 @@
 /* Selecting photos */
 "%d selected" = "%d selected";
 "Shift-click to select photos" = "Shift-click to select photos";
+// Save availability
+"Save to Desktop (already there)" = "Save to Desktop (already there)";
+"Save to Desktop (inbox only)" = "Save to Desktop (inbox only)";

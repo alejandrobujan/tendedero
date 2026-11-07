@@ -5,7 +5,7 @@ import UniformTypeIdentifiers
 // Compiled with the production views and model, without AppDelegate or
 // Inbox's screenshot-settings code. All files and preferences are isolated;
 // copying uses a private pasteboard. Nothing watches the user's screenshots.
-@MainActor enum Inbox { static var folder: URL! }
+enum Inbox { static var folder: URL! }
 
 struct CheckFailed: Error { let message: String }
 
@@ -116,11 +116,11 @@ struct CheckFailed: Error { let message: String }
         let menu = try grab(a).menuProvider()
         let titles = menu.items.map(\.title)
         try check(titles.contains("2 selected"), "Selection menu states how many photos it affects")
-        try check(["Copy", "Open", "Show in Finder", "Share…", "Pin", "Save to Desktop", "Take down"].allSatisfy(titles.contains),
+        try check(["Copy", "Open", "Show in Finder", "Share…", "Pin", "Save to Desktop (inbox only)", "Take down"].allSatisfy(titles.contains),
                   "Selection menu exposes the requested batch actions")
         try check(["Quick Look", "Hold", "Markup", "Move to Trash", "Take down everything to the left"].allSatisfy { !titles.contains($0) },
                   "Single-photo editors and unrelated removal actions are absent from the selection menu")
-        try check(menu.items.first { $0.title == "Save to Desktop" }?.isEnabled == false, "External originals cannot be moved by Save to Desktop")
+        try check(menu.items.first { $0.title == "Save to Desktop (inbox only)" }?.isEnabled == false, "External originals cannot be moved by Save to Desktop")
         line.clearSelection()
         line.toggleSelection(bID)
         try fire("Copy", in: menu)
@@ -295,9 +295,31 @@ struct CheckFailed: Error { let message: String }
         let savedOnlyMenu = try grab(alreadySaved).menuProvider()
         mixed.saveToDesktop([mixedIDs[1], mixedIDs[3]])
         mixed.saveToDesktop(mixedIDs[1])
-        try check(savedOnlyMenu.items.first { $0.title == "Save to Desktop" }?.isEnabled == false
+        try check(savedOnlyMenu.items.first { $0.title == "Save to Desktop (inbox only)" }?.isEnabled == false
                   && !mixed.canPutBack && copiedURLs == mixedURLs,
                   "A selection with no inbox photos is a no-op and preserves clipboard URLs")
+
+        mixed.clearSelection()
+        // Start the single-photo menu checks with a fresh host: this
+        // synchronous runner can retain the outgoing cards from undo.
+        show(mixed)
+        try check(try grab(alreadySaved).menuProvider().items.first { $0.title == "Save to Desktop (already there)" }?.isEnabled == false,
+                  "A single Desktop photo shows why saving is unavailable instead of hiding the action")
+        try check(try grab(b).menuProvider().items.first { $0.title == "Save to Desktop (inbox only)" }?.isEnabled == false,
+                  "A single external photo shows the inbox restriction and preserves its original")
+        try check(try grab(m1).menuProvider().items.first { $0.title == "Save to Desktop" }?.isEnabled == true,
+                  "A single inbox photo still offers Save to Desktop")
+        mixed.toggleSelection(mixedIDs[1])
+        try check(try grab(alreadySaved).menuProvider().items.first { $0.title == "Save to Desktop (already there)" }?.isEnabled == false,
+                  "Single-photo and selection menus explain an existing Desktop file consistently")
+        mixed.clearSelection()
+        let heldInboxID = mixed.items.first { $0.url == m1 && !$0.falling }!.id
+        mixed.setHeld(heldInboxID, true)
+        show(mixed)
+        try fire("Save to Desktop", in: try grab(m1).menuProvider())
+        try check(FileManager.default.fileExists(atPath: moved1.path) && !FileManager.default.fileExists(atPath: m1.path),
+                  "The existing single-photo save still works for an inbox photo held in hand")
+        mixed.putBack()
 
         let handLine = self.line()
         _ = handLine.hangKept(a)
@@ -316,7 +338,87 @@ struct CheckFailed: Error { let message: String }
         eviction.toggleSelection(oldest)
         _ = eviction.hang(c, quietly: true)
         try check(eviction.selectedIDs.isEmpty && FileManager.default.fileExists(atPath: a.path), "Capacity eviction clears stale selection without deleting an external file")
-        print("\(passed) selection checks passed")
+    }
+
+    /// Exercise real directory events, delayed file checks, and overlapping
+    /// watchers. The earlier menu-only checks could not catch a saved image
+    /// being picked up again by the Desktop safety watcher.
+    func checkDesktopWatchers() async throws {
+        // Folder listings can use /private/var where the test root uses
+        // /var. Compare standardized URLs, as the production gate does.
+        func canonical(_ url: URL) -> URL { url.standardizedFileURL }
+        let fm = FileManager.default
+        let desktop = root.appendingPathComponent("watched-desktop", isDirectory: true)
+        try fm.createDirectory(at: desktop, withIntermediateDirectories: true)
+        UserDefaults.standard.removeObject(forKey: "pegged")
+        let line = Line(pasteboard: pasteboard, desktop: desktop)
+        line.maxItems = 100
+        let first = try png("Watched 1.png", in: Inbox.folder)
+        let second = try png("Watched 2.png", in: Inbox.folder)
+        let bytes = try [first, second].map { try Data(contentsOf: $0) }
+        let ids = [line.hang(first, quietly: true)!, line.hang(second, quietly: true)!]
+        var reports: [URL] = []
+        var changes = 0
+        let watchers = (0..<2).map { _ in
+            ScreenshotWatcher(folder: desktop, anyImage: true, onNew: { url in
+                reports.append(url)
+                // The same gate used by AppDelegate.hangCapture, before
+                // either hanging the photo or starting its flight.
+                guard !line.isDesktopSave(url) else { return }
+                _ = line.hang(url, quietly: true)
+            }, onChange: { changes += 1; line.prune() })
+        }
+        defer { watchers.forEach { $0.stop() } }
+        watchers.forEach { $0.start() }
+        try await Task.sleep(nanoseconds: 800_000_000)
+        line.saveToDesktop(ids)
+        let targets = [first, second].map { desktop.appendingPathComponent($0.lastPathComponent) }
+        let deadline = Date().addingTimeInterval(5)
+        while reports.count < 4 && Date() < deadline { try await Task.sleep(nanoseconds: 100_000_000) }
+        try check(targets.allSatisfy { target in reports.filter { canonical($0) == canonical(target) }.count >= 2 },
+                  "Both live folder watchers observe both exported screenshots")
+        try check(line.liveCount == 0 && targets.allSatisfy(line.isDesktopSave),
+                  "Saved screenshots stay off the line after asynchronous and overlapping watcher callbacks")
+        try check(try targets.map { try Data(contentsOf: $0) } == bytes,
+                  "Suppressing re-hang preserves both saved files byte for byte")
+
+        let newCapture = try png("New capture.png", in: desktop)
+        let newDeadline = Date().addingTimeInterval(5)
+        while line.liveCount == 0 && Date() < newDeadline { try await Task.sleep(nanoseconds: 100_000_000) }
+        try check(line.items.filter { !$0.falling }.map { canonical($0.url) } == [canonical(newCapture)],
+                  "A genuine new image is still picked up exactly once by overlapping watchers")
+        line.putBack()
+        try await Task.sleep(nanoseconds: 800_000_000)
+        try check(try [first, second].map { try Data(contentsOf: $0) } == bytes,
+                  "Undo after watcher callbacks restores the exported files byte for byte")
+        try check(line.items.filter { !$0.falling }.map { canonical($0.url) } == [first, second, newCapture].map(canonical)
+                  && targets.allSatisfy { !line.isDesktopSave($0) },
+                  "Undo clears export suppression and restores the original order beside new arrivals")
+
+        let firstID = line.items.first { canonical($0.url) == canonical(first) && !$0.falling }!.id
+        line.saveToDesktop(firstID)
+        try await Task.sleep(nanoseconds: 800_000_000)
+        let changeCount = changes
+        let parked = root.appendingPathComponent("Previously exported.png")
+        try fm.moveItem(at: targets[0], to: parked)
+        let removedDeadline = Date().addingTimeInterval(5)
+        while changes == changeCount && Date() < removedDeadline { try await Task.sleep(nanoseconds: 100_000_000) }
+        try await Task.sleep(nanoseconds: 400_000_000)
+        let replacement = try png(first.lastPathComponent, in: desktop, red: 0.9)
+        let replacedDeadline = Date().addingTimeInterval(5)
+        while !line.items.contains(where: { canonical($0.url) == canonical(replacement) && !$0.falling }) && Date() < replacedDeadline { try await Task.sleep(nanoseconds: 100_000_000) }
+        try check(line.items.contains { canonical($0.url) == canonical(replacement) && !$0.falling } && !line.isDesktopSave(replacement),
+                  "A different file reusing an exported filename is accepted as a new image")
+        try check(try Data(contentsOf: parked) == bytes[0],
+                  "A later namesake never changes the earlier exported file")
+
+        let secondID = line.items.first { canonical($0.url) == canonical(second) && !$0.falling }!.id
+        line.saveToDesktop(secondID)
+        let newID = line.items.first { canonical($0.url) == canonical(newCapture) && !$0.falling }!.id
+        for _ in 0..<11 { line.pin(newID); line.unpin(newID) }
+        try await Task.sleep(nanoseconds: 800_000_000)
+        try check(line.isDesktopSave(targets[1]) && !line.items.contains { canonical($0.url) == canonical(targets[1]) && !$0.falling },
+                  "Saved files remain suppressed after their bounded undo history expires")
     }
 
     func cleanUp() {
@@ -341,5 +443,21 @@ struct CheckFailed: Error { let message: String }
             checks.cleanUp()
             exit(1)
         }
+        // Watcher callbacks arrive on DispatchQueue.main. Yield between
+        // checks inside the application loop so delivery does not depend
+        // on reentrant RunLoop draining in a synchronous main-actor call.
+        Task { @MainActor in
+            do {
+                try await checks.checkDesktopWatchers()
+                print("\(checks.passed) selection checks passed")
+                checks.cleanUp()
+                exit(0)
+            } catch {
+                print("FAIL: \(error)")
+                checks.cleanUp()
+                exit(1)
+            }
+        }
+        NSApp.run()
     }
 }

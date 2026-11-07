@@ -1,5 +1,6 @@
 #!/bin/bash
-# Native checks without XCTest, screenshot watchers or the system clipboard.
+# Native checks without XCTest or the system clipboard. Watchers use only
+# generated files in private test folders.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 CHECK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/tendedero-selection.XXXXXX")"
@@ -18,7 +19,7 @@ cat > "$CHECK_APP/Contents/Info.plist" <<'PLIST'
 </dict></plist>
 PLIST
 SOURCES=()
-for name in Line LineView LinePanel PeggedView GrabArea Share Markup Trim QuickLook Localization; do
+for name in Line LineView LinePanel PeggedView GrabArea Share Markup Trim QuickLook Localization ScreenshotWatcher; do
     SOURCES+=("Sources/Tendedero/$name.swift")
 done
 swiftc -module-name Tendedero -target "$(uname -m)-apple-macosx14.0" -parse-as-library "${SOURCES[@]}" scripts/test-selection.swift \

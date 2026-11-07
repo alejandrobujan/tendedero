@@ -364,6 +364,11 @@ final class Line: ObservableObject {
         return item.url.standardizedFileURL.path.hasPrefix(Inbox.folder.standardizedFileURL.path + "/")
     }
 
+    func isOnDesktop(_ id: UUID) -> Bool {
+        guard let item = items.first(where: { $0.id == id }) else { return false }
+        return item.url.deletingLastPathComponent().standardizedFileURL == desktop.standardizedFileURL
+    }
+
     /// What the button in a photo's corner does.
     enum Corner {
         /// A file in Tendedero's folder: to the Trash.
@@ -420,6 +425,36 @@ final class Line: ObservableObject {
         drop(id, quietly: true)
     }
 
+    /// An exported screenshot keeps its macOS tag. Desktop watchers must
+    /// not mistake that move for a new capture, even after its undo expires.
+    /// Identify the file too, so a later namesake is still picked up.
+    private struct DesktopSave: Equatable {
+        let volume: UInt64
+        let file: UInt64
+        let created: Date?
+
+        init?(_ url: URL) {
+            guard let attributes = try? FileManager.default.attributesOfItem(atPath: url.path),
+                  let volume = attributes[.systemNumber] as? NSNumber,
+                  let file = attributes[.systemFileNumber] as? NSNumber else { return nil }
+            self.volume = volume.uint64Value
+            self.file = file.uint64Value
+            created = attributes[.creationDate] as? Date
+        }
+    }
+
+    private var desktopSaves: [URL: DesktopSave] = [:]
+
+    func isDesktopSave(_ url: URL) -> Bool {
+        let url = url.standardizedFileURL
+        guard let saved = desktopSaves[url] else { return false }
+        guard DesktopSave(url) == saved else {
+            desktopSaves[url] = nil
+            return false
+        }
+        return true
+    }
+
     /// Inbox mode: keep a screenshot by moving it to the Desktop.
     func saveToDesktop(_ id: UUID, step: UUID = UUID()) {
         guard isInInbox(id),
@@ -428,6 +463,7 @@ final class Line: ObservableObject {
         let target = uniqueURL(in: desktop, for: item.url.lastPathComponent)
         do {
             try FileManager.default.moveItem(at: item.url, to: target)
+            desktopSaves[target.standardizedFileURL] = DesktopSave(target)
             clipboardFollows(item.url, to: target)
             drop(id, quietly: true)
             remember(TakenDown(url: item.url, index: index, trashed: nil,
@@ -592,6 +628,7 @@ final class Line: ObservableObject {
         let url = uniqueURL(in: photo.url.deletingLastPathComponent(), for: photo.url.lastPathComponent)
         do {
             try FileManager.default.moveItem(at: moved, to: url)
+            desktopSaves[moved.standardizedFileURL] = nil
             clipboardFollows(moved, to: url)
             // A newer namesake may force a different filename. Earlier
             // actions, such as pinning this photo, must follow that name.
