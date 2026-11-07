@@ -151,19 +151,12 @@ struct GrabArea: NSViewRepresentable {
     }
 
     /// Keep the action discoverable for a single photo too, and explain
-    /// why it cannot move files that are already outside the inbox.
+    /// why other source folders are not handled by this action.
     private func saveToDesktopItem(_ ids: [UUID]) -> NSMenuItem {
         // Preserve the single-photo action, including a photo held in hand.
         let single = ids.count == 1 ? ids.first : nil
-        let enabled = single.map { line.isInInbox($0) } ?? line.canSaveToDesktop(ids)
-        let title: String
-        if enabled {
-            title = L("Save to Desktop")
-        } else if !ids.isEmpty && ids.allSatisfy({ line.isOnDesktop($0) }) {
-            title = L("Save to Desktop (already there)")
-        } else {
-            title = L("Save to Desktop (inbox only)")
-        }
+        let enabled = single.map { line.canSaveToDesktop($0) } ?? line.canSaveToDesktop(ids)
+        let title = enabled ? L("Save to Desktop") : L("Save to Desktop (inbox or Desktop only)")
         let item = ClosureMenuItem(title) {
             if let single { line.saveToDesktop(single) } else { line.saveToDesktop(ids) }
         }

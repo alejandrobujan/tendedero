@@ -79,5 +79,4 @@
 "%d selected" = "已选择 %d 张";
 "Shift-click to select photos" = "按住 Shift 点击以选择图片";
 // Save availability
-"Save to Desktop (already there)" = "存储到桌面（已在桌面）";
-"Save to Desktop (inbox only)" = "存储到桌面（仅收纳目录）";
+"Save to Desktop (inbox or Desktop only)" = "存储到桌面（仅收纳目录或桌面）";

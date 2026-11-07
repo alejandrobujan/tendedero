@@ -81,5 +81,4 @@
 "%d selected" = "%d चुने गए";
 "Shift-click to select photos" = "फ़ोटो चुनने के लिए Shift दबाकर क्लिक करें";
 // Save availability
-"Save to Desktop (already there)" = "डेस्कटॉप पर सहेजें (पहले से मौजूद)";
-"Save to Desktop (inbox only)" = "डेस्कटॉप पर सहेजें (केवल Tendedero फ़ोल्डर)";
+"Save to Desktop (inbox or Desktop only)" = "डेस्कटॉप पर सहेजें (केवल Tendedero फ़ोल्डर या डेस्कटॉप)";

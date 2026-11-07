@@ -298,8 +298,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// A new screenshot lifts off from where it was taken and flies to its
     /// place on the line. Without a known capture area it simply drops in.
     private func hangCapture(_ url: URL) {
-        // Saving to Desktop is our own move, not a new screenshot. More
-        // than one watcher can report it, so keep ignoring that same file.
+        // Several watchers may report a file we just saved. Keep ignoring
+        // that same file after either a move or a copy.
         guard !line.isDesktopSave(url) else { return }
         // Already hanging: a photo put back with ⌘Z comes out of the Trash
         // into the folder, and the watcher sees it arrive. It must not pull

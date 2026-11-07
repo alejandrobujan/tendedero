@@ -116,11 +116,11 @@ struct CheckFailed: Error { let message: String }
         let menu = try grab(a).menuProvider()
         let titles = menu.items.map(\.title)
         try check(titles.contains("2 selected"), "Selection menu states how many photos it affects")
-        try check(["Copy", "Open", "Show in Finder", "Share…", "Pin", "Save to Desktop (inbox only)", "Take down"].allSatisfy(titles.contains),
+        try check(["Copy", "Open", "Show in Finder", "Share…", "Pin", "Save to Desktop (inbox or Desktop only)", "Take down"].allSatisfy(titles.contains),
                   "Selection menu exposes the requested batch actions")
         try check(["Quick Look", "Hold", "Markup", "Move to Trash", "Take down everything to the left"].allSatisfy { !titles.contains($0) },
                   "Single-photo editors and unrelated removal actions are absent from the selection menu")
-        try check(menu.items.first { $0.title == "Save to Desktop (inbox only)" }?.isEnabled == false, "External originals cannot be moved by Save to Desktop")
+        try check(menu.items.first { $0.title == "Save to Desktop (inbox or Desktop only)" }?.isEnabled == false, "External originals cannot be moved by Save to Desktop")
         line.clearSelection()
         line.toggleSelection(bID)
         try fire("Copy", in: menu)
@@ -279,39 +279,41 @@ struct CheckFailed: Error { let message: String }
         try fire("Save to Desktop", in: mixedMenu)
         let moved1 = desktop.appendingPathComponent(m1.lastPathComponent)
         let moved2 = desktop.appendingPathComponent(m2.lastPathComponent)
-        try check(mixed.items.filter { !$0.falling }.map(\.url) == [alreadySaved, b]
+        let desktopCopy = desktop.appendingPathComponent("Already on Desktop 2.png")
+        try check(mixed.items.filter { !$0.falling }.map(\.url) == [b]
                   && copiedURLs == [moved1, alreadySaved, moved2, b],
-                  "Mixed save moves only inbox photos and keeps other selected originals in place")
+                  "Mixed save moves inbox files, copies Desktop files, and keeps clipboard URLs on the Desktop originals")
         try check(try Data(contentsOf: alreadySaved) == mixedBytes[1] && Data(contentsOf: b) == mixedBytes[3]
-                  && !FileManager.default.fileExists(atPath: desktop.appendingPathComponent("Already on Desktop 2.png").path),
-                  "Mixed save neither moves external originals nor duplicates a photo already on Desktop")
+                  && Data(contentsOf: desktopCopy) == mixedBytes[1],
+                  "Mixed save creates a numbered Desktop copy without changing either external original")
         mixed.putBack()
         try check(try mixedURLs.map { try Data(contentsOf: $0) } == mixedBytes
-                  && mixed.items.filter { !$0.falling }.map(\.url) == mixedURLs && !mixed.canPutBack,
-                  "One undo restores the mixed save's moved files, bytes and order")
+                  && mixed.items.filter { !$0.falling }.map(\.url) == mixedURLs && !mixed.canPutBack
+                  && !FileManager.default.fileExists(atPath: desktopCopy.path),
+                  "One undo restores the moved files and order, removes the new copy, and preserves the Desktop original")
         mixed.clearSelection()
-        mixed.toggleSelection(mixedIDs[1])
+        show(mixed)
+        let savedID = mixed.items.first { $0.url == alreadySaved && !$0.falling }!.id
+        mixed.toggleSelection(savedID)
         mixed.toggleSelection(mixedIDs[3])
         let savedOnlyMenu = try grab(alreadySaved).menuProvider()
-        mixed.saveToDesktop([mixedIDs[1], mixedIDs[3]])
-        mixed.saveToDesktop(mixedIDs[1])
-        try check(savedOnlyMenu.items.first { $0.title == "Save to Desktop (inbox only)" }?.isEnabled == false
-                  && !mixed.canPutBack && copiedURLs == mixedURLs,
-                  "A selection with no inbox photos is a no-op and preserves clipboard URLs")
-
+        try fire("Save to Desktop", in: savedOnlyMenu)
+        try check(mixed.canPutBack && copiedURLs == mixedURLs
+                  && FileManager.default.fileExists(atPath: desktopCopy.path),
+                  "A selection containing Desktop files can save again even without any inbox files")
+        mixed.putBack()
         mixed.clearSelection()
-        // Start the single-photo menu checks with a fresh host: this
-        // synchronous runner can retain the outgoing cards from undo.
+        // A fresh host avoids outgoing cards left by the synchronous runner.
         show(mixed)
-        try check(try grab(alreadySaved).menuProvider().items.first { $0.title == "Save to Desktop (already there)" }?.isEnabled == false,
-                  "A single Desktop photo shows why saving is unavailable instead of hiding the action")
-        try check(try grab(b).menuProvider().items.first { $0.title == "Save to Desktop (inbox only)" }?.isEnabled == false,
-                  "A single external photo shows the inbox restriction and preserves its original")
+        try check(try grab(alreadySaved).menuProvider().items.first { $0.title == "Save to Desktop" }?.isEnabled == true,
+                  "A single Desktop photo offers an enabled Save to Desktop action")
+        try check(try grab(b).menuProvider().items.first { $0.title == "Save to Desktop (inbox or Desktop only)" }?.isEnabled == false,
+                  "A photo outside the inbox and Desktop keeps its original location rule")
         try check(try grab(m1).menuProvider().items.first { $0.title == "Save to Desktop" }?.isEnabled == true,
                   "A single inbox photo still offers Save to Desktop")
-        mixed.toggleSelection(mixedIDs[1])
-        try check(try grab(alreadySaved).menuProvider().items.first { $0.title == "Save to Desktop (already there)" }?.isEnabled == false,
-                  "Single-photo and selection menus explain an existing Desktop file consistently")
+        mixed.toggleSelection(mixed.items.first { $0.url == alreadySaved && !$0.falling }!.id)
+        try check(try grab(alreadySaved).menuProvider().items.first { $0.title == "Save to Desktop" }?.isEnabled == true,
+                  "Single-photo and selection menus both allow another Desktop copy")
         mixed.clearSelection()
         let heldInboxID = mixed.items.first { $0.url == m1 && !$0.falling }!.id
         mixed.setHeld(heldInboxID, true)
@@ -338,6 +340,72 @@ struct CheckFailed: Error { let message: String }
         eviction.toggleSelection(oldest)
         _ = eviction.hang(c, quietly: true)
         try check(eviction.selectedIDs.isEmpty && FileManager.default.fileExists(atPath: a.path), "Capacity eviction clears stale selection without deleting an external file")
+        try checkDesktopCopies()
+    }
+
+    func checkDesktopCopies() throws {
+        let fm = FileManager.default
+        let desktop = root.appendingPathComponent("desktop", isDirectory: true)
+        let original = try png("Repeat.png", in: desktop)
+        let namesake = try png("Repeat 2.png", in: desktop, red: 0.9)
+        let bytes = try Data(contentsOf: original)
+        let namesakeBytes = try Data(contentsOf: namesake)
+        let copy = desktop.appendingPathComponent("Repeat 3.png")
+        let nextCopy = desktop.appendingPathComponent("Repeat 4.png")
+        let line = self.line()
+        let id = line.hang(original, quietly: true)!
+        line.pin(id)
+        line.copy(id)
+        show(line)
+        try fire("Save to Desktop", in: try grab(original).menuProvider())
+        try check(try Data(contentsOf: copy) == bytes && Data(contentsOf: original) == bytes
+                  && Data(contentsOf: namesake) == namesakeBytes,
+                  "Single save creates the next available numbered copy without overwriting Desktop originals")
+        try check(line.liveCount == 0 && line.isDesktopSave(copy) && copiedURLs == [original],
+                  "A copied Desktop photo leaves the line, suppresses re-hang, and keeps the original clipboard URL")
+        // A user may hang the copy by hand before undoing its creation.
+        let copyID = line.hang(copy, quietly: true)!
+        line.copy(copyID)
+        line.putBack()
+        try check(!fm.fileExists(atPath: copy.path) && line.liveCount == 1 && line.keptCount == 1
+                  && line.items.first(where: { !$0.falling })?.url == original,
+                  "Undo removes only the new copy and its card, restoring the original photo and pin state")
+        try check(try copiedURLs.count == 1 && copiedURLs[0] != original && Data(contentsOf: copiedURLs[0]) == bytes,
+                  "An undone copy remains recoverable in Trash and its copied file URL stays valid")
+        line.putBack()
+        try check(!line.canPutBack && line.keptCount == 0, "Undo continues to an earlier pin after undoing a Desktop copy")
+
+        let firstID = line.items.first { !$0.falling }!.id
+        line.saveToDesktop(firstID)
+        let secondID = line.hang(original, quietly: true)!
+        line.saveToDesktop(secondID)
+        try check(try Data(contentsOf: copy) == bytes && Data(contentsOf: nextCopy) == bytes,
+                  "Saving the same Desktop original again allocates another free numbered filename")
+        line.putBack()
+        try check(fm.fileExists(atPath: copy.path) && !fm.fileExists(atPath: nextCopy.path),
+                  "One undo removes only the most recent copy")
+        line.putBack()
+        try check(!fm.fileExists(atPath: copy.path) && line.liveCount == 1 && !line.canPutBack,
+                  "A second undo removes the earlier copy without duplicating an original already back on the line")
+
+        line.saveToDesktop(line.items.first { !$0.falling }!.id)
+        let parked = root.appendingPathComponent("Moved Desktop copy.png")
+        try fm.moveItem(at: copy, to: parked)
+        let replacement = try png(copy.lastPathComponent, in: desktop, red: 0.1)
+        let replacementBytes = try Data(contentsOf: replacement)
+        _ = line.hang(replacement, quietly: true)
+        line.putBack()
+        try check(try Data(contentsOf: replacement) == replacementBytes && Data(contentsOf: parked) == bytes
+                  && Data(contentsOf: original) == bytes && line.liveCount == 2,
+                  "Undo preserves a different file now using the copy's name and the copy moved elsewhere")
+
+        line.saveToDesktop(line.items.first { $0.url == original && !$0.falling }!.id)
+        let changedOriginal = try png(original.lastPathComponent, in: desktop, red: 0.6)
+        let changedBytes = try Data(contentsOf: changedOriginal)
+        line.putBack()
+        try check(try Data(contentsOf: original) == changedBytes && !fm.fileExists(atPath: nextCopy.path)
+                  && Data(contentsOf: replacement) == replacementBytes,
+                  "Undo never overwrites later edits to the Desktop original or touches a namesake")
     }
 
     /// Exercise real directory events, delayed file checks, and overlapping
@@ -419,6 +487,23 @@ struct CheckFailed: Error { let message: String }
         try await Task.sleep(nanoseconds: 800_000_000)
         try check(line.isDesktopSave(targets[1]) && !line.items.contains { canonical($0.url) == canonical(targets[1]) && !$0.falling },
                   "Saved files remain suppressed after their bounded undo history expires")
+
+        let originalBytes = try Data(contentsOf: newCapture)
+        let desktopCopy = desktop.appendingPathComponent("New capture 2.png")
+        line.saveToDesktop(newID)
+        let copiedDeadline = Date().addingTimeInterval(5)
+        while reports.filter({ canonical($0) == canonical(desktopCopy) }).count < 2 && Date() < copiedDeadline {
+            try await Task.sleep(nanoseconds: 100_000_000)
+        }
+        try check(reports.filter { canonical($0) == canonical(desktopCopy) }.count >= 2
+                  && !line.items.contains { canonical($0.url) == canonical(desktopCopy) && !$0.falling }
+                  && line.isDesktopSave(desktopCopy),
+                  "Both watchers observe a numbered Desktop copy without hanging it again")
+        line.putBack()
+        try await Task.sleep(nanoseconds: 600_000_000)
+        try check(try Data(contentsOf: newCapture) == originalBytes && !fm.fileExists(atPath: desktopCopy.path)
+                  && line.items.filter { canonical($0.url) == canonical(newCapture) && !$0.falling }.count == 1,
+                  "Undo after copy watcher callbacks preserves the original and restores exactly one card")
     }
 
     func cleanUp() {

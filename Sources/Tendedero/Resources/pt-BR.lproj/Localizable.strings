@@ -79,5 +79,4 @@
 "%d selected" = "%d selecionadas";
 "Shift-click to select photos" = "Clique com Shift para selecionar fotos";
 // Save availability
-"Save to Desktop (already there)" = "Salvar na Mesa (já está lá)";
-"Save to Desktop (inbox only)" = "Salvar na Mesa (somente pasta do Tendedero)";
+"Save to Desktop (inbox or Desktop only)" = "Salvar na Mesa (somente pasta do Tendedero ou Mesa)";

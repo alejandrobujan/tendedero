@@ -79,5 +79,4 @@
 "%d selected" = "%d fotoğraf seçildi";
 "Shift-click to select photos" = "Fotoğraf seçmek için Shift tuşunu basılı tutarak tıklayın";
 // Save availability
-"Save to Desktop (already there)" = "Masaüstüne kaydet (zaten orada)";
-"Save to Desktop (inbox only)" = "Masaüstüne kaydet (yalnızca Tendedero klasörü)";
+"Save to Desktop (inbox or Desktop only)" = "Masaüstüne kaydet (yalnızca Tendedero klasörü veya masaüstü)";

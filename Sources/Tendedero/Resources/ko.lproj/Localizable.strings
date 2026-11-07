@@ -79,5 +79,4 @@
 "%d selected" = "%d개 선택됨";
 "Shift-click to select photos" = "Shift 키를 누른 채 클릭하여 사진 선택";
 // Save availability
-"Save to Desktop (already there)" = "데스크탑에 저장 (이미 저장됨)";
-"Save to Desktop (inbox only)" = "데스크탑에 저장 (Tendedero 폴더만)";
+"Save to Desktop (inbox or Desktop only)" = "데스크탑에 저장 (Tendedero 폴더 또는 데스크탑만)";

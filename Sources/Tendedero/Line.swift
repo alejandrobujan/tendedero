@@ -312,13 +312,16 @@ final class Line: ObservableObject {
     }
 
     func canSaveToDesktop(_ ids: [UUID]) -> Bool {
-        actionItems(ids).contains { isInInbox($0.id) }
+        actionItems(ids).contains { canSaveToDesktop($0.id) }
+    }
+
+    func canSaveToDesktop(_ id: UUID) -> Bool {
+        isInInbox(id) || isOnDesktop(id)
     }
 
     func saveToDesktop(_ ids: [UUID]) {
-        // Photos already on the Desktop, or shown from another folder,
-        // keep their originals. They must not block saving the inbox photos.
-        let photos = actionItems(ids).filter { isInInbox($0.id) }
+        // Inbox files move; files already on the Desktop get another copy.
+        let photos = actionItems(ids).filter { canSaveToDesktop($0.id) }
         guard !photos.isEmpty else { return }
         let step = UUID()
         for item in photos { saveToDesktop(item.id, step: step) }
@@ -426,7 +429,7 @@ final class Line: ObservableObject {
     }
 
     /// An exported screenshot keeps its macOS tag. Desktop watchers must
-    /// not mistake that move for a new capture, even after its undo expires.
+    /// not mistake that saved file for a new capture, even after its undo expires.
     /// Identify the file too, so a later namesake is still picked up.
     private struct DesktopSave: Equatable {
         let volume: UInt64
@@ -455,19 +458,28 @@ final class Line: ObservableObject {
         return true
     }
 
-    /// Inbox mode: keep a screenshot by moving it to the Desktop.
+    /// Move an inbox screenshot to the Desktop, or save another copy of a
+    /// file already there. Every destination gets a name that is still free.
     func saveToDesktop(_ id: UUID, step: UUID = UUID()) {
-        guard isInInbox(id),
+        guard canSaveToDesktop(id),
               let item = items.first(where: { $0.id == id && !$0.falling }),
               let index = liveIndex(of: id) else { return }
+        let copying = !isInInbox(id)
         let target = uniqueURL(in: desktop, for: item.url.lastPathComponent)
         do {
-            try FileManager.default.moveItem(at: item.url, to: target)
-            desktopSaves[target.standardizedFileURL] = DesktopSave(target)
-            clipboardFollows(item.url, to: target)
+            if copying {
+                try FileManager.default.copyItem(at: item.url, to: target)
+            } else {
+                try FileManager.default.moveItem(at: item.url, to: target)
+                clipboardFollows(item.url, to: target)
+            }
+            let identity = DesktopSave(target)
+            desktopSaves[target.standardizedFileURL] = identity
             drop(id, quietly: true)
             remember(TakenDown(url: item.url, index: index, trashed: nil,
-                               kept: item.kept, byHand: item.byHand, moved: target), in: step)
+                               kept: item.kept, byHand: item.byHand,
+                               moved: copying ? nil : target, copied: copying ? target : nil,
+                               copyIdentity: copying ? identity : nil), in: step)
         } catch {
             log.error("Could not save to Desktop: \(error.localizedDescription, privacy: .public)")
             NSSound.beep()
@@ -540,6 +552,8 @@ final class Line: ObservableObject {
         var kept = false
         var byHand = false
         var moved: URL?
+        var copied: URL?
+        var copyIdentity: DesktopSave?
         var pinChange = false
     }
 
@@ -578,13 +592,19 @@ final class Line: ObservableObject {
                 back.insert(item.id)
                 continue
             }
-            guard let url = restore(photo), !items.contains(where: { $0.url == url && !$0.falling }),
-                  let thumb = makeThumbnail(url) else { continue }
-            // The Desktop watcher may have hung the saved copy meanwhile.
-            // It now lives back in the inbox, so its old card must go too.
-            if let moved = photo.moved {
-                for item in items where item.url == moved && !item.falling { drop(item.id, quietly: true) }
+            guard let url = restore(photo) else { continue }
+            // A saved file may have been hung manually meanwhile. Remove
+            // its card only if undo actually moved that file away.
+            if let saved = photo.moved ?? photo.copied, !FileManager.default.fileExists(atPath: saved.path) {
+                for item in items where item.url.standardizedFileURL == saved.standardizedFileURL && !item.falling {
+                    drop(item.id, quietly: true)
+                }
             }
+            if let existing = items.first(where: { $0.url.standardizedFileURL == url.standardizedFileURL && !$0.falling }) {
+                back.insert(existing.id)
+                continue
+            }
+            guard let thumb = makeThumbnail(url) else { continue }
             var item = Pegged(url: url, thumb: thumb)
             item.kept = photo.kept
             item.byHand = photo.byHand
@@ -622,6 +642,22 @@ final class Line: ObservableObject {
     /// The photo's file, where it was before. Nil when it is gone: the Trash
     /// was emptied, or the file was moved or deleted since.
     private func restore(_ photo: TakenDown) -> URL? {
+        if let copied = photo.copied {
+            // The original never moved. Undo removes only the copy we
+            // created, not a different file later using that destination.
+            if let identity = photo.copyIdentity, DesktopSave(copied) == identity {
+                do {
+                    var trashed: NSURL?
+                    try FileManager.default.trashItem(at: copied, resultingItemURL: &trashed)
+                    if let trashed { clipboardFollows(copied, to: trashed as URL) }
+                    desktopSaves[copied.standardizedFileURL] = nil
+                } catch {
+                    log.error("Could not undo Desktop copy: \(error.localizedDescription, privacy: .public)")
+                    return nil
+                }
+            }
+            return FileManager.default.fileExists(atPath: photo.url.path) ? photo.url : nil
+        }
         guard let moved = photo.moved ?? photo.trashed else {
             return FileManager.default.fileExists(atPath: photo.url.path) ? photo.url : nil
         }
