@@ -41,7 +41,14 @@ final class Line: ObservableObject {
     @Published var draggingID: UUID?
     @Published var pressedID: UUID?
     /// Whether the line has slid down into view.
-    @Published var revealed = false
+    @Published var revealed = false {
+        didSet {
+            guard revealed != oldValue else { return }
+            gustWork?.cancel()
+            gustWork = nil
+            if revealed { scheduleGust() }
+        }
+    }
 
     /// Card frames in window coordinates, reported by the views. The panel
     /// uses them to only catch clicks over photos and let the rest through.
@@ -89,7 +96,6 @@ final class Line: ObservableObject {
 
     init() {
         restore()
-        scheduleGust()
     }
 
     // MARK: Hanging and dropping
@@ -548,14 +554,21 @@ final class Line: ObservableObject {
 
     // MARK: Breeze
 
+    private var gustWork: DispatchWorkItem?
+
     /// Every so often a little wind moves the line. It is the detail that
-    /// makes it feel like an object and not a widget.
+    /// makes it feel like an object and not a widget. Tucked away, it rests:
+    /// ordering the panel out does not stop SwiftUI's animation work.
     private func scheduleGust() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + .random(in: 7...16)) { [weak self] in
-            guard let self else { return }
+        guard revealed else { return }
+        let work = DispatchWorkItem { [weak self] in
+            guard let self, self.revealed else { return }
+            self.gustWork = nil
             if !self.items.isEmpty && self.draggingID == nil { self.gust += 1 }
             self.scheduleGust()
         }
+        gustWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + .random(in: 7...16), execute: work)
     }
 
     // MARK: Persistence

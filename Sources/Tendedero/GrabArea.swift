@@ -25,6 +25,10 @@ struct GrabArea: NSViewRepresentable {
         configure(view)
     }
 
+    static func dismantleNSView(_ view: GrabView, coordinator: ()) {
+        view.cancelPress()
+    }
+
     private func configure(_ view: GrabView) {
         let id = item.id
         let line = line
@@ -45,7 +49,10 @@ struct GrabArea: NSViewRepresentable {
         view.onDiscard = { line.pressCorner(id) }
         view.onLongPress = { line.markup(id) }
         view.onForceClick = { line.quickLook(id) }
-        view.onPressChange = { pressed in line.pressedID = pressed ? id : nil }
+        view.onPressChange = { pressed in
+            if pressed { line.pressedID = id }
+            else if line.pressedID == id { line.pressedID = nil }
+        }
         view.menuProvider = { [weak view] in
             let menu = NSMenu()
             // Items say themselves whether they can be used.
@@ -203,6 +210,15 @@ final class GrabView: NSView, NSDraggingSource {
         holdTimer?.invalidate()
         holdTimer = nil
         onPressChange(false)
+    }
+
+    /// A card removed while the line tucks away must release its press, or
+    /// the rebuilt card stays pressed and keeps the line from retracting.
+    /// An already completed click still copies when its timer fires.
+    func cancelPress() {
+        downPoint = nil
+        didLongPress = false
+        endPress()
     }
 
     override func mouseDragged(with event: NSEvent) {

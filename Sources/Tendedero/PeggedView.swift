@@ -9,6 +9,7 @@ struct PeggedView: View {
     @State private var swing: Double = 0
     @State private var arrived = false
     @State private var hovering = false
+    @State private var showingPhoto = false
 
     private var copied: Bool { line.copiedID == item.id }
     private var dragging: Bool { line.draggingID == item.id }
@@ -23,6 +24,31 @@ struct PeggedView: View {
     private var pressed: Bool { line.pressedID == item.id }
 
     var body: some View {
+        ZStack {
+            if line.revealed || showingPhoto { photo.transition(.identity) }
+        }
+        .onAppear(perform: arrive)
+        .onChange(of: item.flying) { was, now in if was && !now { land() } }
+        .onChange(of: line.gust) { _, _ in breeze() }
+        .onChange(of: line.revealed, initial: true) { _, revealed in
+            if revealed {
+                showingPhoto = true
+            } else {
+                // Keep the photo for the slide up, then remove its animated
+                // content. A spring already returning to zero otherwise
+                // keeps running even after the window is ordered out.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    guard !line.revealed else { return }
+                    showingPhoto = false
+                    swing = 0
+                    hovering = false
+                }
+            }
+        }
+        .onChange(of: copied) { _, isCopied in if isCopied { nudge(3) } }
+    }
+
+    private var photo: some View {
         VStack(spacing: -12) {
             Clothespin(pinned: item.kept)
                 .zIndex(1)
@@ -39,10 +65,6 @@ struct PeggedView: View {
         .opacity(item.falling || item.flying ? 0 : (arrived ? 1 : 0))
         .transaction { t in if item.falling { t.animation = nil } }
         .animation(.easeOut(duration: 0.16), value: item.flying)
-        .onAppear(perform: arrive)
-        .onChange(of: item.flying) { was, now in if was && !now { land() } }
-        .onChange(of: line.gust) { _, _ in breeze() }
-        .onChange(of: copied) { _, isCopied in if isCopied { nudge(3) } }
     }
 
     /// The photo fits inside the card area keeping its proportions, so the
@@ -156,13 +178,16 @@ struct PeggedView: View {
     private func breeze() {
         let delay = Double.random(in: 0...0.35)
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            guard line.revealed else { return }
             nudge(Double.random(in: 1.6...3.4))
         }
     }
 
     private func nudge(_ degrees: Double) {
+        guard line.revealed else { return }
         withAnimation(.easeOut(duration: 0.3)) { swing = degrees }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            guard line.revealed else { return }
             withAnimation(.interpolatingSpring(stiffness: 38, damping: 2.4)) { swing = 0 }
         }
     }
