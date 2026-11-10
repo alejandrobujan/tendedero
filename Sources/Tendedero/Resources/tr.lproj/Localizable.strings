@@ -83,3 +83,7 @@
 "Replace" = "Değiştir";
 "Cancel" = "Vazgeç";
 "trimmed" = "kırpıldı";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Tendedero başlangıçta açılsın mı?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero oturum açtığınızda açılmıyor; bu yüzden yeniden başlattıktan sonra siz tekrar açana kadar ip görünmez.";

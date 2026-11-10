@@ -277,7 +277,7 @@ final class ScreenshotWatcher {
     private func listFolder() -> [URL] {
         let urls = (try? FileManager.default.contentsOfDirectory(
             at: folder, includingPropertiesForKeys: [.creationDateKey], options: [.skipsHiddenFiles])) ?? []
-        return urls.sorted { creationDate($0) < creationDate($1) }
+        return urls.map { ($0, creationDate($0)) }.sorted { $0.1 < $1.1 }.map(\.0)
     }
 
     private func creationDate(_ url: URL) -> Date {

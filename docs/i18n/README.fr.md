@@ -12,7 +12,7 @@
   &nbsp;&nbsp;
   <a href="#compiler-depuis-le-code-source">Compiler depuis le code source&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;Français&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;Français&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.it.md">Italiano</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
   <br>
   <sub>Traduction du README anglais. En cas de différence, l’anglais fait foi.</sub>
 </p>
@@ -105,7 +105,7 @@ Tendedero fonctionne entièrement sur votre Mac, et vos captures ne le quittent 
 |:--|:--|
 | **Compatibilité** | macOS 14 Sonoma ou version ultérieure, sur Mac Apple silicon et Intel. Conçu pour macOS 27. |
 | **Taille** | 3,5 Mo |
-| **Langues** | Anglais, espagnol, galicien, français, portugais du Brésil, japonais, coréen, chinois simplifié, turc, azerbaïdjanais et hindi |
+| **Langues** | Anglais, espagnol, galicien, français, portugais du Brésil, italien, japonais, coréen, chinois simplifié, turc, azerbaïdjanais et hindi |
 | **Conçu avec** | Swift, AppKit et SwiftUI |
 | **Accès au réseau** | Aucun |
 | **Prix** | Gratuit |
@@ -119,7 +119,7 @@ Téléchargez l’image disque depuis la [dernière version](../../../../release
 ouvrez-la et glissez Tendedero dans Applications. Ou installez-le avec Homebrew :
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 Tendedero est signé avec un Developer ID et notarié par Apple : il s’ouvre

@@ -83,3 +83,7 @@
 "Replace" = "Remplacer";
 "Cancel" = "Annuler";
 "trimmed" = "raccourci";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Ouvrir Tendedero à l’ouverture de session ?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero ne s’ouvre pas quand vous ouvrez votre session : après un redémarrage, la corde n’est plus là tant que vous ne le rouvrez pas.";

@@ -83,3 +83,7 @@
 "Replace" = "置き換え";
 "Cancel" = "キャンセル";
 "trimmed" = "トリミング済み";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "ログイン時にTendederoを開きますか？";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendederoはログイン時に開かないため、再起動するともう一度開くまでロープは表示されません。";

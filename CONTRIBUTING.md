@@ -78,9 +78,9 @@ macOS screenshot settings Tendedero changed.
 
 Every piece of text in the app goes through `L("English text")` and lives in
 `Sources/Tendedero/Resources/<language>.lproj/Localizable.strings`. The app
-speaks eleven languages: English, Spanish, Galician, French, Brazilian
-Portuguese, Japanese, Korean, Simplified Chinese, Turkish, Azerbaijani and
-Hindi.
+speaks twelve languages: English, Spanish, Galician, French, Brazilian
+Portuguese, Italian, Japanese, Korean, Simplified Chinese, Turkish,
+Azerbaijani and Hindi.
 
 - When you add text, add it to every language. A rough translation is
   better than none; say which ones need a native speaker's review.

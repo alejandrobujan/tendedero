@@ -83,3 +83,7 @@
 "Replace" = "대치";
 "Cancel" = "취소";
 "trimmed" = "다듬음";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "로그인 시 Tendedero를 열까요?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero는 로그인할 때 열리지 않아서, 재시동하면 다시 열 때까지 빨랫줄이 사라져요.";
