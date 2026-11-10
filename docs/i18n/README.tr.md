@@ -12,7 +12,7 @@
   &nbsp;&nbsp;
   <a href="#kaynaktan-derle">Kaynaktan derle&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;Türkçe&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.it.md">Italiano</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;Türkçe&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
   <br>
   <sub>Bu dosya İngilizce README'nin çevirisidir. Bir tutarsızlık varsa İngilizce sürümü esas alın.</sub>
 </p>
@@ -27,7 +27,7 @@
 ## Gözden uzak. Her an erişilebilir.
 
 Aldığınız her ekran görüntüsü, ekranınızın hemen üstündeki bir ipe asılır.
-İşaretçiyi menü çubuğuna götürün, ip aşağı süzülür. Uzaklaşın, kaybolur.
+İşaretçiyi menü çubuğunun ortasına götürün, ip aşağı süzülür. Uzaklaşın, kaybolur.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/tr/demo-dark.gif">
@@ -56,7 +56,14 @@ Aldığınız her ekran görüntüsü, ekranınızın hemen üstündeki bir ipe 
 | Uygulamaya sürükle | Bir kopya gönderir. İpte kalmaya devam eder. |
 | Klasöre sürükle | Orada saklar. İpten ayrılır. |
 | Çöp Kutusu'na sürükle ya da çarpıya tıkla | Siler. |
-| İşaretçiyi menü çubuğunda bırak | O ekranda ipi aşağı indirir. |
+| İşaretçi ipin üzerindeyken <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | Az önce bıraktığını geri asar. |
+| İşaretçi bir fotoğrafın üzerindeyken <kbd>Boşluk</kbd> | Hızlıca bak. |
+| İşaretçi bir fotoğrafın üzerindeyken <kbd>⌫</kbd> | Köşedeki düğmesi gibi bırak. |
+| Sağ tıkla, Paylaş | AirDrop, Mesajlar, Mail ve diğerleriyle gönderir. İpte kalmaya devam eder. |
+| Sağ tıkla, Sabitle | Sakla: düğümün solunda uzay grisi bir mandalla asılı kalır, yeni ekran görüntüleri onu itmez. |
+| Sağ tıkla, Elinde tut | İpten al ve çalışırken önünde tut. |
+| Finder’da bir görsele sağ tıkla, Tendedero’ya as | Herhangi bir görseli ipe sabitlenmiş olarak as. |
+| İşaretçiyi menü çubuğunun ortasında bırak | O ekranda ipi aşağı indirir. |
 | Menü çubuğunda herhangi bir yere tıkla | İpi geri kaldırır. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | İpi gösterir ya da gizler. Menü çubuğundaki Kısayol bölümünden değiştirilebilir. |
 
@@ -96,8 +103,8 @@ Tendedero tamamen Mac'inizde çalışır ve ekran görüntüleriniz hiçbir zama
 | | |
 |:--|:--|
 | **Uyumluluk** | macOS 14 Sonoma veya sonrası, Apple silicon ve Intel. macOS 27 için tasarlandı. |
-| **Boyut** | 1,7 MB |
-| **Diller** | İngilizce, İspanyolca, Galiçyaca, Fransızca, Portekizce (Brezilya), Japonca, Korece, Basitleştirilmiş Çince, Türkçe, Azerice, Hintçe |
+| **Boyut** | 3,5 MB |
+| **Diller** | İngilizce, İspanyolca, Galiçyaca, Fransızca, Portekizce (Brezilya), İtalyanca, Japonca, Korece, Basitleştirilmiş Çince, Türkçe, Azerice, Hintçe |
 | **Yapıldığı teknolojiler** | Swift, AppKit ve SwiftUI |
 | **Ağ erişimi** | Yok |
 | **Fiyat** | Ücretsiz |
@@ -111,7 +118,7 @@ Tendedero tamamen Mac'inizde çalışır ve ekran görüntüleriniz hiçbir zama
 Uygulamalar'a sürükleyin. Ya da Homebrew ile yükleyin:
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 Tendedero, Developer ID ile imzalı ve Apple tarafından onaylıdır; diğer uygulamalar gibi açılır.

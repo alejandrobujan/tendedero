@@ -10,6 +10,7 @@
 "Hide line" = "रस्सी छिपाएँ";
 "Show line" = "रस्सी दिखाएँ";
 "Take everything down" = "सब उतार दें";
+"Put back" = "वापस टाँगें";
 "Handle screenshots" = "स्क्रीनशॉट संभालें";
 "Screenshots hang instantly and skip the Desktop" = "स्क्रीनशॉट तुरंत टँगते हैं और डेस्कटॉप पर नहीं जाते";
 "Open screenshots folder" = "स्क्रीनशॉट फ़ोल्डर खोलें";
@@ -42,18 +43,23 @@
 "When the pointer rests in the menu bar" = "जब पॉइंटर मेनू बार में रुके";
 "When something new hangs" = "जब कुछ नया टँगे";
 "Over full screen apps" = "फ़ुल स्क्रीन ऐप्स के ऊपर";
-"Hang copied images" = "कॉपी की गई तस्वीरें टाँगें";
+"Hang what you copy" = "जो कॉपी करें, उसे टाँगें";
+"Images" = "तस्वीरें";
+"Text" = "टेक्स्ट";
+"Links" = "लिंक";
 "Images you copy hang on the line too" = "आप जो तस्वीरें कॉपी करते हैं, वे भी रस्सी पर टँगती हैं";
-"Hang copied text" = "कॉपी किया गया टेक्स्ट लटकाएं";
-"Text you copy hangs on the line too" = "आपके द्वारा कॉपी किया गया टेक्स्ट भी तार पर लटकेगा";
 "Tendedero, hanging copied images" = "Tendedero, कॉपी की गई तस्वीरें टाँग रहा है";
+"The line is empty" = "रस्सी खाली है";
+"%d on the line" = "रस्सी पर %d";
 
 /* GrabArea */
 "Copy" = "कॉपी करें";
 "Open" = "खोलें";
+"Open Link" = "लिंक खोलें";
 "Quick Look" = "क्विक लुक";
 "Markup" = "मार्कअप";
 "Show in Finder" = "Finder में दिखाएँ";
+"Share…" = "शेयर करें…";
 "Save to Desktop" = "डेस्कटॉप पर सेव करें";
 "Discard" = "हटाएँ";
 "Take down" = "उतारें";
@@ -66,3 +72,19 @@
 
 /* PeggedView */
 "Copied" = "कॉपी हो गया";
+
+/* Pinning and holding photos */
+"Pin" = "पिन करें";
+"Unpin" = "पिन हटाएँ";
+"Hold" = "हाथ में लें";
+"Hang back" = "रस्सी पर लौटाएँ";
+"Hang everything back" = "सब रस्सी पर लौटाएँ";
+"Actual Size" = "असली आकार";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "क्या Tendedero लॉगिन पर खुले?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero लॉगिन करने पर नहीं खुलता, इसलिए रीस्टार्ट के बाद रस्सी तब तक नहीं दिखती जब तक आप इसे फिर से नहीं खोलते।";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "आप जो टेक्स्ट कॉपी करते हैं, वह भी रस्सी पर टँगता है";
+"Links you copy hang on the line too" = "आप जो लिंक कॉपी करते हैं, वे भी रस्सी पर टँगते हैं";

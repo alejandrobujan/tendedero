@@ -1,0 +1,88 @@
+/* Italian. */
+
+/* AppDelegate */
+"Let Tendedero handle your screenshots?" = "Vuoi che Tendedero gestisca i tuoi screenshot?";
+"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "Gli screenshot verranno appesi al filo appena li fai, senza la miniatura fluttuante, e non si accumuleranno sulla Scrivania. Trascinane uno in una cartella per tenerlo, o scartalo con la crocetta. Puoi disattivarlo dalla barra dei menu, e le tue impostazioni tornano come prima quando esci da Tendedero.";
+"Turn on" = "Attiva";
+"Not now" = "Non ora";
+"Hide line" = "Nascondi il filo";
+"Show line" = "Mostra il filo";
+"Take everything down" = "Togli tutto";
+"Put back" = "Rimetti sul filo";
+"Handle screenshots" = "Gestisci gli screenshot";
+"Screenshots hang instantly and skip the Desktop" = "Gli screenshot si appendono subito e saltano la Scrivania";
+"Open screenshots folder" = "Apri la cartella degli screenshot";
+"Sounds" = "Suoni";
+"Open at login" = "Apri al login";
+"Check for Updates…" = "Verifica aggiornamenti…";
+"Quit Tendedero" = "Esci da Tendedero";
+"Could not change the login setting" = "Impossibile modificare l’apertura al login";
+"Move Tendedero to the Applications folder and try again." = "Sposta Tendedero nella cartella Applicazioni e riprova.";
+"Keep on line" = "Tieni sul filo";
+"As many as fit" = "Quante ne entrano";
+"%d photos" = "%d foto";
+"Also watch folders" = "Osserva anche cartelle";
+"Add Folder…" = "Aggiungi cartella…";
+"Stop Watching" = "Smetti di osservare";
+"Watch" = "Osserva";
+"New images saved to this folder will hang on the line." = "Le nuove immagini salvate in questa cartella verranno appese al filo.";
+"Shortcut" = "Scorciatoia";
+"Change Shortcut…" = "Cambia scorciatoia…";
+"Change Shortcut" = "Cambia scorciatoia";
+"None" = "Nessuna";
+"Space" = "Spazio";
+"Press the new shortcut" = "Premi la nuova scorciatoia";
+"Escape cancels. Delete removes the shortcut." = "Esc annulla. Elimina rimuove la scorciatoia.";
+"Size" = "Dimensione";
+"Small" = "Piccola";
+"Medium" = "Media";
+"Large" = "Grande";
+"Bring the line down" = "Fai scendere il filo";
+"When the pointer rests in the menu bar" = "Quando il puntatore si ferma nella barra dei menu";
+"When something new hangs" = "Quando si appende qualcosa di nuovo";
+"Over full screen apps" = "Sopra le app a tutto schermo";
+"Hang what you copy" = "Appendi ciò che copi";
+"Images" = "Immagini";
+"Text" = "Testo";
+"Links" = "Link";
+"Images you copy hang on the line too" = "Anche le immagini che copi si appendono al filo";
+"Tendedero, hanging copied images" = "Tendedero, appende le immagini copiate";
+"The line is empty" = "Il filo è vuoto";
+"%d on the line" = "%d sul filo";
+
+/* GrabArea */
+"Copy" = "Copia";
+"Open" = "Apri";
+"Open Link" = "Apri link";
+"Quick Look" = "Visualizzazione rapida";
+"Markup" = "Annota";
+"Show in Finder" = "Mostra nel Finder";
+"Share…" = "Condividi…";
+"Save to Desktop" = "Salva sulla Scrivania";
+"Discard" = "Scarta";
+"Take down" = "Togli dal filo";
+"Move to Trash" = "Sposta nel Cestino";
+"Take down everything to the left" = "Togli tutto quello a sinistra";
+"Take down everything to the right" = "Togli tutto quello a destra";
+
+/* LineView */
+"Take a screenshot and it will hang here" = "Fai uno screenshot e resterà appeso qui";
+
+/* PeggedView */
+"Copied" = "Copiato";
+
+/* Pinning and holding photos */
+"Pin" = "Fissa";
+"Unpin" = "Non fissare più";
+"Hold" = "Tieni in mano";
+"Hang back" = "Riappendi";
+"Hang everything back" = "Riappendi tutto";
+"Actual Size" = "Dimensioni reali";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Aprire Tendedero al login?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero non si apre quando accedi, quindi dopo un riavvio il filo sparisce finché non lo riapri.";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "Anche il testo che copi si appende al filo";
+"Links you copy hang on the line too" = "Anche i link che copi si appendono al filo";

@@ -24,6 +24,14 @@ final class ScreenshotWatcher {
     private var stopped = false
     private let onNew: (URL) -> Void
     private let onChange: () -> Void
+    /// New images still being written, with their size when last checked.
+    /// A watched folder like Downloads gets files that appear under their
+    /// final name and fill in over seconds; hung at once, they stayed cut off.
+    private var unfinished: [URL: Int] = [:]
+    private var checkingUnfinished = false
+    /// When each of those was first seen. One that is still not whole after
+    /// ten minutes, a stalled download or a broken file, is let go.
+    private var firstSeen: [URL: Date] = [:]
 
     private static let imageExtensions: Set<String> = ["png", "jpg", "jpeg", "heic", "tif", "tiff", "gif", "webp"]
 
@@ -106,6 +114,8 @@ final class ScreenshotWatcher {
     func stop() {
         stopped = true
         missed = false
+        unfinished = [:]
+        firstSeen = [:]
         pending?.cancel()
         pending = nil
         source?.cancel()
@@ -147,9 +157,8 @@ final class ScreenshotWatcher {
         // app launched. Later ones compare against the previous listing.
         let first = known == nil
         let base = known ?? Set(settled.map(\.path))
-        for url in candidates where !base.contains(url.path) {
-            onNew(url)
-        }
+        let fresh = candidates.filter { !base.contains($0.path) }
+        if !fresh.isEmpty { report(fresh) }
         known = Set(files.map(\.path))
         if !first { onChange() }
         if missed {
@@ -158,10 +167,117 @@ final class ScreenshotWatcher {
         }
     }
 
+    /// Hangs what is complete and waits for the rest. Screenshots macOS takes
+    /// arrive whole, so they hang with no delay; an image still being written
+    /// is looked at again every half second until it is whole.
+    private func report(_ urls: [URL], sizes: [URL: Int] = [:]) {
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self else { return }
+            let checked = urls.map { url -> (URL, Int?, Bool) in
+                let size = Self.fileSize(url)
+                return (url, size, size.map { Self.isWhole(url, size: $0, before: sizes[url]) } ?? false)
+            }
+            DispatchQueue.main.async {
+                guard !self.stopped else { return }
+                for (url, size, whole) in checked {
+                    let since = self.firstSeen[url] ?? Date()
+                    if whole {
+                        self.unfinished[url] = nil
+                        self.firstSeen[url] = nil
+                        self.onNew(url)
+                    } else if let size, Date().timeIntervalSince(since) < 600 {
+                        self.unfinished[url] = size
+                        self.firstSeen[url] = since
+                    } else {
+                        // Gone before it was finished, a download that was
+                        // cancelled, or never finished at all.
+                        self.unfinished[url] = nil
+                        self.firstSeen[url] = nil
+                    }
+                }
+                self.checkUnfinishedLater()
+            }
+        }
+    }
+
+    private func checkUnfinishedLater() {
+        guard !unfinished.isEmpty, !checkingUnfinished else { return }
+        checkingUnfinished = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self else { return }
+            self.checkingUnfinished = false
+            guard !self.stopped, !self.unfinished.isEmpty else { return }
+            let waiting = self.unfinished
+            self.report(Array(waiting.keys), sizes: waiting)
+        }
+    }
+
+    /// Asked of the file system each time: a URL keeps the resource values it
+    /// read once, and a file still being written would seem to stop growing.
+    private static func fileSize(_ url: URL) -> Int? {
+        (try? FileManager.default.attributesOfItem(atPath: url.path))?[.size] as? Int
+    }
+
+    /// Whether an image has been written to the end. Most formats say where
+    /// they end, so a cut-off file is told apart at once; ImageIO alone does
+    /// not, and draws the missing part as empty. For the rest, a size that
+    /// held still for half a second has to do. Recordings arrive whole: macOS
+    /// moves them into the folder once they are saved.
+    static func isWhole(_ url: URL, size: Int, before: Int?) -> Bool {
+        if isRecording(url) { return true }
+        guard size > 0, let handle = try? FileHandle(forReadingFrom: url) else { return false }
+        defer { try? handle.close() }
+        let head = (try? handle.read(upToCount: 16)) ?? Data()
+        let tailLength = min(size, 32)
+        try? handle.seek(toOffset: UInt64(size - tailLength))
+        let tail = [UInt8]((try? handle.read(upToCount: tailLength)) ?? Data())
+        switch url.pathExtension.lowercased() {
+        case "png":
+            // The IEND chunk and its checksum close every PNG.
+            return tail.count >= 12 && Array(tail.suffix(12)) == [0, 0, 0, 0, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82]
+        case "jpg", "jpeg":
+            // The end of image marker, allowing a few bytes of padding after it.
+            return zip(tail, tail.dropFirst()).contains { $0 == 0xFF && $1 == 0xD9 }
+        case "gif":
+            return tail.last == 0x3B
+        case "webp":
+            // RIFF says how long the file is.
+            let h = [UInt8](head)
+            guard h.count >= 8, h[0..<4] == [0x52, 0x49, 0x46, 0x46] else { return false }
+            let declared = Int(h[4]) | Int(h[5]) << 8 | Int(h[6]) << 16 | Int(h[7]) << 24
+            return size >= declared + 8
+        case "heic", "heif":
+            return isoBoxesEnd(handle, size: size)
+        default:
+            return before == size
+        }
+    }
+
+    /// HEIC is a chain of boxes, each starting with its length: whole when the
+    /// last one ends where the file does.
+    private static func isoBoxesEnd(_ handle: FileHandle, size: Int) -> Bool {
+        var offset = 0
+        while offset < size {
+            try? handle.seek(toOffset: UInt64(offset))
+            let header = [UInt8]((try? handle.read(upToCount: 16)) ?? Data())
+            guard header.count >= 8 else { return false }
+            var length = header[0..<4].reduce(0) { $0 << 8 | Int($1) }
+            if length == 1 {
+                guard header.count >= 16 else { return false }
+                length = header[8..<16].reduce(0) { $0 << 8 | Int($1) }
+            } else if length == 0 {
+                return true
+            }
+            guard length >= 8 else { return false }
+            offset += length
+        }
+        return offset == size
+    }
+
     private func listFolder() -> [URL] {
         let urls = (try? FileManager.default.contentsOfDirectory(
             at: folder, includingPropertiesForKeys: [.creationDateKey], options: [.skipsHiddenFiles])) ?? []
-        return urls.sorted { creationDate($0) < creationDate($1) }
+        return urls.map { ($0, creationDate($0)) }.sorted { $0.1 < $1.1 }.map(\.0)
     }
 
     private func creationDate(_ url: URL) -> Date {

@@ -9,7 +9,8 @@ import SwiftUI
 /// - The Trash discards it.
 /// - Nowhere that accepts it: the photo flies back to the line.
 ///
-/// Click copies, press and hold opens Markup, the corner cross discards.
+/// Click copies, double click opens, press and hold opens Markup, the corner
+/// cross discards.
 struct GrabArea: NSViewRepresentable {
     let item: Pegged
     let line: Line
@@ -28,9 +29,10 @@ struct GrabArea: NSViewRepresentable {
         let id = item.id
         let line = line
         let isRecording = item.isRecording
-        let isText = item.isText
         view.url = item.url
         view.dragImage = item.thumb
+        view.isHeld = item.held
+        view.onHangBack = { line.onHangBack?(id) }
         view.onClick = { line.copy(id) }
         view.onDoubleClick = { line.open(id) }
         view.onDragStart = { line.draggingID = id }
@@ -40,27 +42,59 @@ struct GrabArea: NSViewRepresentable {
             line.prune()
         }
         view.onTrash = { line.trash(id) }
-        view.onDiscard = { line.discard(id) }
-        view.onLongPress = { if !isText { line.markup(id) } }
+        view.onDiscard = { line.pressCorner(id) }
+        view.onLongPress = { line.markup(id) }
         view.onForceClick = { line.quickLook(id) }
         view.onPressChange = { pressed in line.pressedID = pressed ? id : nil }
-        view.menuProvider = {
+        view.menuProvider = { [weak view] in
             let menu = NSMenu()
             // Items say themselves whether they can be used.
             menu.autoenablesItems = false
             menu.addItem(ClosureMenuItem(L("Copy")) { line.copy(id) })
             menu.addItem(ClosureMenuItem(L("Open")) { line.open(id) })
+            if isText(item.url), Note.cached(item.url)?.link != nil {
+                menu.addItem(ClosureMenuItem(L("Open Link")) { line.openLink(id) })
+            }
             menu.addItem(ClosureMenuItem(L("Quick Look")) { line.quickLook(id) })
-            if !isRecording && !isText {
+            if !isRecording {
+                menu.addItem(ClosureMenuItem(L("Hold")) { line.onHold?(id) })
+            }
+            if !isRecording && !isText(item.url) {
                 menu.addItem(ClosureMenuItem(L("Markup")) { line.markup(id) })
             }
             menu.addItem(ClosureMenuItem(L("Show in Finder")) { line.reveal(id) })
+            if let view, let url = view.url, let window = view.window {
+                // Sending it away is a section of its own.
+                menu.addItem(.separator())
+                let card = window.convertToScreen(view.convert(view.bounds, to: nil))
+                // Once the menu has closed, so the panel opens on its own.
+                let share = ClosureMenuItem(L("Share…")) {
+                    DispatchQueue.main.async { Share.shared.show(url, from: card) }
+                }
+                // The icon macOS uses for Share everywhere.
+                share.image = NSImage(systemSymbolName: "square.and.arrow.up", accessibilityDescription: nil)
+                menu.addItem(share)
+                menu.addItem(.separator())
+            }
+            let item = line.items.first(where: { $0.id == id })
+            let kept = item?.kept == true
+            if !kept {
+                menu.addItem(ClosureMenuItem(L("Pin")) { line.pin(id) })
+            } else if item?.byHand == false {
+                menu.addItem(ClosureMenuItem(L("Unpin")) { line.unpin(id) })
+            }
             let inInbox = line.isInInbox(id)
             if inInbox {
                 menu.addItem(ClosureMenuItem(L("Save to Desktop")) { line.saveToDesktop(id) })
             }
             menu.addItem(.separator())
-            if inInbox {
+            if kept {
+                // A pinned photo never goes to the Trash from here. One hung
+                // by hand comes down; one pinned from the line is unpinned above.
+                if item?.byHand == true {
+                    menu.addItem(ClosureMenuItem(L("Take down")) { line.discard(id) })
+                }
+            } else if inInbox {
                 menu.addItem(ClosureMenuItem(L("Discard")) { line.discard(id) })
             } else {
                 menu.addItem(ClosureMenuItem(L("Take down")) { line.discard(id) })
@@ -84,6 +118,10 @@ final class GrabView: NSView, NSDraggingSource {
 
     var url: URL?
     var dragImage: NSImage?
+    /// Held in your hand: only its faded trace is on the line, and a click
+    /// on it is all it answers, to bring the photo back.
+    var isHeld = false
+    var onHangBack: () -> Void = {}
     var onClick: () -> Void = {}
     var onDoubleClick: () -> Void = {}
     var onDragStart: () -> Void = {}
@@ -99,6 +137,9 @@ final class GrabView: NSView, NSDraggingSource {
     private var startedDrag = false
     private var holdTimer: Timer?
     private var didLongPress = false
+    /// A click copies only once it is clear it is not the first half of a
+    /// double click, which opens the photo and must leave the clipboard alone.
+    private var clickTimer: Timer?
 
     /// How long you hold before Markup opens. Long enough not to fire on a
     /// slow click, short enough to feel deliberate.
@@ -118,6 +159,15 @@ final class GrabView: NSView, NSDraggingSource {
     }
 
     override func mouseDown(with event: NSEvent) {
+        if isHeld {
+            downPoint = nil
+            onHangBack()
+            return
+        }
+        if event.clickCount > 1 {
+            clickTimer?.invalidate()
+            clickTimer = nil
+        }
         if isInCross(event) {
             downPoint = nil
             onDiscard()
@@ -165,15 +215,7 @@ final class GrabView: NSView, NSDraggingSource {
         startedDrag = true
         endPress()
 
-        let item: NSDraggingItem
-        if isText(url), let text = try? String(contentsOf: url, encoding: .utf8) {
-            let pbItem = NSPasteboardItem()
-            pbItem.setString(text, forType: .string)
-            pbItem.setString(url.absoluteString, forType: .fileURL)
-            item = NSDraggingItem(pasteboardWriter: pbItem)
-        } else {
-            item = NSDraggingItem(pasteboardWriter: url as NSURL)
-        }
+        let item = NSDraggingItem(pasteboardWriter: Self.dragWriter(for: url))
         item.setDraggingFrame(imageFrame(), contents: dragImage)
         let session = beginDraggingSession(with: [item], event: event, source: self)
         // Released where nothing accepts it: it flies back to the line.
@@ -182,14 +224,45 @@ final class GrabView: NSView, NSDraggingSource {
         onDragStart()
     }
 
+    /// A photo drags as its file. A note drags as its words for apps, styled
+    /// when it has a style, and as its file for Finder.
+    private static func dragWriter(for url: URL) -> NSPasteboardWriting {
+        guard isText(url) else { return url as NSURL }
+        let item = NSPasteboardItem()
+        if url.pathExtension.lowercased() == "rtf", let data = try? Data(contentsOf: url),
+           let rich = NSAttributedString(rtf: data, documentAttributes: nil) {
+            item.setString(rich.string, forType: .string)
+            item.setData(data, forType: .rtf)
+        } else if let data = try? Data(contentsOf: url) {
+            item.setString(String(decoding: data, as: UTF8.self), forType: .string)
+        }
+        item.setString(url.absoluteString, forType: .fileURL)
+        return item
+    }
+
     override func mouseUp(with event: NSEvent) {
         endPress()
-        if downPoint != nil && !startedDrag && !didLongPress && event.clickCount == 1 { onClick() }
+        if downPoint != nil && !startedDrag && !didLongPress && event.clickCount == 1 {
+            // Waits as long as the system lets a second click count as a double click.
+            clickTimer?.invalidate()
+            // The copy goes ahead even if the line redraws this view meanwhile.
+            let copy = onClick
+            let timer = Timer(timeInterval: NSEvent.doubleClickInterval, repeats: false) { [weak self] _ in
+                MainActor.assumeIsolated {
+                    self?.clickTimer = nil
+                    copy()
+                }
+            }
+            // Keeps time while a menu or a drag runs the loop in another mode.
+            RunLoop.main.add(timer, forMode: .common)
+            clickTimer = timer
+        }
         downPoint = nil
         didLongPress = false
     }
 
     override func rightMouseDown(with event: NSEvent) {
+        guard !isHeld else { return }
         // The menu runs until it closes, and the line stays down meanwhile.
         GrabView.isShowingMenu = true
         NSMenu.popUpContextMenu(menuProvider(), with: event, for: self)

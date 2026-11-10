@@ -12,7 +12,7 @@
   &nbsp;&nbsp;
   <a href="#compilar-a-partir-do-código-fonte">Compilar a partir do código-fonte&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;Português (Brasil)&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;Português (Brasil)&nbsp;·&nbsp;<a href="README.it.md">Italiano</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
   <br>
   <sub>Tradução do README em inglês. Em caso de divergência, vale a versão em inglês.</sub>
 </p>
@@ -27,7 +27,7 @@
 ## Longe da vista. Ao alcance da mão.
 
 Cada captura de tela que você faz fica pendurada num varal logo acima da tela.
-Pare o ponteiro na barra de menus e o varal desce. Afaste-o e ele some.
+Pare o ponteiro no meio da barra de menus e o varal desce. Afaste-o e ele some.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/pt-BR/demo-dark.gif">
@@ -56,7 +56,14 @@ Pare o ponteiro na barra de menus e o varal desce. Afaste-o e ele some.
 | Arrastar para um app | Envia uma cópia. Ela continua no varal. |
 | Arrastar para uma pasta | Guarda a imagem ali. Ela sai do varal. |
 | Arrastar para o Lixo, ou clicar no X | Desapegue. |
-| Parar o ponteiro na barra de menus | Baixa o varal naquela tela. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> com o ponteiro no varal | Pendura de volta o que você acabou de soltar. |
+| <kbd>Espaço</kbd> com o ponteiro numa foto | Dê uma olhada rápida. |
+| <kbd>⌫</kbd> com o ponteiro numa foto | Solte-a, como o botão do canto dela. |
+| Clique com o botão direito e Compartilhar | Envia por AirDrop, Mensagens, Mail e mais. Ela continua no varal. |
+| Clique com o botão direito e Fixar | Guarde-a: fica à esquerda do nó com um prendedor cinza-espacial, e nenhuma captura nova a empurra. |
+| Clique com o botão direito e Segurar | Tire-a do varal e mantenha-a à sua frente enquanto trabalha. |
+| No Finder, clique com o botão direito numa imagem e Pendurar no Tendedero | Pendure qualquer imagem no varal, fixada. |
+| Parar o ponteiro no meio da barra de menus | Baixa o varal naquela tela. |
 | Clicar em qualquer lugar da barra de menus | Recolhe o varal. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Mostra ou oculta o varal. Altere em Atalho, na barra de menus. |
 
@@ -97,8 +104,8 @@ O Tendedero roda inteiramente no seu Mac, e suas capturas nunca saem dele.
 | | |
 |:--|:--|
 | **Compatibilidade** | macOS 14 Sonoma ou posterior, em Macs com Apple silicon e Intel. Projetado para o macOS 27. |
-| **Tamanho** | 1,7 MB |
-| **Idiomas** | Inglês, espanhol, galego, francês, português (Brasil), japonês, coreano, chinês simplificado, turco, azerbaijano e híndi |
+| **Tamanho** | 3,5 MB |
+| **Idiomas** | Inglês, espanhol, galego, francês, português (Brasil), italiano, japonês, coreano, chinês simplificado, turco, azerbaijano e híndi |
 | **Feito com** | Swift, AppKit e SwiftUI |
 | **Acesso à rede** | Nenhum |
 | **Preço** | Gratuito |
@@ -112,7 +119,7 @@ Baixe a imagem de disco da [versão mais recente](../../../../releases/latest),
 abra-a e arraste o Tendedero para Aplicativos. Ou instale com o Homebrew:
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 O Tendedero é assinado com um Developer ID e notarizado pela Apple, então abre

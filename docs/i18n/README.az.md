@@ -12,7 +12,7 @@
   &nbsp;&nbsp;
   <a href="#mənbə-kodundan-yığmaq">Mənbə kodundan yığ&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;Azərbaycanca&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.it.md">Italiano</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;Azərbaycanca&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
   <br>
   <sub>İngiliscə README-nin tərcüməsidir. Fərq olarsa, ingiliscə mətn əsasdır.</sub>
 </p>
@@ -27,7 +27,7 @@
 ## Gözdən uzaq. Əl altında.
 
 Çəkdiyiniz hər ekran şəkli ekranın düz üstündəki ipdən asılır.
-Göstəricini menyu panelində saxlayın, ip aşağı enir. Uzaqlaşdırın, yox olur.
+Göstəricini menyu panelinin ortasında saxlayın, ip aşağı enir. Uzaqlaşdırın, yox olur.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/az/demo-dark.gif">
@@ -56,7 +56,14 @@ Göstəricini menyu panelində saxlayın, ip aşağı enir. Uzaqlaşdırın, yox
 | Proqrama sürükləmək | Surətini göndərir. Şəkil ipdə qalır. |
 | Qovluğa sürükləmək | Orada saxlanır və ipdən çıxır. |
 | Zibil qutusuna sürükləmək və ya çarpaza klik | Ondan qurtulursunuz. |
-| Göstəricini menyu panelində saxlamaq | İpi həmin ekranda endirir. |
+| Göstərici ipin üstündəykən <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | Atdığınızı ipə geri asır. |
+| Göstərici şəklin üstündəykən <kbd>Boşluq</kbd> | Tez baxın. |
+| Göstərici şəklin üstündəykən <kbd>⌫</kbd> | Küncdəki düyməsi kimi buraxın. |
+| Sağ klik, Paylaş | AirDrop, Mesajlar, Mail və digərləri ilə göndərir. Şəkil ipdə qalır. |
+| Sağ klik, Bərkit | Saxlayın: düyünün solunda kosmik boz sancaqla asılır və yeni ekran şəkilləri onu itələmir. |
+| Sağ klik, Əldə saxla | İpdən götürün və işləyərkən qarşınızda saxlayın. |
+| Finder-də şəklə sağ klik, Tendedero-ya as | İstənilən şəkli ipə bərkidilmiş halda asın. |
+| Göstəricini menyu panelinin ortasında saxlamaq | İpi həmin ekranda endirir. |
 | Menyu panelində istənilən yerə klik | İpi yığır. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | İpi göstərir və ya gizlədir. Menyu panelində Qısayol bölməsindən dəyişdirmək olar. |
 
@@ -98,8 +105,8 @@ Tendedero tamamilə Mac-inizdə işləyir və ekran şəkilləriniz oradan heç 
 | | |
 |:--|:--|
 | **Uyğunluq** | macOS 14 Sonoma və ya sonrakı, Apple silicon və Intel Mac-lərdə. macOS 27 üçün hazırlanıb. |
-| **Həcm** | 1,7 MB |
-| **Dillər** | İngilis, ispan, qalisiya, fransız, portuqal (Braziliya), yapon, koreya, sadələşdirilmiş Çin, türk, Azərbaycan və hind dili |
+| **Həcm** | 3,5 MB |
+| **Dillər** | İngilis, ispan, qalisiya, fransız, portuqal (Braziliya), italyan, yapon, koreya, sadələşdirilmiş Çin, türk, Azərbaycan və hind dili |
 | **Nə ilə yazılıb** | Swift, AppKit və SwiftUI |
 | **İnternet bağlantısı** | İstifadə etmir |
 | **Qiymət** | Pulsuz |
@@ -113,7 +120,7 @@ Disk şəklini [son buraxılışdan](../../../../releases/latest) yükləyin,
 açın və Tendedero-nu Applications qovluğuna sürükləyin. Və ya Homebrew ilə quraşdırın:
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 Tendedero Developer ID ilə imzalanıb və Apple tərəfindən notarizasiya olunub,

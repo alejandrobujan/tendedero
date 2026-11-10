@@ -12,7 +12,7 @@
   &nbsp;&nbsp;
   <a href="#build-from-source">Build from source&nbsp;&rsaquo;</a>
   <br><br>
-  English&nbsp;·&nbsp;<a href="docs/i18n/README.es.md">Español</a>&nbsp;·&nbsp;<a href="docs/i18n/README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="docs/i18n/README.fr.md">Français</a>&nbsp;·&nbsp;<a href="docs/i18n/README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="docs/i18n/README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="docs/i18n/README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="docs/i18n/README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="docs/i18n/README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="docs/i18n/README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="docs/i18n/README.hi.md">हिन्दी</a>
+  English&nbsp;·&nbsp;<a href="docs/i18n/README.es.md">Español</a>&nbsp;·&nbsp;<a href="docs/i18n/README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="docs/i18n/README.fr.md">Français</a>&nbsp;·&nbsp;<a href="docs/i18n/README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="docs/i18n/README.it.md">Italiano</a>&nbsp;·&nbsp;<a href="docs/i18n/README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="docs/i18n/README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="docs/i18n/README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="docs/i18n/README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="docs/i18n/README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="docs/i18n/README.hi.md">हिन्दी</a>
 </p>
 
 <p align="center">
@@ -25,7 +25,7 @@
 ## Out of sight. Within reach.
 
 Every screenshot you take hangs on a line just above your screen.
-Rest the pointer in the menu bar and it glides down. Move away and it's gone.
+Rest the pointer in the middle of the menu bar and it glides down. Move away and it's gone.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/demo-dark.gif">
@@ -47,14 +47,21 @@ Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 
 | | |
 |:--|:--|
-| Click | Copy the image or text. |
+| Click | Copy the image. |
 | Press and hold | Open it in Markup. |
 | Double click | Open it in Preview. |
 | Force click | Take a quick look. |
 | Drag into an app | Send a copy. It stays on the line. |
 | Drag into a folder | Keep it there. It leaves the line. |
 | Drag to the Trash, or click the cross | Let it go. |
-| Rest the pointer in the menu bar | Bring the line down on that screen. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> with the pointer on the line | Hang back what you just let go. |
+| <kbd>Space</kbd> with the pointer on a photo | Take a quick look. |
+| <kbd>⌫</kbd> with the pointer on a photo | Let it go, as its corner button does. |
+| Right click, then Share | Send it with AirDrop, Messages, Mail and more. It stays on the line. |
+| Right click, then Pin | Keep it: it hangs left of the knot on a space grey clip, and no new screenshot pushes it off. |
+| Right click, then Hold | Take it off the line and keep it in front of you while you work. |
+| In Finder, right click an image, then Hang on Tendedero | Hang any image on the line, pinned. |
+| Rest the pointer in the middle of the menu bar | Bring the line down on that screen. |
 | Click anything in the menu bar | Put it away. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Show or hide the line. Change it under Shortcut in the menu bar. |
 
@@ -73,13 +80,13 @@ Same shortcuts. Same muscle memory. Just less mess.
 
 <br>
 
-## Copied images and text too.
+## Copied images too.
 
-Take a screenshot with <kbd>⌃</kbd> held, copy an image in Preview, or copy
-text snippets, and they hang on the line like any other. Turn on Hang copied
-images or Hang copied text in the menu bar and the shirt fills in while
-either is on. Click a note card to copy the text, or drag it straight into
-an app. Anything a password manager marks as private is left alone.
+Take a screenshot with <kbd>⌃</kbd> held, or copy an image in Preview, and it
+hangs on the line like any other. Turn on Hang copied images in the menu bar
+and the shirt fills in while it is on. Only images: anything copied along
+with text or a file, and anything a password manager marks as private, is
+left alone.
 
 <br>
 
@@ -95,8 +102,8 @@ Tendedero runs entirely on your Mac, and your screenshots never leave it.
 | | |
 |:--|:--|
 | **Compatibility** | macOS 14 Sonoma or later, on Apple silicon and Intel. Designed for macOS 27. |
-| **Size** | 1.7 MB |
-| **Languages** | English, Spanish, Galician, French, Portuguese (Brazil), Japanese, Korean, Chinese (Simplified), Turkish, Azerbaijani, Hindi |
+| **Size** | 3.5 MB |
+| **Languages** | English, Spanish, Galician, French, Portuguese (Brazil), Italian, Japanese, Korean, Chinese (Simplified), Turkish, Azerbaijani, Hindi |
 | **Built with** | Swift, AppKit and SwiftUI |
 | **Network access** | None |
 | **Price** | Free |
@@ -110,7 +117,7 @@ Download the disk image from the [latest release](../../releases/latest),
 open it and drag Tendedero to Applications. Or install it with Homebrew:
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 Tendedero is signed with a Developer ID and notarized by Apple, so it opens
@@ -130,6 +137,8 @@ open build/Tendedero.app
 Requires the Swift toolchain. Xcode is optional. With the Command Line Tools for macOS 27, the script falls back to the macOS 26 SDK they install alongside, because the new SDK needs a SwiftUI macro plugin only Xcode includes. Local builds are signed ad hoc,
 so macOS asks again for access to the Desktop after each rebuild.
 
+Want to help? Read [CONTRIBUTING.md](CONTRIBUTING.md) first.
+
 <details>
 <summary>Inside the app</summary>
 <br>
@@ -148,6 +157,7 @@ so macOS asks again for access to the Desktop after each rebuild.
 | `Trim.swift` | Trims a screen recording and saves the result |
 | `FullScreen.swift` | Knows when to stay hidden |
 | `Line.swift` | What is hanging, and what you can do with it |
+| `Held.swift` | A photo held in front of you, off the line |
 
 Every image here, the icon included, is drawn in code by
 `scripts/make-icon.swift` and `scripts/make-readme-art.swift`.

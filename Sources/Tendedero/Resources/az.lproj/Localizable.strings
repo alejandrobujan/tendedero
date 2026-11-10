@@ -10,6 +10,7 @@
 "Hide line" = "İpi gizlət";
 "Show line" = "İpi göstər";
 "Take everything down" = "Hamısını ipdən yığ";
+"Put back" = "İpə geri as";
 "Handle screenshots" = "Ekran şəkillərini idarə et";
 "Screenshots hang instantly and skip the Desktop" = "Ekran şəkilləri dərhal asılır və İş masasına düşmür";
 "Open screenshots folder" = "Ekran şəkilləri qovluğunu aç";
@@ -42,18 +43,23 @@
 "When the pointer rests in the menu bar" = "Göstərici menyu panelində dayananda";
 "When something new hangs" = "Yeni bir şey asılanda";
 "Over full screen apps" = "Tam ekran proqramların üzərində";
-"Hang copied images" = "Kopyalanmış şəkilləri as";
+"Hang what you copy" = "Kopyaladıqlarını as";
+"Images" = "Şəkillər";
+"Text" = "Mətn";
+"Links" = "Keçidlər";
 "Images you copy hang on the line too" = "Kopyaladığınız şəkillər də ipdən asılır";
-"Hang copied text" = "Kopyalanmış mətni asmaq";
-"Text you copy hangs on the line too" = "Kopyaladığınız mətn də ipə asılır";
 "Tendedero, hanging copied images" = "Tendedero, kopyalanmış şəkilləri asır";
+"The line is empty" = "İp boşdur";
+"%d on the line" = "İpdə %d ədəd";
 
 /* GrabArea */
 "Copy" = "Kopyala";
 "Open" = "Aç";
+"Open Link" = "Keçidi aç";
 "Quick Look" = "Tez baxış";
 "Markup" = "İşarələmə";
 "Show in Finder" = "Finder-də göstər";
+"Share…" = "Paylaş…";
 "Save to Desktop" = "İş masasında saxla";
 "Discard" = "At";
 "Take down" = "İpdən götür";
@@ -66,3 +72,19 @@
 
 /* PeggedView */
 "Copied" = "Kopyalandı";
+
+/* Pinning and holding photos */
+"Pin" = "Bərkit";
+"Unpin" = "Bərkitməni götür";
+"Hold" = "Əldə saxla";
+"Hang back" = "İpə qaytar";
+"Hang everything back" = "Hamısını ipə qaytar";
+"Actual Size" = "Həqiqi ölçü";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Tendedero sistemə girişdə açılsın?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero sistemə girəndə açılmır, ona görə də yenidən başladandan sonra siz onu yenidən açana qədər ip görünmür.";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "Kopyaladığınız mətn də ipdən asılır";
+"Links you copy hang on the line too" = "Kopyaladığınız keçidlər də ipdən asılır";

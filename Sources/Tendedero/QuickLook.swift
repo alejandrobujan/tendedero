@@ -2,12 +2,13 @@ import AppKit
 import Quartz
 
 /// A quick look at a photo without opening it: the same Quick Look window
-/// Finder shows. Force click a photo, or choose Quick Look from its menu.
-/// The arrow keys go through the rest of the line, and Space or Escape
-/// closes it.
+/// Finder shows. Space with the pointer on a photo, a force click, or Quick
+/// Look from its menu. The arrow keys go through the rest of the line, and
+/// Space or Escape closes it.
 ///
-/// The line never takes the keyboard from the app you are in, so Space over
-/// a photo cannot open it; the window takes the keyboard once it is open.
+/// The line never takes the keyboard from the app you are in: Space is only
+/// borrowed while the pointer rests on a photo, and the window takes the
+/// keyboard once it is open.
 @MainActor
 final class QuickLook: NSObject, QLPreviewPanelDataSource, QLPreviewPanelDelegate {
     static let shared = QuickLook()
