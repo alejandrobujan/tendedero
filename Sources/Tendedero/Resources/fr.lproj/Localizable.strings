@@ -1,0 +1,92 @@
+/* French. */
+
+/* AppDelegate */
+"Let Tendedero handle your screenshots?" = "Laisser Tendedero gérer vos captures d’écran ?";
+"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "Les captures s’accrocheront à la corde dès que vous les prendrez, sans la vignette flottante, et ne s’entasseront plus sur votre bureau. Faites-en glisser une dans un dossier pour la garder, ou jetez-la avec la croix. Vous pouvez désactiver cette option depuis la barre des menus, et vos réglages reviennent quand vous quittez Tendedero.";
+"Turn on" = "Activer";
+"Not now" = "Plus tard";
+"Hide line" = "Masquer la corde";
+"Show line" = "Afficher la corde";
+"Take everything down" = "Tout décrocher";
+"Put back" = "Raccrocher";
+"Handle screenshots" = "Gérer les captures d’écran";
+"Screenshots hang instantly and skip the Desktop" = "Les captures s’accrochent aussitôt et évitent le bureau";
+"Open screenshots folder" = "Ouvrir le dossier des captures";
+"Sounds" = "Sons";
+"Open at login" = "Ouvrir à l’ouverture de session";
+"Check for Updates…" = "Rechercher les mises à jour…";
+"Quit Tendedero" = "Quitter Tendedero";
+"Could not change the login setting" = "Impossible de modifier l’ouverture à la connexion";
+"Move Tendedero to the Applications folder and try again." = "Placez Tendedero dans le dossier Applications, puis réessayez.";
+"Keep on line" = "Garder sur la corde";
+"As many as fit" = "Autant qu’il en tient";
+"%d photos" = "%d photos";
+"Also watch folders" = "Surveiller aussi des dossiers";
+"Add Folder…" = "Ajouter un dossier…";
+"Stop Watching" = "Ne plus surveiller";
+"Watch" = "Surveiller";
+"New images saved to this folder will hang on the line." = "Les nouvelles images enregistrées dans ce dossier s’accrocheront à la corde.";
+"Shortcut" = "Raccourci";
+"Change Shortcut…" = "Modifier le raccourci…";
+"Change Shortcut" = "Modifier le raccourci";
+"None" = "Aucun";
+"Space" = "Espace";
+"Press the new shortcut" = "Appuyez sur le nouveau raccourci";
+"Escape cancels. Delete removes the shortcut." = "Échap annule. Effacer supprime le raccourci.";
+"Size" = "Taille";
+"Small" = "Petite";
+"Medium" = "Moyenne";
+"Large" = "Grande";
+"Bring the line down" = "Faire descendre la corde";
+"When the pointer rests in the menu bar" = "Quand le pointeur reste dans la barre des menus";
+"When something new hangs" = "Quand une nouvelle capture s’accroche";
+"Over full screen apps" = "Au-dessus des apps en plein écran";
+"Hang what you copy" = "Accrocher ce que vous copiez";
+"Images" = "Images";
+"Text" = "Texte";
+"Links" = "Liens";
+"Images you copy hang on the line too" = "Les images copiées s’accrochent aussi à la corde";
+"Tendedero, hanging copied images" = "Tendedero, accroche les images copiées";
+"The line is empty" = "La corde est vide";
+"%d on the line" = "%d sur la corde";
+
+/* GrabArea */
+"Copy" = "Copier";
+"Open" = "Ouvrir";
+"Open Link" = "Ouvrir le lien";
+"Quick Look" = "Coup d’œil";
+"Markup" = "Annotation";
+"Show in Finder" = "Afficher dans le Finder";
+"Share…" = "Partager…";
+"Save to Desktop" = "Enregistrer sur le bureau";
+"Discard" = "Jeter";
+"Take down" = "Décrocher";
+"Move to Trash" = "Placer dans la corbeille";
+"Take down everything to the left" = "Tout décrocher à gauche";
+"Take down everything to the right" = "Tout décrocher à droite";
+
+/* LineView */
+"Take a screenshot and it will hang here" = "Prenez une capture d’écran et elle s’accrochera ici";
+
+/* PeggedView */
+"Copied" = "Copié";
+
+/* Pinning and holding photos */
+"Pin" = "Épingler";
+"Unpin" = "Désépingler";
+"Hold" = "Garder en main";
+"Hang back" = "Remettre sur la corde";
+"Hang everything back" = "Tout remettre sur la corde";
+"Actual Size" = "Taille réelle";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Ouvrir Tendedero à l’ouverture de session ?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero ne s’ouvre pas quand vous ouvrez votre session : après un redémarrage, la corde n’est plus là tant que vous ne le rouvrez pas.";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "Le texte copié s’accroche aussi à la corde";
+"Links you copy hang on the line too" = "Les liens copiés s’accrochent aussi à la corde";
+
+/* Searching the line */
+"Search the line" = "Rechercher sur la corde";
+"%d of %d" = "%d sur %d";

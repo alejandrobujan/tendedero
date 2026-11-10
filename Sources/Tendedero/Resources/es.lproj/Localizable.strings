@@ -1,0 +1,92 @@
+/* Spanish. */
+
+/* AppDelegate */
+"Let Tendedero handle your screenshots?" = "¿Quieres que Tendedero se encargue de tus capturas?";
+"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "Las capturas se colgarán al instante, sin la miniatura flotante, y no se acumularán en el Escritorio. Arrastra una a una carpeta para guardarla, o descártala con la cruz. Puedes desactivarlo desde la barra de menús, y tus ajustes vuelven a ser los de antes al salir de Tendedero.";
+"Turn on" = "Activar";
+"Not now" = "Ahora no";
+"Hide line" = "Ocultar tendedero";
+"Show line" = "Mostrar tendedero";
+"Take everything down" = "Descolgar todo";
+"Put back" = "Volver a colgar";
+"Handle screenshots" = "Encargarse de las capturas";
+"Screenshots hang instantly and skip the Desktop" = "Las capturas se cuelgan al instante y no pasan por el Escritorio";
+"Open screenshots folder" = "Abrir carpeta de capturas";
+"Sounds" = "Sonidos";
+"Open at login" = "Abrir al iniciar sesión";
+"Check for Updates…" = "Buscar actualizaciones…";
+"Quit Tendedero" = "Salir de Tendedero";
+"Could not change the login setting" = "No se pudo cambiar el inicio de sesión";
+"Move Tendedero to the Applications folder and try again." = "Mueve Tendedero a la carpeta Aplicaciones y vuelve a intentarlo.";
+"Keep on line" = "Guardar en la cuerda";
+"As many as fit" = "Las que quepan";
+"%d photos" = "%d fotos";
+"Also watch folders" = "Vigilar también carpetas";
+"Add Folder…" = "Añadir carpeta…";
+"Stop Watching" = "Dejar de vigilar";
+"Watch" = "Vigilar";
+"New images saved to this folder will hang on the line." = "Las imágenes nuevas que se guarden en esta carpeta se colgarán en la cuerda.";
+"Shortcut" = "Atajo";
+"Change Shortcut…" = "Cambiar atajo…";
+"Change Shortcut" = "Cambiar atajo";
+"None" = "Ninguno";
+"Space" = "Espacio";
+"Press the new shortcut" = "Pulsa el nuevo atajo";
+"Escape cancels. Delete removes the shortcut." = "Escape cancela. Borrar quita el atajo.";
+"Size" = "Tamaño";
+"Small" = "Pequeño";
+"Medium" = "Mediano";
+"Large" = "Grande";
+"Bring the line down" = "Bajar la cuerda";
+"When the pointer rests in the menu bar" = "Al dejar el puntero en la barra de menús";
+"When something new hangs" = "Cuando se cuelga algo nuevo";
+"Over full screen apps" = "Sobre apps a pantalla completa";
+"Hang what you copy" = "Colgar lo que copias";
+"Images" = "Imágenes";
+"Text" = "Texto";
+"Links" = "Enlaces";
+"Images you copy hang on the line too" = "Las imágenes que copias también se cuelgan";
+"Tendedero, hanging copied images" = "Tendedero, colgando imágenes copiadas";
+"The line is empty" = "La cuerda está vacía";
+"%d on the line" = "%d en la cuerda";
+
+/* GrabArea */
+"Copy" = "Copiar";
+"Open" = "Abrir";
+"Open Link" = "Abrir enlace";
+"Quick Look" = "Vista Rápida";
+"Markup" = "Marcación";
+"Show in Finder" = "Mostrar en Finder";
+"Share…" = "Compartir…";
+"Save to Desktop" = "Guardar en el Escritorio";
+"Discard" = "Descartar";
+"Take down" = "Descolgar";
+"Move to Trash" = "Mover a la Papelera";
+"Take down everything to the left" = "Descolgar todo lo de la izquierda";
+"Take down everything to the right" = "Descolgar todo lo de la derecha";
+
+/* LineView */
+"Take a screenshot and it will hang here" = "Haz una captura y se quedará colgada aquí";
+
+/* PeggedView */
+"Copied" = "Copiado";
+
+/* Pinning and holding photos */
+"Pin" = "Fijar";
+"Unpin" = "Dejar de fijar";
+"Hold" = "Sostener";
+"Hang back" = "Devolver a la cuerda";
+"Hang everything back" = "Devolver todo a la cuerda";
+"Actual Size" = "Tamaño real";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "¿Abrir Tendedero al iniciar sesión?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero no se abre al iniciar sesión, así que tras reiniciar la cuerda no está hasta que vuelvas a abrirlo.";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "El texto que copias también se cuelga";
+"Links you copy hang on the line too" = "Los enlaces que copias también se cuelgan";
+
+/* Searching the line */
+"Search the line" = "Buscar en la cuerda";
+"%d of %d" = "%d de %d";

@@ -1,0 +1,45 @@
+name: Bug report
+description: Something in Tendedero doesn't work as it should.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Take a screenshot with Cmd+Shift+4
+        2. ...
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version
+      placeholder: macOS 27.0.1
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Tendedero version
+      description: The release you installed, or the commit if you built it from source.
+      placeholder: "1.0.0"
+  - type: dropdown
+    id: handle
+    attributes:
+      label: Is "Handle screenshots" on?
+      description: In the menu bar menu. It changes where macOS saves screenshots.
+      options:
+        - "Yes"
+        - "No"
+        - "Not sure"
+  - type: textarea
+    id: more
+    attributes:
+      label: Anything else
+      description: A screenshot or a short recording helps a lot.

@@ -1,14 +1,47 @@
 import SwiftUI
 
 enum Layout {
-    static let panelHeight: CGFloat = 210
+    /// How big the photos hang, from Size in the menu bar. The clip, the rope
+    /// and the glass frame keep their size; the photos and the room they take
+    /// grow or shrink. Medium is the original size.
+    enum Size: String, CaseIterable {
+        case small, medium, large
+
+        var scale: CGFloat {
+            switch self {
+            case .small: 0.8
+            case .medium: 1
+            case .large: 1.35
+            }
+        }
+    }
+
+    static var size: Size {
+        get { Size(rawValue: UserDefaults.standard.string(forKey: "lineSize") ?? "") ?? .medium }
+        set { UserDefaults.standard.set(newValue.rawValue, forKey: "lineSize") }
+    }
+
+    static var photoMaxHeight: CGFloat { (104 * size.scale).rounded() }
+    static var cardWidth: CGFloat { (150 * size.scale).rounded() }
+    static var spacing: CGFloat { cardWidth + 24 }
+    static var panelHeight: CGFloat { photoMaxHeight + 106 }
     static let ropeTop: CGFloat = 10
-    static let spacing: CGFloat = 174
-    static let cardWidth: CGFloat = 150
     static let pinAbove: CGFloat = 9.5
 
     /// The rope hangs as a parabola from edge to edge of the screen.
     static func sag(width: CGFloat) -> CGFloat { min(30, width * 0.018) }
+
+    static func anchorsPinned(_ pinned: Int, visible: Int) -> Bool {
+        pinned > 0 && pinned < visible - 1
+    }
+
+    /// On a line that scrolls with pinned photos anchored, where the photos
+    /// scrolling behind them should have faded out. Nil otherwise.
+    static func pinnedEdge(count: Int, width: CGFloat, visible: Int, pinned: Int) -> CGFloat? {
+        guard Line.keepOnLine != nil, count > visible, anchorsPinned(pinned, visible: visible) else { return nil }
+        let newest = width / 2 + CGFloat(visible - 1) * spacing / 2
+        return newest - CGFloat(visible - pinned) * spacing
+    }
 
     static func ropeY(x: CGFloat, width: CGFloat) -> CGFloat {
         guard width > 0 else { return ropeTop }
@@ -16,14 +49,38 @@ enum Layout {
         return ropeTop + 4 * sag(width: width) * f * (1 - f)
     }
 
-    static func x(index: Int, count: Int, width: CGFloat) -> CGFloat {
-        let total = CGFloat(max(count - 1, 0)) * spacing
-        return width / 2 - total / 2 + CGFloat(index) * spacing
+    /// Photos hang `spacing` apart, centred. When there are more than the
+    /// `visible` that fit: with Keep on line set, they keep their spacing,
+    /// the newest stays where the last one would hang on a full line, and
+    /// `scroll` brings older ones in from the left. Otherwise (a line hung
+    /// on a wider screen) they move closer together so none is past the edge.
+    ///
+    /// The first `pinned` photos are the pinned ones. On a line that
+    /// scrolls they stay put at its left end, and the rest scroll behind
+    /// them, unless they would leave almost no room for the rest.
+    static func x(index: Int, count: Int, width: CGFloat, visible: Int, scroll: CGFloat,
+                  pinned: Int = 0) -> CGFloat {
+        if Line.keepOnLine != nil && count > visible {
+            let newest = width / 2 + CGFloat(visible - 1) * spacing / 2
+            if anchorsPinned(pinned, visible: visible), index < pinned {
+                return newest - CGFloat(visible - 1 - index) * spacing
+            }
+            return newest - CGFloat(count - 1 - index) * spacing + scroll
+        }
+        let gaps = CGFloat(max(count - 1, 0))
+        let step = gaps > 0 ? min(spacing, max(0, width - 200) / gaps) : spacing
+        return width / 2 - gaps * step / 2 + CGFloat(index) * step
     }
 }
 
 struct LineView: View {
     @ObservedObject var line: Line
+
+    /// While searching, only what matches hangs, from the left as on any
+    /// line: no knot, no pinned end, no scroll.
+    private var shown: [Pegged] { line.shown }
+    private var pinned: Int { line.isSearching ? 0 : line.pinnedLead }
+    private var scroll: CGFloat { line.isSearching ? 0 : line.scroll }
 
     var body: some View {
         GeometryReader { geo in
@@ -31,25 +88,52 @@ struct LineView: View {
             ZStack(alignment: .topLeading) {
                 Rope(width: width)
 
-                SearchTag(line: line)
-                    .position(x: SearchTag.x, y: Layout.ropeY(x: SearchTag.x, width: width) - Layout.pinAbove + SearchTag.height / 2)
-
                 if line.items.isEmpty {
                     Hint()
                         .position(x: width / 2, y: Layout.ropeY(x: width / 2, width: width) + 34)
                         .transition(.opacity)
                 }
 
-                ForEach(Array(line.items.enumerated()), id: \.element.id) { index, item in
-                    let x = Layout.x(index: index, count: line.items.count, width: width)
+                if !line.isSearching, let x = knotX(width: width) {
+                    Knot()
+                        .position(x: x, y: Layout.ropeY(x: x, width: width) + 0.5)
+                        .transition(.opacity)
+                }
+
+                ForEach(Array(shown.enumerated()), id: \.element.id) { index, item in
+                    let x = Layout.x(index: index, count: shown.count, width: width,
+                                     visible: line.visibleCount, scroll: scroll, pinned: pinned)
+                    // On a line that scrolls, a photo reaching the edge of the
+                    // screen, or the knot it slips behind, dims and stops taking
+                    // clicks as soon as it starts to.
+                    let bounds = index >= pinned ? scrollBounds(width: width) : nil
+                    let cardLeft = x - Layout.cardWidth / 2, cardRight = x + Layout.cardWidth / 2
+                    let out = bounds.map { cardLeft < $0.lowerBound || cardRight > $0.upperBound } == true
+                    // On the left it fades gradually: whole in the first place,
+                    // gone once halfway behind the limit.
+                    let fadeIn = bounds.map { bounds -> CGFloat in
+                        let gone = bounds.lowerBound - Layout.cardWidth / 2
+                        let rest = firstLooseX(width: width) - Layout.cardWidth / 2
+                        return min(1, max(0, (cardLeft - gone) / max(1, rest - gone)))
+                    } ?? 1
                     let ropeY = Layout.ropeY(x: x, width: width)
                     PeggedView(item: item, line: line)
                         .frame(width: Layout.cardWidth, height: Layout.panelHeight - ropeY, alignment: .top)
+                        // Photos scrolled towards an edge fade out before they reach it.
+                        .opacity(min(1, max(0, min(x, width - x) / 90)) * fadeIn
+                                 * (bounds.map { cardRight > $0.upperBound } == true ? 0.35 : 1))
+                        .animation(.easeOut(duration: 0.2), value: out)
+                        .allowsHitTesting(!out)
+                        .zIndex(index < pinned ? 1 : 0)
+                        // Left out of a search, a photo rises out of sight
+                        // instead of falling: it is still on the line.
+                        .transition(.opacity.combined(with: .offset(y: -40)))
                         .position(x: x, y: ropeY - Layout.pinAbove + (Layout.panelHeight - ropeY) / 2)
                 }
             }
-            .animation(.spring(response: 0.55, dampingFraction: 0.78), value: line.items.map(\.id))
+            .animation(.spring(response: 0.55, dampingFraction: 0.78), value: shown.map(\.id))
             .animation(.easeInOut(duration: 0.3), value: line.items.isEmpty)
+            .animation(.spring(response: 0.55, dampingFraction: 0.78), value: line.items.map(\.kept))
             // Tucked away, the whole line waits above the top edge and slides
             // out from under the menu bar, the way an auto-hiding Dock does.
             .offset(y: line.revealed ? 0 : -(Layout.panelHeight + 12))
@@ -60,77 +144,70 @@ struct LineView: View {
             line.hitRects = rects
         }
     }
+
+    /// Where the first photo past the pinned ones hangs at rest on a
+    /// scrolling line: the first place, or the one just past the knot.
+    private func firstLooseX(width: CGFloat) -> CGFloat {
+        let newest = width / 2 + CGFloat(line.visibleCount - 1) * Layout.spacing / 2
+        let first = newest - CGFloat(line.visibleCount - 1) * Layout.spacing
+        let lead = Layout.anchorsPinned(pinned, visible: line.visibleCount) ? pinned : 0
+        return first + CGFloat(lead) * Layout.spacing
+    }
+
+    /// Where a photo on a scrolling line stops being whole in view: the
+    /// knot when pinned photos stay put, or else the left edge of the screen,
+    /// and the right edge. Nil on a line that does not scroll.
+    private func scrollBounds(width: CGFloat) -> ClosedRange<CGFloat>? {
+        guard Line.keepOnLine != nil, shown.count > line.visibleCount else { return nil }
+        let pinnedStay = Layout.pinnedEdge(count: shown.count, width: width,
+                                           visible: line.visibleCount, pinned: pinned) != nil
+        let start = pinnedStay ? knotX(width: width) ?? 0 : 0
+        return start...width
+    }
+
+    /// Halfway between the last pinned photo and the next one, or half a
+    /// step past it when nothing hangs loose. The empty place a pinned photo
+    /// leaves still counts, so the knot stays put until the gaps close.
+    private func knotX(width: CGFloat) -> CGFloat? {
+        guard let last = line.items.lastIndex(where: \.kept) else { return nil }
+        let x = { (i: Int) in Layout.x(index: i, count: line.items.count, width: width,
+                                       visible: line.visibleCount, scroll: line.scroll, pinned: line.pinnedLead) }
+        // On a line that scrolls, the pinned photos stay put, and the knot with them.
+        if Layout.pinnedEdge(count: line.items.count, width: width,
+                             visible: line.visibleCount, pinned: line.pinnedLead) != nil {
+            return x(last) + Layout.spacing / 2
+        }
+        let next = last + 1 < line.items.count ? x(last + 1) : x(last) + Layout.spacing
+        return (x(last) + next) / 2
+    }
 }
 
-/// A small glass tag pegged at the start of the line. Clicking it opens
-/// search, the same as Control Option F. Right clicking it shows the menu
-/// bar menu, which a crowded menu bar can hide behind the notch.
-struct SearchTag: View {
-    @ObservedObject var line: Line
-    @State private var hovering = false
-
-    static let x: CGFloat = 96
-    static let height: CGFloat = 26 - 12 + 36
-    /// Its place among the hit rects, so the panel catches clicks on it.
-    static let id = UUID()
-
+/// Where the line is tied: what hangs left of it is pinned and stays.
+private struct Knot: View {
     var body: some View {
-        VStack(spacing: -12) {
-            Clothespin()
-                .zIndex(1)
-            Image(systemName: "magnifyingglass")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.primary)
-                .frame(width: 36, height: 36)
-                .glassFrame(circle: true)
-                .shadow(color: .black.opacity(hovering ? 0.26 : 0.18), radius: hovering ? 10 : 7, y: hovering ? 6 : 4)
-                .scaleEffect(hovering ? 1.08 : 1, anchor: .top)
-                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: hovering)
-                .overlay(ClickArea(action: { line.onSearch?() }, menu: { line.menu?() }))
-                .onHover { hovering = $0 }
-                .help(L("Search screenshots (⌃⌥F)", "Buscar capturas (⌃⌥F)"))
-                .background(
-                    GeometryReader { g in
-                        Color.clear.preference(key: HitRectsKey.self, value: [Self.id: g.frame(in: .global)])
-                    }
-                )
+        ZStack {
+            Ellipse()
+                .fill(Color(white: 0.5))
+                .frame(width: 7, height: 5.5)
+                .shadow(color: .black.opacity(0.25), radius: 1, y: 1)
+            // Two short loose ends hanging from it.
+            Path { p in
+                p.move(to: CGPoint(x: 3.5, y: 3))
+                p.addQuadCurve(to: CGPoint(x: 1.5, y: 11), control: CGPoint(x: 3.8, y: 7))
+                p.move(to: CGPoint(x: 4, y: 3))
+                p.addQuadCurve(to: CGPoint(x: 6.5, y: 10), control: CGPoint(x: 4.5, y: 7))
+            }
+            .stroke(Color(white: 0.55), style: StrokeStyle(lineWidth: 1, lineCap: .round))
+            .frame(width: 8, height: 12)
+            .offset(y: 5)
         }
-    }
-}
-
-/// Takes the first click even though the line's panel never becomes key.
-struct ClickArea: NSViewRepresentable {
-    let action: () -> Void
-    var menu: () -> NSMenu? = { nil }
-
-    func makeNSView(context: Context) -> ClickView {
-        let view = ClickView()
-        updateNSView(view, context: context)
-        return view
-    }
-
-    func updateNSView(_ view: ClickView, context: Context) {
-        view.action = action
-        view.menuProvider = menu
-    }
-
-    final class ClickView: NSView {
-        var action: () -> Void = {}
-        var menuProvider: () -> NSMenu? = { nil }
-        override func rightMouseDown(with event: NSEvent) {
-            if let menu = menuProvider() { NSMenu.popUpContextMenu(menu, with: event, for: self) }
-        }
-        override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
-        override func mouseDown(with event: NSEvent) {}
-        override func mouseUp(with event: NSEvent) {
-            if bounds.contains(convert(event.locationInWindow, from: nil)) { action() }
-        }
+        .allowsHitTesting(false)
     }
 }
 
 private struct Hint: View {
     var body: some View {
-        Text(L("Take a screenshot and it will hang here", "Haz una captura y se quedará colgada aquí"))
+        Text(L("Take a screenshot and it will hang here"))
             .font(.system(size: 12, weight: .medium, design: .rounded))
             .foregroundStyle(.secondary)
             .padding(.horizontal, 12)

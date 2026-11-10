@@ -1,7 +1,9 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/hero-dark.png">
-  <img src="docs/hero-light.png" alt="Tendedero. Screenshots, hung out to dry. Three screenshots in glass frames hang from a thin line under the macOS menu bar.">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/hero-dark.png">
+  <img src="docs/images/hero-light.png" alt="Tendedero. Screenshots, hung out to dry. Three screenshots in glass frames hang from a thin line under the macOS menu bar.">
 </picture>
+
+<h3 align="center"><a href="https://tendedero.app/?lang=en">Try it in your browser at tendedero.app&nbsp;&rsaquo;</a></h3>
 
 <p align="center">
   Free and open source. For macOS 14 and later.
@@ -9,6 +11,13 @@
   <a href="../../releases/latest">Download&nbsp;&rsaquo;</a>
   &nbsp;&nbsp;
   <a href="#build-from-source">Build from source&nbsp;&rsaquo;</a>
+  <br><br>
+  English&nbsp;·&nbsp;<a href="docs/i18n/README.es.md">Español</a>&nbsp;·&nbsp;<a href="docs/i18n/README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="docs/i18n/README.fr.md">Français</a>&nbsp;·&nbsp;<a href="docs/i18n/README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="docs/i18n/README.it.md">Italiano</a>&nbsp;·&nbsp;<a href="docs/i18n/README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="docs/i18n/README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="docs/i18n/README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="docs/i18n/README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="docs/i18n/README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="docs/i18n/README.hi.md">हिन्दी</a>
+</p>
+
+<p align="center">
+  <a href="https://trendshift.io/repositories/287033?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-287033" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/287033/daily?language=Swift" alt="alejandrobujan%2Ftendedero | Trendshift" width="250" height="55"/></a>
+  <a href="https://trendshift.io/repositories/287033?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-287033" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/287033/weekly?language=Swift" alt="alejandrobujan%2Ftendedero | Trendshift" width="250" height="55"/></a>
 </p>
 
 <br>
@@ -16,11 +25,11 @@
 ## Out of sight. Within reach.
 
 Every screenshot you take hangs on a line just above your screen.
-Rest the pointer in the menu bar and it glides down. Move away and it's gone.
+Rest the pointer in the middle of the menu bar and it glides down. Move away and it's gone.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/demo-dark.gif">
-  <img src="docs/demo-light.gif" alt="The pointer rests against the top edge, the line slides down with three screenshots swinging gently, a click copies one, and the line tucks away when the pointer leaves.">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/demo-dark.gif">
+  <img src="docs/images/demo-light.gif" alt="The pointer rests against the top edge, the line slides down with three screenshots swinging gently, a click copies one, and the line tucks away when the pointer leaves.">
 </picture>
 
 <br>
@@ -29,8 +38,8 @@ Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 ## A gesture for everything.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/bento-dark.png">
-  <img src="docs/bento-light.png" alt="Click to copy. Hold to mark up. Drag to share. Let it go.">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/bento-dark.png">
+  <img src="docs/images/bento-light.png" alt="Click to copy. Hold to mark up. Drag to share. Let it go.">
 </picture>
 
 <br>
@@ -41,13 +50,20 @@ Rest the pointer in the menu bar and it glides down. Move away and it's gone.
 | Click | Copy the image. |
 | Press and hold | Open it in Markup. |
 | Double click | Open it in Preview. |
+| Force click | Take a quick look. |
 | Drag into an app | Send a copy. It stays on the line. |
 | Drag into a folder | Keep it there. It leaves the line. |
 | Drag to the Trash, or click the cross | Let it go. |
-| Rest the pointer in the menu bar | Bring the line down on that screen. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> with the pointer on the line | Hang back what you just let go. |
+| <kbd>Space</kbd> with the pointer on a photo | Take a quick look. |
+| <kbd>⌫</kbd> with the pointer on a photo | Let it go, as its corner button does. |
+| Right click, then Share | Send it with AirDrop, Messages, Mail and more. It stays on the line. |
+| Right click, then Pin | Keep it: it hangs left of the knot on a space grey clip, and no new screenshot pushes it off. |
+| Right click, then Hold | Take it off the line and keep it in front of you while you work. |
+| In Finder, right click an image, then Hang on Tendedero | Hang any image on the line, pinned. |
+| Rest the pointer in the middle of the menu bar | Bring the line down on that screen. |
 | Click anything in the menu bar | Put it away. |
-| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Show or hide the line. |
-| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd>, or the tag at the start of the line | Search every screenshot. |
+| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Show or hide the line. Change it under Shortcut in the menu bar. |
 
 <br>
 
@@ -57,18 +73,20 @@ Hand Tendedero your screenshots<sup>1</sup> and they skip the Desktop
 entirely. No floating thumbnail. No five-second wait. Each capture hangs
 the instant you take it, and only what you drag out is kept.
 
+Screen recordings hang there too, with a play button over them.
+Press and hold one to trim it.
+
 Same shortcuts. Same muscle memory. Just less mess.
 
 <br>
 
-## Find any screenshot.
+## Copied images too.
 
-Search reads the text on every screenshot, on the line, on the Desktop and
-wherever you saved them before, and knows what each one shows. Type
-"cloudflare invoice" or "purple website". Results work like the line: click to
-copy, drag to send, Return to copy and get back to work.
-
-It all happens on your Mac, with Vision and, when bundled, Apple's MobileCLIP.
+Take a screenshot with <kbd>⌃</kbd> held, or copy an image in Preview, and it
+hangs on the line like any other. Turn on Hang copied images in the menu bar
+and the shirt fills in while it is on. Only images: anything copied along
+with text or a file, and anything a password manager marks as private, is
+left alone.
 
 <br>
 
@@ -84,8 +102,8 @@ Tendedero runs entirely on your Mac, and your screenshots never leave it.
 | | |
 |:--|:--|
 | **Compatibility** | macOS 14 Sonoma or later, on Apple silicon and Intel. Designed for macOS 27. |
-| **Size** | 1.7 MB, or about 200 MB with MobileCLIP bundled |
-| **Languages** | English, Spanish |
+| **Size** | 3.5 MB |
+| **Languages** | English, Spanish, Galician, French, Portuguese (Brazil), Italian, Japanese, Korean, Chinese (Simplified), Turkish, Azerbaijani, Hindi |
 | **Built with** | Swift, AppKit and SwiftUI |
 | **Network access** | None |
 | **Price** | Free |
@@ -96,11 +114,14 @@ Tendedero runs entirely on your Mac, and your screenshots never leave it.
 ## Install
 
 Download the disk image from the [latest release](../../releases/latest),
-open it and drag Tendedero to Applications.
+open it and drag Tendedero to Applications. Or install it with Homebrew:
 
-Tendedero is not notarized by Apple yet, so the first time macOS will say it
-cannot verify it. Open System Settings, go to Privacy & Security, and click
-Open Anyway next to the message about Tendedero. You only need to do this once.
+```sh
+brew install tendedero
+```
+
+Tendedero is signed with a Developer ID and notarized by Apple, so it opens
+like any other app.
 
 <br>
 
@@ -113,13 +134,10 @@ scripts/build-app.sh
 open build/Tendedero.app
 ```
 
-To search by what screenshots show, run `scripts/download-clip.sh` first. It
-fetches Apple's MobileCLIP-S2 (about 200 MB, under Apple's
-[weights license](https://github.com/apple/ml-mobileclip/blob/main/LICENSE_weights_data))
-and the build bundles it. Without it, search works by text.
-
 Requires the Swift toolchain. Xcode is optional. With the Command Line Tools for macOS 27, the script falls back to the macOS 26 SDK they install alongside, because the new SDK needs a SwiftUI macro plugin only Xcode includes. Local builds are signed ad hoc,
 so macOS asks again for access to the Desktop after each rebuild.
+
+Want to help? Read [CONTRIBUTING.md](CONTRIBUTING.md) first.
 
 <details>
 <summary>Inside the app</summary>
@@ -133,16 +151,20 @@ so macOS asks again for access to the Desktop after each rebuild.
 | `PeggedView.swift` | One photo: glass frame, clip, swing and breeze |
 | `GrabArea.swift` | Click, long press, drag and drop |
 | `ScreenshotWatcher.swift` | Notices new screenshots |
-| `ScreenshotIndex.swift` | Reads and ranks screenshots for search |
-| `SearchPanel.swift` | The search window |
-| `Clip.swift` | MobileCLIP and its tokenizer, for searching by what a picture shows |
+| `ClipboardWatcher.swift` | Notices images copied to the clipboard |
 | `Inbox.swift` | Takes over screenshot settings and puts them back |
 | `Markup.swift` | Opens the system Markup editor and saves the result |
+| `Trim.swift` | Trims a screen recording and saves the result |
+| `FullScreen.swift` | Knows when to stay hidden |
 | `Line.swift` | What is hanging, and what you can do with it |
+| `Held.swift` | A photo held in front of you, off the line |
 
 Every image here, the icon included, is drawn in code by
 `scripts/make-icon.swift` and `scripts/make-readme-art.swift`.
 `scripts/make-dmg.sh` builds the disk image for releases.
+
+Translations live in `Sources/Tendedero/Resources`, one `.lproj` folder per
+language. `swift scripts/check-strings.swift` checks that none is missing.
 
 </details>
 
@@ -151,14 +173,14 @@ Every image here, the icon included, is drawn in code by
 ---
 
 <sub>
-1. On first launch, Tendedero offers to handle your screenshots. If you accept, it turns off the floating thumbnail and saves new screenshots to its own folder, two settings also found under Options in Cmd+Shift+5. Your previous settings are saved and restored when Tendedero quits or the option is turned off from the menu bar.
+1. On first launch, Tendedero offers to handle your screenshots. If you accept, it turns off the floating thumbnail and saves new screenshots to its own folder, two settings also found under Options in Cmd+Shift+5. Your previous settings are saved and restored when Tendedero quits or the option is turned off from the menu bar. Tendedero hides automatically while an app is in full screen.
 </sub>
 
 <br>
 <br>
 
 <p align="center">
-  <img src="docs/icon.png" width="64" height="64" alt="">
+  <img src="docs/images/icon.png" width="64" height="64" alt="">
   <br>
   <sub>The code is MIT licensed. The Tendedero name and icon are not, so forks need their own. See <a href="LICENSE">LICENSE</a>.</sub>
   <br>

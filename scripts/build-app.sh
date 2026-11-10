@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 
 CONFIG="${1:-release}"
 APP="build/Tendedero.app"
-VERSION="1.0.0"
+VERSION="1.9.0"
 
 # Builds one architecture and prints the binary's path.
 # The Command Line Tools for macOS 27 ship an SDK whose SwiftUI needs a macro
@@ -48,16 +48,13 @@ done
 iconutil -c icns "$ICONSET" -o "$APP/Contents/Resources/Tendedero.icns"
 rm -rf "$WORK"
 
-# MobileCLIP for searching by what a screenshot shows, when it has been
-# downloaded with scripts/download-clip.sh. Without it, search uses text only.
-if [ -d Models/mobileclip_s2_image.mlpackage ] && [ -d Models/mobileclip_s2_text.mlpackage ]; then
-  mkdir -p "$APP/Contents/Resources/CLIP"
-  for m in mobileclip_s2_image mobileclip_s2_text; do
-    [ -d "Models/$m.mlmodelc" ] || xcrun coremlcompiler compile "Models/$m.mlpackage" Models >/dev/null
-    cp -R "Models/$m.mlmodelc" "$APP/Contents/Resources/CLIP/"
-  done
-  cp Models/clip-vocab.json Models/clip-merges.txt "$APP/Contents/Resources/CLIP/"
-fi
+# Translations: one folder per language, listed in Info.plist so macOS knows
+# which languages the app speaks.
+LANGUAGES=""
+for dir in Sources/Tendedero/Resources/*.lproj; do
+  cp -R "$dir" "$APP/Contents/Resources/"
+  LANGUAGES="$LANGUAGES<string>$(basename "$dir" .lproj)</string>"
+done
 
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -71,18 +68,41 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleIconFile</key><string>Tendedero</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>${VERSION}</string>
-  <key>CFBundleVersion</key><string>1</string>
+  <key>CFBundleVersion</key><string>12</string>
+  <key>CFBundleDevelopmentRegion</key><string>en</string>
+  <key>CFBundleLocalizations</key><array>${LANGUAGES}</array>
   <key>LSMinimumSystemVersion</key><string>14.0</string>
   <key>LSUIElement</key><true/>
   <key>NSHighResolutionCapable</key><true/>
   <key>NSDesktopFolderUsageDescription</key>
   <string>Tendedero watches the folder where macOS saves your screenshots so it can hang them on the line.</string>
   <key>NSDocumentsFolderUsageDescription</key>
-  <string>Tendedero reads screenshots saved in Documents so you can search them. They never leave your Mac.</string>
+  <string>Tendedero watches the folder you chose so it can hang new images on the line.</string>
+  <key>NSDownloadsFolderUsageDescription</key>
+  <string>Tendedero watches the folder you chose so it can hang new images on the line.</string>
+  <key>NSServices</key>
+  <array>
+    <dict>
+      <key>NSMenuItem</key><dict><key>default</key><string>Hang on Tendedero</string></dict>
+      <key>NSMessage</key><string>hangOnLine</string>
+      <key>NSPortName</key><string>Tendedero</string>
+      <key>NSRequiredContext</key><dict/>
+      <key>NSSendFileTypes</key><array><string>public.image</string><string>public.plain-text</string><string>public.rtf</string></array>
+    </dict>
+  </array>
 </dict>
 </plist>
 PLIST
 
-# Ad-hoc signature so it runs locally. Releases should use a Developer ID.
-codesign --force --deep --sign - "$APP" >/dev/null
+# Sign with a Developer ID when one is in the keychain (or SIGN_IDENTITY is
+# set), with the hardened runtime and a secure timestamp that notarization
+# requires. Without one, sign ad hoc so the app still runs locally.
+IDENTITY="${SIGN_IDENTITY:-$(security find-identity -v -p codesigning 2>/dev/null | awk -F'"' '/Developer ID Application/{print $2; exit}')}"
+if [ -n "$IDENTITY" ]; then
+  codesign --force --options runtime --timestamp --sign "$IDENTITY" "$APP"
+  echo "Signed with $IDENTITY"
+else
+  codesign --force --deep --sign - "$APP" >/dev/null
+  echo "Signed ad hoc (no Developer ID found)"
+fi
 echo "Built $APP"
