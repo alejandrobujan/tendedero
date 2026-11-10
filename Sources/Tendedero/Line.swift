@@ -48,7 +48,7 @@ final class Line: ObservableObject {
             guard revealed != oldValue else { return }
             gustWork?.cancel()
             gustWork = nil
-            if revealed { scheduleGust() }
+            if revealed { scheduleGust(); refreshNotes() }
         }
     }
 
@@ -83,6 +83,24 @@ final class Line: ObservableObject {
 
     var liveCount: Int { items.filter { !$0.falling }.count }
 
+    // MARK: Searching
+
+    /// The words of what hangs, read once per item.
+    let search = SearchIndex()
+    /// What is typed in the search field under the line.
+    @Published var query = ""
+    var isSearching: Bool { !SearchIndex.words(query).isEmpty }
+
+    /// What hangs, narrowed by the search. A photo that is falling stays,
+    /// so its fall is not cut short.
+    var shown: [Pegged] {
+        let words = SearchIndex.words(query)
+        guard !words.isEmpty else { return items }
+        return items.filter { $0.falling || search.matches($0.url, words) }
+    }
+
+    var shownCount: Int { shown.filter { !$0.falling }.count }
+
     /// Photos hung by hand. They hang together at the left end of the line,
     /// before the knot, and never fall to make room.
     var keptCount: Int { items.filter { !$0.falling && $0.kept }.count }
@@ -103,6 +121,13 @@ final class Line: ObservableObject {
         self.pasteboard = pasteboard
         self.desktop = desktop
         restore()
+        search.onChange = { [weak self] in self?.objectWillChange.send() }
+        // What already hangs is read once, a moment after launch.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in self?.indexForSearch() }
+    }
+
+    private func indexForSearch() {
+        search.update(items.filter { !$0.falling }.map(\.url))
     }
 
     // MARK: Hanging and dropping
@@ -255,8 +280,36 @@ final class Line: ObservableObject {
     private var onClipboard: (urls: [URL], change: Int)?
 
     private func putOnClipboard(_ urls: [URL]) {
+        // Several notes paste as one text, a blank line apart: most apps
+        // paste only the first item of a copy.
+        if urls.count > 1, urls.allSatisfy(isText) {
+            let entry = NSPasteboardItem()
+            let words = urls.compactMap { Note.cached($0).map { [$0.title, $0.body].filter { !$0.isEmpty }.joined(separator: "\n") } }
+            entry.setString(words.joined(separator: "\n\n"), forType: .string)
+            entry.setData(Data(), forType: selfCopyType)
+            let pb = pasteboard
+            pb.clearContents()
+            pb.writeObjects([entry])
+            onClipboard = (urls, pb.changeCount)
+            return
+        }
         let entries = urls.map { url in
             let entry = NSPasteboardItem()
+            // A note is its words, styled and plain, marked as Tendedero's
+            // own so it is not hung again.
+            if isText(url) {
+                if url.pathExtension.lowercased() == "rtf", let data = try? Data(contentsOf: url) {
+                    let data = lightPageRTF(data)
+                    entry.setData(data, forType: .rtf)
+                    if let plain = NSAttributedString(rtf: data, documentAttributes: nil)?.string {
+                        entry.setString(plain, forType: .string)
+                    }
+                } else if let text = try? String(contentsOf: url, encoding: .utf8) {
+                    entry.setString(text, forType: .string)
+                }
+                entry.setData(Data(), forType: selfCopyType)
+                return entry
+            }
             // Each photo has its own image and file representation. Apps
             // that accept several files can paste the whole selection.
             if !isRecording(url), let png = pngData(url) { entry.setData(png, forType: .png) }
@@ -273,24 +326,52 @@ final class Line: ObservableObject {
     /// picture. When the file moves after a copy, to the Trash or the Desktop,
     /// the clipboard follows it, or those apps would find nothing to paste.
     private func clipboardFollows(_ url: URL, to moved: URL) {
-        guard let onClipboard, onClipboard.urls.contains(url),
+        // A copied note is its words, which do not depend on the file: once
+        // moved out of the notes folder it would go back as a bare file.
+        guard !isText(url), let onClipboard, onClipboard.urls.contains(url),
               onClipboard.change == pasteboard.changeCount else { return }
         putOnClipboard(onClipboard.urls.map { $0 == url ? moved : $0 })
     }
 
+    /// A double click: a copied link opens in the browser, anything else in
+    /// its app.
     func open(_ id: UUID) {
+        guard let item = items.first(where: { $0.id == id }) else { return }
+        if isText(item.url), let link = Note.cached(item.url)?.link {
+            NSWorkspace.shared.open(link)
+        } else {
+            NSWorkspace.shared.open(item.url)
+        }
+    }
+
+    /// The file itself, in its app. This is how a note is edited, a link
+    /// included, so one turned into a link by an edit can be edited back.
+    func openFile(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
         NSWorkspace.shared.open(item.url)
     }
 
+    func openLink(_ id: UUID) {
+        guard let item = items.first(where: { $0.id == id }), isText(item.url),
+              let link = Note.cached(item.url)?.link else { return }
+        NSWorkspace.shared.open(link)
+    }
+
     func open(_ ids: [UUID]) {
-        for item in actionItems(ids) { NSWorkspace.shared.open(item.url) }
+        for item in actionItems(ids) { open(item.id) }
     }
 
     /// Pinned screenshots must be unpinned first, just as in their own menu.
     func canDiscard(_ ids: [UUID]) -> Bool {
         let photos = actionItems(ids)
         return !photos.isEmpty && photos.allSatisfy { !$0.kept || $0.byHand }
+    }
+
+    /// Several dropped on the Dock's Trash together: one step puts them all
+    /// back.
+    func trash(_ ids: [UUID]) {
+        let step = UUID()
+        for (n, id) in ids.enumerated() { trash(id, quietly: n > 0, step: step) }
     }
 
     func discard(_ ids: [UUID]) {
@@ -370,7 +451,9 @@ final class Line: ObservableObject {
     /// Files anywhere else, like the Desktop, stay where they are.
     func isInInbox(_ id: UUID) -> Bool {
         guard let item = items.first(where: { $0.id == id }) else { return false }
+        // Copied text and links are Tendedero's own files too.
         return item.url.standardizedFileURL.path.hasPrefix(Inbox.folder.standardizedFileURL.path + "/")
+            || NoteFolder.contains(item.url)
     }
 
     func isOnDesktop(_ id: UUID) -> Bool {
@@ -508,7 +591,10 @@ final class Line: ObservableObject {
     /// not edit video, so a recording opens in the trimming editor instead.
     func markup(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
-        if item.isRecording {
+        if isText(item.url) {
+            // Holding a note opens it to edit, as holding a photo marks it up.
+            NSWorkspace.shared.open(item.url)
+        } else if item.isRecording {
             Trim.shared.edit(item.url, size: item.thumb.size)
         } else {
             Markup.shared.edit(item.url)
@@ -520,6 +606,7 @@ final class Line: ObservableObject {
         guard let i = items.firstIndex(where: { $0.url == url && !$0.falling }),
               let thumb = makeThumbnail(url) else { return }
         items[i].thumb = thumb
+        indexForSearch()
     }
 
     /// Quick Look on this photo, with the rest of the line a key press away.
@@ -527,6 +614,17 @@ final class Line: ObservableObject {
         let live = items.filter { !$0.falling }
         guard let index = live.firstIndex(where: { $0.id == id }) else { return }
         QuickLook.shared.show(live.map(\.url), at: index)
+    }
+
+    /// A note edited in another app shows its new words, on the line and
+    /// held in front of you.
+    func refreshNotes() {
+        for item in items where !item.falling && isText(item.url) {
+            guard let cached = Note.peek(item.url),
+                  let modified = Note.modificationDate(item.url), modified != cached.modified else { continue }
+            reloadThumbnail(for: item.url)
+            Held.reload(item.url)
+        }
     }
 
     /// After a change of size, every photo is redrawn sharp at the new one.
@@ -790,6 +888,7 @@ final class Line: ObservableObject {
 
     private func save() {
         let live = items.filter { !$0.falling }
+        search.update(live.map(\.url))
         UserDefaults.standard.set(live.map(\.url.path), forKey: storeKey)
         UserDefaults.standard.set(live.filter(\.kept).map(\.url.path), forKey: keptKey)
         UserDefaults.standard.set(live.filter(\.byHand).map(\.url.path), forKey: byHandKey)
@@ -834,10 +933,58 @@ func isRecording(_ url: URL) -> Bool {
     ["mov", "mp4"].contains(url.pathExtension.lowercased())
 }
 
+/// Copied text: plain text is saved as .txt, styled text as .rtf.
+func isText(_ url: URL) -> Bool {
+    ["txt", "rtf"].contains(url.pathExtension.lowercased()) && NoteFolder.contains(url)
+}
+
+/// Text copied in dark mode carries dark backgrounds and light ink, which look
+/// wrong on a white page. Dark backgrounds are dropped, light grey or white ink
+/// goes back to the default, and light coloured ink is darkened to stay
+/// readable. Bold, italic, fonts, links and light highlights are kept.
+func lightPageStyled(_ source: NSAttributedString) -> NSAttributedString {
+    let m = NSMutableAttributedString(attributedString: source)
+    let full = NSRange(location: 0, length: m.length)
+    var edits: [(NSRange, NSAttributedString.Key, NSColor?)] = []
+    m.enumerateAttribute(.backgroundColor, in: full) { v, r, _ in
+        guard let c = v as? NSColor else { return }
+        if let rgb = c.usingColorSpace(.deviceRGB), rgb.alphaComponent > 0.05, rgb.brightnessComponent >= 0.5 { return }
+        edits.append((r, .backgroundColor, nil))
+    }
+    m.enumerateAttribute(.foregroundColor, in: full) { v, r, _ in
+        guard let c = v as? NSColor else { return }
+        guard let rgb = c.usingColorSpace(.deviceRGB) else { edits.append((r, .foregroundColor, nil)); return }
+        if rgb.brightnessComponent <= 0.6 { return }
+        if rgb.saturationComponent < 0.25 {
+            edits.append((r, .foregroundColor, nil))
+        } else {
+            edits.append((r, .foregroundColor, NSColor(deviceHue: rgb.hueComponent, saturation: min(1, rgb.saturationComponent + 0.2),
+                                                       brightness: 0.55, alpha: 1)))
+        }
+    }
+    for (r, key, color) in edits {
+        if let color { m.addAttribute(key, value: color, range: r) } else { m.removeAttribute(key, range: r) }
+    }
+    return m
+}
+
+/// RTF bytes, cleaned as above.
+func lightPageRTF(_ data: Data) -> Data {
+    guard let a = NSAttributedString(rtf: data, documentAttributes: nil) else { return data }
+    let clean = lightPageStyled(a)
+    return (try? clean.data(from: NSRange(location: 0, length: clean.length),
+                            documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf])) ?? data
+}
+
+/// Marks a pasteboard written by the line itself, so copying a note off the
+/// line does not hang it again.
+let selfCopyType = NSPasteboard.PasteboardType("app.tendedero.SelfCopy")
+
 /// The default size covers a card at twice its size in points, as on a
 /// Retina screen, and no more: every photo on the line keeps one in memory.
-func makeThumbnail(_ url: URL, maxPixels: Int = Int(320 * Layout.size.scale)) -> NSImage? {
+func makeThumbnail(_ url: URL, maxPixels: Int = Int(320 * Layout.size.scale), full: Bool = false) -> NSImage? {
     if isRecording(url) { return firstFrame(url, maxPixels: maxPixels) }
+    if isText(url) { return MainActor.assumeIsolated { noteCard(url, maxPixels: maxPixels, full: full) } }
     guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
     let options: [CFString: Any] = [
         kCGImageSourceCreateThumbnailFromImageAlways: true,

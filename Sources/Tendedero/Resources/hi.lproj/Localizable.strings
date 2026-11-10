@@ -11,6 +11,7 @@
 "Show line" = "रस्सी दिखाएँ";
 "Take everything down" = "सब उतार दें";
 "Put back" = "वापस टाँगें";
+"Screenshots" = "स्क्रीनशॉट";
 "Handle screenshots" = "स्क्रीनशॉट संभालें";
 "Screenshots hang instantly and skip the Desktop" = "स्क्रीनशॉट तुरंत टँगते हैं और डेस्कटॉप पर नहीं जाते";
 "Open screenshots folder" = "स्क्रीनशॉट फ़ोल्डर खोलें";
@@ -25,8 +26,8 @@
 "%d photos" = "%d फ़ोटो";
 "Also watch folders" = "फ़ोल्डर पर भी नज़र रखें";
 "Add Folder…" = "फ़ोल्डर जोड़ें…";
-"Stop Watching" = "नज़र रखना बंद करें";
 "Watch" = "नज़र रखें";
+"Show “%@” in Finder" = "“%@” को Finder में दिखाएँ";
 "New images saved to this folder will hang on the line." = "इस फ़ोल्डर में सेव होने वाली नई तस्वीरें रस्सी पर टँग जाएँगी।";
 "Shortcut" = "शॉर्टकट";
 "Change Shortcut…" = "शॉर्टकट बदलें…";
@@ -43,7 +44,10 @@
 "When the pointer rests in the menu bar" = "जब पॉइंटर मेनू बार में रुके";
 "When something new hangs" = "जब कुछ नया टँगे";
 "Over full screen apps" = "फ़ुल स्क्रीन ऐप्स के ऊपर";
-"Hang copied images" = "कॉपी की गई तस्वीरें टाँगें";
+"Hang what you copy" = "जो कॉपी करें, उसे टाँगें";
+"Images" = "तस्वीरें";
+"Text" = "टेक्स्ट";
+"Links" = "लिंक";
 "Images you copy hang on the line too" = "आप जो तस्वीरें कॉपी करते हैं, वे भी रस्सी पर टँगती हैं";
 "Tendedero, hanging copied images" = "Tendedero, कॉपी की गई तस्वीरें टाँग रहा है";
 "The line is empty" = "रस्सी खाली है";
@@ -52,6 +56,7 @@
 /* GrabArea */
 "Copy" = "कॉपी करें";
 "Open" = "खोलें";
+"Open Link" = "लिंक खोलें";
 "Quick Look" = "क्विक लुक";
 "Markup" = "मार्कअप";
 "Show in Finder" = "Finder में दिखाएँ";
@@ -86,3 +91,14 @@
 /* Open at login, offered on each install and update */
 "Open Tendedero at login?" = "क्या Tendedero लॉगिन पर खुले?";
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero लॉगिन करने पर नहीं खुलता, इसलिए रीस्टार्ट के बाद रस्सी तब तक नहीं दिखती जब तक आप इसे फिर से नहीं खोलते।";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "आप जो टेक्स्ट कॉपी करते हैं, वह भी रस्सी पर टँगता है";
+"Links you copy hang on the line too" = "आप जो लिंक कॉपी करते हैं, वे भी रस्सी पर टँगते हैं";
+
+/* Searching the line */
+"Search the line" = "रस्सी पर खोजें";
+"%d of %d" = "%2$d में से %1$d";
+
+/* Zoom on hover */
+"Zoom on hover" = "होवर पर बड़ा करें";

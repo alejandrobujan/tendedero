@@ -87,7 +87,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
       <key>NSMessage</key><string>hangOnLine</string>
       <key>NSPortName</key><string>Tendedero</string>
       <key>NSRequiredContext</key><dict/>
-      <key>NSSendFileTypes</key><array><string>public.image</string></array>
+      <key>NSSendFileTypes</key><array><string>public.image</string><string>public.plain-text</string><string>public.rtf</string></array>
     </dict>
   </array>
 </dict>

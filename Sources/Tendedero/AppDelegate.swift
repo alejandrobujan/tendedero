@@ -19,8 +19,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// screenshot app saves to.
     private var folderWatchers: [ScreenshotWatcher] = []
     private var clipboardWatcher: ClipboardWatcher!
+    private var noteWatcher: NoteWatcher!
     private var signalSources: [DispatchSourceSignal] = []
     private var hotKey: HotKey?
+    /// ⌃⌥F searches the line. Fixed, apart from the shortcut that shows it.
+    private var searchHotKey: HotKey?
+    private var searchBar: SearchBar!
+    private let zoom = Zoom()
     private var cancellables = Set<AnyCancellable>()
     private var mouseTimer: Timer?
 
@@ -78,8 +83,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         startWatcher()
         clipboardWatcher = ClipboardWatcher { [weak self] url in self?.hangCapture(url) }
         if ClipboardWatcher.isEnabled { clipboardWatcher.start() }
+        noteWatcher = NoteWatcher { [weak self] in self?.line.refreshNotes() }
+        noteWatcher.start()
 
         registerShortcut()
+        searchBar = SearchBar(line: line)
+        searchBar.onReturn = { [weak self] in self?.copyFirstMatch() }
+        searchBar.onEnd = { [weak self] in self?.endSearch(tuckAway: true) }
+        searchHotKey = HotKey(Self.searchShortcut) { [weak self] in self?.startSearch() }
 
         setUpStatusItem()
         watchMenuBarClicks()
@@ -296,9 +307,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     /// Watching the clipboard is opt in, from the menu bar only.
-    private func setClipboard(_ on: Bool) {
-        ClipboardWatcher.isEnabled = on
-        if on { clipboardWatcher.start() } else { clipboardWatcher.stop() }
+    private func refreshClipboardWatcher() {
+        if ClipboardWatcher.isEnabled { clipboardWatcher.start() } else { clipboardWatcher.stop() }
         updateStatusIcon()
     }
 
@@ -508,6 +518,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
         }
         if !on {
+            // Tucked away by any means, a search under way ends with it.
+            if searchBar?.isShown == true { endSearch(tuckAway: false) }
+            zoom.hide()
             undoAnchor = nil
             holdPutBackKey(false)
             line.clearSelection()
@@ -525,6 +538,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 refresh()
             }
         }
+    }
+
+    // MARK: Searching the line
+
+    static let searchShortcut = Shortcut(keyCode: kVK_ANSI_F, modifiers: [.control, .option], key: "f")
+
+    /// Brings the line down and opens the search field under it.
+    private func startSearch() {
+        if !isRevealed { toggle() }
+        keepOpen = true
+        pinned = true
+        searchBar.show(below: panel.frame)
+    }
+
+    /// Return copies the newest photo, note or link that matches, and the
+    /// line goes back up, as after picking a result in Spotlight.
+    private func copyFirstMatch() {
+        guard line.isSearching, let item = line.shown.last(where: { !$0.falling }) else { return }
+        line.copy(item.id)
+        endSearch(tuckAway: true)
+    }
+
+    /// The whole line comes back. With Escape it also tucks away; after a
+    /// click elsewhere it stays as it is.
+    private func endSearch(tuckAway: Bool) {
+        line.query = ""
+        searchBar.hide()
+        if tuckAway, isRevealed { setRevealed(false) }
     }
 
     @objc private func toggle() {
@@ -648,21 +689,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
 
         updateMousePassThrough(mouse)
+        updateZoom(mouse)
 
         // The line's zone runs from its lowest point up to the top of the
         // screen, menu bar included, so moving up never hides it.
         var zone = panel.frame
         if let screen = panel.screen { zone.size.height = screen.frame.maxY - zone.minY }
         let inside = NSMouseInRect(mouse, zone, false)
+        // While searching, the keys belong to the search field: Space and
+        // Delete type, and ⌘Z undoes typing.
+        let searching = searchBar?.isShown == true
         let atUndoAnchor = isAtUndoAnchor(mouse)
-        if inside && pinned { pinned = false }
-        holdPutBackKey((inside || atUndoAnchor) && !GrabView.isShowingMenu && !Share.shared.isOpen)
-        holdPhotoKeys(over: inside ? photo(under: mouse) : nil)
-        holdSelectionKeys(inside && !GrabView.isShowingMenu && !Share.shared.isOpen)
+        if inside && pinned && !searching { pinned = false }
+        holdPutBackKey((inside || atUndoAnchor) && !searching && !GrabView.isShowingMenu && !Share.shared.isOpen)
+        holdPhotoKeys(over: inside && !searching ? photo(under: mouse) : nil)
+        holdSelectionKeys(inside && !searching && !GrabView.isShowingMenu && !Share.shared.isOpen)
         // Gaps left by discarded photos close once the pointer moves away.
         if !inside { line.closeGaps() }
 
-        let busy = pinned || atUndoAnchor || GrabView.isDragging || GrabView.isShowingMenu || Share.shared.isOpen
+        // A search keeps the line down until Escape or a click elsewhere.
+        let busy = pinned || searching || atUndoAnchor || GrabView.isDragging || GrabView.isShowingMenu || Share.shared.isOpen
             || line.pressedID != nil || now < peekUntil
         if inside || busy {
             awaySince = nil
@@ -674,6 +720,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 setRevealed(false)
             }
         }
+    }
+
+    /// The card under the pointer opens larger below the line. Not while
+    /// dragging, in a card's menu, or while one of our windows is in front,
+    /// like Quick Look.
+    private func updateZoom(_ mouse: NSPoint) {
+        guard Zoom.isEnabled, !GrabView.isDragging, !GrabView.isShowingMenu, NSApp.keyWindow == nil,
+              let screen = panel.screen else {
+            zoom.hide()
+            return
+        }
+        let local = panel.convertPoint(fromScreen: mouse)
+        let flipped = CGPoint(x: local.x, y: panel.frame.height - local.y)
+        let hit = line.hitRects.first { $0.value.contains(flipped) }
+        let item = hit.flatMap { hit in line.items.first { $0.id == hit.key && !$0.falling && !$0.flying } }
+        let card = hit.map {
+            CGRect(x: panel.frame.minX + $0.value.minX, y: panel.frame.maxY - $0.value.maxY,
+                   width: $0.value.width, height: $0.value.height)
+        }
+        zoom.update(item, card: card, on: screen)
     }
 
     /// The panel spans the whole width of the screen, so it only accepts the
@@ -716,8 +782,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     // MARK: Hang on Tendedero
 
-    /// The service macOS lists for images in Finder and elsewhere. What
-    /// you hang yourself is pinned, and the line comes down to show it.
+    /// The service macOS lists for images and text files in Finder and
+    /// elsewhere. What you hang yourself is pinned, and the line comes down
+    /// to show it. A text file is copied in as a note.
     @objc func hangOnLine(_ pasteboard: NSPasteboard, userData: String?,
                           error: AutoreleasingUnsafeMutablePointer<NSString?>) {
         let urls = pasteboard.readObjects(forClasses: [NSURL.self],
@@ -725,7 +792,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard !urls.isEmpty else { return }
         comeDown(on: nil)
         var any = false
-        for url in urls where line.hangKept(url) { any = true }
+        for url in urls {
+            let hung = NoteFolder.isTextFile(url) ? NoteFolder.adopt(url) : url
+            if let hung, line.hangKept(hung) { any = true }
+        }
         if !any { NSSound.beep() }
     }
 
@@ -965,11 +1035,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         menu.addItem(toggleItem)
 
-        let clearItem = ClosureMenuItem(L("Take everything down")) { [weak self] in
-            self?.line.clear()
-        }
-        clearItem.isEnabled = line.liveCount > 0
-        menu.addItem(clearItem)
+        let searchItem = ClosureMenuItem(L("Search the line")) { [weak self] in self?.startSearch() }
+        searchItem.keyEquivalent = Self.searchShortcut.key
+        searchItem.keyEquivalentModifierMask = Self.searchShortcut.modifiers
+        searchItem.isEnabled = line.liveCount > 0
+        menu.addItem(searchItem)
 
         let putBackItem = ClosureMenuItem(L("Put back"), key: "z") { [weak self] in
             self?.putBack()
@@ -977,10 +1047,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         putBackItem.isEnabled = line.canPutBack
         menu.addItem(putBackItem)
 
+        let clearItem = ClosureMenuItem(L("Take everything down")) { [weak self] in
+            self?.line.clear()
+        }
+        clearItem.isEnabled = line.liveCount > 0
+        menu.addItem(clearItem)
+
         if !Held.heldIDs.isEmpty {
             menu.addItem(ClosureMenuItem(L("Hang everything back")) { Held.hangEverythingBack() })
         }
 
+        // Where screenshots and other images come from, together.
+        menu.addItem(.separator())
+        menu.addItem(.sectionHeader(title: L("Screenshots")))
         let inbox = ClosureMenuItem(L("Handle screenshots")) { [weak self] in
             self?.setInbox(!Inbox.isEnabled)
         }
@@ -988,12 +1067,57 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         inbox.toolTip = L("Screenshots hang instantly and skip the Desktop")
         menu.addItem(inbox)
 
-        let clipboard = ClosureMenuItem(L("Hang copied images")) { [weak self] in
-            self?.setClipboard(!ClipboardWatcher.isEnabled)
+        let folderItem = NSMenuItem(title: L("Also watch folders"), action: nil, keyEquivalent: "")
+        let folderMenu = NSMenu()
+        folderMenu.autoenablesItems = false
+        let folders = Self.extraFolders
+        // Each folder is ticked: a click stops watching it, as with any
+        // ticked item. Holding Option turns it into Show in Finder.
+        for folder in folders {
+            let name = FileManager.default.displayName(atPath: folder.path)
+            let item = ClosureMenuItem(name) { [weak self] in
+                AppDelegate.extraFolders.removeAll { $0.standardizedFileURL == folder.standardizedFileURL }
+                self?.startWatcher()
+            }
+            item.state = .on
+            folderMenu.addItem(item)
+            let reveal = ClosureMenuItem(String(format: L("Show “%@” in Finder"), name)) {
+                NSWorkspace.shared.open(folder)
+            }
+            reveal.isAlternate = true
+            reveal.keyEquivalentModifierMask = .option
+            folderMenu.addItem(reveal)
         }
-        clipboard.state = ClipboardWatcher.isEnabled ? .on : .off
-        clipboard.toolTip = L("Images you copy hang on the line too")
-        menu.addItem(clipboard)
+        if !folders.isEmpty { folderMenu.addItem(.separator()) }
+        let add = ClosureMenuItem(L("Add Folder…")) { [weak self] in self?.chooseExtraFolder() }
+        add.isEnabled = folders.count < Self.maxExtraFolders
+        folderMenu.addItem(add)
+        folderItem.submenu = folderMenu
+        menu.addItem(folderItem)
+
+        menu.addItem(ClosureMenuItem(L("Open screenshots folder")) { [weak self] in
+            guard let self else { return }
+            NSWorkspace.shared.open(self.watcher.folder)
+        })
+
+        // What you copy, in a section of its own: each kind is its own choice.
+        menu.addItem(.separator())
+        menu.addItem(.sectionHeader(title: L("Hang what you copy")))
+        let kinds: [(String, String, ReferenceWritableKeyPath<ClipboardWatcher.Type, Bool>)] = [
+            (L("Images"), L("Images you copy hang on the line too"), \.imagesEnabled),
+            (L("Text"), L("Text you copy hangs on the line too"), \.textEnabled),
+            (L("Links"), L("Links you copy hang on the line too"), \.linksEnabled),
+        ]
+        for (title, tip, key) in kinds {
+            let item = ClosureMenuItem(title) { [weak self] in
+                ClipboardWatcher.self[keyPath: key].toggle()
+                self?.refreshClipboardWatcher()
+            }
+            item.state = ClipboardWatcher.self[keyPath: key] ? .on : .off
+            item.toolTip = tip
+            menu.addItem(item)
+        }
+        menu.addItem(.separator())
 
         let bringDown = NSMenuItem(title: L("Bring the line down"), action: nil, keyEquivalent: "")
         let options = NSMenu()
@@ -1015,36 +1139,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         options.addItem(fullScreen)
         bringDown.submenu = options
         menu.addItem(bringDown)
-
-        let folderItem = NSMenuItem(title: L("Also watch folders"), action: nil, keyEquivalent: "")
-        let folderMenu = NSMenu()
-        folderMenu.autoenablesItems = false
-        let folders = Self.extraFolders
-        for folder in folders {
-            let item = ClosureMenuItem(FileManager.default.displayName(atPath: folder.path)) {
-                NSWorkspace.shared.open(folder)
-            }
-            item.state = .on
-            folderMenu.addItem(item)
-        }
-        if !folders.isEmpty { folderMenu.addItem(.separator()) }
-        let add = ClosureMenuItem(L("Add Folder…")) { [weak self] in self?.chooseExtraFolder() }
-        add.isEnabled = folders.count < Self.maxExtraFolders
-        folderMenu.addItem(add)
-        if !folders.isEmpty {
-            let stop = NSMenuItem(title: L("Stop Watching"), action: nil, keyEquivalent: "")
-            let stopMenu = NSMenu()
-            for folder in folders {
-                stopMenu.addItem(ClosureMenuItem(FileManager.default.displayName(atPath: folder.path)) { [weak self] in
-                    AppDelegate.extraFolders.removeAll { $0.standardizedFileURL == folder.standardizedFileURL }
-                    self?.startWatcher()
-                })
-            }
-            stop.submenu = stopMenu
-            folderMenu.addItem(stop)
-        }
-        folderItem.submenu = folderMenu
-        menu.addItem(folderItem)
 
         let keepItem = NSMenuItem(title: L("Keep on line"), action: nil, keyEquivalent: "")
         let keeps = NSMenu()
@@ -1069,6 +1163,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         sizeItem.submenu = sizes
         menu.addItem(sizeItem)
 
+        let zoomItem = ClosureMenuItem(L("Zoom on hover")) { [weak self] in
+            Zoom.isEnabled.toggle()
+            if !Zoom.isEnabled { self?.zoom.hide() }
+        }
+        zoomItem.state = Zoom.isEnabled ? .on : .off
+        menu.addItem(zoomItem)
+
         let shortcutItem = NSMenuItem(title: L("Shortcut"), action: nil, keyEquivalent: "")
         let shortcuts = NSMenu()
         let current = NSMenuItem(title: Shortcut.current?.display ?? L("None"), action: nil, keyEquivalent: "")
@@ -1077,11 +1178,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         shortcuts.addItem(ClosureMenuItem(L("Change Shortcut…")) { [weak self] in self?.changeShortcut() })
         shortcutItem.submenu = shortcuts
         menu.addItem(shortcutItem)
-
-        menu.addItem(ClosureMenuItem(L("Open screenshots folder")) { [weak self] in
-            guard let self else { return }
-            NSWorkspace.shared.open(self.watcher.folder)
-        })
 
         menu.addItem(.separator())
 

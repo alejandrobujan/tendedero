@@ -34,7 +34,10 @@ struct GrabArea: NSViewRepresentable {
         view.isHeld = item.held
         view.toolTip = L("Shift-click to select photos")
         view.onSelect = { line.toggleSelection(id) }
-        view.onPlainPress = { line.clearSelection() }
+        // Pressing a selected photo keeps the selection, so it can be
+        // dragged as a group; a plain click on it clears it when released.
+        view.onPlainPress = { if !line.selectedIDs.contains(id) { line.clearSelection() } }
+        view.onPlainClick = { line.clearSelection() }
         view.onHangBack = { line.onHangBack?(id) }
         view.onClick = { line.copy(id) }
         view.onDoubleClick = { line.open(id) }
@@ -44,7 +47,13 @@ struct GrabArea: NSViewRepresentable {
             // Moved into a folder: it is saved where you wanted it.
             line.prune()
         }
-        view.onTrash = { line.trash(id) }
+        // A photo selected with others drags them all, and they go to the
+        // Trash together.
+        let inGroup = { line.selectedIDs.contains(id) && line.selectedIDs.count > 1 }
+        view.dragGroup = { inGroup() ? line.selectedItems.map { ($0.url, $0.thumb) } : [] }
+        view.onTrash = {
+            if inGroup() { line.trash(line.selectedItems.map(\.id)) } else { line.trash(id) }
+        }
         view.onDiscard = { line.pressCorner(id) }
         view.onLongPress = { line.markup(id) }
         view.onForceClick = { line.quickLook(id) }
@@ -58,12 +67,15 @@ struct GrabArea: NSViewRepresentable {
             // Items say themselves whether they can be used.
             menu.autoenablesItems = false
             menu.addItem(ClosureMenuItem(L("Copy")) { line.copy(id) })
-            menu.addItem(ClosureMenuItem(L("Open")) { line.open(id) })
+            menu.addItem(ClosureMenuItem(L("Open")) { line.openFile(id) })
+            if isText(item.url), Note.cached(item.url)?.link != nil {
+                menu.addItem(ClosureMenuItem(L("Open Link")) { line.openLink(id) })
+            }
             menu.addItem(ClosureMenuItem(L("Quick Look")) { line.quickLook(id) })
             if !isRecording {
                 menu.addItem(ClosureMenuItem(L("Hold")) { line.onHold?(id) })
             }
-            if !isRecording {
+            if !isRecording && !isText(item.url) {
                 menu.addItem(ClosureMenuItem(L("Markup")) { line.markup(id) })
             }
             menu.addItem(ClosureMenuItem(L("Show in Finder")) { line.reveal(id) })
@@ -172,12 +184,16 @@ final class GrabView: NSView, NSDraggingSource {
 
     var url: URL?
     var dragImage: NSImage?
+    /// Every photo that drags along with this one, when it is selected with
+    /// others. Empty for a drag of its own.
+    var dragGroup: () -> [(URL, NSImage)] = { [] }
     /// Held in your hand: only its faded trace is on the line, and a click
     /// on it is all it answers, to bring the photo back.
     var isHeld = false
     var onHangBack: () -> Void = {}
     var onSelect: () -> Void = {}
     var onPlainPress: () -> Void = {}
+    var onPlainClick: () -> Void = {}
     var onClick: () -> Void = {}
     var onDoubleClick: () -> Void = {}
     var onDragStart: () -> Void = {}
@@ -276,18 +292,49 @@ final class GrabView: NSView, NSDraggingSource {
         startedDrag = true
         endPress()
 
-        let item = NSDraggingItem(pasteboardWriter: url as NSURL)
-        item.setDraggingFrame(imageFrame(), contents: dragImage)
-        let session = beginDraggingSession(with: [item], event: event, source: self)
+        let group = dragGroup()
+        let items: [NSDraggingItem]
+        if group.count > 1 {
+            // A small pile, each with its own picture, set off a little.
+            let base = imageFrame()
+            items = group.enumerated().map { n, member in
+                let item = NSDraggingItem(pasteboardWriter: Self.dragWriter(for: member.0))
+                item.setDraggingFrame(base.offsetBy(dx: CGFloat(n) * 6, dy: CGFloat(-n) * 6), contents: member.1)
+                return item
+            }
+        } else {
+            let item = NSDraggingItem(pasteboardWriter: Self.dragWriter(for: url))
+            item.setDraggingFrame(imageFrame(), contents: dragImage)
+            items = [item]
+        }
+        let session = beginDraggingSession(with: items, event: event, source: self)
+        if items.count > 1 { session.draggingFormation = .pile }
         // Released where nothing accepts it: it flies back to the line.
         session.animatesToStartingPositionsOnCancelOrFail = true
         GrabView.isDragging = true
         onDragStart()
     }
 
+    /// A photo drags as its file. A note drags as its words for apps, styled
+    /// when it has a style, and as its file for Finder.
+    private static func dragWriter(for url: URL) -> NSPasteboardWriting {
+        guard isText(url) else { return url as NSURL }
+        let item = NSPasteboardItem()
+        if url.pathExtension.lowercased() == "rtf", let data = try? Data(contentsOf: url),
+           let rich = NSAttributedString(rtf: data, documentAttributes: nil) {
+            item.setString(rich.string, forType: .string)
+            item.setData(data, forType: .rtf)
+        } else if let data = try? Data(contentsOf: url) {
+            item.setString(String(decoding: data, as: UTF8.self), forType: .string)
+        }
+        item.setString(url.absoluteString, forType: .fileURL)
+        return item
+    }
+
     override func mouseUp(with event: NSEvent) {
         endPress()
         if downPoint != nil && !startedDrag && !didLongPress && event.clickCount == 1 {
+            onPlainClick()
             // Waits as long as the system lets a second click count as a double click.
             Self.clickTimer?.invalidate()
             // The copy goes ahead even if the line redraws this view meanwhile.

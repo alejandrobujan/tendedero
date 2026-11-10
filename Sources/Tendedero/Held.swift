@@ -1,4 +1,5 @@
 import AppKit
+import SwiftUI
 
 /// A photo taken off the line to keep in front of you while you work: a
 /// design to copy, numbers to type in, steps to follow. It is the photo
@@ -14,10 +15,13 @@ final class Held: NSObject {
     private static var open: [UUID: Held] = [:]
 
     let id: UUID
+    let url: URL
     private let panel: HeldPanel
     private let view: HeldView
     /// Its size at 100%, in points.
     private let natural: NSSize
+    /// Set for copied text, which reflows instead of keeping a shape.
+    private let noteScale: NoteScale?
     /// Called with where it was on screen, to fly back to its clip from there.
     private let onHangBack: (UUID, CGRect) -> Void
 
@@ -28,11 +32,17 @@ final class Held: NSObject {
               let screen = LinePanel.screenUnderPointer() else { return }
         // No sharper than the screen can show, so a huge image stays light.
         let longest = max(screen.frame.width, screen.frame.height) * screen.backingScaleFactor
-        guard let image = makeThumbnail(url, maxPixels: Int(longest)), image.size.width > 0 else { return }
+        guard let image = makeThumbnail(url, maxPixels: Int(longest), full: true), image.size.width > 0 else { return }
         open[id] = Held(id: id, url: url, image: image, on: screen, line: line, onHangBack: onHangBack)
     }
 
     static func hangBack(_ id: UUID) { open[id]?.hangBack() }
+
+    /// A held note whose file was edited shows the new words.
+    static func reload(_ url: URL) {
+        guard let note = Note.peek(url) else { return }
+        for held in open.values where held.url == url { held.view.show(note) }
+    }
 
     static func hangEverythingBack() {
         for held in open.values { held.hangBack() }
@@ -49,22 +59,28 @@ final class Held: NSObject {
     private init(id: UUID, url: URL, image: NSImage, on screen: NSScreen, line: Line,
                  onHangBack: @escaping (UUID, CGRect) -> Void) {
         self.id = id
+        self.url = url
         self.onHangBack = onHangBack
         let scale = screen.backingScaleFactor
         natural = NSSize(width: image.size.width / scale + HeldView.border * 2,
                          height: image.size.height / scale + HeldView.border * 2)
-        view = HeldView(image: image)
+        let note = isText(url) ? Note.cached(url) : nil
+        noteScale = note == nil ? nil : NoteScale()
+        view = HeldView(image: image, note: note, scale: noteScale)
         panel = HeldPanel(content: view)
         super.init()
         view.onHangBack = { [weak self] in self?.hangBack() }
         view.onZoom = { [weak self] factor, anchor in self?.zoom(by: factor, around: anchor) }
         view.onActualSize = { [weak self] in self?.actualSize() }
         view.onCopy = { line.copy(id) }
+        panel.onCopy = { line.copy(id) }
+        panel.onEscape = { [weak self] in self?.hangBack() }
         view.onMarkup = { line.markup(id) }
         view.onQuickLook = { line.quickLook(id) }
-        // Stretched from an edge or a corner, it keeps the photo's shape.
-        panel.contentAspectRatio = natural
-        panel.minSize = NSSize(width: 80, height: 80)
+        // Stretched from an edge or a corner, a photo keeps its shape; a
+        // note takes any shape and its text reflows.
+        if noteScale == nil { panel.contentAspectRatio = natural }
+        panel.minSize = NSSize(width: noteScale == nil ? 80 : 120, height: 80)
         panel.setFrame(startFrame(on: screen), display: false)
         panel.orderFrontRegardless()
     }
@@ -82,6 +98,17 @@ final class Held: NSObject {
     /// Zooms keeping the point under the pointer where it is.
     private func zoom(by factor: CGFloat, around anchor: NSPoint) {
         let frame = panel.frame
+        if let noteScale {
+            // A note grows from the shape it has, words included.
+            let u = min(max(noteScale.u * factor, 0.9), 8)
+            let f = u / noteScale.u
+            let w = frame.width * f, h = frame.height * f
+            guard w >= 120, h >= 80 else { return }
+            noteScale.u = u
+            let fx = (anchor.x - frame.minX) / frame.width, fy = (anchor.y - frame.minY) / frame.height
+            panel.setFrame(NSRect(x: anchor.x - w * fx, y: anchor.y - h * fy, width: w, height: h), display: true)
+            return
+        }
         let scale = min(max(frame.width * factor / natural.width, 0.1), 4)
         let w = natural.width * scale, h = natural.height * scale
         guard w >= 60, h >= 60 else { return }
@@ -90,6 +117,7 @@ final class Held: NSObject {
     }
 
     private func actualSize() {
+        noteScale?.u = NoteScale.natural
         let frame = panel.frame
         panel.setFrame(NSRect(x: frame.midX - natural.width / 2, y: frame.midY - natural.height / 2,
                               width: natural.width, height: natural.height), display: true)
@@ -107,6 +135,31 @@ final class Held: NSObject {
 /// A click makes it key without bringing Tendedero to the front, so the app
 /// you work in stays active; it then takes Escape and ⌘C.
 private final class HeldPanel: NSPanel {
+    /// ⌘C copies what is selected in a held note, else the whole item.
+    var onCopy: () -> Void = {}
+    var onEscape: () -> Void = {}
+
+    override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        guard event.modifierFlags.contains(.command), let key = event.charactersIgnoringModifiers else {
+            return super.performKeyEquivalent(with: event)
+        }
+        let text = firstResponder as? NSTextView
+        switch key {
+        case "c":
+            if let text, text.selectedRange().length > 0 { text.copy(nil) } else { onCopy() }
+            return true
+        case "a":
+            guard let text else { return super.performKeyEquivalent(with: event) }
+            text.selectAll(nil)
+            return true
+        default:
+            return super.performKeyEquivalent(with: event)
+        }
+    }
+
+    /// Escape hangs it back, even while its text has the focus.
+    override func cancelOperation(_ sender: Any?) { onEscape() }
+
     init(content: NSView) {
         // Resizable from its edges and corners, like any window.
         super.init(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel, .resizable],
@@ -120,6 +173,10 @@ private final class HeldPanel: NSPanel {
         isReleasedWhenClosed = false
         isMovableByWindowBackground = true
         becomesKeyOnlyIfNeeded = false
+        // Set on purpose: by default clicks fall through the transparent
+        // pixels outside the rounded corners, so the corners could not be
+        // grabbed to resize.
+        ignoresMouseEvents = false
         contentView = content
     }
 
@@ -141,9 +198,12 @@ private final class HeldView: NSVisualEffectView {
     var onQuickLook: () -> Void = {}
 
     private let photo = CALayer()
+    /// Copied text is held as real, selectable text instead of a picture.
+    private var sheet: NSView?
+    private var noteScale: NoteScale?
     private let hangBackButton = CornerButton(symbol: "arrow.up.to.line")
 
-    init(image: NSImage) {
+    init(image: NSImage, note: Note? = nil, scale: NoteScale? = nil) {
         super.init(frame: .zero)
         material = .popover
         blendingMode = .behindWindow
@@ -153,11 +213,22 @@ private final class HeldView: NSVisualEffectView {
         layer?.masksToBounds = true
         layer?.borderWidth = 0.5
         layer?.borderColor = NSColor.white.withAlphaComponent(0.45).cgColor
-        photo.contents = image
-        photo.contentsGravity = .resizeAspect
-        photo.cornerRadius = 7
-        photo.masksToBounds = true
-        layer?.addSublayer(photo)
+        if let note {
+            let scale = scale ?? NoteScale()
+            noteScale = scale
+            let host = NSHostingView(rootView: HeldNote(note: note, scale: scale))
+            host.wantsLayer = true
+            host.layer?.cornerRadius = 7
+            host.layer?.masksToBounds = true
+            addSubview(host)
+            sheet = host
+        } else {
+            photo.contents = image
+            photo.contentsGravity = .resizeAspect
+            photo.cornerRadius = 7
+            photo.masksToBounds = true
+            layer?.addSublayer(photo)
+        }
         hangBackButton.alphaValue = 0
         hangBackButton.onPress = { [weak self] in self?.onHangBack() }
         hangBackButton.setAccessibilityLabel(L("Hang back"))
@@ -168,11 +239,17 @@ private final class HeldView: NSVisualEffectView {
 
     required init?(coder: NSCoder) { fatalError() }
 
+    func show(_ note: Note) {
+        guard let host = sheet as? NSHostingView<HeldNote>, let noteScale else { return }
+        host.rootView = HeldNote(note: note, scale: noteScale)
+    }
+
     override func layout() {
         super.layout()
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         photo.frame = bounds.insetBy(dx: Self.border, dy: Self.border)
+        sheet?.frame = bounds.insetBy(dx: Self.border, dy: Self.border)
         photo.contentsScale = window?.backingScaleFactor ?? 2
         CATransaction.commit()
         hangBackButton.frame = NSRect(x: 9, y: bounds.height - 29, width: 20, height: 20)
@@ -233,7 +310,9 @@ private final class HeldView: NSVisualEffectView {
         menu.addItem(.separator())
         menu.addItem(ClosureMenuItem(L("Copy")) { [weak self] in self?.onCopy() })
         menu.addItem(ClosureMenuItem(L("Quick Look")) { [weak self] in self?.onQuickLook() })
-        menu.addItem(ClosureMenuItem(L("Markup")) { [weak self] in self?.onMarkup() })
+        if sheet == nil {
+            menu.addItem(ClosureMenuItem(L("Markup")) { [weak self] in self?.onMarkup() })
+        }
         menu.addItem(ClosureMenuItem(L("Actual Size")) { [weak self] in self?.onActualSize() })
         NSMenu.popUpContextMenu(menu, with: event, for: self)
     }
