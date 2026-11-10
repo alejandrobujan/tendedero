@@ -934,28 +934,64 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         searchItem.isEnabled = line.liveCount > 0
         menu.addItem(searchItem)
 
-        let clearItem = ClosureMenuItem(L("Take everything down")) { [weak self] in
-            self?.line.clear()
-        }
-        clearItem.isEnabled = line.liveCount > 0
-        menu.addItem(clearItem)
-
         let putBackItem = ClosureMenuItem(L("Put back"), key: "z") { [weak self] in
             self?.putBack()
         }
         putBackItem.isEnabled = line.canPutBack
         menu.addItem(putBackItem)
 
+        let clearItem = ClosureMenuItem(L("Take everything down")) { [weak self] in
+            self?.line.clear()
+        }
+        clearItem.isEnabled = line.liveCount > 0
+        menu.addItem(clearItem)
+
         if !Held.heldIDs.isEmpty {
             menu.addItem(ClosureMenuItem(L("Hang everything back")) { Held.hangEverythingBack() })
         }
 
+        // Where screenshots and other images come from, together.
+        menu.addItem(.separator())
+        menu.addItem(.sectionHeader(title: L("Screenshots")))
         let inbox = ClosureMenuItem(L("Handle screenshots")) { [weak self] in
             self?.setInbox(!Inbox.isEnabled)
         }
         inbox.state = Inbox.isEnabled ? .on : .off
         inbox.toolTip = L("Screenshots hang instantly and skip the Desktop")
         menu.addItem(inbox)
+
+        let folderItem = NSMenuItem(title: L("Also watch folders"), action: nil, keyEquivalent: "")
+        let folderMenu = NSMenu()
+        folderMenu.autoenablesItems = false
+        let folders = Self.extraFolders
+        // Each folder is ticked: a click stops watching it, as with any
+        // ticked item. Holding Option turns it into Show in Finder.
+        for folder in folders {
+            let name = FileManager.default.displayName(atPath: folder.path)
+            let item = ClosureMenuItem(name) { [weak self] in
+                AppDelegate.extraFolders.removeAll { $0.standardizedFileURL == folder.standardizedFileURL }
+                self?.startWatcher()
+            }
+            item.state = .on
+            folderMenu.addItem(item)
+            let reveal = ClosureMenuItem(String(format: L("Show “%@” in Finder"), name)) {
+                NSWorkspace.shared.open(folder)
+            }
+            reveal.isAlternate = true
+            reveal.keyEquivalentModifierMask = .option
+            folderMenu.addItem(reveal)
+        }
+        if !folders.isEmpty { folderMenu.addItem(.separator()) }
+        let add = ClosureMenuItem(L("Add Folder…")) { [weak self] in self?.chooseExtraFolder() }
+        add.isEnabled = folders.count < Self.maxExtraFolders
+        folderMenu.addItem(add)
+        folderItem.submenu = folderMenu
+        menu.addItem(folderItem)
+
+        menu.addItem(ClosureMenuItem(L("Open screenshots folder")) { [weak self] in
+            guard let self else { return }
+            NSWorkspace.shared.open(self.watcher.folder)
+        })
 
         // What you copy, in a section of its own: each kind is its own choice.
         menu.addItem(.separator())
@@ -997,36 +1033,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         bringDown.submenu = options
         menu.addItem(bringDown)
 
-        let folderItem = NSMenuItem(title: L("Also watch folders"), action: nil, keyEquivalent: "")
-        let folderMenu = NSMenu()
-        folderMenu.autoenablesItems = false
-        let folders = Self.extraFolders
-        for folder in folders {
-            let item = ClosureMenuItem(FileManager.default.displayName(atPath: folder.path)) {
-                NSWorkspace.shared.open(folder)
-            }
-            item.state = .on
-            folderMenu.addItem(item)
-        }
-        if !folders.isEmpty { folderMenu.addItem(.separator()) }
-        let add = ClosureMenuItem(L("Add Folder…")) { [weak self] in self?.chooseExtraFolder() }
-        add.isEnabled = folders.count < Self.maxExtraFolders
-        folderMenu.addItem(add)
-        if !folders.isEmpty {
-            let stop = NSMenuItem(title: L("Stop Watching"), action: nil, keyEquivalent: "")
-            let stopMenu = NSMenu()
-            for folder in folders {
-                stopMenu.addItem(ClosureMenuItem(FileManager.default.displayName(atPath: folder.path)) { [weak self] in
-                    AppDelegate.extraFolders.removeAll { $0.standardizedFileURL == folder.standardizedFileURL }
-                    self?.startWatcher()
-                })
-            }
-            stop.submenu = stopMenu
-            folderMenu.addItem(stop)
-        }
-        folderItem.submenu = folderMenu
-        menu.addItem(folderItem)
-
         let keepItem = NSMenuItem(title: L("Keep on line"), action: nil, keyEquivalent: "")
         let keeps = NSMenu()
         let fit = ClosureMenuItem(L("As many as fit")) { [weak self] in self?.setKeep(nil) }
@@ -1058,11 +1064,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         shortcuts.addItem(ClosureMenuItem(L("Change Shortcut…")) { [weak self] in self?.changeShortcut() })
         shortcutItem.submenu = shortcuts
         menu.addItem(shortcutItem)
-
-        menu.addItem(ClosureMenuItem(L("Open screenshots folder")) { [weak self] in
-            guard let self else { return }
-            NSWorkspace.shared.open(self.watcher.folder)
-        })
 
         menu.addItem(.separator())
 

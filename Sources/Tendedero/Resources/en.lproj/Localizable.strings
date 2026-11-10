@@ -11,6 +11,7 @@
 "Show line" = "Show line";
 "Take everything down" = "Take everything down";
 "Put back" = "Put back";
+"Screenshots" = "Screenshots";
 "Handle screenshots" = "Handle screenshots";
 "Screenshots hang instantly and skip the Desktop" = "Screenshots hang instantly and skip the Desktop";
 "Open screenshots folder" = "Open screenshots folder";
@@ -25,8 +26,8 @@
 "%d photos" = "%d photos";
 "Also watch folders" = "Also watch folders";
 "Add Folder…" = "Add Folder…";
-"Stop Watching" = "Stop Watching";
 "Watch" = "Watch";
+"Show “%@” in Finder" = "Show “%@” in Finder";
 "New images saved to this folder will hang on the line." = "New images saved to this folder will hang on the line.";
 "Shortcut" = "Shortcut";
 "Change Shortcut…" = "Change Shortcut…";

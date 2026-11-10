@@ -11,6 +11,7 @@
 "Show line" = "İpi göstər";
 "Take everything down" = "Hamısını ipdən yığ";
 "Put back" = "İpə geri as";
+"Screenshots" = "Ekran şəkilləri";
 "Handle screenshots" = "Ekran şəkillərini idarə et";
 "Screenshots hang instantly and skip the Desktop" = "Ekran şəkilləri dərhal asılır və İş masasına düşmür";
 "Open screenshots folder" = "Ekran şəkilləri qovluğunu aç";
@@ -25,8 +26,8 @@
 "%d photos" = "%d şəkil";
 "Also watch folders" = "Qovluqları da izlə";
 "Add Folder…" = "Qovluq əlavə et…";
-"Stop Watching" = "İzləməyi dayandır";
 "Watch" = "İzlə";
+"Show “%@” in Finder" = "“%@” qovluğunu Finder-də göstər";
 "New images saved to this folder will hang on the line." = "Bu qovluğa saxlanan yeni şəkillər ipdən asılacaq.";
 "Shortcut" = "Qısayol";
 "Change Shortcut…" = "Qısayolu dəyiş…";

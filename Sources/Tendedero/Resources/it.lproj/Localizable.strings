@@ -9,6 +9,7 @@
 "Show line" = "Mostra il filo";
 "Take everything down" = "Togli tutto";
 "Put back" = "Rimetti sul filo";
+"Screenshots" = "Screenshot";
 "Handle screenshots" = "Gestisci gli screenshot";
 "Screenshots hang instantly and skip the Desktop" = "Gli screenshot si appendono subito e saltano la Scrivania";
 "Open screenshots folder" = "Apri la cartella degli screenshot";
@@ -23,8 +24,8 @@
 "%d photos" = "%d foto";
 "Also watch folders" = "Osserva anche cartelle";
 "Add Folder…" = "Aggiungi cartella…";
-"Stop Watching" = "Smetti di osservare";
 "Watch" = "Osserva";
+"Show “%@” in Finder" = "Mostra “%@” nel Finder";
 "New images saved to this folder will hang on the line." = "Le nuove immagini salvate in questa cartella verranno appese al filo.";
 "Shortcut" = "Scorciatoia";
 "Change Shortcut…" = "Cambia scorciatoia…";

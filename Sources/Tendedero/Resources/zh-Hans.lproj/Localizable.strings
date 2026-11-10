@@ -9,6 +9,7 @@
 "Show line" = "显示晾衣绳";
 "Take everything down" = "全部取下";
 "Put back" = "挂回去";
+"Screenshots" = "截图";
 "Handle screenshots" = "接管截图";
 "Screenshots hang instantly and skip the Desktop" = "截图即刻挂上，不再经过桌面";
 "Open screenshots folder" = "打开截图文件夹";
@@ -23,8 +24,8 @@
 "%d photos" = "%d 张";
 "Also watch folders" = "同时监视文件夹";
 "Add Folder…" = "添加文件夹…";
-"Stop Watching" = "停止监视";
 "Watch" = "监视";
+"Show “%@” in Finder" = "在访达中显示“%@”";
 "New images saved to this folder will hang on the line." = "保存到此文件夹的新图片会挂到晾衣绳上。";
 "Shortcut" = "快捷键";
 "Change Shortcut…" = "更改快捷键…";

@@ -9,6 +9,7 @@
 "Show line" = "ロープを表示";
 "Take everything down" = "すべて外す";
 "Put back" = "掛け直す";
+"Screenshots" = "スクリーンショット";
 "Handle screenshots" = "スクリーンショットを任せる";
 "Screenshots hang instantly and skip the Desktop" = "撮った瞬間に吊るされ、デスクトップを経由しません";
 "Open screenshots folder" = "スクリーンショットのフォルダを開く";
@@ -23,8 +24,8 @@
 "%d photos" = "%d枚";
 "Also watch folders" = "フォルダも監視";
 "Add Folder…" = "フォルダを追加…";
-"Stop Watching" = "監視を停止";
 "Watch" = "監視";
+"Show “%@” in Finder" = "“%@”をFinderで表示";
 "New images saved to this folder will hang on the line." = "このフォルダに保存された新しい画像がロープに吊るされます。";
 "Shortcut" = "ショートカット";
 "Change Shortcut…" = "ショートカットを変更…";

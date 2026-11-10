@@ -9,6 +9,7 @@
 "Show line" = "Mostrar varal";
 "Take everything down" = "Recolher tudo";
 "Put back" = "Pendurar de volta";
+"Screenshots" = "Capturas de tela";
 "Handle screenshots" = "Cuidar das capturas de tela";
 "Screenshots hang instantly and skip the Desktop" = "As capturas vão direto para o varal, sem passar pela Mesa";
 "Open screenshots folder" = "Abrir pasta de capturas";
@@ -23,8 +24,8 @@
 "%d photos" = "%d fotos";
 "Also watch folders" = "Monitorar também pastas";
 "Add Folder…" = "Adicionar Pasta…";
-"Stop Watching" = "Parar de Monitorar";
 "Watch" = "Monitorar";
+"Show “%@” in Finder" = "Mostrar “%@” no Finder";
 "New images saved to this folder will hang on the line." = "As novas imagens salvas nesta pasta irão para o varal.";
 "Shortcut" = "Atalho";
 "Change Shortcut…" = "Alterar Atalho…";

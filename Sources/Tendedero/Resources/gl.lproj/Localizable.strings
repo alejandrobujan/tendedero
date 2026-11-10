@@ -9,6 +9,7 @@
 "Show line" = "Amosar a corda";
 "Take everything down" = "Descolgar todo";
 "Put back" = "Volver colgar";
+"Screenshots" = "Capturas";
 "Handle screenshots" = "Encargarse das capturas";
 "Screenshots hang instantly and skip the Desktop" = "As capturas pendúranse ao momento e non pasan polo Escritorio";
 "Open screenshots folder" = "Abrir o cartafol de capturas";
@@ -23,8 +24,8 @@
 "%d photos" = "%d fotos";
 "Also watch folders" = "Vixiar tamén cartafoles";
 "Add Folder…" = "Engadir cartafol…";
-"Stop Watching" = "Deixar de vixiar";
 "Watch" = "Vixiar";
+"Show “%@” in Finder" = "Amosar «%@» no Finder";
 "New images saved to this folder will hang on the line." = "As imaxes novas que se garden neste cartafol penduraranse na corda.";
 "Shortcut" = "Atallo";
 "Change Shortcut…" = "Cambiar o atallo…";

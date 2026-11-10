@@ -11,6 +11,7 @@
 "Show line" = "रस्सी दिखाएँ";
 "Take everything down" = "सब उतार दें";
 "Put back" = "वापस टाँगें";
+"Screenshots" = "स्क्रीनशॉट";
 "Handle screenshots" = "स्क्रीनशॉट संभालें";
 "Screenshots hang instantly and skip the Desktop" = "स्क्रीनशॉट तुरंत टँगते हैं और डेस्कटॉप पर नहीं जाते";
 "Open screenshots folder" = "स्क्रीनशॉट फ़ोल्डर खोलें";
@@ -25,8 +26,8 @@
 "%d photos" = "%d फ़ोटो";
 "Also watch folders" = "फ़ोल्डर पर भी नज़र रखें";
 "Add Folder…" = "फ़ोल्डर जोड़ें…";
-"Stop Watching" = "नज़र रखना बंद करें";
 "Watch" = "नज़र रखें";
+"Show “%@” in Finder" = "“%@” को Finder में दिखाएँ";
 "New images saved to this folder will hang on the line." = "इस फ़ोल्डर में सेव होने वाली नई तस्वीरें रस्सी पर टँग जाएँगी।";
 "Shortcut" = "शॉर्टकट";
 "Change Shortcut…" = "शॉर्टकट बदलें…";

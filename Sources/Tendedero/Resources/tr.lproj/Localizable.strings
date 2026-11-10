@@ -9,6 +9,7 @@
 "Show line" = "İpi göster";
 "Take everything down" = "Hepsini indir";
 "Put back" = "Geri as";
+"Screenshots" = "Ekran görüntüleri";
 "Handle screenshots" = "Ekran görüntülerini yönet";
 "Screenshots hang instantly and skip the Desktop" = "Ekran görüntüleri anında asılır ve Masaüstünü atlar";
 "Open screenshots folder" = "Ekran görüntüleri klasörünü aç";
@@ -23,8 +24,8 @@
 "%d photos" = "%d fotoğraf";
 "Also watch folders" = "Klasörleri de izle";
 "Add Folder…" = "Klasör ekle…";
-"Stop Watching" = "İzlemeyi durdur";
 "Watch" = "İzle";
+"Show “%@” in Finder" = "“%@” klasörünü Finder'da göster";
 "New images saved to this folder will hang on the line." = "Bu klasöre kaydedilen yeni görseller ipe asılır.";
 "Shortcut" = "Kısayol";
 "Change Shortcut…" = "Kısayolu değiştir…";
