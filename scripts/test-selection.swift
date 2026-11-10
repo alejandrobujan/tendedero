@@ -354,6 +354,7 @@ struct CheckFailed: Error { let message: String }
         try check(eviction.selectedIDs.isEmpty && FileManager.default.fileExists(atPath: a.path), "Capacity eviction clears stale selection without deleting an external file")
         try checkDesktopCopies()
         try checkTrimMerge()
+        try checkTrimDesktopHistory()
     }
 
     /// The trim undo steps share history and capacity with batch actions.
@@ -435,6 +436,55 @@ struct CheckFailed: Error { let message: String }
         // no file is created in the user's notes folder.
         let note = try menu(Pegged(url: NoteFolder.url.appendingPathComponent("check-\(UUID()).txt"), thumb: thumb))
         try check(!note.contains("Markup") && !note.contains("Trim"), "A note's native menu offers neither image nor video editing")
+    }
+
+    func checkTrimDesktopHistory() throws {
+        let fm = FileManager.default
+        for replacing in [false, true] {
+            let line = self.line()
+            let stem = replacing ? "Replacement history" : "New trim history"
+            let original = try png(stem + ".png", in: Inbox.folder)
+            let originalBytes = try Data(contentsOf: original)
+            let originalID = line.hang(original, quietly: true)!
+            let trimmed = try png(stem + " trimmed.png", in: Inbox.folder, red: 0.8)
+            let trimmedBytes = try Data(contentsOf: trimmed)
+            let trimmedURL: URL
+            let trimmedID: UUID
+            if replacing {
+                let trashed = try swapIn(trimmed, at: original)
+                line.rememberReplaced(original, original: trashed)
+                line.takeClip(originalID, thumb: makeThumbnail(original)!)
+                trimmedURL = original
+                trimmedID = originalID
+            } else {
+                trimmedID = line.hang(trimmed, quietly: true, squeezing: true, after: original)!
+                line.rememberSavedAsNew(trimmed)
+                trimmedURL = trimmed
+            }
+            line.copy(trimmedID)
+            line.saveToDesktop(trimmedID)
+            let exported = root.appendingPathComponent("desktop").appendingPathComponent(trimmedURL.lastPathComponent)
+            try check(try Data(contentsOf: exported) == trimmedBytes && !fm.fileExists(atPath: trimmedURL.path)
+                      && copiedURLs == [exported], "\(stem): Desktop save moves the trimmed bytes and updates the copied URL")
+            let namesake = try png(trimmedURL.lastPathComponent, in: Inbox.folder, red: 0.1)
+            let namesakeBytes = try Data(contentsOf: namesake)
+            line.putBack()
+            let restored = line.items.first { $0.url != namesake && !$0.falling && (replacing || $0.url != original) }!
+            try check(try restored.url != trimmedURL && Data(contentsOf: restored.url) == trimmedBytes
+                      && Data(contentsOf: namesake) == namesakeBytes && copiedURLs == [restored.url],
+                      "\(stem): undo save uses a free name and preserves the later namesake")
+            line.putBack()
+            try check(try Data(contentsOf: namesake) == namesakeBytes && !line.canPutBack,
+                      "\(stem): the earlier trim undo follows the restored name and preserves unrelated files")
+            if replacing {
+                try check(try Data(contentsOf: restored.url) == originalBytes && line.liveCount == 1,
+                          "Replace then save: two undos restore the original bytes at the collision-safe path")
+            } else {
+                try check(try !fm.fileExists(atPath: restored.url.path) && Data(contentsOf: original) == originalBytes
+                          && line.liveCount == 1 && copiedURLs.allSatisfy { fm.fileExists(atPath: $0.path) },
+                          "Save as New then save: two undos remove only the trimmed copy and leave valid copied URLs")
+            }
+        }
     }
 
     func checkTrimSearch() async throws {
