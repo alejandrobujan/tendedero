@@ -702,8 +702,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     // MARK: Hang on Tendedero
 
-    /// The service macOS lists for images in Finder and elsewhere. What
-    /// you hang yourself is pinned, and the line comes down to show it.
+    /// The service macOS lists for images and text files in Finder and
+    /// elsewhere. What you hang yourself is pinned, and the line comes down
+    /// to show it. A text file is copied in as a note.
     @objc func hangOnLine(_ pasteboard: NSPasteboard, userData: String?,
                           error: AutoreleasingUnsafeMutablePointer<NSString?>) {
         let urls = pasteboard.readObjects(forClasses: [NSURL.self],
@@ -711,7 +712,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard !urls.isEmpty else { return }
         comeDown(on: nil)
         var any = false
-        for url in urls where line.hangKept(url) { any = true }
+        for url in urls {
+            let hung = NoteFolder.isTextFile(url) ? NoteFolder.adopt(url) : url
+            if let hung, line.hangKept(hung) { any = true }
+        }
         if !any { NSSound.beep() }
     }
 

@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// Where copied text and links are kept: next to the screenshots folder, not
 /// in it, so a note is known by where it lives and never mixed with captures.
@@ -12,6 +13,37 @@ enum NoteFolder {
         url.deletingLastPathComponent().standardizedFileURL.path == Self.url.standardizedFileURL.path
     }
 
+    /// Whether a file from elsewhere, such as Finder, can hang as a note.
+    static func isTextFile(_ url: URL) -> Bool {
+        guard let type = UTType(filenameExtension: url.pathExtension) else { return false }
+        return type.conforms(to: .plainText) || type.conforms(to: .rtf)
+    }
+
+    /// A text file hung from Finder is copied in, so it becomes a note and
+    /// the original stays untouched. Plain text of any kind (Markdown,
+    /// source code) is kept as .txt. Huge files are left alone.
+    static func adopt(_ source: URL) -> URL? {
+        if contains(source) { return source }
+        let size = (try? FileManager.default.attributesOfItem(atPath: source.path))?[.size] as? Int ?? 0
+        guard isTextFile(source), size <= 1_000_000 else { return nil }
+        let ext = source.pathExtension.lowercased() == "rtf" ? "rtf" : "txt"
+        let base = source.deletingPathExtension().lastPathComponent
+        let fm = FileManager.default
+        var target = url.appendingPathComponent("\(base).\(ext)")
+        var n = 2
+        while fm.fileExists(atPath: target.path) {
+            target = url.appendingPathComponent("\(base) \(n).\(ext)")
+            n += 1
+        }
+        do {
+            try fm.createDirectory(at: url, withIntermediateDirectories: true)
+            try fm.copyItem(at: source, to: target)
+            try fm.setAttributes([.posixPermissions: 0o600], ofItemAtPath: target.path)
+            return target
+        } catch {
+            return nil
+        }
+    }
 }
 
 /// What a copied text shows on the line: its first line as a title, the
