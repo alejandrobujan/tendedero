@@ -37,7 +37,9 @@ struct Pegged: Identifiable, Equatable {
 final class Line: ObservableObject {
     @Published private(set) var items: [Pegged] = []
     @Published private(set) var gust = 0
-    @Published var copiedID: UUID?
+    @Published private(set) var copiedIDs: Set<UUID> = []
+    @Published private(set) var selectedIDs: Set<UUID> = []
+    private var copyGeneration = 0
     @Published var draggingID: UUID?
     @Published var pressedID: UUID?
     /// Whether the line has slid down into view.
@@ -111,8 +113,13 @@ final class Line: ObservableObject {
     private var oldestLoose: Pegged? { items.first { !$0.falling && !$0.kept && !$0.held } }
 
     private let storeKey = "pegged"
+    private let pasteboard: NSPasteboard
+    private let desktop: URL
 
-    init() {
+    init(pasteboard: NSPasteboard = .general,
+         desktop: URL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")) {
+        self.pasteboard = pasteboard
+        self.desktop = desktop
         restore()
         search.onChange = { [weak self] in self?.objectWillChange.send() }
         // What already hangs is read once, a moment after launch.
@@ -163,6 +170,7 @@ final class Line: ObservableObject {
 
     func drop(_ id: UUID, quietly: Bool = false) {
         guard let i = items.firstIndex(where: { $0.id == id }), !items[i].falling else { return }
+        selectedIDs.remove(id)
         onFall?(items[i])
         items[i].falling = true
         hitRects[id] = nil
@@ -227,48 +235,91 @@ final class Line: ObservableObject {
         }
     }
 
-    // MARK: Actions on one photo
+    // MARK: Selecting photos
+
+    /// A selection follows the line's order, not the order of the clicks.
+    var selectedItems: [Pegged] { actionItems(Array(selectedIDs)) }
+
+    private func actionItems(_ ids: [UUID]) -> [Pegged] {
+        let ids = Set(ids)
+        return items.filter { ids.contains($0.id) && !$0.falling && !$0.held }
+    }
+
+    func toggleSelection(_ id: UUID) {
+        guard !actionItems([id]).isEmpty else { return }
+        if !selectedIDs.insert(id).inserted { selectedIDs.remove(id) }
+    }
+
+    func clearSelection() { selectedIDs.removeAll() }
+
+    // MARK: Actions on photos
 
     func copy(_ id: UUID) {
-        guard let item = items.first(where: { $0.id == id }) else { return }
-        putOnClipboard(item.url)
+        guard let item = items.first(where: { $0.id == id && !$0.falling }) else { return }
+        copyPhotos([item])
+    }
 
-        copiedID = id
+    func copy(_ ids: [UUID]) {
+        copyPhotos(actionItems(ids))
+    }
+
+    private func copyPhotos(_ photos: [Pegged]) {
+        guard !photos.isEmpty else { return }
+        putOnClipboard(photos.map(\.url))
+
+        copiedIDs = Set(photos.map(\.id))
+        copyGeneration += 1
+        let generation = copyGeneration
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
-            if self?.copiedID == id { self?.copiedID = nil }
+            if self?.copyGeneration == generation { self?.copiedIDs = [] }
         }
     }
 
-    /// The file last put on the clipboard, and the clipboard's change count
+    /// The files last put on the clipboard, and the clipboard's change count
     /// right after. While the count is the same, nothing else has been copied.
-    private var onClipboard: (url: URL, change: Int)?
+    private var onClipboard: (urls: [URL], change: Int)?
 
-    private func putOnClipboard(_ url: URL) {
-        let entry = NSPasteboardItem()
-        if isText(url) {
-            if url.pathExtension.lowercased() == "rtf", let data = try? Data(contentsOf: url) {
-                let data = lightPageRTF(data)
-                entry.setData(data, forType: .rtf)
-                if let plain = NSAttributedString(rtf: data, documentAttributes: nil)?.string {
-                    entry.setString(plain, forType: .string)
-                }
-            } else if let text = try? String(contentsOf: url, encoding: .utf8) {
-                entry.setString(text, forType: .string)
-            }
+    private func putOnClipboard(_ urls: [URL]) {
+        // Several notes paste as one text, a blank line apart: most apps
+        // paste only the first item of a copy.
+        if urls.count > 1, urls.allSatisfy(isText) {
+            let entry = NSPasteboardItem()
+            let words = urls.compactMap { Note.cached($0).map { [$0.title, $0.body].filter { !$0.isEmpty }.joined(separator: "\n") } }
+            entry.setString(words.joined(separator: "\n\n"), forType: .string)
             entry.setData(Data(), forType: selfCopyType)
-            let pb = NSPasteboard.general
+            let pb = pasteboard
             pb.clearContents()
             pb.writeObjects([entry])
-            onClipboard = (url, pb.changeCount)
+            onClipboard = (urls, pb.changeCount)
             return
         }
-        // A recording is copied as the file, which apps paste as the video.
-        if !isRecording(url), let png = pngData(url) { entry.setData(png, forType: .png) }
-        entry.setString(url.absoluteString, forType: .fileURL)
-        let pb = NSPasteboard.general
+        let entries = urls.map { url in
+            let entry = NSPasteboardItem()
+            // A note is its words, styled and plain, marked as Tendedero's
+            // own so it is not hung again.
+            if isText(url) {
+                if url.pathExtension.lowercased() == "rtf", let data = try? Data(contentsOf: url) {
+                    let data = lightPageRTF(data)
+                    entry.setData(data, forType: .rtf)
+                    if let plain = NSAttributedString(rtf: data, documentAttributes: nil)?.string {
+                        entry.setString(plain, forType: .string)
+                    }
+                } else if let text = try? String(contentsOf: url, encoding: .utf8) {
+                    entry.setString(text, forType: .string)
+                }
+                entry.setData(Data(), forType: selfCopyType)
+                return entry
+            }
+            // Each photo has its own image and file representation. Apps
+            // that accept several files can paste the whole selection.
+            if !isRecording(url), let png = pngData(url) { entry.setData(png, forType: .png) }
+            entry.setString(url.absoluteString, forType: .fileURL)
+            return entry
+        }
+        let pb = pasteboard
         pb.clearContents()
-        pb.writeObjects([entry])
-        onClipboard = (url, pb.changeCount)
+        pb.writeObjects(entries)
+        onClipboard = (urls, pb.changeCount)
     }
 
     /// Apps like Finder or a chat window paste the copied file rather than the
@@ -277,9 +328,9 @@ final class Line: ObservableObject {
     private func clipboardFollows(_ url: URL, to moved: URL) {
         // A copied note is its words, which do not depend on the file: once
         // moved out of the notes folder it would go back as a bare file.
-        guard !isText(url), let onClipboard, onClipboard.url == url,
-              onClipboard.change == NSPasteboard.general.changeCount else { return }
-        putOnClipboard(moved)
+        guard !isText(url), let onClipboard, onClipboard.urls.contains(url),
+              onClipboard.change == pasteboard.changeCount else { return }
+        putOnClipboard(onClipboard.urls.map { $0 == url ? moved : $0 })
     }
 
     /// A double click: a copied link opens in the browser, anything else in
@@ -304,6 +355,63 @@ final class Line: ObservableObject {
         guard let item = items.first(where: { $0.id == id }), isText(item.url),
               let link = Note.cached(item.url)?.link else { return }
         NSWorkspace.shared.open(link)
+    }
+
+    func open(_ ids: [UUID]) {
+        for item in actionItems(ids) { open(item.id) }
+    }
+
+    /// Pinned screenshots must be unpinned first, just as in their own menu.
+    func canDiscard(_ ids: [UUID]) -> Bool {
+        let photos = actionItems(ids)
+        return !photos.isEmpty && photos.allSatisfy { !$0.kept || $0.byHand }
+    }
+
+    /// Several dropped on the Dock's Trash together: one step puts them all
+    /// back.
+    func trash(_ ids: [UUID]) {
+        let step = UUID()
+        for (n, id) in ids.enumerated() { trash(id, quietly: n > 0, step: step) }
+    }
+
+    func discard(_ ids: [UUID]) {
+        guard canDiscard(ids) else { NSSound.beep(); return }
+        let photos = actionItems(ids)
+        let step = UUID()
+        // Finish the whole action before an undo can run. New arrivals are
+        // not part of this snapshot, and failed removals stay selected.
+        for (n, item) in photos.enumerated() {
+            discard(item.id, quietly: n > 0, step: step)
+        }
+    }
+
+    func pin(_ ids: [UUID]) {
+        let step = UUID()
+        for (n, item) in actionItems(ids).filter({ !$0.kept }).enumerated() {
+            pin(item.id, quietly: n > 0, step: step)
+        }
+    }
+
+    func unpin(_ ids: [UUID]) {
+        let step = UUID()
+        // Each photo joins the front of the loose ones, so work backwards.
+        for item in actionItems(ids).reversed() { unpin(item.id, step: step) }
+    }
+
+    func canSaveToDesktop(_ ids: [UUID]) -> Bool {
+        actionItems(ids).contains { canSaveToDesktop($0.id) }
+    }
+
+    func canSaveToDesktop(_ id: UUID) -> Bool {
+        isInInbox(id) || isOnDesktop(id)
+    }
+
+    func saveToDesktop(_ ids: [UUID]) {
+        // Inbox files move; files already on the Desktop get another copy.
+        let photos = actionItems(ids).filter { canSaveToDesktop($0.id) }
+        guard !photos.isEmpty else { return }
+        let step = UUID()
+        for item in photos { saveToDesktop(item.id, step: step) }
     }
 
     /// Moves the file to the Trash and takes the photo off the line. When a
@@ -346,6 +454,11 @@ final class Line: ObservableObject {
         // Copied text and links are Tendedero's own files too.
         return item.url.standardizedFileURL.path.hasPrefix(Inbox.folder.standardizedFileURL.path + "/")
             || NoteFolder.contains(item.url)
+    }
+
+    func isOnDesktop(_ id: UUID) -> Bool {
+        guard let item = items.first(where: { $0.id == id }) else { return false }
+        return item.url.deletingLastPathComponent().standardizedFileURL == desktop.standardizedFileURL
     }
 
     /// What the button in a photo's corner does.
@@ -404,15 +517,58 @@ final class Line: ObservableObject {
         drop(id, quietly: true)
     }
 
-    /// Inbox mode: keep a screenshot by moving it to the Desktop.
-    func saveToDesktop(_ id: UUID) {
-        guard let item = items.first(where: { $0.id == id }) else { return }
-        let desktop = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
+    /// An exported screenshot keeps its macOS tag. Desktop watchers must
+    /// not mistake that saved file for a new capture, even after its undo expires.
+    /// Identify the file too, so a later namesake is still picked up.
+    private struct DesktopSave: Equatable {
+        let volume: UInt64
+        let file: UInt64
+        let created: Date?
+
+        init?(_ url: URL) {
+            guard let attributes = try? FileManager.default.attributesOfItem(atPath: url.path),
+                  let volume = attributes[.systemNumber] as? NSNumber,
+                  let file = attributes[.systemFileNumber] as? NSNumber else { return nil }
+            self.volume = volume.uint64Value
+            self.file = file.uint64Value
+            created = attributes[.creationDate] as? Date
+        }
+    }
+
+    private var desktopSaves: [URL: DesktopSave] = [:]
+
+    func isDesktopSave(_ url: URL) -> Bool {
+        let url = url.standardizedFileURL
+        guard let saved = desktopSaves[url] else { return false }
+        guard DesktopSave(url) == saved else {
+            desktopSaves[url] = nil
+            return false
+        }
+        return true
+    }
+
+    /// Move an inbox screenshot to the Desktop, or save another copy of a
+    /// file already there. Every destination gets a name that is still free.
+    func saveToDesktop(_ id: UUID, step: UUID = UUID()) {
+        guard canSaveToDesktop(id),
+              let item = items.first(where: { $0.id == id && !$0.falling }),
+              let index = liveIndex(of: id) else { return }
+        let copying = !isInInbox(id)
         let target = uniqueURL(in: desktop, for: item.url.lastPathComponent)
         do {
-            try FileManager.default.moveItem(at: item.url, to: target)
-            clipboardFollows(item.url, to: target)
+            if copying {
+                try FileManager.default.copyItem(at: item.url, to: target)
+            } else {
+                try FileManager.default.moveItem(at: item.url, to: target)
+                clipboardFollows(item.url, to: target)
+            }
+            let identity = DesktopSave(target)
+            desktopSaves[target.standardizedFileURL] = identity
             drop(id, quietly: true)
+            remember(TakenDown(url: item.url, index: index, trashed: nil,
+                               kept: item.kept, byHand: item.byHand,
+                               moved: copying ? nil : target, copied: copying ? target : nil,
+                               copyIdentity: copying ? identity : nil), in: step)
         } catch {
             log.error("Could not save to Desktop: \(error.localizedDescription, privacy: .public)")
             NSSound.beep()
@@ -483,16 +639,26 @@ final class Line: ObservableObject {
         NSWorkspace.shared.activateFileViewerSelecting([item.url])
     }
 
+    func reveal(_ ids: [UUID]) {
+        let urls = actionItems(ids).map(\.url)
+        guard !urls.isEmpty else { return }
+        NSWorkspace.shared.activateFileViewerSelecting(urls)
+    }
+
     // MARK: Putting back
 
-    /// A photo taken down by hand: its file, where it hung among the photos
-    /// still on the line, and where the file went if it went to the Trash.
+    /// A photo before an undoable action: its file, position, pin state,
+    /// and where the file went if it was moved.
     private struct TakenDown {
-        let url: URL
+        var url: URL
         let index: Int
         let trashed: URL?
         var kept = false
         var byHand = false
+        var moved: URL?
+        var copied: URL?
+        var copyIdentity: DesktopSave?
+        var pinChange = false
     }
 
     /// What was taken down, the latest last. A step holds everything one
@@ -501,6 +667,9 @@ final class Line: ObservableObject {
     private static let maxSteps = 20
 
     var canPutBack: Bool { !steps.isEmpty }
+    /// Keeps undo reachable where a menu action just finished, even below
+    /// the photo band or after the last photo has been taken down.
+    var onUndoableAction: (() -> Void)?
 
     private func remember(_ photo: TakenDown, in step: UUID) {
         if let i = steps.lastIndex(where: { $0.id == step }) {
@@ -508,29 +677,46 @@ final class Line: ObservableObject {
         } else {
             steps.append((step, [photo]))
             if steps.count > Self.maxSteps { steps.removeFirst() }
+            onUndoableAction?()
         }
     }
 
-    /// Put back, or ⌘Z over the line: what was taken down last hangs again
-    /// where it was, and a file sent to the Trash comes back out of it.
+    /// Put back, or ⌘Z: restore the previous positions and pin states, and
+    /// bring files back from the Trash or Desktop if they were moved.
     func putBack() {
         guard let step = steps.popLast() else { return }
         var back: Set<UUID> = []
         // The last one taken down goes back first, so each finds its place.
         for photo in step.photos.reversed() {
-            guard let url = restore(photo), !items.contains(where: { $0.url == url && !$0.falling }),
-                  let thumb = makeThumbnail(url) else { continue }
+            if photo.pinChange {
+                guard let index = items.firstIndex(where: { $0.url == photo.url && !$0.falling }) else { continue }
+                var item = items.remove(at: index)
+                item.kept = photo.kept
+                insert(item, atLiveIndex: photo.index)
+                back.insert(item.id)
+                continue
+            }
+            guard let url = restore(photo) else { continue }
+            // A saved file may have been hung manually meanwhile. Remove
+            // its card only if undo actually moved that file away.
+            if let saved = photo.moved ?? photo.copied, !FileManager.default.fileExists(atPath: saved.path) {
+                for item in items where item.url.standardizedFileURL == saved.standardizedFileURL && !item.falling {
+                    drop(item.id, quietly: true)
+                }
+            }
+            if let existing = items.first(where: { $0.url.standardizedFileURL == url.standardizedFileURL && !$0.falling }) {
+                back.insert(existing.id)
+                continue
+            }
+            guard let thumb = makeThumbnail(url) else { continue }
             var item = Pegged(url: url, thumb: thumb)
             item.kept = photo.kept
             item.byHand = photo.byHand
-            let live = items.filter { !$0.falling }
             if let gap = items.firstIndex(where: { $0.falling && $0.url == photo.url }) {
                 // Its empty place is still on the line: it hangs back there.
                 items[gap] = item
-            } else if photo.index < live.count, let i = items.firstIndex(where: { $0.id == live[photo.index].id }) {
-                items.insert(item, at: i)
             } else {
-                items.append(item)
+                insert(item, atLiveIndex: photo.index)
             }
             back.insert(item.id)
         }
@@ -548,20 +734,55 @@ final class Line: ObservableObject {
         play("Tink", volume: 0.35)
     }
 
+    private func insert(_ item: Pegged, atLiveIndex index: Int) {
+        let live = items.filter { !$0.falling }
+        if index < live.count, let i = items.firstIndex(where: { $0.id == live[index].id }) {
+            items.insert(item, at: i)
+        } else {
+            items.append(item)
+        }
+    }
+
     /// The photo's file, where it was before. Nil when it is gone: the Trash
     /// was emptied, or the file was moved or deleted since.
     private func restore(_ photo: TakenDown) -> URL? {
-        guard let trashed = photo.trashed else {
+        if let copied = photo.copied {
+            // The original never moved. Undo removes only the copy we
+            // created, not a different file later using that destination.
+            if let identity = photo.copyIdentity, DesktopSave(copied) == identity {
+                do {
+                    var trashed: NSURL?
+                    try FileManager.default.trashItem(at: copied, resultingItemURL: &trashed)
+                    if let trashed { clipboardFollows(copied, to: trashed as URL) }
+                    desktopSaves[copied.standardizedFileURL] = nil
+                } catch {
+                    log.error("Could not undo Desktop copy: \(error.localizedDescription, privacy: .public)")
+                    return nil
+                }
+            }
+            return FileManager.default.fileExists(atPath: photo.url.path) ? photo.url : nil
+        }
+        guard let moved = photo.moved ?? photo.trashed else {
             return FileManager.default.fileExists(atPath: photo.url.path) ? photo.url : nil
         }
         let url = uniqueURL(in: photo.url.deletingLastPathComponent(), for: photo.url.lastPathComponent)
         do {
-            try FileManager.default.moveItem(at: trashed, to: url)
-            clipboardFollows(trashed, to: url)
+            try FileManager.default.moveItem(at: moved, to: url)
+            desktopSaves[moved.standardizedFileURL] = nil
+            clipboardFollows(moved, to: url)
+            // A newer namesake may force a different filename. Earlier
+            // actions, such as pinning this photo, must follow that name.
+            if url != photo.url {
+                for step in steps.indices {
+                    for i in steps[step].photos.indices where steps[step].photos[i].url == photo.url {
+                        steps[step].photos[i].url = url
+                    }
+                }
+            }
             log.notice("Put back \(url.lastPathComponent, privacy: .public)")
             return url
         } catch {
-            log.error("Could not put back \(trashed.path, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            log.error("Could not put back \(moved.path, privacy: .public): \(error.localizedDescription, privacy: .public)")
             return nil
         }
     }
@@ -583,23 +804,31 @@ final class Line: ObservableObject {
     }
 
     /// Pin: the photo joins the kept ones at the left end of the line.
-    func pin(_ id: UUID) {
-        guard let i = items.firstIndex(where: { $0.id == id && !$0.falling && !$0.kept }) else { return }
+    func pin(_ id: UUID, quietly: Bool = false, step: UUID = UUID()) {
+        guard let i = items.firstIndex(where: { $0.id == id && !$0.falling && !$0.kept }),
+              let index = liveIndex(of: id) else { return }
         var item = items.remove(at: i)
+        let before = TakenDown(url: item.url, index: index, trashed: nil,
+                               kept: item.kept, byHand: item.byHand, pinChange: true)
         item.kept = true
         items.insert(item, at: keptCount)
         save()
-        play("Tink", volume: 0.35)
+        remember(before, in: step)
+        if !quietly { play("Tink", volume: 0.35) }
     }
 
     /// Unpin: it hangs loose again, first past the kept ones, so it is the
     /// next to fall from a full line.
-    func unpin(_ id: UUID) {
-        guard let i = items.firstIndex(where: { $0.id == id && !$0.falling && $0.kept && !$0.byHand }) else { return }
+    func unpin(_ id: UUID, step: UUID = UUID()) {
+        guard let i = items.firstIndex(where: { $0.id == id && !$0.falling && $0.kept && !$0.byHand }),
+              let index = liveIndex(of: id) else { return }
         var item = items.remove(at: i)
+        let before = TakenDown(url: item.url, index: index, trashed: nil,
+                               kept: item.kept, byHand: item.byHand, pinChange: true)
         item.kept = false
         items.insert(item, at: keptCount)
         save()
+        remember(before, in: step)
     }
 
     /// An image hung from another app, with Hang on Tendedero. Like a
@@ -628,6 +857,7 @@ final class Line: ObservableObject {
     /// Off the line and into your hand, or back onto its clip.
     func setHeld(_ id: UUID, _ held: Bool) {
         guard let i = items.firstIndex(where: { $0.id == id && !$0.falling }) else { return }
+        if held { selectedIDs.remove(id) }
         items[i].held = held
         if !held { items[i].flying = true }
     }

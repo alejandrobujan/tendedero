@@ -80,6 +80,12 @@
 "Hang everything back" = "全部放回绳上";
 "Actual Size" = "实际大小";
 
+/* Selecting photos */
+"%d selected" = "已选择 %d 张";
+"Shift-click to select photos" = "按住 Shift 点击以选择图片";
+// Save availability
+"Save to Desktop (inbox or Desktop only)" = "存储到桌面（仅收纳目录或桌面）";
+
 /* Open at login, offered on each install and update */
 "Open Tendedero at login?" = "登录时打开 Tendedero？";
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero 不会在登录时打开，所以重新启动后，晾衣绳会一直不见，直到你再次打开它。";

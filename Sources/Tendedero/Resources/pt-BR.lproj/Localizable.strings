@@ -80,6 +80,12 @@
 "Hang everything back" = "Devolver tudo ao varal";
 "Actual Size" = "Tamanho real";
 
+/* Selecting photos */
+"%d selected" = "Seleção: %d";
+"Shift-click to select photos" = "Clique com Shift para selecionar fotos";
+// Save availability
+"Save to Desktop (inbox or Desktop only)" = "Salvar na Mesa (somente pasta do Tendedero ou Mesa)";
+
 /* Open at login, offered on each install and update */
 "Open Tendedero at login?" = "Abrir o Tendedero ao iniciar sessão?";
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "O Tendedero não abre quando você inicia a sessão, então depois de reiniciar o varal some até você abri-lo de novo.";

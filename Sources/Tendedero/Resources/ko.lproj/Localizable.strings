@@ -80,6 +80,12 @@
 "Hang everything back" = "모두 줄에 돌려놓기";
 "Actual Size" = "실제 크기";
 
+/* Selecting photos */
+"%d selected" = "%d개 선택됨";
+"Shift-click to select photos" = "Shift 키를 누른 채 클릭하여 사진 선택";
+// Save availability
+"Save to Desktop (inbox or Desktop only)" = "데스크탑에 저장 (Tendedero 폴더 또는 데스크탑만)";
+
 /* Open at login, offered on each install and update */
 "Open Tendedero at login?" = "로그인 시 Tendedero를 열까요?";
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero는 로그인할 때 열리지 않아서, 재시동하면 다시 열 때까지 빨랫줄이 사라져요.";

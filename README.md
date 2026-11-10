@@ -47,6 +47,9 @@ Rest the pointer in the middle of the menu bar and it glides down. Move away and
 
 | | |
 |:--|:--|
+| Shift-click | Add or remove a photo from the selection. Releasing Shift keeps it selected. |
+| Right-click a selected photo | Copy, open, show in Finder, share, pin/unpin, save to Desktop or take down the selection. The menu shows the count; each action keeps its existing file and pin rules. |
+| With a selection, pointer on the line | ⌘C copies the selection; ⌫ over a photo takes it down in one undo step; Esc clears the selection. An ordinary click or hiding the line also clears it. |
 | Click | Copy the image. |
 | Press and hold | Open it in Markup. |
 | Double click | Open it in Preview. |
@@ -54,7 +57,7 @@ Rest the pointer in the middle of the menu bar and it glides down. Move away and
 | Drag into an app | Send a copy. It stays on the line. |
 | Drag into a folder | Keep it there. It leaves the line. |
 | Drag to the Trash, or click the cross | Let it go. |
-| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> with the pointer on the line | Hang back what you just let go. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> over the line or where its menu just closed | Undo the last discard, pin/unpin, or Save to Desktop, including a whole selection. Move away or click elsewhere to return undo to the other app. |
 | <kbd>Space</kbd> with the pointer on a photo | Take a quick look. |
 | <kbd>⌫</kbd> with the pointer on a photo | Let it go, as its corner button does. |
 | Right click, then Share | Send it with AirDrop, Messages, Mail and more. It stays on the line. |

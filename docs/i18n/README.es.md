@@ -49,6 +49,9 @@ Lleva el puntero al centro de la barra de menús y la cuerda baja. Apártalo y d
 
 | | |
 |:--|:--|
+| Mayús-clic | Añade o quita una foto de la selección. Al soltar Mayús, la selección se mantiene. |
+| Clic derecho en una foto seleccionada | Copia, abre, muestra en Finder, comparte, fija/desfija, guarda en el Escritorio o descuelga la selección. El menú indica cuántas fotos hay y mantiene las reglas de archivos y fotos fijadas. |
+| Con fotos seleccionadas y el puntero en la cuerda | ⌘C copia la selección; ⌫ sobre una foto la descuelga en un solo paso de deshacer; Esc borra la selección. Un clic normal u ocultar la cuerda también la borra. |
 | Clic | Copia la imagen. |
 | Mantener pulsado | La abre en Marcación. |
 | Doble clic | La abre en Vista Previa. |
@@ -56,7 +59,7 @@ Lleva el puntero al centro de la barra de menús y la cuerda baja. Apártalo y d
 | Arrastrar a una app | Envía una copia, y la captura sigue colgada. |
 | Arrastrar a una carpeta | Se queda ahí y sale de la cuerda. |
 | Arrastrar a la Papelera o hacer clic en la cruz | Te deshaces de ella. |
-| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> con el puntero en la cuerda | Vuelve a colgar lo que acabas de soltar. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> sobre la cuerda o donde acaba de cerrarse su menú | Deshace el último descarte, fijado/desfijado o guardado en el Escritorio, incluida toda la selección. Aleja el puntero o haz clic fuera para devolver Deshacer a la otra app. |
 | <kbd>Espacio</kbd> con el puntero en una foto | Échale un vistazo. |
 | <kbd>⌫</kbd> con el puntero en una foto | Suéltala, como su botón de la esquina. |
 | Clic derecho y Compartir | Envíala por AirDrop, Mensajes, Mail y más, y la captura sigue colgada. |

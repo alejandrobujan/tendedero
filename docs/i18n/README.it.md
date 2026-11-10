@@ -50,13 +50,16 @@ Porta il puntatore al centro della barra dei menu e il filo scende. Allontanalo 
 | | |
 |:--|:--|
 | Clic | Copia l’immagine. |
+| Clic con Maiusc | Aggiunge o rimuove una foto dalla selezione. La selezione resta anche dopo aver rilasciato Maiusc. |
+| Clic destro su una foto selezionata | Copia, apre, mostra nel Finder, condivide, fissa o non fissa più, salva sulla Scrivania o toglie dal filo le foto selezionate. Il menu mostra il numero di foto; ogni azione mantiene le regole esistenti per i file e le foto fissate. |
+| Con una selezione e il puntatore sul filo | ⌘C copia la selezione; ⌫ sopra una foto toglie la selezione dal filo in un’unica operazione annullabile; Esc cancella la selezione. Anche un clic normale o nascondere il filo cancella la selezione. |
 | Tenere premuto | La apre per annotarla. |
 | Doppio clic | La apre in Anteprima. |
 | Clic con pressione | Le dà un’occhiata con Visualizzazione rapida. |
 | Trascinare in un’app | Invia una copia, e lo screenshot resta sul filo. |
 | Trascinare in una cartella | Resta lì e lascia il filo. |
 | Trascinare nel Cestino o fare clic sulla crocetta | Te ne liberi. |
-| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> con il puntatore sul filo | Riappende quello che hai appena tolto. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> sul filo o dove si è appena chiuso il suo menu | Annulla l’ultima rimozione, modifica delle foto fissate o salvataggio sulla Scrivania, anche per un’intera selezione. Sposta il puntatore altrove o fai clic fuori per restituire il comando Annulla all’altra app. |
 | <kbd>Spazio</kbd> con il puntatore su una foto | Dalle un’occhiata. |
 | <kbd>⌫</kbd> con il puntatore su una foto | Toglila, come con il pulsante nell’angolo. |
 | Clic destro, poi Condividi | Inviala con AirDrop, Messaggi, Mail e altro, e lo screenshot resta sul filo. |

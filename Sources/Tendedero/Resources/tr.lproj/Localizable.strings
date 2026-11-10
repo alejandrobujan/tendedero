@@ -80,6 +80,12 @@
 "Hang everything back" = "Hepsini ipe geri koy";
 "Actual Size" = "Gerçek boyut";
 
+/* Selecting photos */
+"%d selected" = "%d fotoğraf seçildi";
+"Shift-click to select photos" = "Fotoğraf seçmek için Shift tuşunu basılı tutarak tıklayın";
+// Save availability
+"Save to Desktop (inbox or Desktop only)" = "Masaüstüne kaydet (yalnızca Tendedero klasörü veya masaüstü)";
+
 /* Open at login, offered on each install and update */
 "Open Tendedero at login?" = "Tendedero başlangıçta açılsın mı?";
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero oturum açtığınızda açılmıyor; bu yüzden yeniden başlattıktan sonra siz tekrar açana kadar ip görünmez.";

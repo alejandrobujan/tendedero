@@ -10,7 +10,8 @@ struct PeggedView: View {
     @State private var arrived = false
     @State private var hovering = false
 
-    private var copied: Bool { line.copiedID == item.id }
+    private var copied: Bool { line.copiedIDs.contains(item.id) }
+    private var selected: Bool { line.selectedIDs.contains(item.id) }
     private var dragging: Bool { line.draggingID == item.id }
 
     private var cornerSymbol: String {
@@ -100,6 +101,23 @@ struct PeggedView: View {
             }
             .padding(Frame.inset)
             .glassFrame(cornerRadius: Frame.radius)
+            .overlay {
+                if selected {
+                    RoundedRectangle(cornerRadius: Frame.radius, style: .continuous)
+                        .strokeBorder(Color.accentColor, lineWidth: 3)
+                        .allowsHitTesting(false)
+                }
+            }
+            .overlay(alignment: .topTrailing) {
+                if selected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(.white, Color.accentColor)
+                        .font(.system(size: 17, weight: .semibold))
+                        .padding(5)
+                        .allowsHitTesting(false)
+                }
+            }
             .shadow(color: .black.opacity(hovering ? 0.26 : 0.18), radius: hovering ? 14 : 10, y: hovering ? 8 : 5)
             // Holding presses the photo in slowly, so a long press feels like
             // it is building up to something.

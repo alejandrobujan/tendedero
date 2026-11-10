@@ -80,6 +80,12 @@
 "Hang everything back" = "Riappendi tutto";
 "Actual Size" = "Dimensioni reali";
 
+/* Selecting photos */
+"%d selected" = "Selezione: %d";
+"Shift-click to select photos" = "Fai clic tenendo premuto Maiusc per selezionare le foto";
+// Save availability
+"Save to Desktop (inbox or Desktop only)" = "Salva sulla Scrivania (solo da Tendedero o dalla Scrivania)";
+
 /* Open at login, offered on each install and update */
 "Open Tendedero at login?" = "Aprire Tendedero al login?";
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero non si apre quando accedi, quindi dopo un riavvio il filo sparisce finché non lo riapri.";

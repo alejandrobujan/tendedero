@@ -32,6 +32,12 @@ struct GrabArea: NSViewRepresentable {
         view.url = item.url
         view.dragImage = item.thumb
         view.isHeld = item.held
+        view.toolTip = L("Shift-click to select photos")
+        view.onSelect = { line.toggleSelection(id) }
+        // Pressing a selected photo keeps the selection, so it can be
+        // dragged as a group; a plain click on it clears it when released.
+        view.onPlainPress = { if !line.selectedIDs.contains(id) { line.clearSelection() } }
+        view.onPlainClick = { line.clearSelection() }
         view.onHangBack = { line.onHangBack?(id) }
         view.onClick = { line.copy(id) }
         view.onDoubleClick = { line.open(id) }
@@ -41,12 +47,22 @@ struct GrabArea: NSViewRepresentable {
             // Moved into a folder: it is saved where you wanted it.
             line.prune()
         }
-        view.onTrash = { line.trash(id) }
+        // A photo selected with others drags them all, and they go to the
+        // Trash together.
+        let inGroup = { line.selectedIDs.contains(id) && line.selectedIDs.count > 1 }
+        view.dragGroup = { inGroup() ? line.selectedItems.map { ($0.url, $0.thumb) } : [] }
+        view.onTrash = {
+            if inGroup() { line.trash(line.selectedItems.map(\.id)) } else { line.trash(id) }
+        }
         view.onDiscard = { line.pressCorner(id) }
         view.onLongPress = { line.markup(id) }
         view.onForceClick = { line.quickLook(id) }
         view.onPressChange = { pressed in line.pressedID = pressed ? id : nil }
         view.menuProvider = { [weak view] in
+            if line.selectedIDs.contains(id) {
+                return selectionMenu(line.selectedItems, from: view)
+            }
+            line.clearSelection()
             let menu = NSMenu()
             // Items say themselves whether they can be used.
             menu.autoenablesItems = false
@@ -84,9 +100,7 @@ struct GrabArea: NSViewRepresentable {
                 menu.addItem(ClosureMenuItem(L("Unpin")) { line.unpin(id) })
             }
             let inInbox = line.isInInbox(id)
-            if inInbox {
-                menu.addItem(ClosureMenuItem(L("Save to Desktop")) { line.saveToDesktop(id) })
-            }
+            menu.addItem(saveToDesktopItem([id]))
             menu.addItem(.separator())
             if kept {
                 // A pinned photo never goes to the Trash from here. One hung
@@ -109,6 +123,58 @@ struct GrabArea: NSViewRepresentable {
             return menu
         }
     }
+
+    /// A menu captures the selection when it opens. New photos arriving
+    /// while it is open cannot become part of an action by accident.
+    private func selectionMenu(_ photos: [Pegged], from view: GrabView?) -> NSMenu {
+        let ids = photos.map(\.id)
+        let menu = NSMenu()
+        menu.autoenablesItems = false
+        let count = NSMenuItem(title: String(format: L("%d selected"), photos.count), action: nil, keyEquivalent: "")
+        count.isEnabled = false
+        menu.addItem(count)
+        menu.addItem(.separator())
+        menu.addItem(ClosureMenuItem(L("Copy")) { line.copy(ids) })
+        menu.addItem(ClosureMenuItem(L("Open")) { line.open(ids) })
+        menu.addItem(ClosureMenuItem(L("Show in Finder")) { line.reveal(ids) })
+        if let view, let window = view.window {
+            let card = window.convertToScreen(view.convert(view.bounds, to: nil))
+            menu.addItem(.separator())
+            let share = ClosureMenuItem(L("Share…")) {
+                DispatchQueue.main.async { Share.shared.show(photos.map(\.url), from: card) }
+            }
+            share.image = NSImage(systemSymbolName: "square.and.arrow.up", accessibilityDescription: nil)
+            menu.addItem(share)
+        }
+        menu.addItem(.separator())
+        if photos.contains(where: { !$0.kept }) {
+            menu.addItem(ClosureMenuItem(L("Pin")) { line.pin(ids) })
+        }
+        if photos.contains(where: { $0.kept && !$0.byHand }) {
+            menu.addItem(ClosureMenuItem(L("Unpin")) { line.unpin(ids) })
+        }
+        menu.addItem(saveToDesktopItem(ids))
+        menu.addItem(.separator())
+        let inInbox = photos.allSatisfy { !$0.kept && line.isInInbox($0.id) }
+        let discard = ClosureMenuItem(inInbox ? L("Discard") : L("Take down")) { line.discard(ids) }
+        discard.isEnabled = line.canDiscard(ids)
+        menu.addItem(discard)
+        return menu
+    }
+
+    /// Keep the action discoverable for a single photo too, and explain
+    /// why other source folders are not handled by this action.
+    private func saveToDesktopItem(_ ids: [UUID]) -> NSMenuItem {
+        // Preserve the single-photo action, including a photo held in hand.
+        let single = ids.count == 1 ? ids.first : nil
+        let enabled = single.map { line.canSaveToDesktop($0) } ?? line.canSaveToDesktop(ids)
+        let title = enabled ? L("Save to Desktop") : L("Save to Desktop (inbox or Desktop only)")
+        let item = ClosureMenuItem(title) {
+            if let single { line.saveToDesktop(single) } else { line.saveToDesktop(ids) }
+        }
+        item.isEnabled = enabled
+        return item
+    }
 }
 
 final class GrabView: NSView, NSDraggingSource {
@@ -118,10 +184,16 @@ final class GrabView: NSView, NSDraggingSource {
 
     var url: URL?
     var dragImage: NSImage?
+    /// Every photo that drags along with this one, when it is selected with
+    /// others. Empty for a drag of its own.
+    var dragGroup: () -> [(URL, NSImage)] = { [] }
     /// Held in your hand: only its faded trace is on the line, and a click
     /// on it is all it answers, to bring the photo back.
     var isHeld = false
     var onHangBack: () -> Void = {}
+    var onSelect: () -> Void = {}
+    var onPlainPress: () -> Void = {}
+    var onPlainClick: () -> Void = {}
     var onClick: () -> Void = {}
     var onDoubleClick: () -> Void = {}
     var onDragStart: () -> Void = {}
@@ -139,7 +211,7 @@ final class GrabView: NSView, NSDraggingSource {
     private var didLongPress = false
     /// A click copies only once it is clear it is not the first half of a
     /// double click, which opens the photo and must leave the clipboard alone.
-    private var clickTimer: Timer?
+    private static var clickTimer: Timer?
 
     /// How long you hold before Markup opens. Long enough not to fire on a
     /// slow click, short enough to feel deliberate.
@@ -159,14 +231,19 @@ final class GrabView: NSView, NSDraggingSource {
     }
 
     override func mouseDown(with event: NSEvent) {
+        Self.clickTimer?.invalidate()
+        Self.clickTimer = nil
+        if event.modifierFlags.contains(.shift) {
+            downPoint = nil
+            endPress()
+            if !isHeld { onSelect() }
+            return
+        }
+        onPlainPress()
         if isHeld {
             downPoint = nil
             onHangBack()
             return
-        }
-        if event.clickCount > 1 {
-            clickTimer?.invalidate()
-            clickTimer = nil
         }
         if isInCross(event) {
             downPoint = nil
@@ -215,9 +292,23 @@ final class GrabView: NSView, NSDraggingSource {
         startedDrag = true
         endPress()
 
-        let item = NSDraggingItem(pasteboardWriter: Self.dragWriter(for: url))
-        item.setDraggingFrame(imageFrame(), contents: dragImage)
-        let session = beginDraggingSession(with: [item], event: event, source: self)
+        let group = dragGroup()
+        let items: [NSDraggingItem]
+        if group.count > 1 {
+            // A small pile, each with its own picture, set off a little.
+            let base = imageFrame()
+            items = group.enumerated().map { n, member in
+                let item = NSDraggingItem(pasteboardWriter: Self.dragWriter(for: member.0))
+                item.setDraggingFrame(base.offsetBy(dx: CGFloat(n) * 6, dy: CGFloat(-n) * 6), contents: member.1)
+                return item
+            }
+        } else {
+            let item = NSDraggingItem(pasteboardWriter: Self.dragWriter(for: url))
+            item.setDraggingFrame(imageFrame(), contents: dragImage)
+            items = [item]
+        }
+        let session = beginDraggingSession(with: items, event: event, source: self)
+        if items.count > 1 { session.draggingFormation = .pile }
         // Released where nothing accepts it: it flies back to the line.
         session.animatesToStartingPositionsOnCancelOrFail = true
         GrabView.isDragging = true
@@ -243,19 +334,20 @@ final class GrabView: NSView, NSDraggingSource {
     override func mouseUp(with event: NSEvent) {
         endPress()
         if downPoint != nil && !startedDrag && !didLongPress && event.clickCount == 1 {
+            onPlainClick()
             // Waits as long as the system lets a second click count as a double click.
-            clickTimer?.invalidate()
+            Self.clickTimer?.invalidate()
             // The copy goes ahead even if the line redraws this view meanwhile.
             let copy = onClick
-            let timer = Timer(timeInterval: NSEvent.doubleClickInterval, repeats: false) { [weak self] _ in
+            let timer = Timer(timeInterval: NSEvent.doubleClickInterval, repeats: false) { _ in
                 MainActor.assumeIsolated {
-                    self?.clickTimer = nil
+                    Self.clickTimer = nil
                     copy()
                 }
             }
             // Keeps time while a menu or a drag runs the loop in another mode.
             RunLoop.main.add(timer, forMode: .common)
-            clickTimer = timer
+            Self.clickTimer = timer
         }
         downPoint = nil
         didLongPress = false
@@ -263,6 +355,9 @@ final class GrabView: NSView, NSDraggingSource {
 
     override func rightMouseDown(with event: NSEvent) {
         guard !isHeld else { return }
+        Self.clickTimer?.invalidate()
+        Self.clickTimer = nil
+        endPress()
         // The menu runs until it closes, and the line stays down meanwhile.
         GrabView.isShowingMenu = true
         NSMenu.popUpContextMenu(menuProvider(), with: event, for: self)
