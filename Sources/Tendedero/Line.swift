@@ -459,8 +459,8 @@ final class Line: ObservableObject {
             return
         }
         // As when something new hangs, a full line lets its oldest photo go,
-        // never one that just came back.
-        while liveCount > maxItems, let oldest = items.first(where: { !$0.falling && !$0.kept && !back.contains($0.id) }) {
+        // never one that just came back or one you are holding.
+        while liveCount > maxItems, let oldest = items.first(where: { !$0.falling && !$0.kept && !$0.held && !back.contains($0.id) }) {
             letGo(oldest.id)
         }
         keepKeptFirst()
