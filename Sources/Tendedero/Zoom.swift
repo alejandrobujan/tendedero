@@ -1,17 +1,20 @@
 import AppKit
 import SwiftUI
 
-/// A closer look without clicking: resting the pointer on a photo or a note
-/// opens a larger copy of it just below the line. Moving along the line, it
-/// follows the pointer from one card to the next at once; leaving the line
-/// closes it. It is drawn in its own window, because the line's strip is
-/// only as tall as the cards, and it never takes a click.
+/// A closer look without clicking: resting the pointer on a photo opens a
+/// larger copy of it just below the line. Moving along the line, it follows
+/// the pointer from one card to the next at once; leaving the line closes
+/// it. It is drawn in its own window, because the line's strip is only as
+/// tall as the cards, and it never takes a click.
+///
+/// Ported from upstream PR #65 by Denis Mennesson, without the sticky notes
+/// it was built on.
 @MainActor
 final class Zoom {
-    /// Zoom on hover, from the menu bar. On out of the box.
+    /// Zoom on hover, from the menu bar. Off until chosen.
     static var isEnabled: Bool {
-        get { !UserDefaults.standard.bool(forKey: "zoomOff") }
-        set { UserDefaults.standard.set(!newValue, forKey: "zoomOff") }
+        get { UserDefaults.standard.bool(forKey: "zoomOn") }
+        set { UserDefaults.standard.set(newValue, forKey: "zoomOn") }
     }
 
     /// How long the pointer rests on a card before it opens. Long enough
@@ -24,10 +27,9 @@ final class Zoom {
     /// Below the card, clear of the Copied label.
     private static let gap: CGFloat = 34
     private static let maxSize = CGSize(width: 560, height: 420)
-    private static let noteSide: CGFloat = 300
 
     private let window: NSPanel
-    private let host = NSHostingView(rootView: ZoomView(image: nil, isNote: false, size: .zero))
+    private let host = NSHostingView(rootView: ZoomView(image: nil, size: .zero))
 
     private var shownID: UUID?
     private var shownThumb: NSImage?
@@ -63,10 +65,14 @@ final class Zoom {
             return
         }
         lostSince = nil
-        // Already open: follow the pointer, and the card if the line scrolls.
-        if shownID != nil {
-            show(item, card: card, on: screen)
-            return
+        if let shown = shownID {
+            // Still the same card: follow it if the line scrolls.
+            if shown == item.id {
+                show(item, card: card, on: screen)
+                return
+            }
+            // Another card: close this one and wait again, as for the first.
+            hide()
         }
         if candidate != item.id {
             candidate = item.id
@@ -87,25 +93,24 @@ final class Zoom {
 
     private func show(_ item: Pegged, card: CGRect, on screen: NSScreen) {
         let visible = screen.visibleFrame
+        // The free space under the line, the same whichever card it is.
+        let top = screen.frame.maxY - Layout.panelHeight - Self.gap
         let room = CGSize(width: min(Self.maxSize.width, visible.width - 32),
-                          height: min(Self.maxSize.height, card.minY - Self.gap - visible.minY - 16))
+                          height: min(Self.maxSize.height, top - visible.minY - 32))
         guard room.width > 120, room.height > 120 else { return hide() }
 
-        let size: CGSize
-        if item.isNote {
-            let side = min(Self.noteSide, room.width, room.height)
-            size = CGSize(width: side, height: side)
-        } else {
-            // A photo in its glass frame, as on the line, never past its own size.
-            let photo = item.thumb.size
-            guard photo.width > 0, photo.height > 0 else { return hide() }
-            let inner = CGSize(width: room.width - Frame.inset * 2, height: room.height - Frame.inset * 2)
-            let scale = min(inner.width / photo.width, inner.height / photo.height)
-            size = CGSize(width: photo.width * scale + Frame.inset * 2, height: photo.height * scale + Frame.inset * 2)
-        }
+        // A photo in its glass frame, as on the line, never past its own size.
+        let photo = item.thumb.size
+        guard photo.width > 0, photo.height > 0 else { return hide() }
+        let inner = CGSize(width: room.width - Frame.inset * 2, height: room.height - Frame.inset * 2)
+        let scale = min(inner.width / photo.width, inner.height / photo.height)
+        let size = CGSize(width: photo.width * scale + Frame.inset * 2, height: photo.height * scale + Frame.inset * 2)
 
-        let x = min(max(card.midX - size.width / 2, visible.minX + 16), visible.maxX - 16 - size.width)
-        let content = CGRect(x: x, y: card.minY - Self.gap - size.height, width: size.width, height: size.height)
+        // Always in the middle of the screen, so it does not move from card
+        // to card. Lower only on a screen so small it would cover the line.
+        let content = CGRect(x: visible.midX - size.width / 2,
+                             y: min(visible.midY - size.height / 2, top - size.height),
+                             width: size.width, height: size.height)
         let frame = content.insetBy(dx: -Self.margin, dy: -Self.margin).integral
 
         if item.id != shownID || item.thumb !== shownThumb {
@@ -113,7 +118,7 @@ final class Zoom {
             // Drawn again at the larger size, so it stays sharp.
             let pixels = Int(max(size.width, size.height) * screen.backingScaleFactor)
             let image = makeThumbnail(item.url, maxPixels: pixels) ?? item.thumb
-            host.rootView = ZoomView(image: image, isNote: item.isNote, size: size, generation: generation)
+            host.rootView = ZoomView(image: image, size: size, generation: generation)
             shownID = item.id
             shownThumb = item.thumb
         }
@@ -124,34 +129,22 @@ final class Zoom {
 
 struct ZoomView: View {
     let image: NSImage?
-    let isNote: Bool
     let size: CGSize
     var generation = 0
 
     var body: some View {
         if let image {
-            Grown(generation: generation) { card(image) }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
-    }
-
-    @ViewBuilder private func card(_ image: NSImage) -> some View {
-        if isNote {
-            Image(nsImage: image)
-                .resizable()
-                .interpolation(.high)
-                .frame(width: size.width, height: size.height)
-                .clipShape(RoundedRectangle(cornerRadius: Frame.noteRadius, style: .continuous))
-                .shadow(color: .black.opacity(0.28), radius: 18, y: 10)
-        } else {
-            Image(nsImage: image)
-                .resizable()
-                .interpolation(.high)
-                .frame(width: size.width - Frame.inset * 2, height: size.height - Frame.inset * 2)
-                .clipShape(RoundedRectangle(cornerRadius: Frame.radius - Frame.inset, style: .continuous))
-                .padding(Frame.inset)
-                .glassFrame(cornerRadius: Frame.radius)
-                .shadow(color: .black.opacity(0.28), radius: 18, y: 10)
+            Grown(generation: generation) {
+                Image(nsImage: image)
+                    .resizable()
+                    .interpolation(.high)
+                    .frame(width: size.width - Frame.inset * 2, height: size.height - Frame.inset * 2)
+                    .clipShape(RoundedRectangle(cornerRadius: Frame.radius - Frame.inset, style: .continuous))
+                    .padding(Frame.inset)
+                    .glassFrame(cornerRadius: Frame.radius)
+                    .shadow(color: .black.opacity(0.28), radius: 18, y: 10)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }

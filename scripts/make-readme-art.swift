@@ -65,6 +65,30 @@ let translations: [String: [String: String]] = [
         "Let it go.": "E esquécete.",
         "The cross or the Trash. That\u{2019}s it.": "A cruz ou a Papeleira. Nada máis.",
     ],
+    "hi": [
+        "Screenshots, hung out to dry.": "स्क्रीनशॉट, रस्सी पर सूखते हुए।",
+        "Copied": "कॉपी हो गया",
+        "Click to copy.": "क्लिक करें, कॉपी हो जाएगा।",
+        "Paste it anywhere, instantly.": "कहीं भी पेस्ट करें, तुरंत।",
+        "Hold to mark up.": "दबाए रखें, मार्कअप करें।",
+        "Annotate, crop or sign in place.": "वहीं नोट लिखें, क्रॉप करें या साइन करें।",
+        "Drag to share.": "खींचें, शेयर करें।",
+        "Apps get a copy. Folders keep it.": "ऐप्स को कॉपी मिलती है। फ़ोल्डर उसे रख लेते हैं।",
+        "Let it go.": "जाने दें।",
+        "The cross or the Trash. That\u{2019}s it.": "क्रॉस या ट्रैश। बस इतना ही।",
+    ],
+    "it": [
+        "Screenshots, hung out to dry.": "I tuoi screenshot, stesi ad asciugare.",
+        "Copied": "Copiato",
+        "Click to copy.": "Clic per copiare.",
+        "Paste it anywhere, instantly.": "Incollala dove vuoi, all\u{2019}istante.",
+        "Hold to mark up.": "Tieni premuto per annotare.",
+        "Annotate, crop or sign in place.": "Annota, ritaglia o firma sul posto.",
+        "Drag to share.": "Trascina per condividere.",
+        "Apps get a copy. Folders keep it.": "Le app ricevono una copia. Le cartelle, l\u{2019}originale.",
+        "Let it go.": "E non pensarci pi\u{F9}.",
+        "The cross or the Trash. That\u{2019}s it.": "La crocetta o il Cestino. Tutto qui.",
+    ],
     "fr": [
         "Screenshots, hung out to dry.": "Vos captures, mises à sécher.",
         "Copied": "Copié",
@@ -156,6 +180,7 @@ struct Theme {
     let shadow: NSColor
     let tile: NSColor
     let tileInk: NSColor
+    let tagline: [NSColor]     // the website's title gradient
 }
 
 let light = Theme(
@@ -167,7 +192,8 @@ let light = Theme(
     line: color(120, 124, 145), glassFill: color(255, 255, 255, 0.5),
     edgeTop: color(255, 255, 255, 0.95), edgeBottom: color(255, 255, 255, 0.35),
     shadow: color(40, 40, 80, 0.22),
-    tile: color(245, 245, 247), tileInk: color(29, 29, 31))
+    tile: color(245, 245, 247), tileInk: color(29, 29, 31),
+    tagline: [color(157, 75, 255), color(228, 91, 208), color(255, 138, 91)])
 
 let dark = Theme(
     name: "dark",
@@ -178,7 +204,8 @@ let dark = Theme(
     line: color(150, 154, 175), glassFill: color(255, 255, 255, 0.12),
     edgeTop: color(255, 255, 255, 0.45), edgeBottom: color(255, 255, 255, 0.08),
     shadow: color(0, 0, 0, 0.5),
-    tile: color(28, 28, 30), tileInk: color(245, 245, 247))
+    tile: color(28, 28, 30), tileInk: color(245, 245, 247),
+    tagline: [color(181, 123, 255), color(240, 112, 216), color(255, 160, 112)])
 
 // MARK: Canvas
 
@@ -225,6 +252,26 @@ func leftText(_ string: String, size: CGFloat, weight: NSFont.Weight, color: NSC
     let s = NSAttributedString(string: string, attributes: [.font: font, .foregroundColor: color, .kern: tracking])
     if s.size().width > maxWidth { fatalError("\"\(string)\" is too long: \(Int(s.size().width)) of \(Int(maxWidth)) points") }
     s.draw(at: NSPoint(x: x, y: baselineY + font.descender))
+}
+
+/// Text filled with a horizontal gradient, through a mask of the glyphs.
+func gradientText(_ string: String, size: CGFloat, weight: NSFont.Weight, colors: [NSColor], tracking: CGFloat,
+                  centerX: CGFloat, baselineY: CGFloat, canvas: NSSize, scale: CGFloat, ctx: CGContext) {
+    let font = NSFont.systemFont(ofSize: size, weight: weight)
+    let s = NSAttributedString(string: string, attributes: [.font: font, .foregroundColor: NSColor.white, .kern: tracking])
+    let w = s.size().width
+    let mask = CGContext(data: nil, width: Int(canvas.width * scale), height: Int(canvas.height * scale), bitsPerComponent: 8,
+                         bytesPerRow: 0, space: CGColorSpaceCreateDeviceGray(), bitmapInfo: CGImageAlphaInfo.none.rawValue)!
+    mask.scaleBy(x: scale, y: scale)
+    NSGraphicsContext.saveGraphicsState()
+    NSGraphicsContext.current = NSGraphicsContext(cgContext: mask, flipped: false)
+    s.draw(at: NSPoint(x: centerX - w / 2, y: baselineY + font.descender))
+    NSGraphicsContext.restoreGraphicsState()
+    ctx.saveGState()
+    ctx.clip(to: NSRect(origin: .zero, size: canvas), mask: mask.makeImage()!)
+    NSGradient(colors: colors, atLocations: [0, 0.55, 1], colorSpace: .sRGB)!
+        .draw(in: NSRect(x: centerX - w / 2, y: baselineY - size * 0.4, width: w, height: size * 1.4), angle: 0)
+    ctx.restoreGState()
 }
 
 func textWidth(_ string: String, size: CGFloat, weight: NSFont.Weight) -> CGFloat {
@@ -424,9 +471,12 @@ func hero(_ t: Theme) {
     let rep = makeBitmap(W, H, scale: s)
     draw(rep, scale: s) { ctx in
         t.page.setFill(); NSRect(x: 0, y: 0, width: W, height: H).fill()
-        text("Tendedero", size: 84, weight: .semibold, color: t.ink, tracking: -2.4, centerX: W / 2, baselineY: H - 128)
-        text(T("Screenshots, hung out to dry."), size: 30, weight: .regular, color: t.secondaryInk,
-             tracking: -0.4, centerX: W / 2, baselineY: H - 182)
+        // The words in the website's style: a bold name, the tagline in its gradient.
+        text("Tendedero", size: 88, weight: .bold, color: t.ink, tracking: -2.8, centerX: W / 2, baselineY: H - 126)
+        let tagline = T("Screenshots, hung out to dry.")
+        let size = min(34, 34 * 1000 / textWidth(tagline, size: 34, weight: .bold))
+        gradientText(tagline, size: size, weight: .bold, colors: t.tagline, tracking: -0.8,
+                     centerX: W / 2, baselineY: H - 184, canvas: NSSize(width: W, height: H), scale: s, ctx: ctx)
         let frames = [Frame(x: 290, w: 250, h: 172, tilt: 2.5, kind: 0),
                       Frame(x: 560, w: 270, h: 186, tilt: -1.2, kind: 1),
                       Frame(x: 830, w: 220, h: 160, tilt: 3, kind: 2)]

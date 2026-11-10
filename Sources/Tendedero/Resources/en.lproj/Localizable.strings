@@ -10,6 +10,8 @@
 "Hide line" = "Hide line";
 "Show line" = "Show line";
 "Take everything down" = "Take everything down";
+"Put back" = "Put back";
+"Screenshots" = "Screenshots";
 "Handle screenshots" = "Handle screenshots";
 "Screenshots hang instantly and skip the Desktop" = "Screenshots hang instantly and skip the Desktop";
 "Open screenshots folder" = "Open screenshots folder";
@@ -24,8 +26,8 @@
 "%d photos" = "%d photos";
 "Also watch folders" = "Also watch folders";
 "Add Folder…" = "Add Folder…";
-"Stop Watching" = "Stop Watching";
 "Watch" = "Watch";
+"Show “%@” in Finder" = "Show “%@” in Finder";
 "New images saved to this folder will hang on the line." = "New images saved to this folder will hang on the line.";
 "Shortcut" = "Shortcut";
 "Change Shortcut…" = "Change Shortcut…";
@@ -42,16 +44,23 @@
 "When the pointer rests in the menu bar" = "When the pointer rests in the menu bar";
 "When something new hangs" = "When something new hangs";
 "Over full screen apps" = "Over full screen apps";
-"Hang copied images" = "Hang copied images";
+"Hang what you copy" = "Hang what you copy";
+"Images" = "Images";
+"Text" = "Text";
+"Links" = "Links";
 "Images you copy hang on the line too" = "Images you copy hang on the line too";
 "Tendedero, hanging copied images" = "Tendedero, hanging copied images";
+"The line is empty" = "The line is empty";
+"%d on the line" = "%d on the line";
 
 /* GrabArea */
 "Copy" = "Copy";
 "Open" = "Open";
+"Open Link" = "Open Link";
 "Quick Look" = "Quick Look";
 "Markup" = "Markup";
 "Show in Finder" = "Show in Finder";
+"Share…" = "Share…";
 "Save to Desktop" = "Save to Desktop";
 "Discard" = "Discard";
 "Take down" = "Take down";
@@ -65,19 +74,25 @@
 /* PeggedView */
 "Copied" = "Copied";
 
-/* Notes */
-"New Note…" = "New Note…";
-"New Note" = "New Note";
-"Edit Note" = "Edit Note";
-"Hang" = "Hang";
-"Save" = "Save";
-"Cancel" = "Cancel";
-"Write something…" = "Write something…";
-"Color" = "Color";
-"Yellow" = "Yellow";
-"Pink" = "Pink";
-"Blue" = "Blue";
-"Green" = "Green";
+/* Pinning and holding photos */
+"Pin" = "Pin";
+"Unpin" = "Unpin";
+"Hold" = "Hold";
+"Hang back" = "Hang back";
+"Hang everything back" = "Hang everything back";
+"Actual Size" = "Actual Size";
 
-/* Zoom */
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Open Tendedero at login?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero does not open when you log in, so after a restart the line is gone until you open it again.";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "Text you copy hangs on the line too";
+"Links you copy hang on the line too" = "Links you copy hang on the line too";
+
+/* Searching the line */
+"Search the line" = "Search the line";
+"%d of %d" = "%d of %d";
+
+/* Zoom on hover */
 "Zoom on hover" = "Zoom on hover";

@@ -8,6 +8,8 @@
 "Hide line" = "ロープを非表示";
 "Show line" = "ロープを表示";
 "Take everything down" = "すべて外す";
+"Put back" = "掛け直す";
+"Screenshots" = "スクリーンショット";
 "Handle screenshots" = "スクリーンショットを任せる";
 "Screenshots hang instantly and skip the Desktop" = "撮った瞬間に吊るされ、デスクトップを経由しません";
 "Open screenshots folder" = "スクリーンショットのフォルダを開く";
@@ -22,8 +24,8 @@
 "%d photos" = "%d枚";
 "Also watch folders" = "フォルダも監視";
 "Add Folder…" = "フォルダを追加…";
-"Stop Watching" = "監視を停止";
 "Watch" = "監視";
+"Show “%@” in Finder" = "“%@”をFinderで表示";
 "New images saved to this folder will hang on the line." = "このフォルダに保存された新しい画像がロープに吊るされます。";
 "Shortcut" = "ショートカット";
 "Change Shortcut…" = "ショートカットを変更…";
@@ -40,16 +42,23 @@
 "When the pointer rests in the menu bar" = "ポインタがメニューバーにとどまったとき";
 "When something new hangs" = "新しいものが吊るされたとき";
 "Over full screen apps" = "フルスクリーンのアプリの上にも";
-"Hang copied images" = "コピーした画像を吊るす";
+"Hang what you copy" = "コピーしたものを吊るす";
+"Images" = "画像";
+"Text" = "テキスト";
+"Links" = "リンク";
 "Images you copy hang on the line too" = "コピーした画像もロープに吊るされます";
 "Tendedero, hanging copied images" = "Tendedero、コピーした画像を吊るしています";
+"The line is empty" = "ロープは空です";
+"%d on the line" = "ロープに%d件";
 
 /* GrabArea */
 "Copy" = "コピー";
 "Open" = "開く";
+"Open Link" = "リンクを開く";
 "Quick Look" = "クイックルック";
 "Markup" = "マークアップ";
 "Show in Finder" = "Finderで表示";
+"Share…" = "共有…";
 "Save to Desktop" = "デスクトップに保存";
 "Discard" = "破棄";
 "Take down" = "外す";
@@ -63,19 +72,25 @@
 /* PeggedView */
 "Copied" = "コピーしました";
 
-/* Notes */
-"New Note…" = "新規メモ…";
-"New Note" = "新規メモ";
-"Edit Note" = "メモを編集";
-"Hang" = "吊るす";
-"Save" = "保存";
-"Cancel" = "キャンセル";
-"Write something…" = "何か書いてください…";
-"Color" = "カラー";
-"Yellow" = "黄";
-"Pink" = "ピンク";
-"Blue" = "青";
-"Green" = "緑";
+/* Pinning and holding photos */
+"Pin" = "ピン留め";
+"Unpin" = "ピン留めを外す";
+"Hold" = "手に取る";
+"Hang back" = "ロープに戻す";
+"Hang everything back" = "すべてロープに戻す";
+"Actual Size" = "実際のサイズ";
 
-/* Zoom */
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "ログイン時にTendederoを開きますか？";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendederoはログイン時に開かないため、再起動するともう一度開くまでロープは表示されません。";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "コピーしたテキストもロープに吊るされます";
+"Links you copy hang on the line too" = "コピーしたリンクもロープに吊るされます";
+
+/* Searching the line */
+"Search the line" = "ロープを検索";
+"%d of %d" = "%d / %d";
+
+/* Zoom on hover */
 "Zoom on hover" = "ポインタを重ねて拡大";
