@@ -1,0 +1,88 @@
+/* Turkish. */
+
+/* AppDelegate */
+"Let Tendedero handle your screenshots?" = "Ekran görüntülerini Tendedero yönetsin mi?";
+"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "Ekran görüntüleri, kayan küçük resim olmadan anında ipin üzerine asılacak ve Masaüstünüzde birikmeyecek. Saklamak için bir klasöre sürükleyin ya da çarpı ile silin. Bunu menü çubuğundan kapatabilirsiniz; Tendedero kapandığında ayarlarınız geri gelir.";
+"Turn on" = "Etkinleştir";
+"Not now" = "Şimdi değil";
+"Hide line" = "İpi gizle";
+"Show line" = "İpi göster";
+"Take everything down" = "Hepsini indir";
+"Put back" = "Geri as";
+"Handle screenshots" = "Ekran görüntülerini yönet";
+"Screenshots hang instantly and skip the Desktop" = "Ekran görüntüleri anında asılır ve Masaüstünü atlar";
+"Open screenshots folder" = "Ekran görüntüleri klasörünü aç";
+"Sounds" = "Sesler";
+"Open at login" = "Başlangıçta aç";
+"Check for Updates…" = "Güncellemeleri denetle…";
+"Quit Tendedero" = "Tendedero'yu kapat";
+"Could not change the login setting" = "Giriş ayarı değiştirilemedi";
+"Move Tendedero to the Applications folder and try again." = "Tendedero'yu Uygulamalar klasörüne taşıyın ve tekrar deneyin.";
+"Keep on line" = "İpte tut";
+"As many as fit" = "Sığdığı kadar";
+"%d photos" = "%d fotoğraf";
+"Also watch folders" = "Klasörleri de izle";
+"Add Folder…" = "Klasör ekle…";
+"Stop Watching" = "İzlemeyi durdur";
+"Watch" = "İzle";
+"New images saved to this folder will hang on the line." = "Bu klasöre kaydedilen yeni görseller ipe asılır.";
+"Shortcut" = "Kısayol";
+"Change Shortcut…" = "Kısayolu değiştir…";
+"Change Shortcut" = "Kısayolu değiştir";
+"None" = "Yok";
+"Space" = "Boşluk";
+"Press the new shortcut" = "Yeni kısayolu basın";
+"Escape cancels. Delete removes the shortcut." = "Escape iptal eder. Sil kısayolu kaldırır.";
+"Size" = "Boyut";
+"Small" = "Küçük";
+"Medium" = "Orta";
+"Large" = "Büyük";
+"Bring the line down" = "İpi indir";
+"When the pointer rests in the menu bar" = "İşaretçi menü çubuğunda durduğunda";
+"When something new hangs" = "Yeni bir şey asıldığında";
+"Over full screen apps" = "Tam ekran uygulamaların üzerinde";
+"Hang what you copy" = "Kopyaladıklarını as";
+"Images" = "Görseller";
+"Text" = "Metin";
+"Links" = "Bağlantılar";
+"Images you copy hang on the line too" = "Kopyaladığınız görseller de ipe asılır";
+"Tendedero, hanging copied images" = "Tendedero, kopyalanan görselleri asıyor";
+"The line is empty" = "İp boş";
+"%d on the line" = "İpte %d tane";
+
+/* GrabArea */
+"Copy" = "Kopyala";
+"Open" = "Aç";
+"Open Link" = "Bağlantıyı aç";
+"Quick Look" = "Hızlı Bakış";
+"Markup" = "İşaretle";
+"Show in Finder" = "Finder'da göster";
+"Share…" = "Paylaş…";
+"Save to Desktop" = "Masaüstüne kaydet";
+"Discard" = "Sil";
+"Take down" = "İndir";
+"Move to Trash" = "Çöp Kutusu'na taşı";
+"Take down everything to the left" = "Soldakilerin hepsini indir";
+"Take down everything to the right" = "Sağdakilerin hepsini indir";
+
+/* LineView */
+"Take a screenshot and it will hang here" = "Bir ekran görüntüsü al, buraya asılacak";
+
+/* PeggedView */
+"Copied" = "Kopyalandı";
+
+/* Pinning and holding photos */
+"Pin" = "Sabitle";
+"Unpin" = "Sabitlemeyi kaldır";
+"Hold" = "Elinde tut";
+"Hang back" = "İpe geri koy";
+"Hang everything back" = "Hepsini ipe geri koy";
+"Actual Size" = "Gerçek boyut";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Tendedero başlangıçta açılsın mı?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero oturum açtığınızda açılmıyor; bu yüzden yeniden başlattıktan sonra siz tekrar açana kadar ip görünmez.";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "Kopyaladığınız metin de ipe asılır";
+"Links you copy hang on the line too" = "Kopyaladığınız bağlantılar da ipe asılır";

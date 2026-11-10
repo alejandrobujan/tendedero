@@ -11,14 +11,25 @@ final class LinePanel: NSPanel {
         backgroundColor = .clear
         hasShadow = false
         level = .floating
-        // Every Space except full screen ones: a video or a presentation in full
-        // screen should never get a clothesline across the top.
-        collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
+        // Every Space, full screen ones included. Whether the line comes down
+        // over a full screen app is up to the user, see FullScreen.showLineOver.
+        collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenAuxiliary]
         hidesOnDeactivate = false
         isMovable = false
         becomesKeyOnlyIfNeeded = true
         ignoresMouseEvents = true
         contentView = content
+    }
+
+    /// Two-finger swipes and the scroll wheel, for moving along a long line.
+    var onScroll: ((NSEvent) -> Void)?
+
+    override func sendEvent(_ event: NSEvent) {
+        if event.type == .scrollWheel, let onScroll {
+            onScroll(event)
+        } else {
+            super.sendEvent(event)
+        }
     }
 
     override var canBecomeKey: Bool { false }

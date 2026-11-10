@@ -51,6 +51,10 @@ final class CaptureFlight {
 
     private static var current: [CaptureFlight] = []
 
+    /// Captures flying to the line right now. Each one holds a large image,
+    /// so in a burst of captures only a couple fly and the rest drop in.
+    static var flightsInProgress: Int { current.filter { !$0.falling }.count }
+
     /// - Parameters:
     ///   - from: the captured area, in screen coordinates.
     ///   - to: the card's frame on the line, in screen coordinates, unrotated.
@@ -69,9 +73,15 @@ final class CaptureFlight {
     /// A discarded card falling off the line, drawn over the whole screen so
     /// it is never cut by the line's strip. Same motion as the app always had:
     /// 520 points down, tilting further, fading, 0.55 s ease in.
-    static func fall(image: CGImage, card: CGRect, tilt: CGFloat, on screen: NSScreen) {
+    static func fall(image: CGImage, card: CGRect, tilt: CGFloat, pinned: Bool = false, on screen: NSScreen) {
         let flight = CaptureFlight(image: image, from: card, to: card, tilt: tilt, screen: screen)
         flight.falling = true
+        // A pinned photo falls with its space grey clip, as it hung.
+        if pinned {
+            flight.clip.colors = [NSColor(white: 0.30, alpha: 1).cgColor, NSColor(white: 0.47, alpha: 1).cgColor,
+                                  NSColor(white: 0.38, alpha: 1).cgColor, NSColor(white: 0.24, alpha: 1).cgColor]
+            flight.clip.borderColor = NSColor(white: 1, alpha: 0.35).cgColor
+        }
         flight.duration = 0.55
         current.append(flight)
         flight.completion = { [weak flight] in current.removeAll { $0 === flight } }
@@ -89,7 +99,7 @@ final class CaptureFlight {
         window.hasShadow = false
         window.ignoresMouseEvents = true
         window.level = NSWindow.Level(rawValue: NSWindow.Level.floating.rawValue + 1)
-        window.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
+        window.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenAuxiliary]
 
         let host = NSView(frame: NSRect(origin: .zero, size: screen.frame.size))
         host.wantsLayer = true

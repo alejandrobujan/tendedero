@@ -1,0 +1,88 @@
+/* Korean. */
+
+/* AppDelegate */
+"Let Tendedero handle your screenshots?" = "Tendedero가 스크린샷을 관리하도록 할까요?";
+"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "스크린샷을 찍는 즉시 플로팅 썸네일 없이 빨랫줄에 걸리고, 데스크탑에 쌓이지 않아요. 보관하려면 폴더로 드래그하고, 버리려면 X 버튼을 클릭하세요. 메뉴 막대에서 언제든 끌 수 있고, Tendedero를 종료하면 원래 설정으로 돌아가요.";
+"Turn on" = "켜기";
+"Not now" = "나중에";
+"Hide line" = "빨랫줄 가리기";
+"Show line" = "빨랫줄 보기";
+"Take everything down" = "모두 걷어내기";
+"Put back" = "다시 걸기";
+"Handle screenshots" = "스크린샷 관리";
+"Screenshots hang instantly and skip the Desktop" = "스크린샷이 바로 걸리고 데스크탑을 거치지 않아요";
+"Open screenshots folder" = "스크린샷 폴더 열기";
+"Sounds" = "사운드";
+"Open at login" = "로그인 시 열기";
+"Check for Updates…" = "업데이트 확인…";
+"Quit Tendedero" = "Tendedero 종료";
+"Could not change the login setting" = "로그인 설정을 변경할 수 없음";
+"Move Tendedero to the Applications folder and try again." = "Tendedero를 응용 프로그램 폴더로 옮긴 다음 다시 시도하세요.";
+"Keep on line" = "빨랫줄에 남길 개수";
+"As many as fit" = "들어가는 만큼";
+"%d photos" = "사진 %d장";
+"Also watch folders" = "다른 폴더도 지켜보기";
+"Add Folder…" = "폴더 추가…";
+"Stop Watching" = "지켜보기 중단";
+"Watch" = "지켜보기";
+"New images saved to this folder will hang on the line." = "이 폴더에 새로 저장되는 이미지가 빨랫줄에 걸려요.";
+"Shortcut" = "단축키";
+"Change Shortcut…" = "단축키 변경…";
+"Change Shortcut" = "단축키 변경";
+"None" = "없음";
+"Space" = "스페이스";
+"Press the new shortcut" = "새 단축키를 누르세요";
+"Escape cancels. Delete removes the shortcut." = "Esc 키를 누르면 취소되고, Delete 키를 누르면 단축키가 지워져요.";
+"Size" = "크기";
+"Small" = "작게";
+"Medium" = "중간";
+"Large" = "크게";
+"Bring the line down" = "빨랫줄 내리기";
+"When the pointer rests in the menu bar" = "포인터가 메뉴 막대에 머무를 때";
+"When something new hangs" = "새 항목이 걸릴 때";
+"Over full screen apps" = "전체 화면 앱 위에서도";
+"Hang what you copy" = "복사한 것 걸기";
+"Images" = "이미지";
+"Text" = "텍스트";
+"Links" = "링크";
+"Images you copy hang on the line too" = "복사한 이미지도 빨랫줄에 걸려요";
+"Tendedero, hanging copied images" = "Tendedero, 복사한 이미지 거는 중";
+"The line is empty" = "빨랫줄이 비어 있어요";
+"%d on the line" = "빨랫줄에 %d개";
+
+/* GrabArea */
+"Copy" = "복사하기";
+"Open" = "열기";
+"Open Link" = "링크 열기";
+"Quick Look" = "훑어보기";
+"Markup" = "마크업";
+"Show in Finder" = "Finder에서 보기";
+"Share…" = "공유…";
+"Save to Desktop" = "데스크탑에 저장";
+"Discard" = "버리기";
+"Take down" = "걷어내기";
+"Move to Trash" = "휴지통으로 이동";
+"Take down everything to the left" = "왼쪽 모두 걷어내기";
+"Take down everything to the right" = "오른쪽 모두 걷어내기";
+
+/* LineView */
+"Take a screenshot and it will hang here" = "스크린샷을 찍으면 여기에 걸려요";
+
+/* PeggedView */
+"Copied" = "복사됨";
+
+/* Pinning and holding photos */
+"Pin" = "고정하기";
+"Unpin" = "고정 해제";
+"Hold" = "손에 들기";
+"Hang back" = "줄에 돌려놓기";
+"Hang everything back" = "모두 줄에 돌려놓기";
+"Actual Size" = "실제 크기";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "로그인 시 Tendedero를 열까요?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero는 로그인할 때 열리지 않아서, 재시동하면 다시 열 때까지 빨랫줄이 사라져요.";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "복사한 텍스트도 빨랫줄에 걸려요";
+"Links you copy hang on the line too" = "복사한 링크도 빨랫줄에 걸려요";

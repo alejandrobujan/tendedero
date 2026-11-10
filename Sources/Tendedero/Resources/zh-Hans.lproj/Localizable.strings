@@ -1,62 +1,88 @@
-// Run swift scripts/check-strings.swift after changing these translations.
+/* Chinese (Simplified). */
 
-"AirDrop" = "隔空投送";
-"Annotate" = "标注";
-"Arrow" = "箭头";
-"Auto-clean after 7 days" = "7 天后自动清理";
-"Black" = "黑色";
-"Blue" = "蓝色";
-"Blur" = "模糊";
-"Copied" = "已复制";
-"Copy" = "复制";
-"Copy an image anywhere, then hang it here" = "在任何地方复制图片后，从这里挂上";
-"Could not change the login setting" = "无法更改登录项设置";
-"Discard" = "丢弃";
-"Discard changes" = "放弃修改";
-"Done" = "完成";
-"Drag to move   ·   Drag the handles to resize   ·   ⌫ Delete   ·   ←↑↓→ Nudge   ·   ⌘D Duplicate   ·   Double-click text to edit" = "拖动移动   ·   拖动手柄缩放   ·   ⌫ 删除   ·   ←↑↓→ 微调   ·   ⌘D 复制   ·   双击文字可修改";
-"Ellipse" = "圆形";
-"Empty screenshots folder (%@)" = "清空截图文件夹（%@）";
-"Esc or click outside  Finish   ·   ⏎ New line   ·   ⌘Z Undo typing   ·   Size and color apply as you type" = "Esc 或点击空白处  完成输入   ·   ⏎ 换行   ·   ⌘Z 撤销输入   ·   字号和颜色可边打边改";
-"Green" = "绿色";
-"Handle screenshots" = "接管截图";
-"Hang clipboard image" = "挂剪贴板里的图";
-"Hide line" = "隐藏晾衣绳";
+/* AppDelegate */
 "Let Tendedero handle your screenshots?" = "让 Tendedero 接管你的截图？";
-"Line width" = "线条粗细";
-"Mosaic" = "马赛克";
-"Move Tendedero to the Applications folder and try again." = "请先把 Tendedero 移到「应用程序」文件夹，再试一次。";
-"Move to Trash" = "移到废纸篓";
-"Moves everything in it to the Trash" = "把里面所有内容移到废纸篓";
-"Moves screenshots in that folder to the Trash once they are 7 days old" = "该文件夹里的截图满 7 天后移到废纸篓";
-"Not now" = "以后再说";
-"Open" = "打开";
-"Open at login" = "登录时打开";
-"Open screenshots folder" = "打开截图文件夹";
-"Pen" = "画笔";
-"Press Esc again to discard your changes" = "再按一次 Esc 放弃修改";
-"Quit Tendedero" = "退出 Tendedero";
-"Rectangle" = "矩形";
-"Red" = "红色";
-"Redo" = "重做";
-"Save to Desktop" = "存储到桌面";
-"Save to the file" = "保存到原文件";
-"Screenshots hang instantly and skip the Desktop" = "截图即刻挂上，不再经过桌面";
 "Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "你截图的那一瞬间，图片就会挂到晾衣绳上——没有浮动缩略图，也不会堆到桌面上。拖进文件夹即保留，点叉即丢弃。随时可以从菜单栏关掉，退出 Tendedero 后你的设置会自动还原。";
-"Select and move" = "选择/移动";
-"Share…" = "分享…";
-"Show in Finder" = "在访达中显示";
-"Show line" = "显示晾衣绳";
-"Sounds" = "声音";
-"Take a screenshot and it will hang here" = "截个图，它就会挂在这里";
-"Take down" = "取下";
-"Take everything down" = "全部取下";
-"Text" = "文字";
-"Text box" = "文本框";
-"Text size" = "文字大小";
 "Turn on" = "开启";
-"Type…" = "输入文字…";
-"Undo" = "撤销";
-"White" = "白色";
-"Yellow" = "黄色";
-"⏎ Done   ·   Esc Cancel   ·   ⌘Z Undo   ·   V Select   ·   1–8 Tools   ·   [ ] Size   ·   ⇧ Straight / square / circle   ·   Pinch or ⌘± Zoom   ·   Space-drag Pan" = "⏎ 完成   ·   Esc 取消   ·   ⌘Z 撤销   ·   V 选择   ·   1–8 切换工具   ·   [ ] 粗细/字号   ·   ⇧ 水平/正方形/正圆   ·   双指捏合或 ⌘± 缩放   ·   空格+拖动 平移";
+"Not now" = "以后再说";
+"Hide line" = "隐藏晾衣绳";
+"Show line" = "显示晾衣绳";
+"Take everything down" = "全部取下";
+"Put back" = "挂回去";
+"Handle screenshots" = "接管截图";
+"Screenshots hang instantly and skip the Desktop" = "截图即刻挂上，不再经过桌面";
+"Open screenshots folder" = "打开截图文件夹";
+"Sounds" = "声音";
+"Open at login" = "登录时打开";
+"Check for Updates…" = "检查更新…";
+"Quit Tendedero" = "退出 Tendedero";
+"Could not change the login setting" = "无法更改登录项设置";
+"Move Tendedero to the Applications folder and try again." = "请先把 Tendedero 移到「应用程序」文件夹，再试一次。";
+"Keep on line" = "绳上保留";
+"As many as fit" = "放得下的数量";
+"%d photos" = "%d 张";
+"Also watch folders" = "同时监视文件夹";
+"Add Folder…" = "添加文件夹…";
+"Stop Watching" = "停止监视";
+"Watch" = "监视";
+"New images saved to this folder will hang on the line." = "保存到此文件夹的新图片会挂到晾衣绳上。";
+"Shortcut" = "快捷键";
+"Change Shortcut…" = "更改快捷键…";
+"Change Shortcut" = "更改快捷键";
+"None" = "无";
+"Space" = "空格";
+"Press the new shortcut" = "请按下新的快捷键";
+"Escape cancels. Delete removes the shortcut." = "按 Esc 取消，按删除键移除快捷键。";
+"Size" = "大小";
+"Small" = "小";
+"Medium" = "中";
+"Large" = "大";
+"Bring the line down" = "放下晾衣绳";
+"When the pointer rests in the menu bar" = "指针停在菜单栏时";
+"When something new hangs" = "有新内容挂上时";
+"Over full screen apps" = "在全屏 App 上";
+"Hang what you copy" = "挂上复制的内容";
+"Images" = "图片";
+"Text" = "文字";
+"Links" = "链接";
+"Images you copy hang on the line too" = "复制的图片也会挂上绳";
+"Tendedero, hanging copied images" = "Tendedero，正在挂上复制的图片";
+"The line is empty" = "晾衣绳上是空的";
+"%d on the line" = "晾衣绳上有 %d 张";
+
+/* GrabArea */
+"Copy" = "复制";
+"Open" = "打开";
+"Open Link" = "打开链接";
+"Quick Look" = "快速查看";
+"Markup" = "标记";
+"Show in Finder" = "在访达中显示";
+"Share…" = "共享…";
+"Save to Desktop" = "存储到桌面";
+"Discard" = "丢弃";
+"Take down" = "取下";
+"Move to Trash" = "移到废纸篓";
+"Take down everything to the left" = "取下左侧全部";
+"Take down everything to the right" = "取下右侧全部";
+
+/* LineView */
+"Take a screenshot and it will hang here" = "截个图，它就会挂在这里";
+
+/* PeggedView */
+"Copied" = "已复制";
+
+/* Pinning and holding photos */
+"Pin" = "固定";
+"Unpin" = "取消固定";
+"Hold" = "拿在手上";
+"Hang back" = "放回绳上";
+"Hang everything back" = "全部放回绳上";
+"Actual Size" = "实际大小";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "登录时打开 Tendedero？";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero 不会在登录时打开，所以重新启动后，晾衣绳会一直不见，直到你再次打开它。";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "复制的文字也会挂在绳子上";
+"Links you copy hang on the line too" = "复制的链接也会挂上绳";

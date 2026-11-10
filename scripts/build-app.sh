@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 
 CONFIG="${1:-release}"
 APP="build/Tendedero.app"
-VERSION="1.0.0"
+VERSION="1.9.0"
 
 # Builds one architecture and prints the binary's path.
 # The Command Line Tools for macOS 27 ship an SDK whose SwiftUI needs a macro
@@ -68,35 +68,28 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleIconFile</key><string>Tendedero</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>${VERSION}</string>
-  <key>CFBundleVersion</key><string>1</string>
+  <key>CFBundleVersion</key><string>12</string>
   <key>CFBundleDevelopmentRegion</key><string>en</string>
   <key>CFBundleLocalizations</key><array>${LANGUAGES}</array>
   <key>LSMinimumSystemVersion</key><string>14.0</string>
   <key>LSUIElement</key><true/>
   <key>NSHighResolutionCapable</key><true/>
+  <key>NSDesktopFolderUsageDescription</key>
+  <string>Tendedero watches the folder where macOS saves your screenshots so it can hang them on the line.</string>
+  <key>NSDocumentsFolderUsageDescription</key>
+  <string>Tendedero watches the folder you chose so it can hang new images on the line.</string>
+  <key>NSDownloadsFolderUsageDescription</key>
+  <string>Tendedero watches the folder you chose so it can hang new images on the line.</string>
   <key>NSServices</key>
   <array>
     <dict>
-      <key>NSMenuItem</key><dict>
-        <key>default</key><string>Hang</string>
-        <key>zh-Hans</key><string>挂</string>
-        <key>zh-Hant</key><string>掛</string>
-        <key>es</key><string>Colgar</string>
-      </dict>
-      <key>NSMessage</key><string>hangService</string>
+      <key>NSMenuItem</key><dict><key>default</key><string>Hang on Tendedero</string></dict>
+      <key>NSMessage</key><string>hangOnLine</string>
       <key>NSPortName</key><string>Tendedero</string>
-      <key>NSSendTypes</key>
-      <array>
-        <string>NSFilenamesPboardType</string>
-        <string>NSImagePboardType</string>
-        <string>public.image</string>
-        <string>public.file-url</string>
-      </array>
       <key>NSRequiredContext</key><dict/>
+      <key>NSSendFileTypes</key><array><string>public.image</string><string>public.plain-text</string><string>public.rtf</string></array>
     </dict>
   </array>
-  <key>NSDesktopFolderUsageDescription</key>
-  <string>Tendedero watches the folder where macOS saves your screenshots so it can hang them on the line.</string>
 </dict>
 </plist>
 PLIST

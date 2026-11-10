@@ -29,6 +29,114 @@ let translations: [String: [String: String]] = [
         "Let it go.": "Y olvídate.",
         "The cross or the Trash. That\u{2019}s it.": "La cruz o la Papelera. Nada más.",
     ],
+    "tr": [
+        "Screenshots, hung out to dry.": "Ekran görüntüleri, ipe asılı.",
+        "Copied": "Kopyalandı",
+        "Click to copy.": "Tıkla ve kopyala.",
+        "Paste it anywhere, instantly.": "İstediğin yere anında yapıştır.",
+        "Hold to mark up.": "Basılı tut ve işaretle.",
+        "Annotate, crop or sign in place.": "Yerinde yaz, kırp veya imzala.",
+        "Drag to share.": "Sürükle ve paylaş.",
+        "Apps get a copy. Folders keep it.": "Uygulamalar kopya alır, klasörler saklar.",
+        "Let it go.": "Bırak gitsin.",
+        "The cross or the Trash. That\u{2019}s it.": "Çarpı veya Çöp Kutusu. Hepsi bu.",
+    ],
+    "az": [
+        "Screenshots, hung out to dry.": "Ekran şəkilləri, ipə sərilib.",
+        "Copied": "Kopyalandı",
+        "Click to copy.": "Klikləyin, kopyalayın.",
+        "Paste it anywhere, instantly.": "İstədiyiniz yerə dərhal yapışdırın.",
+        "Hold to mark up.": "Basıb saxlayın, işarələyin.",
+        "Annotate, crop or sign in place.": "Elə oradaca qeyd edin, kəsin, imzalayın.",
+        "Drag to share.": "Sürükləyin, paylaşın.",
+        "Apps get a copy. Folders keep it.": "Proqram surətini alır. Qovluq özünü saxlayır.",
+        "Let it go.": "Burax getsin.",
+        "The cross or the Trash. That\u{2019}s it.": "Çarpaz və ya Zibil qutusu. Vəssalam.",
+    ],
+    "gl": [
+        "Screenshots, hung out to dry.": "As túas capturas, tendidas.",
+        "Copied": "Copiado",
+        "Click to copy.": "Clic para copiar.",
+        "Paste it anywhere, instantly.": "Pégaa onde queiras, ao momento.",
+        "Hold to mark up.": "Mantén para anotar.",
+        "Annotate, crop or sign in place.": "Anota, recorta ou asina aí mesmo.",
+        "Drag to share.": "Arrastra para compartir.",
+        "Apps get a copy. Folders keep it.": "As apps reciben unha copia. Os cartafoles, o orixinal.",
+        "Let it go.": "E esquécete.",
+        "The cross or the Trash. That\u{2019}s it.": "A cruz ou a Papeleira. Nada máis.",
+    ],
+    "hi": [
+        "Screenshots, hung out to dry.": "स्क्रीनशॉट, रस्सी पर सूखते हुए।",
+        "Copied": "कॉपी हो गया",
+        "Click to copy.": "क्लिक करें, कॉपी हो जाएगा।",
+        "Paste it anywhere, instantly.": "कहीं भी पेस्ट करें, तुरंत।",
+        "Hold to mark up.": "दबाए रखें, मार्कअप करें।",
+        "Annotate, crop or sign in place.": "वहीं नोट लिखें, क्रॉप करें या साइन करें।",
+        "Drag to share.": "खींचें, शेयर करें।",
+        "Apps get a copy. Folders keep it.": "ऐप्स को कॉपी मिलती है। फ़ोल्डर उसे रख लेते हैं।",
+        "Let it go.": "जाने दें।",
+        "The cross or the Trash. That\u{2019}s it.": "क्रॉस या ट्रैश। बस इतना ही।",
+    ],
+    "it": [
+        "Screenshots, hung out to dry.": "I tuoi screenshot, stesi ad asciugare.",
+        "Copied": "Copiato",
+        "Click to copy.": "Clic per copiare.",
+        "Paste it anywhere, instantly.": "Incollala dove vuoi, all\u{2019}istante.",
+        "Hold to mark up.": "Tieni premuto per annotare.",
+        "Annotate, crop or sign in place.": "Annota, ritaglia o firma sul posto.",
+        "Drag to share.": "Trascina per condividere.",
+        "Apps get a copy. Folders keep it.": "Le app ricevono una copia. Le cartelle, l\u{2019}originale.",
+        "Let it go.": "E non pensarci pi\u{F9}.",
+        "The cross or the Trash. That\u{2019}s it.": "La crocetta o il Cestino. Tutto qui.",
+    ],
+    "fr": [
+        "Screenshots, hung out to dry.": "Vos captures, mises à sécher.",
+        "Copied": "Copié",
+        "Click to copy.": "Cliquez pour copier.",
+        "Paste it anywhere, instantly.": "Collez-la où vous voulez, aussitôt.",
+        "Hold to mark up.": "Maintenez pour annoter.",
+        "Annotate, crop or sign in place.": "Annotez, recadrez ou signez sur place.",
+        "Drag to share.": "Glissez pour partager.",
+        "Apps get a copy. Folders keep it.": "Les apps reçoivent une copie. Les dossiers la gardent.",
+        "Let it go.": "Laissez filer.",
+        "The cross or the Trash. That\u{2019}s it.": "La croix ou la corbeille. C\u{2019}est tout.",
+    ],
+    "pt-BR": [
+        "Screenshots, hung out to dry.": "Suas capturas, secando no varal.",
+        "Copied": "Copiado",
+        "Click to copy.": "Clique para copiar.",
+        "Paste it anywhere, instantly.": "Cole onde quiser, na hora.",
+        "Hold to mark up.": "Segure para marcar.",
+        "Annotate, crop or sign in place.": "Anote, recorte ou assine ali mesmo.",
+        "Drag to share.": "Arraste para compartilhar.",
+        "Apps get a copy. Folders keep it.": "Apps recebem uma cópia. Pastas a guardam.",
+        "Let it go.": "Desapegue.",
+        "The cross or the Trash. That\u{2019}s it.": "O X ou o Lixo. Só isso.",
+    ],
+    "ja": [
+        "Screenshots, hung out to dry.": "スクリーンショットを、物干しに。",
+        "Copied": "コピーしました",
+        "Click to copy.": "クリックでコピー。",
+        "Paste it anywhere, instantly.": "どこにでも、すぐにペースト。",
+        "Hold to mark up.": "長押しでマークアップ。",
+        "Annotate, crop or sign in place.": "その場で書き込み、トリミング、署名。",
+        "Drag to share.": "ドラッグで共有。",
+        "Apps get a copy. Folders keep it.": "アプリへはコピー、フォルダへは保存。",
+        "Let it go.": "手放すだけ。",
+        "The cross or the Trash. That\u{2019}s it.": "×かゴミ箱へ。それだけ。",
+    ],
+    "ko": [
+        "Screenshots, hung out to dry.": "빨랫줄에 널어 둔 스크린샷.",
+        "Copied": "복사됨",
+        "Click to copy.": "클릭해서 복사.",
+        "Paste it anywhere, instantly.": "어디든 바로 붙여넣기.",
+        "Hold to mark up.": "길게 눌러 마크업.",
+        "Annotate, crop or sign in place.": "그 자리에서 주석, 자르기, 서명까지.",
+        "Drag to share.": "드래그해서 공유.",
+        "Apps get a copy. Folders keep it.": "앱에는 사본을, 폴더에는 원본을.",
+        "Let it go.": "미련 없이 버리기.",
+        "The cross or the Trash. That\u{2019}s it.": "X 버튼이나 휴지통이면 끝.",
+    ],
     "zh-Hans": [
         "Screenshots, hung out to dry.": "截图，挂起来晾着。",
         "Copied": "已复制",
@@ -72,6 +180,7 @@ struct Theme {
     let shadow: NSColor
     let tile: NSColor
     let tileInk: NSColor
+    let tagline: [NSColor]     // the website's title gradient
 }
 
 let light = Theme(
@@ -83,7 +192,8 @@ let light = Theme(
     line: color(120, 124, 145), glassFill: color(255, 255, 255, 0.5),
     edgeTop: color(255, 255, 255, 0.95), edgeBottom: color(255, 255, 255, 0.35),
     shadow: color(40, 40, 80, 0.22),
-    tile: color(245, 245, 247), tileInk: color(29, 29, 31))
+    tile: color(245, 245, 247), tileInk: color(29, 29, 31),
+    tagline: [color(157, 75, 255), color(228, 91, 208), color(255, 138, 91)])
 
 let dark = Theme(
     name: "dark",
@@ -94,7 +204,8 @@ let dark = Theme(
     line: color(150, 154, 175), glassFill: color(255, 255, 255, 0.12),
     edgeTop: color(255, 255, 255, 0.45), edgeBottom: color(255, 255, 255, 0.08),
     shadow: color(0, 0, 0, 0.5),
-    tile: color(28, 28, 30), tileInk: color(245, 245, 247))
+    tile: color(28, 28, 30), tileInk: color(245, 245, 247),
+    tagline: [color(181, 123, 255), color(240, 112, 216), color(255, 160, 112)])
 
 // MARK: Canvas
 
@@ -141,6 +252,26 @@ func leftText(_ string: String, size: CGFloat, weight: NSFont.Weight, color: NSC
     let s = NSAttributedString(string: string, attributes: [.font: font, .foregroundColor: color, .kern: tracking])
     if s.size().width > maxWidth { fatalError("\"\(string)\" is too long: \(Int(s.size().width)) of \(Int(maxWidth)) points") }
     s.draw(at: NSPoint(x: x, y: baselineY + font.descender))
+}
+
+/// Text filled with a horizontal gradient, through a mask of the glyphs.
+func gradientText(_ string: String, size: CGFloat, weight: NSFont.Weight, colors: [NSColor], tracking: CGFloat,
+                  centerX: CGFloat, baselineY: CGFloat, canvas: NSSize, scale: CGFloat, ctx: CGContext) {
+    let font = NSFont.systemFont(ofSize: size, weight: weight)
+    let s = NSAttributedString(string: string, attributes: [.font: font, .foregroundColor: NSColor.white, .kern: tracking])
+    let w = s.size().width
+    let mask = CGContext(data: nil, width: Int(canvas.width * scale), height: Int(canvas.height * scale), bitsPerComponent: 8,
+                         bytesPerRow: 0, space: CGColorSpaceCreateDeviceGray(), bitmapInfo: CGImageAlphaInfo.none.rawValue)!
+    mask.scaleBy(x: scale, y: scale)
+    NSGraphicsContext.saveGraphicsState()
+    NSGraphicsContext.current = NSGraphicsContext(cgContext: mask, flipped: false)
+    s.draw(at: NSPoint(x: centerX - w / 2, y: baselineY + font.descender))
+    NSGraphicsContext.restoreGraphicsState()
+    ctx.saveGState()
+    ctx.clip(to: NSRect(origin: .zero, size: canvas), mask: mask.makeImage()!)
+    NSGradient(colors: colors, atLocations: [0, 0.55, 1], colorSpace: .sRGB)!
+        .draw(in: NSRect(x: centerX - w / 2, y: baselineY - size * 0.4, width: w, height: size * 1.4), angle: 0)
+    ctx.restoreGState()
 }
 
 func textWidth(_ string: String, size: CGFloat, weight: NSFont.Weight) -> CGFloat {
@@ -340,9 +471,12 @@ func hero(_ t: Theme) {
     let rep = makeBitmap(W, H, scale: s)
     draw(rep, scale: s) { ctx in
         t.page.setFill(); NSRect(x: 0, y: 0, width: W, height: H).fill()
-        text("Tendedero", size: 84, weight: .semibold, color: t.ink, tracking: -2.4, centerX: W / 2, baselineY: H - 128)
-        text(T("Screenshots, hung out to dry."), size: 30, weight: .regular, color: t.secondaryInk,
-             tracking: -0.4, centerX: W / 2, baselineY: H - 182)
+        // The words in the website's style: a bold name, the tagline in its gradient.
+        text("Tendedero", size: 88, weight: .bold, color: t.ink, tracking: -2.8, centerX: W / 2, baselineY: H - 126)
+        let tagline = T("Screenshots, hung out to dry.")
+        let size = min(34, 34 * 1000 / textWidth(tagline, size: 34, weight: .bold))
+        gradientText(tagline, size: size, weight: .bold, colors: t.tagline, tracking: -0.8,
+                     centerX: W / 2, baselineY: H - 184, canvas: NSSize(width: W, height: H), scale: s, ctx: ctx)
         let frames = [Frame(x: 290, w: 250, h: 172, tilt: 2.5, kind: 0),
                       Frame(x: 560, w: 270, h: 186, tilt: -1.2, kind: 1),
                       Frame(x: 830, w: 220, h: 160, tilt: 3, kind: 2)]

@@ -1,5 +1,7 @@
 // Checks the translations: every L("...") in the code has an entry in each
 // language, and no language keeps entries the code no longer uses.
+// A missing translation is only a warning, because the app shows the English
+// text instead. Everything else is an error.
 // Usage: swift scripts/check-strings.swift
 import Foundation
 
@@ -11,6 +13,7 @@ let fm = FileManager.default
 // checked, so it is reported too.
 var used = Set<String>()
 var problems: [String] = []
+var warnings: [String] = []
 let literal = try NSRegularExpression(pattern: #"\bL\(\s*"((?:[^"\\]|\\.)*)"\s*\)"#)
 let anyCall = try NSRegularExpression(pattern: #"\bL\("#)
 for case let file as URL in fm.enumerator(at: sources, includingPropertiesForKeys: nil)!
@@ -37,12 +40,16 @@ for folder in languages {
         continue
     }
     let keys = Set(table.keys)
-    for key in used.subtracting(keys).sorted() { problems.append("\(folder): missing \"\(key)\"") }
+    for key in used.subtracting(keys).sorted() {
+        let message = "\(folder): missing \"\(key)\""
+        if folder == "en.lproj" { problems.append(message) } else { warnings.append(message) }
+    }
     for key in keys.subtracting(used).sorted() { problems.append("\(folder): unused \"\(key)\"") }
 }
 
+warnings.forEach { print("warning: \($0)") }
 if problems.isEmpty {
-    print("\(used.count) strings, all present in \(languages.map { $0.replacingOccurrences(of: ".lproj", with: "") }.joined(separator: ", "))")
+    print("\(used.count) strings, checked in \(languages.map { $0.replacingOccurrences(of: ".lproj", with: "") }.joined(separator: ", "))")
 } else {
     problems.forEach { print($0) }
     exit(1)

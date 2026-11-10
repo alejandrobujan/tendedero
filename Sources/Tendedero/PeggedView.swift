@@ -12,13 +12,25 @@ struct PeggedView: View {
 
     private var copied: Bool { line.copiedID == item.id }
     private var dragging: Bool { line.draggingID == item.id }
+
+    private var cornerSymbol: String {
+        switch line.corner(of: item.id) {
+        case .trash: "xmark"
+        case .hide: "eye.slash"
+        case .unpin: "pin.slash"
+        }
+    }
     private var pressed: Bool { line.pressedID == item.id }
 
     var body: some View {
         VStack(spacing: -12) {
-            Clothespin()
+            Clothespin(pinned: item.kept)
                 .zIndex(1)
+            // Held in your hand: a faded trace of it waits on its clip.
             card
+                .saturation(item.held ? 0 : 1)
+                .opacity(item.held ? 0.3 : 1)
+                .animation(.easeOut(duration: 0.25), value: item.held)
         }
         .rotationEffect(.degrees(swing + item.tilt), anchor: .top)
         .offset(y: arrived ? 0 : -46)
@@ -36,7 +48,7 @@ struct PeggedView: View {
     /// The photo fits inside the card area keeping its proportions, so the
     /// white border hugs it whether the screenshot is wide or tall.
     static func photoSize(for size: CGSize) -> CGSize {
-        let maxW = Layout.cardWidth - 14, maxH: CGFloat = 104
+        let maxW = Layout.cardWidth - 14, maxH = Layout.photoMaxHeight
         guard size.width > 0, size.height > 0 else { return CGSize(width: maxW, height: maxH) }
         let scale = min(maxW / size.width, maxH / size.height)
         return CGSize(width: size.width * scale, height: size.height * scale)
@@ -53,10 +65,20 @@ struct PeggedView: View {
 
     private var photoSize: CGSize { Self.photoSize(for: item.thumb.size) }
 
+    /// A photo shows its picture. Copied text is drawn live as a sheet from
+    /// Notes, so it follows the light or dark appearance.
+    @ViewBuilder private var content: some View {
+        if isText(item.url), let note = Note.cached(item.url) {
+            NoteSheet(note: note, width: photoSize.width, height: photoSize.height)
+        } else {
+            Image(nsImage: item.thumb)
+                .resizable()
+                .interpolation(.high)
+        }
+    }
+
     private var card: some View {
-        Image(nsImage: item.thumb)
-            .resizable()
-            .interpolation(.high)
+        content
             .frame(width: photoSize.width, height: photoSize.height)
             // Concentric corners: the photo's radius is the frame's minus the
             // inset, the way macOS rounds nested shapes.
@@ -65,6 +87,17 @@ struct PeggedView: View {
                 RoundedRectangle(cornerRadius: Frame.radius - Frame.inset, style: .continuous)
                     .strokeBorder(Color.white.opacity(0.18), lineWidth: 0.5)
             )
+            .overlay {
+                // A recording says so with a play button over its first frame.
+                if item.isRecording {
+                    Image(systemName: "play.fill")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.primary)
+                        .frame(width: 28, height: 28)
+                        .glassFrame(circle: true)
+                        .allowsHitTesting(false)
+                }
+            }
             .padding(Frame.inset)
             .glassFrame(cornerRadius: Frame.radius)
             .shadow(color: .black.opacity(hovering ? 0.26 : 0.18), radius: hovering ? 14 : 10, y: hovering ? 8 : 5)
@@ -74,14 +107,17 @@ struct PeggedView: View {
             .animation(pressed ? .easeInOut(duration: 0.45) : .spring(response: 0.3, dampingFraction: 0.6), value: pressed)
             .opacity(dragging ? 0.45 : 1)
             .overlay(alignment: .topLeading) {
-                // Drawn here, clicked through GrabView, which sits on top.
-                Image(systemName: "xmark")
+                // Drawn here, clicked through GrabView, which sits on top. A
+                // cross sends a file in Tendedero's folder to the Trash; for a
+                // file anywhere else, or one hung by hand, it only hides it
+                // from the line. A pinned photo is unpinned instead.
+                Image(systemName: cornerSymbol)
                     .font(.system(size: 8, weight: .bold))
                     .foregroundStyle(.primary)
                     .frame(width: 20, height: 20)
                     .glassFrame(circle: true)
                     .padding(3)
-                    .opacity(hovering && !dragging ? 1 : 0)
+                    .opacity(hovering && !dragging && !item.held ? 1 : 0)
                     .scaleEffect(hovering ? 1 : 0.6)
                     .allowsHitTesting(false)
             }
@@ -91,6 +127,8 @@ struct PeggedView: View {
                     Label(L("Copied"), systemImage: "checkmark")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(.primary)
+                        // Wider than a narrow card rather than broken over several lines.
+                        .fixedSize()
                         .padding(.horizontal, 10)
                         .padding(.vertical, 5)
                         .glassFrame(capsule: true)
@@ -128,11 +166,13 @@ struct PeggedView: View {
     private func breeze() {
         let delay = Double.random(in: 0...0.35)
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            guard line.revealed else { return }
             nudge(Double.random(in: 1.6...3.4))
         }
     }
 
     private func nudge(_ degrees: Double) {
+        guard line.revealed else { return }
         withAnimation(.easeOut(duration: 0.3)) { swing = degrees }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             withAnimation(.interpolatingSpring(stiffness: 38, damping: 2.4)) { swing = 0 }
@@ -167,6 +207,10 @@ extension View {
 /// A minimal aluminium clip: a brushed metal pill with a slot where it
 /// grips the line, and a soft shadow so it reads on any background.
 struct Clothespin: View {
+    /// Silver for what comes and goes, space grey for what you pinned, the
+    /// way Macs come in both: what stays on the line reads at a glance.
+    var pinned = false
+
     private let metal = LinearGradient(
         stops: [
             .init(color: Color(white: 0.70), location: 0),
@@ -176,20 +220,29 @@ struct Clothespin: View {
         ],
         startPoint: .leading, endPoint: .trailing)
 
+    private let spaceGrey = LinearGradient(
+        stops: [
+            .init(color: Color(white: 0.30), location: 0),
+            .init(color: Color(white: 0.47), location: 0.35),
+            .init(color: Color(white: 0.38), location: 0.65),
+            .init(color: Color(white: 0.24), location: 1),
+        ],
+        startPoint: .leading, endPoint: .trailing)
+
     var body: some View {
         RoundedRectangle(cornerRadius: 3.5, style: .continuous)
-            .fill(metal)
+            .fill(pinned ? spaceGrey : metal)
             .frame(width: 9, height: 26)
             .overlay(
                 RoundedRectangle(cornerRadius: 3.5, style: .continuous)
-                    .stroke(LinearGradient(colors: [Color.white.opacity(0.9), Color.black.opacity(0.18)],
+                    .stroke(LinearGradient(colors: [Color.white.opacity(pinned ? 0.45 : 0.9), Color.black.opacity(0.18)],
                                            startPoint: .top, endPoint: .bottom),
                             lineWidth: 0.6)
             )
             .overlay(alignment: .top) {
                 // The slot the line passes through.
                 Capsule()
-                    .fill(Color.black.opacity(0.32))
+                    .fill(Color.black.opacity(pinned ? 0.55 : 0.32))
                     .frame(width: 5, height: 1.4)
                     .padding(.top, 8.5)
             }

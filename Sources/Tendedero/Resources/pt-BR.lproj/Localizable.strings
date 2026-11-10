@@ -1,0 +1,88 @@
+/* Brazilian Portuguese. */
+
+/* AppDelegate */
+"Let Tendedero handle your screenshots?" = "Deixar o Tendedero cuidar das suas capturas de tela?";
+"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "As capturas vão para o varal no instante em que você as faz, sem a miniatura flutuante, e não se acumulam mais na sua Mesa. Arraste uma para uma pasta para guardá-la, ou descarte-a no X. Você pode desativar isso na barra de menus, e seus ajustes voltam quando o Tendedero é encerrado.";
+"Turn on" = "Ativar";
+"Not now" = "Agora não";
+"Hide line" = "Ocultar varal";
+"Show line" = "Mostrar varal";
+"Take everything down" = "Recolher tudo";
+"Put back" = "Pendurar de volta";
+"Handle screenshots" = "Cuidar das capturas de tela";
+"Screenshots hang instantly and skip the Desktop" = "As capturas vão direto para o varal, sem passar pela Mesa";
+"Open screenshots folder" = "Abrir pasta de capturas";
+"Sounds" = "Sons";
+"Open at login" = "Abrir ao iniciar sessão";
+"Check for Updates…" = "Buscar Atualizações…";
+"Quit Tendedero" = "Encerrar Tendedero";
+"Could not change the login setting" = "Não foi possível alterar a abertura ao iniciar sessão";
+"Move Tendedero to the Applications folder and try again." = "Mova o Tendedero para a pasta Aplicativos e tente novamente.";
+"Keep on line" = "Manter no varal";
+"As many as fit" = "Quantas couberem";
+"%d photos" = "%d fotos";
+"Also watch folders" = "Monitorar também pastas";
+"Add Folder…" = "Adicionar Pasta…";
+"Stop Watching" = "Parar de Monitorar";
+"Watch" = "Monitorar";
+"New images saved to this folder will hang on the line." = "As novas imagens salvas nesta pasta irão para o varal.";
+"Shortcut" = "Atalho";
+"Change Shortcut…" = "Alterar Atalho…";
+"Change Shortcut" = "Alterar Atalho";
+"None" = "Nenhum";
+"Space" = "Espaço";
+"Press the new shortcut" = "Pressione o novo atalho";
+"Escape cancels. Delete removes the shortcut." = "Esc cancela. Delete remove o atalho.";
+"Size" = "Tamanho";
+"Small" = "Pequeno";
+"Medium" = "Médio";
+"Large" = "Grande";
+"Bring the line down" = "Baixar o varal";
+"When the pointer rests in the menu bar" = "Quando o ponteiro para na barra de menus";
+"When something new hangs" = "Quando algo novo vai para o varal";
+"Over full screen apps" = "Sobre apps em tela cheia";
+"Hang what you copy" = "Pendurar o que você copia";
+"Images" = "Imagens";
+"Text" = "Texto";
+"Links" = "Links";
+"Images you copy hang on the line too" = "As imagens que você copia também vão para o varal";
+"Tendedero, hanging copied images" = "Tendedero, pendurando imagens copiadas";
+"The line is empty" = "O varal está vazio";
+"%d on the line" = "%d no varal";
+
+/* GrabArea */
+"Copy" = "Copiar";
+"Open" = "Abrir";
+"Open Link" = "Abrir link";
+"Quick Look" = "Visualização Rápida";
+"Markup" = "Marcação";
+"Show in Finder" = "Mostrar no Finder";
+"Share…" = "Compartilhar…";
+"Save to Desktop" = "Salvar na Mesa";
+"Discard" = "Descartar";
+"Take down" = "Recolher";
+"Move to Trash" = "Mover para o Lixo";
+"Take down everything to the left" = "Recolher tudo à esquerda";
+"Take down everything to the right" = "Recolher tudo à direita";
+
+/* LineView */
+"Take a screenshot and it will hang here" = "Faça uma captura de tela e ela será pendurada aqui";
+
+/* PeggedView */
+"Copied" = "Copiado";
+
+/* Pinning and holding photos */
+"Pin" = "Fixar";
+"Unpin" = "Desafixar";
+"Hold" = "Segurar";
+"Hang back" = "Devolver ao varal";
+"Hang everything back" = "Devolver tudo ao varal";
+"Actual Size" = "Tamanho real";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Abrir o Tendedero ao iniciar sessão?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "O Tendedero não abre quando você inicia a sessão, então depois de reiniciar o varal some até você abri-lo de novo.";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "O texto que você copia também vai para o varal";
+"Links you copy hang on the line too" = "Os links que você copia também vão para o varal";
