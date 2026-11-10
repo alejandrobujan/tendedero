@@ -84,7 +84,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         setUpStatusItem()
         watchMenuBarClicks()
 
+        // Hang on Tendedero, in the menu of images in Finder and other apps.
+        NSApp.servicesProvider = self
+        NSUpdateDynamicServices()
+
         Markup.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
+        Share.shared.clearAll()
         Trim.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         panel.onScroll = { [weak self] event in
             // Sideways on a trackpad, or the wheel of a mouse.
@@ -93,6 +98,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             self?.line.scroll(by: event.hasPreciseScrollingDeltas ? delta : delta * 12)
         }
         line.onFall = { [weak self] item in self?.fall(item) }
+        line.onHold = { [weak self] id in self?.hold(id) }
+        line.onHangBack = { id in Held.hangBack(id) }
 
         line.$items
             .receive(on: RunLoop.main)
@@ -129,6 +136,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         if !Inbox.wasOffered {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in self?.offerInbox() }
+        } else if Self.shouldOfferLogin {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { Self.offerLogin() }
         }
 
         if !UserDefaults.standard.bool(forKey: "welcomed") {
@@ -148,6 +157,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         if Inbox.isEnabled { Inbox.restore() }
+        Share.shared.clearAll()
     }
 
     // MARK: Inbox mode
@@ -233,8 +243,54 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         alert.addButton(withTitle: L("Turn on"))
         alert.addButton(withTitle: L("Not now"))
         if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
+        // A menu bar app that does not open at login is gone after the first
+        // restart, so the first launch offers it too, ticked.
+        let login = Self.shouldOfferLogin ? NSButton(checkboxWithTitle: L("Open at login"), target: nil, action: nil) : nil
+        if let login {
+            login.state = .on
+            alert.accessoryView = login
+            Self.loginOffered()
+        }
         NSApp.activate(ignoringOtherApps: true)
         if alert.runModal() == .alertFirstButtonReturn { setInbox(true) }
+        if login?.state == .on { Self.openAtLogin() }
+    }
+
+    // MARK: Open at login
+
+    private static let loginOfferedKey = "loginOfferedVersion"
+    private static var version: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+    }
+
+    /// Each install or update asks once whether Tendedero should open at
+    /// login, unless it already does.
+    private static var shouldOfferLogin: Bool {
+        SMAppService.mainApp.status != .enabled
+            && UserDefaults.standard.string(forKey: loginOfferedKey) != version
+    }
+
+    private static func loginOffered() {
+        UserDefaults.standard.set(version, forKey: loginOfferedKey)
+    }
+
+    private static func offerLogin() {
+        loginOffered()
+        let alert = NSAlert()
+        alert.messageText = L("Open Tendedero at login?")
+        alert.informativeText = L("Tendedero does not open when you log in, so after a restart the line is gone until you open it again.")
+        alert.addButton(withTitle: L("Open at login"))
+        alert.addButton(withTitle: L("Not now"))
+        if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
+        NSApp.activate(ignoringOtherApps: true)
+        if alert.runModal() == .alertFirstButtonReturn { openAtLogin() }
+    }
+
+    /// Turned off in System Settings, macOS asks for approval there.
+    private static func openAtLogin() {
+        guard SMAppService.mainApp.status != .enabled else { return }
+        toggleLaunchAtLogin()
+        if SMAppService.mainApp.status == .requiresApproval { SMAppService.openSystemSettingsLoginItems() }
     }
 
     /// Watching the clipboard is opt in, from the menu bar only.
@@ -263,6 +319,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// An empty line goes away, unless it was opened on purpose.
     private func itemsChanged() {
         updateStatusIcon()
+        Held.forget(except: Set(line.items.filter { !$0.falling && $0.held }.map(\.id)))
         guard line.liveCount == 0, !keepOpen else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [weak self] in
             guard let self, self.line.liveCount == 0, !self.keepOpen else { return }
@@ -286,6 +343,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// A new screenshot lifts off from where it was taken and flies to its
     /// place on the line. Without a known capture area it simply drops in.
     private func hangCapture(_ url: URL) {
+        // Already hanging: a photo put back with ⌘Z comes out of the Trash
+        // into the folder, and the watcher sees it arrive. It must not pull
+        // the line over to the screen it was first taken on.
+        guard !line.items.contains(where: { $0.url.standardizedFileURL == url.standardizedFileURL && !$0.falling })
+        else { return }
         let from = captureRect(of: url)
         let screen = from.flatMap { from in
             NSScreen.screens.first { NSMouseInRect(CGPoint(x: from.midX, y: from.midY), $0.frame, false) }
@@ -339,7 +401,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard isPresent, isRevealed, !item.flying, !Self.reducesMotion, let screen = panel.screen,
               let card = cardFrame(for: item.id),
               let image = item.thumb.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return }
-        CaptureFlight.fall(image: image, card: card, tilt: CGFloat(item.tilt), on: screen)
+        CaptureFlight.fall(image: image, card: card, tilt: CGFloat(item.tilt), pinned: item.kept, on: screen)
     }
 
     /// Where a card will hang, in screen coordinates, using the same layout
@@ -348,7 +410,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard let index = line.items.firstIndex(where: { $0.id == id }) else { return nil }
         let width = panel.frame.width
         let x = Layout.x(index: index, count: line.items.count, width: width,
-                         visible: line.visibleCount, scroll: line.scroll)
+                         visible: line.visibleCount, scroll: line.scroll, pinned: line.pinnedLead)
         let viewTop = Layout.ropeY(x: x, width: width) - Layout.pinAbove
         let cardTop = viewTop + PeggedView.cardOffsetBelowTop
         let size = PeggedView.cardSize(for: line.items[index].thumb.size)
@@ -483,6 +545,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         mouseTimer = nil
         panel.ignoresMouseEvents = true
         holdPutBackKey(false)
+        holdPhotoKeys(over: nil)
     }
 
     /// How long the cursor rests against the top edge before the line comes
@@ -542,6 +605,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         guard isRevealed else {
             holdPutBackKey(false)
+            holdPhotoKeys(over: nil)
             line.closeGaps()
             // Resting in the middle of the menu bar brings the line down on
             // that screen. Pushing against the top edge is part of it, and it
@@ -577,10 +641,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let inside = NSMouseInRect(mouse, zone, false)
         if inside && pinned { pinned = false }
         holdPutBackKey(inside)
+        holdPhotoKeys(over: inside ? photo(under: mouse) : nil)
         // Gaps left by discarded photos close once the pointer moves away.
         if !inside { line.closeGaps() }
 
-        let busy = pinned || GrabView.isDragging || GrabView.isShowingMenu
+        let busy = pinned || GrabView.isDragging || GrabView.isShowingMenu || Share.shared.isOpen
             || line.pressedID != nil || now < peekUntil
         if inside || busy {
             awaySince = nil
@@ -610,6 +675,81 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         if panel.ignoresMouseEvents == overPhoto {
             panel.ignoresMouseEvents = !overPhoto
+        }
+    }
+
+    // MARK: Holding
+
+    /// Takes a photo off the line to hold in front of you. The line goes
+    /// up, so it is out of the way of the photo you are looking at.
+    private func hold(_ id: UUID) {
+        guard let item = line.items.first(where: { $0.id == id && !$0.falling && !$0.held }) else { return }
+        line.setHeld(id, true)
+        Held.show(id, url: item.url, line: line) { [weak self] id, frame in self?.hangBack(id, from: frame) }
+    }
+
+    /// Back onto its clip: the line comes down and the photo flies home.
+    private func hangBack(_ id: UUID, from frame: CGRect) {
+        line.setHeld(id, false)
+        comeDown(on: NSScreen.screens.first { $0.frame.intersects(frame) })
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) { [weak self] in
+            self?.fly(id, from: frame)
+        }
+    }
+
+    // MARK: Hang on Tendedero
+
+    /// The service macOS lists for images in Finder and elsewhere. What
+    /// you hang yourself is pinned, and the line comes down to show it.
+    @objc func hangOnLine(_ pasteboard: NSPasteboard, userData: String?,
+                          error: AutoreleasingUnsafeMutablePointer<NSString?>) {
+        let urls = pasteboard.readObjects(forClasses: [NSURL.self],
+                                          options: [.urlReadingFileURLsOnly: true]) as? [URL] ?? []
+        guard !urls.isEmpty else { return }
+        comeDown(on: nil)
+        var any = false
+        for url in urls where line.hangKept(url) { any = true }
+        if !any { NSSound.beep() }
+    }
+
+    // MARK: Keys over a photo
+
+    /// Delete and Space while the pointer rests on a photo: Delete does what
+    /// its corner button does, Space takes a quick look, as in Finder. Like
+    /// ⌘Z, they are borrowed as hot keys only then, so every other app keeps
+    /// them.
+    private var photoKeys: [HotKey] = []
+    private var photoKeysFor: UUID?
+
+    private func holdPhotoKeys(over id: UUID?) {
+        let id = id.flatMap { id in line.items.first { $0.id == id && !$0.falling && !$0.held }?.id }
+        guard id != photoKeysFor else { return }
+        photoKeysFor = id
+        photoKeys = []
+        guard let id else { return }
+        photoKeys = [
+            HotKey(Shortcut(keyCode: kVK_Delete, modifiers: [], key: "\u{8}")) { [weak self] in
+                self?.line.pressCorner(id)
+            },
+            HotKey(Shortcut(keyCode: kVK_Space, modifiers: [], key: " ")) { [weak self] in
+                self?.quickLookToggle(id)
+            },
+        ].compactMap { $0 }
+    }
+
+    /// The photo whose card is under the pointer, if any.
+    private func photo(under mouse: NSPoint) -> UUID? {
+        let local = panel.convertPoint(fromScreen: mouse)
+        let flipped = CGPoint(x: local.x, y: panel.frame.height - local.y)
+        return line.hitRects.first { $0.value.contains(flipped) }?.key
+    }
+
+    /// Space opens Quick Look, and closes it again if it is already open.
+    private func quickLookToggle(_ id: UUID) {
+        if QLPreviewPanel.sharedPreviewPanelExists(), let panel = QLPreviewPanel.shared(), panel.isVisible {
+            panel.orderOut(nil)
+        } else {
+            line.quickLook(id)
         }
     }
 
@@ -751,6 +891,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         putBackItem.isEnabled = line.canPutBack
         menu.addItem(putBackItem)
+
+        if !Held.heldIDs.isEmpty {
+            menu.addItem(ClosureMenuItem(L("Hang everything back")) { Held.hangEverythingBack() })
+        }
 
         let inbox = ClosureMenuItem(L("Handle screenshots")) { [weak self] in
             self?.setInbox(!Inbox.isEnabled)
@@ -934,3 +1078,4 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
 }
+

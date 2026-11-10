@@ -53,6 +53,7 @@
 "Quick Look" = "Visualização Rápida";
 "Markup" = "Marcação";
 "Show in Finder" = "Mostrar no Finder";
+"Share…" = "Compartilhar…";
 "Save to Desktop" = "Salvar na Mesa";
 "Discard" = "Descartar";
 "Take down" = "Recolher";
@@ -66,5 +67,18 @@
 /* PeggedView */
 "Copied" = "Copiado";
 
-"Hang copied text" = "Hang copied text";
-"Text you copy hangs on the line too" = "Text you copy hangs on the line too";
+/* Pinning and holding photos */
+"Pin" = "Fixar";
+"Unpin" = "Desafixar";
+"Hold" = "Segurar";
+"Hang back" = "Devolver ao varal";
+"Hang everything back" = "Devolver tudo ao varal";
+"Actual Size" = "Tamanho real";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Abrir o Tendedero ao iniciar sessão?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "O Tendedero não abre quando você inicia a sessão, então depois de reiniciar o varal some até você abri-lo de novo.";
+
+/* Copied text */
+"Hang copied text" = "Pendurar texto copiado";
+"Text you copy hangs on the line too" = "O texto que você copia também vai para o varal";

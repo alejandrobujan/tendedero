@@ -12,7 +12,7 @@
   &nbsp;&nbsp;
   <a href="#소스에서-빌드하기">소스에서 빌드하기&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;한국어&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.it.md">Italiano</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;한국어&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
   <br>
   <sub>영어 README를 번역한 문서예요. 내용이 다를 경우 영어 원문이 우선해요.</sub>
 </p>
@@ -57,6 +57,12 @@
 | 폴더로 드래그 | 폴더에 보관해요. 빨랫줄에서는 사라져요. |
 | 휴지통으로 드래그하거나 X 버튼 클릭 | 미련 없이 버려요. |
 | 포인터를 빨랫줄에 두고 <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | 방금 버린 걸 다시 걸어요. |
+| 포인터를 사진에 두고 <kbd>Space</kbd> | 훑어봐요. |
+| 포인터를 사진에 두고 <kbd>⌫</kbd> | 모서리 버튼처럼 놓아줘요. |
+| 오른쪽 클릭 후 공유 | AirDrop, 메시지, Mail 등으로 보내요. 빨랫줄에는 그대로 남아요. |
+| 오른쪽 클릭 후 고정하기 | 남겨 둬요. 매듭 왼쪽에 스페이스 그레이 집게로 걸리고, 새 스크린샷에 밀려나지 않아요. |
+| 오른쪽 클릭 후 손에 들기 | 줄에서 내려 작업하는 동안 눈앞에 둬요. |
+| Finder에서 이미지를 오른쪽 클릭 후 Tendedero에 걸기 | 어떤 이미지든 고정해서 줄에 걸어요. |
 | 포인터를 메뉴 막대 가운데에 올려 두기 | 그 화면에 빨랫줄을 내려요. |
 | 메뉴 막대의 아무 곳이나 클릭 | 빨랫줄을 치워요. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | 빨랫줄을 보거나 가려요. 메뉴 막대의 단축키에서 바꿀 수 있어요. |
@@ -97,8 +103,8 @@ Tendedero는 전적으로 Mac에서만 실행되며, 스크린샷은 절대 Mac 
 | | |
 |:--|:--|
 | **호환성** | Apple 실리콘 및 Intel 기반 Mac의 macOS 14 Sonoma 이상. macOS 27에 맞춰 디자인됨. |
-| **크기** | 1.7MB |
-| **언어** | 영어, 스페인어, 갈리시아어, 프랑스어, 포르투갈어(브라질), 일본어, 한국어, 중국어(간체), 튀르키예어, 아제르바이잔어, 힌디어 |
+| **크기** | 3.5MB |
+| **언어** | 영어, 스페인어, 갈리시아어, 프랑스어, 포르투갈어(브라질), 이탈리아어, 일본어, 한국어, 중국어(간체), 튀르키예어, 아제르바이잔어, 힌디어 |
 | **개발 도구** | Swift, AppKit 및 SwiftUI |
 | **네트워크 접근** | 없음 |
 | **가격** | 무료 |
@@ -112,7 +118,7 @@ Tendedero는 전적으로 Mac에서만 실행되며, 스크린샷은 절대 Mac 
 Tendedero를 응용 프로그램 폴더로 드래그하세요. Homebrew로 설치할 수도 있어요.
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 Tendedero는 Developer ID로 서명되고 Apple의 공증을 받았기 때문에

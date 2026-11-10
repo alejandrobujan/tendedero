@@ -26,10 +26,10 @@ final class ClipboardWatcher {
         set { UserDefaults.standard.set(newValue, forKey: enabledKey) }
     }
 
-    /// Hang copied text. Until chosen, it follows the images switch, so an
-    /// update keeps working as before and a fresh install watches nothing.
+    /// Hang copied text. Off until chosen: nothing you copy is kept on disk
+    /// unless you asked for it.
     static var textEnabled: Bool {
-        get { UserDefaults.standard.object(forKey: textKey) as? Bool ?? imagesEnabled }
+        get { UserDefaults.standard.bool(forKey: textKey) }
         set { UserDefaults.standard.set(newValue, forKey: textKey) }
     }
 
@@ -133,18 +133,21 @@ final class ClipboardWatcher {
 
     private var lastText: String?
 
+    /// Notes go to their own folder, apart from the screenshots.
     private func save(text: String, rtf: Data?) {
         if let last, FileManager.default.fileExists(atPath: last.url.path), lastText == text { return }
         let ext = rtf == nil ? "txt" : "rtf"
+        let name = "Text"
         let fm = FileManager.default
-        var url = Inbox.folder.appendingPathComponent("Text \(Self.stamp()).\(ext)")
+        let folder = NoteFolder.url
+        var url = folder.appendingPathComponent("\(name) \(Self.stamp()).\(ext)")
         var n = 2
         while fm.fileExists(atPath: url.path) {
-            url = Inbox.folder.appendingPathComponent("Text \(Self.stamp()) \(n).\(ext)")
+            url = folder.appendingPathComponent("\(name) \(Self.stamp()) \(n).\(ext)")
             n += 1
         }
         do {
-            try fm.createDirectory(at: Inbox.folder, withIntermediateDirectories: true)
+            try fm.createDirectory(at: folder, withIntermediateDirectories: true)
             try (rtf ?? Data(text.utf8)).write(to: url, options: .atomic)
             try fm.setAttributes([.posixPermissions: 0o600], ofItemAtPath: url.path)
             last = (Data(), url)

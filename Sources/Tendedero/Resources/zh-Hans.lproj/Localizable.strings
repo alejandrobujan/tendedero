@@ -53,6 +53,7 @@
 "Quick Look" = "快速查看";
 "Markup" = "标记";
 "Show in Finder" = "在访达中显示";
+"Share…" = "共享…";
 "Save to Desktop" = "存储到桌面";
 "Discard" = "丢弃";
 "Take down" = "取下";
@@ -66,5 +67,18 @@
 /* PeggedView */
 "Copied" = "已复制";
 
+/* Pinning and holding photos */
+"Pin" = "固定";
+"Unpin" = "取消固定";
+"Hold" = "拿在手上";
+"Hang back" = "放回绳上";
+"Hang everything back" = "全部放回绳上";
+"Actual Size" = "实际大小";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "登录时打开 Tendedero？";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero 不会在登录时打开，所以重新启动后，晾衣绳会一直不见，直到你再次打开它。";
+
+/* Copied text */
 "Hang copied text" = "挂上复制的文字";
 "Text you copy hangs on the line too" = "复制的文字也会挂在绳子上";

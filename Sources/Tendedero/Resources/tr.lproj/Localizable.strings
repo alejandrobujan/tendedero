@@ -53,6 +53,7 @@
 "Quick Look" = "Hızlı Bakış";
 "Markup" = "İşaretle";
 "Show in Finder" = "Finder'da göster";
+"Share…" = "Paylaş…";
 "Save to Desktop" = "Masaüstüne kaydet";
 "Discard" = "Sil";
 "Take down" = "İndir";
@@ -66,5 +67,18 @@
 /* PeggedView */
 "Copied" = "Kopyalandı";
 
-"Hang copied text" = "Hang copied text";
-"Text you copy hangs on the line too" = "Text you copy hangs on the line too";
+/* Pinning and holding photos */
+"Pin" = "Sabitle";
+"Unpin" = "Sabitlemeyi kaldır";
+"Hold" = "Elinde tut";
+"Hang back" = "İpe geri koy";
+"Hang everything back" = "Hepsini ipe geri koy";
+"Actual Size" = "Gerçek boyut";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Tendedero başlangıçta açılsın mı?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero oturum açtığınızda açılmıyor; bu yüzden yeniden başlattıktan sonra siz tekrar açana kadar ip görünmez.";
+
+/* Copied text */
+"Hang copied text" = "Kopyalanan metni as";
+"Text you copy hangs on the line too" = "Kopyaladığınız metin de ipe asılır";

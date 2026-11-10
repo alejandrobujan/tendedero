@@ -12,7 +12,7 @@
   &nbsp;&nbsp;
   <a href="#सोर्स-से-बनाएँ">सोर्स से बनाएँ&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;हिन्दी
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.it.md">Italiano</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;हिन्दी
   <br>
   <sub>अंग्रेज़ी README का अनुवाद। कहीं फ़र्क़ हो तो अंग्रेज़ी वाला ही मान्य है।</sub>
 </p>
@@ -57,6 +57,12 @@
 | किसी फ़ोल्डर में खींचें | उसे वहीं रखें। वह रस्सी से उतर जाती है। |
 | ट्रैश में खींचें, या क्रॉस पर क्लिक करें | जाने दें। |
 | पॉइंटर रस्सी पर रखकर <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | जिसे अभी जाने दिया, उसे वापस टाँगें। |
+| पॉइंटर फ़ोटो पर रखकर <kbd>Space</kbd> | झट से देखें। |
+| पॉइंटर फ़ोटो पर रखकर <kbd>⌫</kbd> | कोने के बटन की तरह जाने दें। |
+| राइट क्लिक, फिर शेयर करें | AirDrop, Messages, Mail और दूसरे तरीकों से भेजें। वह रस्सी पर बनी रहती है। |
+| राइट क्लिक, फिर पिन करें | इसे रखें: यह गाँठ के बाईं ओर स्पेस ग्रे क्लिप पर टँगा रहता है, और कोई नया स्क्रीनशॉट इसे नहीं हटाता। |
+| राइट क्लिक, फिर हाथ में लें | इसे रस्सी से उतारें और काम करते समय सामने रखें। |
+| Finder में किसी तस्वीर पर राइट क्लिक, फिर Tendedero पर टाँगें | कोई भी तस्वीर रस्सी पर पिन करके टाँगें। |
 | पॉइंटर को मेनू बार के बीच में रोकें | उस स्क्रीन पर रस्सी नीचे लाएँ। |
 | मेनू बार में कहीं भी क्लिक करें | रस्सी ऊपर कर दें। |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | रस्सी दिखाएँ या छिपाएँ। मेनू बार में शॉर्टकट से इसे बदलें। |
@@ -97,8 +103,8 @@ Tendedero पूरी तरह आपके Mac पर चलता है, �
 | | |
 |:--|:--|
 | **संगतता** | macOS 14 Sonoma या उसके बाद, Apple silicon और Intel दोनों पर। macOS 27 के लिए बनाया गया। |
-| **आकार** | 1.7 MB |
-| **भाषाएँ** | अंग्रेज़ी, स्पेनिश, गैलिशियन, फ़्रेंच, पुर्तगाली (ब्राज़ील), जापानी, कोरियाई, चीनी (सरलीकृत), तुर्की, अज़रबैजानी और हिन्दी |
+| **आकार** | 3.5 MB |
+| **भाषाएँ** | अंग्रेज़ी, स्पेनिश, गैलिशियन, फ़्रेंच, पुर्तगाली (ब्राज़ील), इतालवी, जापानी, कोरियाई, चीनी (सरलीकृत), तुर्की, अज़रबैजानी और हिन्दी |
 | **किससे बना** | Swift, AppKit और SwiftUI |
 | **इंटरनेट** | ज़रूरत नहीं |
 | **क़ीमत** | मुफ़्त |
@@ -112,7 +118,7 @@ Tendedero पूरी तरह आपके Mac पर चलता है, �
 और Tendedero को Applications में खींच दें। या Homebrew से इंस्टॉल करें:
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 Tendedero पर Developer ID से साइन है और Apple ने इसे नोटराइज़ किया है, इसलिए यह

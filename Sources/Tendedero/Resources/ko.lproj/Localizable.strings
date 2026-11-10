@@ -53,6 +53,7 @@
 "Quick Look" = "훑어보기";
 "Markup" = "마크업";
 "Show in Finder" = "Finder에서 보기";
+"Share…" = "공유…";
 "Save to Desktop" = "데스크탑에 저장";
 "Discard" = "버리기";
 "Take down" = "걷어내기";
@@ -66,5 +67,18 @@
 /* PeggedView */
 "Copied" = "복사됨";
 
-"Hang copied text" = "Hang copied text";
-"Text you copy hangs on the line too" = "Text you copy hangs on the line too";
+/* Pinning and holding photos */
+"Pin" = "고정하기";
+"Unpin" = "고정 해제";
+"Hold" = "손에 들기";
+"Hang back" = "줄에 돌려놓기";
+"Hang everything back" = "모두 줄에 돌려놓기";
+"Actual Size" = "실제 크기";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "로그인 시 Tendedero를 열까요?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero는 로그인할 때 열리지 않아서, 재시동하면 다시 열 때까지 빨랫줄이 사라져요.";
+
+/* Copied text */
+"Hang copied text" = "복사한 텍스트 걸기";
+"Text you copy hangs on the line too" = "복사한 텍스트도 빨랫줄에 걸려요";

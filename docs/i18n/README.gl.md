@@ -12,7 +12,7 @@
   &nbsp;&nbsp;
   <a href="#compilar-dende-o-código">Compilar dende o código&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;Galego&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;Galego&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.it.md">Italiano</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
   <br>
   <sub>Tradución do README en inglés. Se algo non coincide, manda o inglés.</sub>
 </p>
@@ -57,6 +57,12 @@ Leva o punteiro ao centro da barra de menús e a corda baixa. Apártao e desapar
 | Arrastrar a un cartafol | Queda alí e sae da corda. |
 | Arrastrar á Papeleira ou facer clic na cruz | Desfaste dela. |
 | <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> co punteiro na corda | Volve colgar o que acabas de soltar. |
+| <kbd>Espazo</kbd> co punteiro nunha foto | Bótalle unha ollada. |
+| <kbd>⌫</kbd> co punteiro nunha foto | Sóltaa, como o seu botón da esquina. |
+| Clic dereito e Compartir | Envíaa por AirDrop, Mensaxes, Mail e máis, e a captura segue pendurada. |
+| Clic dereito e Fixar | Gárdaa: pendura á esquerda do nó cunha pinza gris espacial e ningunha captura nova a empurra. |
+| Clic dereito e Suxeitar | Quítaa da corda e tena diante mentres traballas. |
+| No Finder, clic dereito nunha imaxe e Pendurar en Tendedero | Pendura calquera imaxe na corda, fixada. |
 | Deixar o punteiro no centro da barra de menús | Baixa a corda nesa pantalla. |
 | Facer clic en calquera sitio da barra de menús | Recolle a corda. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Amosa ou oculta a corda. Cámbiase en Atallo, na barra de menús. |
@@ -98,8 +104,8 @@ Tendedero funciona só no teu Mac, e as túas capturas nunca saen del.
 | | |
 |:--|:--|
 | **Compatibilidade** | macOS 14 Sonoma ou posterior, en Mac con Apple silicon ou Intel. Pensado para macOS 27. |
-| **Tamaño** | 1,7 MB |
-| **Idiomas** | Inglés, español, galego, francés, portugués do Brasil, xaponés, coreano, chinés simplificado, turco, acerbaixano e hindi |
+| **Tamaño** | 3,5 MB |
+| **Idiomas** | Inglés, español, galego, francés, portugués do Brasil, italiano, xaponés, coreano, chinés simplificado, turco, acerbaixano e hindi |
 | **Feito con** | Swift, AppKit e SwiftUI |
 | **Conexión a internet** | Non a usa |
 | **Prezo** | De balde |
@@ -113,7 +119,7 @@ Descarga a imaxe de disco dende a [última versión](../../../../releases/latest
 ábrea e arrastra Tendedero a Aplicacións. Tamén podes instalalo con Homebrew:
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 Tendedero está asinado cun Developer ID e notarizado por Apple, así que se
