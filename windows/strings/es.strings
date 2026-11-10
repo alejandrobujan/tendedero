@@ -1,0 +1,4 @@
+/* Sobrescrituras para Windows. Se cargan después de las de macOS. */
+"Show in Finder" = "Mostrar en el Explorador de archivos";
+"Move to Trash" = "Mover a la Papelera de reciclaje";
+"Move Tendedero to the Applications folder and try again." = "Inténtalo de nuevo, o abre Tendedero desde su carpeta.";
