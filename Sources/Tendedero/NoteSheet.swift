@@ -26,7 +26,10 @@ enum NoteFolder {
         if contains(source) { return source }
         let size = (try? FileManager.default.attributesOfItem(atPath: source.path))?[.size] as? Int ?? 0
         guard isTextFile(source), size <= 1_000_000 else { return nil }
-        let ext = source.pathExtension.lowercased() == "rtf" ? "rtf" : "txt"
+        // Styled text stays RTF and Markdown stays Markdown; any other plain
+        // text becomes .txt.
+        let kind = source.pathExtension.lowercased()
+        let ext = kind == "rtf" ? "rtf" : ["md", "markdown"].contains(kind) ? "md" : "txt"
         let base = source.deletingPathExtension().lastPathComponent
         let fm = FileManager.default
         var target = url.appendingPathComponent("\(base).\(ext)")
@@ -57,6 +60,8 @@ struct Note {
     var modified: Date? = nil
     /// A copy that is just a web address hangs as a link: its site and path.
     var link: URL? = nil
+    /// Written in Markdown: shown formatted, copied back as written.
+    var markdown = false
 
     /// Read once per thumbnail and kept, so drawing the line never touches
     /// the disk.
@@ -104,6 +109,22 @@ struct Note {
         if let link = webAddress(trimmed), let host = link.host {
             let site = host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
             return Note(title: site, body: trimmed, code: false, date: date, link: link)
+        }
+        // Markdown before code: a list can look like code at a glance.
+        let kind = url.pathExtension.lowercased()
+        if kind == "md" || (kind != "rtf" && !monospaced && Markdown.looks(trimmed)) {
+            let lines = trimmed.components(separatedBy: .newlines)
+            let first = lines.first ?? ""
+            let rest = lines.dropFirst().joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
+            // "# Shopping" is the title; a note that starts with a list, a
+            // quote or code has none, and neither does a long first line.
+            if let heading = Markdown.heading(first) {
+                return Note(title: heading, body: rest, code: false, date: date, markdown: true)
+            }
+            if Markdown.startsBlock(first) || first.count > titleLimit {
+                return Note(title: "", body: trimmed, code: false, date: date, markdown: true)
+            }
+            return Note(title: first, body: rest, code: false, date: date, markdown: true)
         }
         if monospaced || looksLikeCode(trimmed) {
             return Note(title: "", body: trimmed, code: true, date: date)
@@ -223,13 +244,20 @@ struct NoteSheet: View {
                         .layoutPriority(0)
                 } else {
                     if !note.title.isEmpty {
-                        Text(note.title)
+                        Text(note.markdown ? Markdown.inline(note.title) : AttributedString(note.title))
                             .font(.system(size: (note.body.isEmpty ? 12.5 : 11) * u, weight: .bold))
                             .foregroundStyle(dark ? Color(white: 0.96) : Color(white: 0.11))
                             .lineLimit(3)
                             .layoutPriority(1)
                     }
-                    if !note.body.isEmpty {
+                    if !note.body.isEmpty, note.markdown {
+                        Text(Markdown.swiftUI(note.body, size: (note.title.isEmpty ? 9.5 : 8.5) * u,
+                                              ink: dark ? Color(white: 0.96) : Color(white: 0.11),
+                                              soft: dark ? Color.white.opacity(0.75) : Color(white: 0.24),
+                                              link: dark ? Color(red: 0.9, green: 0.706, blue: 0.133) : Color(red: 0.788, green: 0.604, blue: 0)))
+                            .lineSpacing(1 * u)
+                            .layoutPriority(0)
+                    } else if !note.body.isEmpty {
                         Text(linked(note.body))
                             // Without a title, the words are the note: a little bigger.
                             .font(.system(size: (note.title.isEmpty ? 9.5 : 8.5) * u))
@@ -411,10 +439,18 @@ private struct NoteText: NSViewRepresentable {
                 .font: NSFont.monospacedSystemFont(ofSize: 7.5 * u, weight: .regular),
                 .foregroundColor: ink, .paragraphStyle: style])
         }
-        let result = NSMutableAttributedString(string: note.title, attributes: [
+        let title = note.markdown ? String(Markdown.inline(note.title).characters) : note.title
+        let result = NSMutableAttributedString(string: title, attributes: [
             .font: NSFont.systemFont(ofSize: (note.body.isEmpty ? 12.5 : 11) * u, weight: .bold),
             .foregroundColor: ink])
         guard !note.body.isEmpty else { return result }
+        if note.markdown {
+            if !title.isEmpty { result.append(NSAttributedString(string: "\n")) }
+            result.append(Markdown.appKit(note.body, size: (title.isEmpty ? 9.5 : 8.5) * u, ink: ink,
+                                          soft: dark ? NSColor(white: 1, alpha: 0.75) : NSColor(white: 0.24, alpha: 1),
+                                          link: link, lineSpacing: 1 * u))
+            return result
+        }
         let style = NSMutableParagraphStyle()
         style.lineSpacing = 1 * u
         style.paragraphSpacingBefore = note.title.isEmpty ? 0 : 3 * u

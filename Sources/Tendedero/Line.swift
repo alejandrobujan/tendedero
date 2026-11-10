@@ -935,7 +935,7 @@ func isRecording(_ url: URL) -> Bool {
 
 /// Copied text: plain text is saved as .txt, styled text as .rtf.
 func isText(_ url: URL) -> Bool {
-    ["txt", "rtf"].contains(url.pathExtension.lowercased()) && NoteFolder.contains(url)
+    ["txt", "rtf", "md"].contains(url.pathExtension.lowercased()) && NoteFolder.contains(url)
 }
 
 /// Text copied in dark mode carries dark backgrounds and light ink, which look
