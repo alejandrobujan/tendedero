@@ -8,6 +8,7 @@
 "Hide line" = "Ocultar varal";
 "Show line" = "Mostrar varal";
 "Take everything down" = "Recolher tudo";
+"Put back" = "Pendurar de volta";
 "Handle screenshots" = "Cuidar das capturas de tela";
 "Screenshots hang instantly and skip the Desktop" = "As capturas vão direto para o varal, sem passar pela Mesa";
 "Open screenshots folder" = "Abrir pasta de capturas";
@@ -43,9 +44,8 @@
 "Hang copied images" = "Pendurar imagens copiadas";
 "Images you copy hang on the line too" = "As imagens que você copia também vão para o varal";
 "Tendedero, hanging copied images" = "Tendedero, pendurando imagens copiadas";
-"Hang copied text" = "Pendurar texto copiado";
-"Text you copy hangs as a note card" = "O texto que você copia é pendurado como um cartão de nota";
-"Tendedero, hanging copied text" = "Tendedero, pendurando texto copiado";
+"The line is empty" = "O varal está vazio";
+"%d on the line" = "%d no varal";
 
 /* GrabArea */
 "Copy" = "Copiar";
@@ -53,6 +53,7 @@
 "Quick Look" = "Visualização Rápida";
 "Markup" = "Marcação";
 "Show in Finder" = "Mostrar no Finder";
+"Share…" = "Compartilhar…";
 "Save to Desktop" = "Salvar na Mesa";
 "Discard" = "Descartar";
 "Take down" = "Recolher";
@@ -65,3 +66,19 @@
 
 /* PeggedView */
 "Copied" = "Copiado";
+
+/* Pinning and holding photos */
+"Pin" = "Fixar";
+"Unpin" = "Desafixar";
+"Hold" = "Segurar";
+"Hang back" = "Devolver ao varal";
+"Hang everything back" = "Devolver tudo ao varal";
+"Actual Size" = "Tamanho real";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Abrir o Tendedero ao iniciar sessão?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "O Tendedero não abre quando você inicia a sessão, então depois de reiniciar o varal some até você abri-lo de novo.";
+
+/* Copied text */
+"Hang copied text" = "Pendurar texto copiado";
+"Text you copy hangs on the line too" = "O texto que você copia também vai para o varal";
