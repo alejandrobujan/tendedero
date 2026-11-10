@@ -149,6 +149,18 @@ let translations: [String: [String: String]] = [
         "Let it go.": "松手放下。",
         "The cross or the Trash. That\u{2019}s it.": "点叉或拖进废纸篓，就这么简单。",
     ],
+    "vi": [
+        "Screenshots, hung out to dry.": "Ảnh chụp màn hình, phơi ngay trên dây.",
+        "Copied": "Đã sao chép",
+        "Click to copy.": "Nhấp để sao chép.",
+        "Paste it anywhere, instantly.": "Dán vào mọi nơi, tức thì.",
+        "Hold to mark up.": "Giữ để đánh dấu.",
+        "Annotate, crop or sign in place.": "Ghi chú, cắt hoặc ký ngay tại chỗ.",
+        "Drag to share.": "Kéo để chia sẻ.",
+        "Apps get a copy. Folders keep it.": "App nhận bản sao. Thư mục giữ bản gốc.",
+        "Let it go.": "Bỏ đi thôi.",
+        "The cross or the Trash. That\u{2019}s it.": "Dấu chéo hoặc Thùng rác. Thế là xong.",
+    ],
 ]
 
 func T(_ english: String) -> String {
