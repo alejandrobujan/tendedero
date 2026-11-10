@@ -28,6 +28,10 @@ let translations: [String: [String: String]] = [
         "Apps get a copy. Folders keep it.": "Las apps reciben una copia. Las carpetas, el original.",
         "Let it go.": "Y olvídate.",
         "The cross or the Trash. That\u{2019}s it.": "La cruz o la Papelera. Nada más.",
+        "Copy any text.": "Copia cualquier texto.",
+        "It hangs as a note, links too.": "Se cuelga como nota, y los enlaces también.",
+        "Search the line.": "Busca en la cuerda.",
+        "\u{2303}\u{2325}F finds words, even in screenshots.": "⌃⌥F encuentra palabras, también en capturas.",
     ],
     "tr": [
         "Capture it. Copy it. Hang it all out to dry.": "Yakala. Kopyala. Hepsini ipe as.",
@@ -40,6 +44,10 @@ let translations: [String: [String: String]] = [
         "Apps get a copy. Folders keep it.": "Uygulamalar kopya alır, klasörler saklar.",
         "Let it go.": "Bırak gitsin.",
         "The cross or the Trash. That\u{2019}s it.": "Çarpı veya Çöp Kutusu. Hepsi bu.",
+        "Copy any text.": "Metni de kopyala.",
+        "It hangs as a note, links too.": "Not olarak asılır, bağlantılar da.",
+        "Search the line.": "İpte ara.",
+        "\u{2303}\u{2325}F finds words, even in screenshots.": "⌃⌥F ekran görüntülerindeki yazıları bile bulur.",
     ],
     "az": [
         "Capture it. Copy it. Hang it all out to dry.": "Çək. Kopyala. Hamısını ipə sər.",
@@ -52,6 +60,10 @@ let translations: [String: [String: String]] = [
         "Apps get a copy. Folders keep it.": "Proqram surətini alır. Qovluq özünü saxlayır.",
         "Let it go.": "Burax getsin.",
         "The cross or the Trash. That\u{2019}s it.": "Çarpaz və ya Zibil qutusu. Vəssalam.",
+        "Copy any text.": "Mətni də kopyala.",
+        "It hangs as a note, links too.": "Qeyd kimi asılır, keçidlər də.",
+        "Search the line.": "İpdə axtar.",
+        "\u{2303}\u{2325}F finds words, even in screenshots.": "⌃⌥F ekran şəkillərindəki sözləri də tapır.",
     ],
     "gl": [
         "Capture it. Copy it. Hang it all out to dry.": "Captúrao. Cópiao. Téndeo todo.",
@@ -64,6 +76,10 @@ let translations: [String: [String: String]] = [
         "Apps get a copy. Folders keep it.": "As apps reciben unha copia. Os cartafoles, o orixinal.",
         "Let it go.": "E esquécete.",
         "The cross or the Trash. That\u{2019}s it.": "A cruz ou a Papeleira. Nada máis.",
+        "Copy any text.": "Copia calquera texto.",
+        "It hangs as a note, links too.": "Pendúrase como nota, e as ligazóns tamén.",
+        "Search the line.": "Busca na corda.",
+        "\u{2303}\u{2325}F finds words, even in screenshots.": "⌃⌥F atopa palabras, tamén en capturas.",
     ],
     "hi": [
         "Capture it. Copy it. Hang it all out to dry.": "कैप्चर करें, कॉपी करें, सब रस्सी पर टाँग दें।",
@@ -76,6 +92,10 @@ let translations: [String: [String: String]] = [
         "Apps get a copy. Folders keep it.": "ऐप्स को कॉपी मिलती है। फ़ोल्डर उसे रख लेते हैं।",
         "Let it go.": "जाने दें।",
         "The cross or the Trash. That\u{2019}s it.": "क्रॉस या ट्रैश। बस इतना ही।",
+        "Copy any text.": "कोई भी टेक्स्ट कॉपी करें।",
+        "It hangs as a note, links too.": "यह नोट बनकर टँगता है, लिंक भी।",
+        "Search the line.": "रस्सी पर खोजें।",
+        "\u{2303}\u{2325}F finds words, even in screenshots.": "⌃⌥F स्क्रीनशॉट के शब्द भी ढूँढता है।",
     ],
     "it": [
         "Capture it. Copy it. Hang it all out to dry.": "Cattura. Copia. Stendi tutto ad asciugare.",
@@ -88,6 +108,10 @@ let translations: [String: [String: String]] = [
         "Apps get a copy. Folders keep it.": "Le app ricevono una copia. Le cartelle, l\u{2019}originale.",
         "Let it go.": "E non pensarci pi\u{F9}.",
         "The cross or the Trash. That\u{2019}s it.": "La crocetta o il Cestino. Tutto qui.",
+        "Copy any text.": "Copia qualsiasi testo.",
+        "It hangs as a note, links too.": "Si appende come nota, anche i link.",
+        "Search the line.": "Cerca sul filo.",
+        "\u{2303}\u{2325}F finds words, even in screenshots.": "⌃⌥F trova le parole, anche negli screenshot.",
     ],
     "fr": [
         "Capture it. Copy it. Hang it all out to dry.": "Capturez. Copiez. Mettez tout à sécher.",
@@ -100,6 +124,10 @@ let translations: [String: [String: String]] = [
         "Apps get a copy. Folders keep it.": "Les apps reçoivent une copie. Les dossiers la gardent.",
         "Let it go.": "Laissez filer.",
         "The cross or the Trash. That\u{2019}s it.": "La croix ou la corbeille. C\u{2019}est tout.",
+        "Copy any text.": "Copiez du texte.",
+        "It hangs as a note, links too.": "Il s’accroche en note, les liens aussi.",
+        "Search the line.": "Cherchez sur la corde.",
+        "\u{2303}\u{2325}F finds words, even in screenshots.": "⌃⌥F trouve les mots, même dans les captures.",
     ],
     "pt-BR": [
         "Capture it. Copy it. Hang it all out to dry.": "Capture. Copie. Pendure tudo no varal.",
@@ -112,6 +140,10 @@ let translations: [String: [String: String]] = [
         "Apps get a copy. Folders keep it.": "Apps recebem uma cópia. Pastas a guardam.",
         "Let it go.": "Desapegue.",
         "The cross or the Trash. That\u{2019}s it.": "O X ou o Lixo. Só isso.",
+        "Copy any text.": "Copie qualquer texto.",
+        "It hangs as a note, links too.": "Ele vira uma nota, e os links também.",
+        "Search the line.": "Busque no varal.",
+        "\u{2303}\u{2325}F finds words, even in screenshots.": "⌃⌥F acha palavras, até nas capturas.",
     ],
     "ja": [
         "Capture it. Copy it. Hang it all out to dry.": "撮って、コピーして、ぜんぶ物干しに。",
@@ -124,6 +156,10 @@ let translations: [String: [String: String]] = [
         "Apps get a copy. Folders keep it.": "アプリへはコピー、フォルダへは保存。",
         "Let it go.": "手放すだけ。",
         "The cross or the Trash. That\u{2019}s it.": "×かゴミ箱へ。それだけ。",
+        "Copy any text.": "テキストもコピー。",
+        "It hangs as a note, links too.": "メモとして吊るされます。リンクも。",
+        "Search the line.": "ロープを検索。",
+        "\u{2303}\u{2325}F finds words, even in screenshots.": "⌃⌥Fで、スクリーンショットの文字まで。",
     ],
     "ko": [
         "Capture it. Copy it. Hang it all out to dry.": "찍고, 복사하고, 모두 빨랫줄에 널어 두세요.",
@@ -136,6 +172,10 @@ let translations: [String: [String: String]] = [
         "Apps get a copy. Folders keep it.": "앱에는 사본을, 폴더에는 원본을.",
         "Let it go.": "미련 없이 버리기.",
         "The cross or the Trash. That\u{2019}s it.": "X 버튼이나 휴지통이면 끝.",
+        "Copy any text.": "텍스트도 복사.",
+        "It hangs as a note, links too.": "메모로 걸려요. 링크도요.",
+        "Search the line.": "빨랫줄에서 찾기.",
+        "\u{2303}\u{2325}F finds words, even in screenshots.": "⌃⌥F로 스크린샷 속 글자까지 찾아요.",
     ],
     "zh-Hans": [
         "Capture it. Copy it. Hang it all out to dry.": "截下来，复制好，统统挂起来晾着。",
@@ -148,6 +188,10 @@ let translations: [String: [String: String]] = [
         "Apps get a copy. Folders keep it.": "拖进 App 是副本，拖进文件夹就存下来。",
         "Let it go.": "松手放下。",
         "The cross or the Trash. That\u{2019}s it.": "点叉或拖进废纸篓，就这么简单。",
+        "Copy any text.": "复制任何文字。",
+        "It hangs as a note, links too.": "它会挂成便签，链接也一样。",
+        "Search the line.": "在绳上搜索。",
+        "\u{2303}\u{2325}F finds words, even in screenshots.": "⌃⌥F 连截图里的文字也能找到。",
     ],
     "vi": [
         "Screenshots, hung out to dry.": "Ảnh chụp màn hình, phơi ngay trên dây.",
@@ -536,7 +580,8 @@ func lerp(_ a: NSPoint, _ b: NSPoint, _ x: CGFloat) -> NSPoint { NSPoint(x: lerp
 func demo(_ t: Theme) {
     let W: CGFloat = 960, H: CGFloat = 340, s: CGFloat = 1
     let fps: CGFloat = 25, duration: CGFloat = 5.2
-    let frames = [Frame(x: 250, w: 210, h: 146, tilt: 2.5, kind: 0),
+    // The same line as the hero: a note, a photo and a chart.
+    let frames = [Frame(x: 250, w: 210, h: 146, tilt: 2.5, kind: 3),
                   Frame(x: 480, w: 230, h: 158, tilt: -1.2, kind: 1),
                   Frame(x: 705, w: 190, h: 136, tilt: 3, kind: 2)]
     let rest = NSPoint(x: 620, y: 90), edge = NSPoint(x: 560, y: H), onPhoto = NSPoint(x: 492, y: 175)
@@ -591,19 +636,23 @@ func demo(_ t: Theme) {
 // MARK: Bento
 
 func bento(_ t: Theme) {
-    let W: CGFloat = 1200, H: CGFloat = 700, s: CGFloat = 2, gap: CGFloat = 20
+    let W: CGFloat = 1200, H: CGFloat = 1040, s: CGFloat = 2, gap: CGFloat = 20
     let tiles: [(String, String, String)] = [
         ("doc.on.doc", T("Click to copy."), T("Paste it anywhere, instantly.")),
         ("pencil.tip.crop.circle", T("Hold to mark up."), T("Annotate, crop or sign in place.")),
         ("arrow.up.forward.app", T("Drag to share."), T("Apps get a copy. Folders keep it.")),
         ("xmark.circle", T("Let it go."), T("The cross or the Trash. That\u{2019}s it.")),
+        ("note.text", T("Copy any text."), T("It hangs as a note, links too.")),
+        ("magnifyingglass", T("Search the line."), T("\u{2303}\u{2325}F finds words, even in screenshots.")),
     ]
     let rep = makeBitmap(W, H, scale: s)
     draw(rep, scale: s) { ctx in
         t.page.setFill(); NSRect(x: 0, y: 0, width: W, height: H).fill()
-        let tw = (W - gap * 3) / 2, th = (H - gap * 3) / 2
+        // Two columns, as many rows as the tiles need.
+        let rows = CGFloat((tiles.count + 1) / 2)
+        let tw = (W - gap * 3) / 2, th = (H - gap * (rows + 1)) / rows
         for (i, tile) in tiles.enumerated() {
-            let col = CGFloat(i % 2), row = CGFloat(1 - i / 2)
+            let col = CGFloat(i % 2), row = rows - 1 - CGFloat(i / 2)
             let r = NSRect(x: gap + col * (tw + gap), y: gap + row * (th + gap), width: tw, height: th)
             t.tile.setFill()
             NSBezierPath(roundedRect: r, xRadius: 28, yRadius: 28).fill()

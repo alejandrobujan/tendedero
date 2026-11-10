@@ -31,7 +31,7 @@ Porta il puntatore al centro della barra dei menu e il filo scende. Allontanalo 
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/it/demo-dark.gif">
-  <img src="../images/it/demo-light.gif" alt="Il puntatore tocca il bordo superiore, il filo scende con tre screenshot che oscillano piano, un clic ne copia una e il filo si ritira quando il puntatore si allontana.">
+  <img src="../images/it/demo-light.gif" alt="Il puntatore tocca il bordo superiore, il filo scende con una nota e due screenshot che oscillano piano, un clic copia uno screenshot e il filo si ritira quando il puntatore si allontana.">
 </picture>
 
 <br>
@@ -41,7 +41,7 @@ Porta il puntatore al centro della barra dei menu e il filo scende. Allontanalo 
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/it/bento-dark.png">
-  <img src="../images/it/bento-light.png" alt="Clic per copiare. Tieni premuto per annotare. Trascina per condividere. E non pensarci più.">
+  <img src="../images/it/bento-light.png" alt="Clic per copiare. Tieni premuto per annotare. Trascina per condividere. E non pensarci più. Copia qualsiasi testo. Cerca sul filo.">
 </picture>
 
 <br>

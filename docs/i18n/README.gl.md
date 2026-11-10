@@ -31,7 +31,7 @@ Leva o punteiro ao centro da barra de menús e a corda baixa. Apártao e desapar
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/gl/demo-dark.gif">
-  <img src="../images/gl/demo-light.gif" alt="O punteiro toca o bordo superior, a corda baixa con tres capturas que se abanean, un clic copia unha e a corda recóllese cando o punteiro se aparta.">
+  <img src="../images/gl/demo-light.gif" alt="O punteiro toca o bordo superior, a corda baixa cunha nota e dúas capturas que se abanean, un clic copia unha captura e a corda recóllese cando o punteiro se aparta.">
 </picture>
 
 <br>
@@ -41,7 +41,7 @@ Leva o punteiro ao centro da barra de menús e a corda baixa. Apártao e desapar
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/gl/bento-dark.png">
-  <img src="../images/gl/bento-light.png" alt="Clic para copiar. Mantén para anotar. Arrastra para compartir. E esquécete.">
+  <img src="../images/gl/bento-light.png" alt="Clic para copiar. Mantén para anotar. Arrastra para compartir. E esquécete. Copia calquera texto. Busca na corda.">
 </picture>
 
 <br>

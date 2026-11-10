@@ -31,7 +31,7 @@ Pare o ponteiro no meio da barra de menus e o varal desce. Afaste-o e ele some.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/pt-BR/demo-dark.gif">
-  <img src="../images/pt-BR/demo-light.gif" alt="O ponteiro encosta na borda superior, o varal desce com três capturas balançando de leve, um clique copia uma delas, e o varal se recolhe quando o ponteiro se afasta.">
+  <img src="../images/pt-BR/demo-light.gif" alt="O ponteiro encosta na borda superior, o varal desce com uma nota e duas capturas balançando de leve, um clique copia uma captura, e o varal se recolhe quando o ponteiro se afasta.">
 </picture>
 
 <br>
@@ -41,7 +41,7 @@ Pare o ponteiro no meio da barra de menus e o varal desce. Afaste-o e ele some.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/pt-BR/bento-dark.png">
-  <img src="../images/pt-BR/bento-light.png" alt="Clique para copiar. Segure para marcar. Arraste para compartilhar. Desapegue.">
+  <img src="../images/pt-BR/bento-light.png" alt="Clique para copiar. Segure para marcar. Arraste para compartilhar. Desapegue. Copie qualquer texto. Busque no varal.">
 </picture>
 
 <br>

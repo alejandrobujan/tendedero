@@ -31,7 +31,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/ko/demo-dark.gif">
-  <img src="../images/ko/demo-light.gif" alt="포인터가 화면 위쪽 가장자리에 닿으면 스크린샷 세 장이 살랑살랑 흔들리며 빨랫줄이 내려오고, 클릭하면 한 장이 복사되며, 포인터가 떠나면 빨랫줄이 다시 올라가요.">
+  <img src="../images/ko/demo-light.gif" alt="포인터가 화면 위쪽 가장자리에 닿으면 메모 한 장과 스크린샷 두 장이 살랑살랑 흔들리며 빨랫줄이 내려오고, 클릭하면 스크린샷 한 장이 복사되며, 포인터가 떠나면 빨랫줄이 다시 올라가요.">
 </picture>
 
 <br>
@@ -41,7 +41,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/ko/bento-dark.png">
-  <img src="../images/ko/bento-light.png" alt="클릭해서 복사. 길게 눌러 마크업. 드래그해서 공유. 미련 없이 버리기.">
+  <img src="../images/ko/bento-light.png" alt="클릭해서 복사. 길게 눌러 마크업. 드래그해서 공유. 미련 없이 버리기. 텍스트도 복사. 빨랫줄에서 찾기.">
 </picture>
 
 <br>

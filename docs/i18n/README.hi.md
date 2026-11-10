@@ -31,7 +31,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/hi/demo-dark.gif">
-  <img src="../images/hi/demo-light.gif" alt="पॉइंटर ऊपरी किनारे पर रुकता है, रस्सी धीरे-धीरे झूलते तीन स्क्रीनशॉट के साथ नीचे आती है, एक क्लिक से एक कॉपी होता है, और पॉइंटर हटते ही रस्सी ऊपर चली जाती है।">
+  <img src="../images/hi/demo-light.gif" alt="पॉइंटर ऊपरी किनारे पर रुकता है, रस्सी धीरे-धीरे झूलते एक नोट और दो स्क्रीनशॉट के साथ नीचे आती है, एक क्लिक से एक स्क्रीनशॉट कॉपी होता है, और पॉइंटर हटते ही रस्सी ऊपर चली जाती है।">
 </picture>
 
 <br>
@@ -41,7 +41,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/hi/bento-dark.png">
-  <img src="../images/hi/bento-light.png" alt="क्लिक करें, कॉपी हो जाएगा। दबाए रखें, मार्कअप करें। खींचें, शेयर करें। जाने दें।">
+  <img src="../images/hi/bento-light.png" alt="क्लिक करें, कॉपी हो जाएगा। दबाए रखें, मार्कअप करें। खींचें, शेयर करें। जाने दें। कोई भी टेक्स्ट कॉपी करें। रस्सी पर खोजें।">
 </picture>
 
 <br>

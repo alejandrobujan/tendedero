@@ -31,7 +31,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/ja/demo-dark.gif">
-  <img src="../images/ja/demo-light.gif" alt="ポインタが画面の上端に触れると、3枚のスクリーンショットをゆらゆら揺らしながらロープが降りてくる。1枚をクリックしてコピーし、ポインタが離れるとロープはしまわれる。">
+  <img src="../images/ja/demo-light.gif" alt="ポインタが画面の上端に触れると、メモ1枚とスクリーンショット2枚をゆらゆら揺らしながらロープが降りてくる。スクリーンショットをクリックしてコピーし、ポインタが離れるとロープはしまわれる。">
 </picture>
 
 <br>
@@ -41,7 +41,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/ja/bento-dark.png">
-  <img src="../images/ja/bento-light.png" alt="クリックでコピー。長押しでマークアップ。ドラッグで共有。あとは手放すだけ。">
+  <img src="../images/ja/bento-light.png" alt="クリックでコピー。長押しでマークアップ。ドラッグで共有。あとは手放すだけ。テキストもコピー。ロープを検索。">
 </picture>
 
 <br>

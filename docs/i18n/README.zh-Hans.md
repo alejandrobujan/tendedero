@@ -31,7 +31,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/zh-Hans/demo-dark.gif">
-  <img src="../images/zh-Hans/demo-light.gif" alt="指针停在上边缘，绳子带着三张截图轻轻摇晃着滑下来，单击复制其中一张，指针离开后绳子收起。">
+  <img src="../images/zh-Hans/demo-light.gif" alt="指针停在上边缘，绳子带着一张便签和两张截图轻轻摇晃着滑下来，单击复制一张截图，指针离开后绳子收起。">
 </picture>
 
 <br>
@@ -41,7 +41,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/zh-Hans/bento-dark.png">
-  <img src="../images/zh-Hans/bento-light.png" alt="单击复制。长按标记。拖拽分享。松手放下。">
+  <img src="../images/zh-Hans/bento-light.png" alt="单击复制。长按标记。拖拽分享。松手放下。复制任何文字。在绳上搜索。">
 </picture>
 
 <br>

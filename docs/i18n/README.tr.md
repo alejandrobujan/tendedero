@@ -31,7 +31,7 @@ Aldığınız her ekran görüntüsü ve kopyaladığınız her şey, ekranını
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/tr/demo-dark.gif">
-  <img src="../images/tr/demo-light.gif" alt="İşaretçi üst kenara değiyor, ip üç ekran görüntüsüyle sallanarak aşağı iniyor, bir tıklamayla biri kopyalanıyor ve işaretçi ayrılınca ip geri çekiliyor.">
+  <img src="../images/tr/demo-light.gif" alt="İşaretçi üst kenara değiyor, ip bir not ve iki ekran görüntüsüyle sallanarak aşağı iniyor, bir tıklamayla bir ekran görüntüsü kopyalanıyor ve işaretçi ayrılınca ip geri çekiliyor.">
 </picture>
 
 <br>
@@ -41,7 +41,7 @@ Aldığınız her ekran görüntüsü ve kopyaladığınız her şey, ekranını
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/tr/bento-dark.png">
-  <img src="../images/tr/bento-light.png" alt="Tıkla ve kopyala. Basılı tut ve işaretle. Sürükle ve paylaş. Bırak gitsin.">
+  <img src="../images/tr/bento-light.png" alt="Tıkla ve kopyala. Basılı tut ve işaretle. Sürükle ve paylaş. Bırak gitsin. Metni de kopyala. İpte ara.">
 </picture>
 
 <br>

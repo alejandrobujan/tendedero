@@ -31,7 +31,7 @@ Göstəricini menyu panelinin ortasında saxlayın, ip aşağı enir. Uzaqlaşd�
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/az/demo-dark.gif">
-  <img src="../images/az/demo-light.gif" alt="Göstərici yuxarı kənara toxunur, ip üç yüngülcə yellənən ekran şəkli ilə aşağı enir, bir klik birini kopyalayır və göstərici uzaqlaşanda ip yığılır.">
+  <img src="../images/az/demo-light.gif" alt="Göstərici yuxarı kənara toxunur, ip yüngülcə yellənən bir qeyd və iki ekran şəkli ilə aşağı enir, bir klik bir ekran şəklini kopyalayır və göstərici uzaqlaşanda ip yığılır.">
 </picture>
 
 <br>
@@ -41,7 +41,7 @@ Göstəricini menyu panelinin ortasında saxlayın, ip aşağı enir. Uzaqlaşd�
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/az/bento-dark.png">
-  <img src="../images/az/bento-light.png" alt="Klikləyin, kopyalayın. Basıb saxlayın, işarələyin. Sürükləyin, paylaşın. Burax getsin.">
+  <img src="../images/az/bento-light.png" alt="Klikləyin, kopyalayın. Basıb saxlayın, işarələyin. Sürükləyin, paylaşın. Burax getsin. Mətni də kopyala. İpdə axtar.">
 </picture>
 
 <br>

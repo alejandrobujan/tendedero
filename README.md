@@ -29,7 +29,7 @@ Rest the pointer in the middle of the menu bar and it glides down. Move away and
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/demo-dark.gif">
-  <img src="docs/images/demo-light.gif" alt="The pointer rests against the top edge, the line slides down with three screenshots swinging gently, a click copies one, and the line tucks away when the pointer leaves.">
+  <img src="docs/images/demo-light.gif" alt="The pointer rests against the top edge, the line slides down with a note and two screenshots swinging gently, a click copies a screenshot, and the line tucks away when the pointer leaves.">
 </picture>
 
 <br>
@@ -39,7 +39,7 @@ Rest the pointer in the middle of the menu bar and it glides down. Move away and
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/bento-dark.png">
-  <img src="docs/images/bento-light.png" alt="Click to copy. Hold to mark up. Drag to share. Let it go.">
+  <img src="docs/images/bento-light.png" alt="Click to copy. Hold to mark up. Drag to share. Let it go. Copy any text. Search the line.">
 </picture>
 
 <br>

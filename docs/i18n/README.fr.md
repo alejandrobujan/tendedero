@@ -31,7 +31,7 @@ Posez le pointeur au milieu de la barre des menus et la corde descend. Éloignez
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/fr/demo-dark.gif">
-  <img src="../images/fr/demo-light.gif" alt="Le pointeur touche le bord supérieur, la corde descend avec trois captures qui se balancent, un clic en copie une, et la corde remonte quand le pointeur s’éloigne.">
+  <img src="../images/fr/demo-light.gif" alt="Le pointeur touche le bord supérieur, la corde descend avec une note et deux captures qui se balancent, un clic copie une capture, et la corde remonte quand le pointeur s’éloigne.">
 </picture>
 
 <br>
@@ -41,7 +41,7 @@ Posez le pointeur au milieu de la barre des menus et la corde descend. Éloignez
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/fr/bento-dark.png">
-  <img src="../images/fr/bento-light.png" alt="Cliquez pour copier. Maintenez pour annoter. Glissez pour partager. Laissez filer.">
+  <img src="../images/fr/bento-light.png" alt="Cliquez pour copier. Maintenez pour annoter. Glissez pour partager. Laissez filer. Copiez du texte. Cherchez sur la corde.">
 </picture>
 
 <br>

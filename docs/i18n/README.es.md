@@ -31,7 +31,7 @@ Lleva el puntero al centro de la barra de menús y la cuerda baja. Apártalo y d
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/es/demo-dark.gif">
-  <img src="../images/es/demo-light.gif" alt="El puntero toca el borde superior, la cuerda baja con tres capturas que se balancean, un clic copia una y la cuerda se recoge cuando el puntero se aparta.">
+  <img src="../images/es/demo-light.gif" alt="El puntero toca el borde superior, la cuerda baja con una nota y dos capturas que se balancean, un clic copia una captura y la cuerda se recoge cuando el puntero se aparta.">
 </picture>
 
 <br>
@@ -41,7 +41,7 @@ Lleva el puntero al centro de la barra de menús y la cuerda baja. Apártalo y d
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/es/bento-dark.png">
-  <img src="../images/es/bento-light.png" alt="Clic para copiar. Mantén para anotar. Arrastra para compartir. Y olvídate.">
+  <img src="../images/es/bento-light.png" alt="Clic para copiar. Mantén para anotar. Arrastra para compartir. Y olvídate. Copia cualquier texto. Busca en la cuerda.">
 </picture>
 
 <br>
