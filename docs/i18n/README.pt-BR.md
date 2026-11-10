@@ -1,6 +1,6 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/pt-BR/hero-dark.png">
-  <img src="../images/pt-BR/hero-light.png" alt="Tendedero. Suas capturas, secando no varal. Três capturas em molduras de vidro penduradas num varal fino sob a barra de menus do macOS.">
+  <img src="../images/pt-BR/hero-light.png" alt="Tendedero. Capture. Copie. Pendure tudo no varal. Uma nota e duas capturas em molduras de vidro penduradas num varal fino sob a barra de menus do macOS.">
 </picture>
 
 <h3 align="center"><a href="https://tendedero.app/?lang=pt-BR">Experimente no navegador em tendedero.app&nbsp;&rsaquo;</a></h3>
@@ -26,7 +26,7 @@
 
 ## Longe da vista. Ao alcance da mão.
 
-Cada captura de tela que você faz fica pendurada num varal logo acima da tela.
+Cada captura de tela que você faz, e tudo o que você copia, fica pendurado num varal logo acima da tela.
 Pare o ponteiro no meio da barra de menus e o varal desce. Afaste-o e ele some.
 
 <picture>
@@ -49,26 +49,26 @@ Pare o ponteiro no meio da barra de menus e o varal desce. Afaste-o e ele some.
 
 | | |
 |:--|:--|
-| Shift + clique | Adiciona ou remove uma foto da seleção. Soltar Shift mantém a seleção. |
-| Clique direito em uma foto selecionada | Copia, abre, mostra no Finder, compartilha, fixa/desafixa, salva na Mesa ou retira a seleção. O menu mostra a quantidade e mantém as regras de arquivos e fotos fixadas. |
-| Com uma seleção e o cursor no varal | ⌘C copia a seleção; ⌫ sobre uma foto retira o grupo em uma única etapa de desfazer; Esc limpa a seleção. Um clique normal ou ocultar o varal também limpa a seleção. |
-| Clicar | Copia a imagem. |
-| Clicar e segurar | Abre na Marcação. |
-| Clicar duas vezes | Abre no Pré-Visualização. |
+| Clicar | Copia. Uma nota copia o texto, com a formatação original. |
+| Clicar e segurar | Abre na Marcação. Uma nota abre para edição. |
+| Clicar duas vezes | Abre no Pré-Visualização. Um link abre no navegador. |
 | Clique forte | Abre na Visualização Rápida. |
 | Arrastar para um app | Envia uma cópia. Ela continua no varal. |
 | Arrastar para uma pasta | Guarda a imagem ali. Ela sai do varal. |
 | Arrastar para o Lixo, ou clicar no X | Desapegue. |
-| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> no varal ou onde o menu acabou de fechar | Desfaz o último descarte, fixação/desafixação ou salvamento na Mesa, incluindo toda a seleção. Afaste o ponteiro ou clique fora para devolver Desfazer ao outro app. |
+| Shift + clique | Seleciona várias. O menu, <kbd>⌘</kbd>&thinsp;<kbd>C</kbd>, <kbd>⌫</kbd> e arrastar agem sobre todas. <kbd>Esc</kbd> ou um clique normal limpa a seleção. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> com o ponteiro no varal | Desfaz o que você acabou de fazer: soltar, fixar ou salvar na Mesa, inclusive uma seleção inteira. |
 | <kbd>Espaço</kbd> com o ponteiro numa foto | Dê uma olhada rápida. |
 | <kbd>⌫</kbd> com o ponteiro numa foto | Solte-a, como o botão do canto dela. |
 | Clique com o botão direito e Compartilhar | Envia por AirDrop, Mensagens, Mail e mais. Ela continua no varal. |
 | Clique com o botão direito e Fixar | Guarde-a: fica à esquerda do nó com um prendedor cinza-espacial, e nenhuma captura nova a empurra. |
-| Clique com o botão direito e Segurar | Tire-a do varal e mantenha-a à sua frente enquanto trabalha. |
-| No Finder, clique com o botão direito numa imagem e Pendurar no Tendedero | Pendure qualquer imagem no varal, fixada. |
+| Clique com o botão direito e Segurar | Tire-a do varal e mantenha-a à sua frente enquanto trabalha. Uma nota segurada é texto selecionável. |
+| No Finder, clique com o botão direito numa imagem ou num arquivo de texto e Pendurar no Tendedero | Pendure-o no varal, fixado. |
+| Parar o ponteiro numa foto, com Ampliar ao passar o ponteiro ativado | Veja-a maior no meio da tela. |
 | Parar o ponteiro no meio da barra de menus | Baixa o varal naquela tela. |
 | Clicar em qualquer lugar da barra de menus | Recolhe o varal. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Mostra ou oculta o varal. Altere em Atalho, na barra de menus. |
+| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | Busca no varal. |
 
 <br>
 
@@ -85,20 +85,36 @@ Os mesmos atalhos. A mesma memória muscular. Só menos bagunça.
 
 <br>
 
-## Imagens copiadas também.
+## Texto, links e imagens copiados também.
 
-Faça uma captura segurando <kbd>⌃</kbd>, ou copie uma imagem no Pré-Visualização,
-e ela vai para o varal como qualquer outra. Ative Pendurar imagens copiadas na
-barra de menus; a camiseta fica preenchida enquanto a opção estiver ativa. Só
-imagens: o que for copiado junto com texto ou um arquivo, e o que um gerenciador
-de senhas marcar como privado, fica de fora.
+Ative um por um em Pendurar o que você copia, na barra de menus; a camiseta
+fica preenchida enquanto algum estiver ativo.
+
+O texto copiado vai para o varal como uma nota, uma folha do Notas na mesma
+moldura de vidro: a primeira linha é o título, o Markdown aparece formatado e
+o código mantém suas linhas. Um endereço web vai como link, com o site e o
+caminho. Faça uma captura segurando <kbd>⌃</kbd>, ou copie uma imagem no
+Pré-Visualização, e ela vai para o varal como qualquer outra.
+
+Nada é guardado de um campo de senha, do que um gerenciador de senhas marcar
+como privado, nem de outro dispositivo pela Área de Transferência Universal.
+
+<br>
+
+## Encontre qualquer coisa no varal.
+
+Pressione <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> e digite. Só o que corresponde fica
+no varal: as palavras de uma captura, lidas no seu Mac assim que ela é
+pendurada, e as palavras de cada nota e link.
+<kbd>Return</kbd> copia o resultado mais recente.
 
 <br>
 
 ## Privado por princípio.
 
 Sem conta. Sem rede. Sem estatísticas.
-O Tendedero roda inteiramente no seu Mac, e suas capturas nunca saem dele.
+O Tendedero roda inteiramente no seu Mac, inclusive a leitura do texto nas
+capturas, e nada do que você pendura sai dele.
 
 <br>
 
@@ -154,15 +170,22 @@ Mesa a cada nova compilação.
 | `AppDelegate.swift` | Barra de menus, atalho, baixar e recolher o varal |
 | `LinePanel.swift` | A faixa transparente ao longo do topo da tela |
 | `LineView.swift` | O varal e onde cada foto fica pendurada |
-| `PeggedView.swift` | Uma foto: moldura de vidro, prendedor, balanço e brisa |
+| `PeggedView.swift` | Uma foto ou nota: moldura de vidro, prendedor, balanço e brisa |
 | `GrabArea.swift` | Clique, clique longo, arrastar e soltar |
 | `ScreenshotWatcher.swift` | Percebe novas capturas |
-| `ClipboardWatcher.swift` | Percebe imagens copiadas para a área de transferência |
+| `ClipboardWatcher.swift` | Percebe imagens, texto e links copiados para a área de transferência |
+| `NoteSheet.swift` | O texto copiado desenhado como uma folha do Notas |
+| `Markdown.swift` | Markdown nas notas |
 | `Inbox.swift` | Assume os ajustes de captura e depois os restaura |
 | `Markup.swift` | Abre o editor de Marcação do sistema e salva o resultado |
 | `Trim.swift` | Corta uma gravação de tela e salva o resultado |
 | `FullScreen.swift` | Sabe quando ficar escondido |
 | `Line.swift` | O que está pendurado, e o que você pode fazer com isso |
+| `Held.swift` | Uma foto segurada à sua frente, fora do varal |
+| `SearchIndex.swift` | Lê o texto das capturas, neste Mac, para a busca |
+| `SearchBar.swift` | O campo de busca sob o varal |
+| `Zoom.swift` | Uma cópia maior de uma foto ao passar o ponteiro |
+| `Share.swift` | Compartilhar, no menu de uma foto |
 
 Todas as imagens desta página, incluindo o ícone, são desenhadas em código por
 `scripts/make-icon.swift` e `scripts/make-readme-art.swift`.

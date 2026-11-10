@@ -1,6 +1,6 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/es/hero-dark.png">
-  <img src="../images/es/hero-light.png" alt="Tendedero. Tus capturas, tendidas. Tres capturas en marcos de cristal cuelgan de una cuerda fina bajo la barra de menús de macOS.">
+  <img src="../images/es/hero-light.png" alt="Tendedero. Captúralo. Cópialo. Tiéndelo todo. Una nota y dos capturas en marcos de cristal cuelgan de una cuerda fina bajo la barra de menús de macOS.">
 </picture>
 
 <h3 align="center"><a href="https://tendedero.app/?lang=es">Pruébala desde el navegador en tendedero.app&nbsp;&rsaquo;</a></h3>
@@ -26,7 +26,7 @@
 
 ## Fuera de la vista. Siempre a mano.
 
-Cada captura que haces queda colgada en una cuerda justo encima de la pantalla.
+Cada captura que haces, y todo lo que copias, queda colgado en una cuerda justo encima de la pantalla.
 Lleva el puntero al centro de la barra de menús y la cuerda baja. Apártalo y desaparece.
 
 <picture>
@@ -49,26 +49,26 @@ Lleva el puntero al centro de la barra de menús y la cuerda baja. Apártalo y d
 
 | | |
 |:--|:--|
-| Mayús-clic | Añade o quita una foto de la selección. Al soltar Mayús, la selección se mantiene. |
-| Clic derecho en una foto seleccionada | Copia, abre, muestra en Finder, comparte, fija/desfija, guarda en el Escritorio o descuelga la selección. El menú indica cuántas fotos hay y mantiene las reglas de archivos y fotos fijadas. |
-| Con fotos seleccionadas y el puntero en la cuerda | ⌘C copia la selección; ⌫ sobre una foto la descuelga en un solo paso de deshacer; Esc borra la selección. Un clic normal u ocultar la cuerda también la borra. |
-| Clic | Copia la imagen. |
-| Mantener pulsado | La abre en Marcación. |
-| Doble clic | La abre en Vista Previa. |
+| Clic | La copia. Una nota copia su texto, con el formato que tenía. |
+| Mantener pulsado | La abre en Marcación. Una nota se abre para editarla. |
+| Doble clic | La abre en Vista Previa. Un enlace se abre en el navegador. |
 | Clic fuerte | Le echa un vistazo con Vista Rápida. |
 | Arrastrar a una app | Envía una copia, y la captura sigue colgada. |
 | Arrastrar a una carpeta | Se queda ahí y sale de la cuerda. |
 | Arrastrar a la Papelera o hacer clic en la cruz | Te deshaces de ella. |
-| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> sobre la cuerda o donde acaba de cerrarse su menú | Deshace el último descarte, fijado/desfijado o guardado en el Escritorio, incluida toda la selección. Aleja el puntero o haz clic fuera para devolver Deshacer a la otra app. |
+| Mayús-clic | Selecciona varias. Su menú, <kbd>⌘</kbd>&thinsp;<kbd>C</kbd>, <kbd>⌫</kbd> y arrastrar actúan sobre todas. <kbd>Esc</kbd> o un clic normal deshacen la selección. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> con el puntero en la cuerda | Deshace lo que acabas de hacer: soltar, fijar o guardar en el Escritorio, incluida una selección entera. |
 | <kbd>Espacio</kbd> con el puntero en una foto | Échale un vistazo. |
 | <kbd>⌫</kbd> con el puntero en una foto | Suéltala, como su botón de la esquina. |
 | Clic derecho y Compartir | Envíala por AirDrop, Mensajes, Mail y más, y la captura sigue colgada. |
 | Clic derecho y Fijar | Guárdala: cuelga a la izquierda del nudo con una pinza gris espacial y ninguna captura nueva la empuja. |
-| Clic derecho y Sostener | Quítala de la cuerda y tenla delante mientras trabajas. |
-| En el Finder, clic derecho en una imagen y Colgar en Tendedero | Cuelga cualquier imagen en la cuerda, fijada. |
+| Clic derecho y Sostener | Quítala de la cuerda y tenla delante mientras trabajas. Una nota sostenida es texto que puedes seleccionar. |
+| En el Finder, clic derecho en una imagen o un archivo de texto y Colgar en Tendedero | Cuélgalo en la cuerda, fijado. |
+| Dejar el puntero en una foto, con Ampliar al pasar el puntero activado | Mírala más grande en el centro de la pantalla. |
 | Dejar el puntero en el centro de la barra de menús | Baja la cuerda en esa pantalla. |
 | Hacer clic en cualquier sitio de la barra de menús | Recoge la cuerda. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Muestra u oculta la cuerda. Se cambia en Atajo, en la barra de menús. |
+| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | Busca en la cuerda. |
 
 <br>
 
@@ -85,20 +85,36 @@ Los mismos atajos y las mismas costumbres. Pero sin desorden.
 
 <br>
 
-## También las imágenes que copias.
+## También el texto, los enlaces y las imágenes que copias.
 
-Haz una captura con <kbd>⌃</kbd> pulsado, o copia una imagen en Vista Previa,
-y se cuelga como cualquier otra. Activa Colgar imágenes copiadas en la barra
-de menús; mientras está activo, la camiseta se rellena. Solo imágenes: lo que
-se copia junto con texto o un archivo, y lo que un gestor de contraseñas marca
-como privado, se deja tal cual.
+Actívalos uno a uno en Colgar lo que copias, en la barra de menús; mientras
+alguno está activo, la camiseta se rellena.
+
+El texto copiado se cuelga como una nota, una hoja de Notas en el mismo marco
+de cristal: la primera línea es su título, el Markdown se ve con formato y el
+código conserva sus líneas. Una dirección web se cuelga como enlace, con su
+sitio y su ruta. Haz una captura con <kbd>⌃</kbd> pulsado, o copia una imagen
+en Vista Previa, y se cuelga como cualquier otra.
+
+No se guarda nada de un campo de contraseña, de lo que un gestor de contraseñas
+marca como privado ni de otro dispositivo a través del Portapapeles universal.
+
+<br>
+
+## Encuentra cualquier cosa en la cuerda.
+
+Pulsa <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> y escribe. Solo lo que coincide se queda
+en la cuerda: las palabras de una captura, leídas en tu Mac en cuanto se cuelga,
+y las de cada nota y cada enlace.
+<kbd>Retorno</kbd> copia la coincidencia más reciente.
 
 <br>
 
 ## Privacidad de serie.
 
 Sin cuentas, sin conexión a internet, sin analíticas.
-Tendedero funciona solo en tu Mac, y tus capturas nunca salen de él.
+Tendedero funciona solo en tu Mac, también al leer el texto de las capturas,
+y nada de lo que cuelgas sale nunca de él.
 
 <br>
 
@@ -154,15 +170,22 @@ vuelve a pedir acceso al Escritorio cada vez que recompilas.
 | `AppDelegate.swift` | La barra de menús, el atajo, y bajar y recoger la cuerda |
 | `LinePanel.swift` | La franja transparente del borde superior de la pantalla |
 | `LineView.swift` | La cuerda y dónde cuelga cada foto |
-| `PeggedView.swift` | Cada foto: marco de cristal, pinza, balanceo y brisa |
+| `PeggedView.swift` | Cada foto o nota: marco de cristal, pinza, balanceo y brisa |
 | `GrabArea.swift` | Clic, pulsación larga, y arrastrar y soltar |
 | `ScreenshotWatcher.swift` | Se da cuenta de las capturas nuevas |
-| `ClipboardWatcher.swift` | Se da cuenta de las imágenes copiadas |
+| `ClipboardWatcher.swift` | Se da cuenta de las imágenes, el texto y los enlaces copiados |
+| `NoteSheet.swift` | El texto copiado, dibujado como una hoja de Notas |
+| `Markdown.swift` | El Markdown de las notas |
 | `Inbox.swift` | Toma el control de los ajustes de captura y luego los devuelve |
 | `Markup.swift` | Abre el editor de Marcación del sistema y guarda el resultado |
 | `Trim.swift` | Recorta una grabación de pantalla y guarda el resultado |
 | `FullScreen.swift` | Sabe cuándo tiene que quedarse oculto |
 | `Line.swift` | Qué hay colgado y qué puedes hacer con ello |
+| `Held.swift` | Una foto sostenida delante de ti, fuera de la cuerda |
+| `SearchIndex.swift` | Lee el texto de las capturas, en este Mac, para la búsqueda |
+| `SearchBar.swift` | El campo de búsqueda bajo la cuerda |
+| `Zoom.swift` | Una copia más grande de una foto al pasar el puntero |
+| `Share.swift` | Compartir, desde el menú de una foto |
 
 Todas las imágenes de esta página, icono incluido, se dibujan con código en
 `scripts/make-icon.swift` y `scripts/make-readme-art.swift`.

@@ -1,6 +1,6 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/it/hero-dark.png">
-  <img src="../images/it/hero-light.png" alt="Tendedero. I tuoi screenshot, stesi ad asciugare. Tre screenshot in cornici di vetro appesi a un filo sottile sotto la barra dei menu di macOS.">
+  <img src="../images/it/hero-light.png" alt="Tendedero. Cattura. Copia. Stendi tutto ad asciugare. Una nota e due screenshot in cornici di vetro appesi a un filo sottile sotto la barra dei menu di macOS.">
 </picture>
 
 <h3 align="center"><a href="https://tendedero.app/">Provala nel browser su tendedero.app&nbsp;&rsaquo;</a></h3>
@@ -26,7 +26,7 @@
 
 ## Fuori dalla vista. Sempre a portata di mano.
 
-Ogni screenshot che fai resta appeso a un filo proprio sopra lo schermo.
+Ogni screenshot che fai, e tutto ciò che copi, resta appeso a un filo proprio sopra lo schermo.
 Porta il puntatore al centro della barra dei menu e il filo scende. Allontanalo e sparisce.
 
 <picture>
@@ -49,26 +49,26 @@ Porta il puntatore al centro della barra dei menu e il filo scende. Allontanalo 
 
 | | |
 |:--|:--|
-| Clic | Copia l’immagine. |
-| Clic con Maiusc | Aggiunge o rimuove una foto dalla selezione. La selezione resta anche dopo aver rilasciato Maiusc. |
-| Clic destro su una foto selezionata | Copia, apre, mostra nel Finder, condivide, fissa o non fissa più, salva sulla Scrivania o toglie dal filo le foto selezionate. Il menu mostra il numero di foto; ogni azione mantiene le regole esistenti per i file e le foto fissate. |
-| Con una selezione e il puntatore sul filo | ⌘C copia la selezione; ⌫ sopra una foto toglie la selezione dal filo in un’unica operazione annullabile; Esc cancella la selezione. Anche un clic normale o nascondere il filo cancella la selezione. |
-| Tenere premuto | La apre per annotarla. |
-| Doppio clic | La apre in Anteprima. |
+| Clic | Copia la foto. Una nota copia il suo testo, con la sua formattazione. |
+| Tenere premuto | La apre per annotarla. Una nota si apre per modificarla. |
+| Doppio clic | La apre in Anteprima. Un link si apre nel browser. |
 | Clic con pressione | Le dà un’occhiata con Visualizzazione rapida. |
 | Trascinare in un’app | Invia una copia, e lo screenshot resta sul filo. |
 | Trascinare in una cartella | Resta lì e lascia il filo. |
 | Trascinare nel Cestino o fare clic sulla crocetta | Te ne liberi. |
-| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> sul filo o dove si è appena chiuso il suo menu | Annulla l’ultima rimozione, modifica delle foto fissate o salvataggio sulla Scrivania, anche per un’intera selezione. Sposta il puntatore altrove o fai clic fuori per restituire il comando Annulla all’altra app. |
+| Clic con Maiusc | Ne seleziona più d’una. Il loro menu, <kbd>⌘</kbd>&thinsp;<kbd>C</kbd>, <kbd>⌫</kbd> e un trascinamento agiscono su tutte. <kbd>Esc</kbd> o un semplice clic annulla la selezione. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> con il puntatore sul filo | Annulla quello che hai appena fatto: togliere, fissare o salvare sulla Scrivania, anche un’intera selezione. |
 | <kbd>Spazio</kbd> con il puntatore su una foto | Dalle un’occhiata. |
 | <kbd>⌫</kbd> con il puntatore su una foto | Toglila, come con il pulsante nell’angolo. |
 | Clic destro, poi Condividi | Inviala con AirDrop, Messaggi, Mail e altro, e lo screenshot resta sul filo. |
 | Clic destro, poi Fissa | Tienila: resta appesa a sinistra del nodo con una molletta grigio siderale, e nessun nuovo screenshot la spinge via. |
-| Clic destro, poi Tieni in mano | Toglila dal filo e tienila davanti a te mentre lavori. |
-| Nel Finder, clic destro su un’immagine, poi Appendi in Tendedero | Appendi qualsiasi immagine al filo, fissata. |
+| Clic destro, poi Tieni in mano | Toglila dal filo e tienila davanti a te mentre lavori. Una nota tenuta in mano è testo che puoi selezionare. |
+| Nel Finder, clic destro su un’immagine o un file di testo, poi Appendi in Tendedero | Appendilo al filo, fissato. |
+| Fermare il puntatore su una foto, con Ingrandisci al passaggio attivo | La vedi più grande al centro dello schermo. |
 | Fermare il puntatore al centro della barra dei menu | Fa scendere il filo su quello schermo. |
 | Fare clic in un punto qualsiasi della barra dei menu | Ritira il filo. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Mostra o nasconde il filo. Si cambia in Scorciatoia, nella barra dei menu. |
+| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | Cerca sul filo. |
 
 <br>
 
@@ -86,20 +86,36 @@ Le stesse scorciatoie. Le stesse abitudini. Solo meno disordine.
 
 <br>
 
-## Anche le immagini che copi.
+## Anche testo, link e immagini che copi.
 
-Fai uno screenshot tenendo premuto <kbd>⌃</kbd>, o copia un’immagine in
-Anteprima, e si appende come tutte le altre. Attiva Appendi le immagini
-copiate nella barra dei menu; finché è attivo, la maglietta si riempie. Solo
-immagini: ciò che viene copiato insieme a del testo o a un file, e ciò che un
-gestore di password segna come privato, viene lasciato stare.
+Attivali uno per uno in Appendi ciò che copi, nella barra dei menu; finché
+almeno uno è attivo, la maglietta si riempie.
+
+Il testo copiato si appende come una nota, un foglio di Note nella stessa
+cornice di vetro: la prima riga è il titolo, il Markdown appare formattato e il
+codice mantiene le sue righe. Un indirizzo web si appende come link, con il
+sito e il percorso. Fai uno screenshot tenendo premuto <kbd>⌃</kbd>, o copia
+un’immagine in Anteprima, e si appende come tutte le altre.
+
+Non viene tenuto nulla da un campo password, da ciò che un gestore di password
+segna come privato, o da un altro dispositivo tramite Appunti condivisi.
+
+<br>
+
+## Trova qualsiasi cosa sul filo.
+
+Premi <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> e scrivi. Sul filo
+resta solo ciò che corrisponde: le parole in uno screenshot, lette sul tuo Mac
+nel momento in cui si appende, e le parole di ogni nota e link.
+<kbd>Invio</kbd> copia la corrispondenza più recente.
 
 <br>
 
 ## Privacy di serie.
 
 Nessun account. Nessuna connessione. Nessuna analisi.
-Tendedero funziona solo sul tuo Mac, e i tuoi screenshot non lo lasciano mai.
+Tendedero funziona solo sul tuo Mac, lettura del testo negli screenshot compresa,
+e nulla di ciò che appendi lo lascia mai.
 
 <br>
 
@@ -157,16 +173,22 @@ Vuoi dare una mano? Leggi prima [CONTRIBUTING.md](../../CONTRIBUTING.md).
 | `AppDelegate.swift` | La barra dei menu, la scorciatoia, e far scendere e ritirare il filo |
 | `LinePanel.swift` | La striscia trasparente lungo il bordo superiore dello schermo |
 | `LineView.swift` | Il filo e dove si appende ogni foto |
-| `PeggedView.swift` | Ogni foto: cornice di vetro, molletta, oscillazione e brezza |
+| `PeggedView.swift` | Ogni foto o nota: cornice di vetro, molletta, oscillazione e brezza |
 | `GrabArea.swift` | Clic, pressione prolungata, trascinamento e rilascio |
 | `ScreenshotWatcher.swift` | Si accorge dei nuovi screenshot |
-| `ClipboardWatcher.swift` | Si accorge delle immagini copiate negli appunti |
+| `ClipboardWatcher.swift` | Si accorge di immagini, testo e link copiati negli appunti |
+| `NoteSheet.swift` | Il testo copiato, disegnato come un foglio di Note |
+| `Markdown.swift` | Il Markdown nelle note |
 | `Inbox.swift` | Prende il controllo delle impostazioni degli screenshot e poi le restituisce |
 | `Markup.swift` | Apre l’editor di annotazioni del sistema e salva il risultato |
 | `Trim.swift` | Taglia una registrazione dello schermo e salva il risultato |
 | `FullScreen.swift` | Sa quando deve restare nascosto |
 | `Line.swift` | Cosa è appeso, e cosa puoi farci |
 | `Held.swift` | Una foto tenuta in mano davanti a te, fuori dal filo |
+| `SearchIndex.swift` | Legge il testo negli screenshot, su questo Mac, per la ricerca |
+| `SearchBar.swift` | Il campo di ricerca sotto il filo |
+| `Zoom.swift` | Una copia più grande di una foto al passaggio del puntatore |
+| `Share.swift` | Condividi, dal menu di una foto |
 
 Tutte le immagini di questa pagina, icona compresa, sono disegnate in codice da
 `scripts/make-icon.swift` e `scripts/make-readme-art.swift`.
