@@ -12,7 +12,7 @@
   &nbsp;&nbsp;
   <a href="#从源码构建">从源码构建&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;简体中文&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.it.md">Italiano</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;简体中文&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
   <br>
   <sub>本文译自英文 README。如有出入，以英文版为准。</sub>
 </p>
@@ -27,7 +27,7 @@
 ## 看不见，却够得着
 
 你每截一张图，它都会挂到屏幕顶上的一根绳上。
-把指针停在菜单栏，绳子就滑下来；移开，它就收起。
+把指针停在菜单栏中间，绳子就滑下来；移开，它就收起。
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/zh-Hans/demo-dark.gif">
@@ -56,7 +56,14 @@
 | 拖进 App | 送一份副本过去。原图仍挂在绳上。 |
 | 拖进文件夹 | 存在那儿。原图从绳上取下。 |
 | 拖到废纸篓，或点叉 | 松手丢弃。 |
-| 指针停在菜单栏 | 在那一块屏幕上放下绳子。 |
+| 指针在绳子上时按 <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | 把刚丢掉的挂回去。 |
+| 指针在照片上时按 <kbd>空格</kbd> | 快速查看。 |
+| 指针在照片上时按 <kbd>⌫</kbd> | 像点角上的按钮一样放开它。 |
+| 右键点按，选“共享” | 通过隔空投送、信息、邮件等发送。原图仍挂在绳上。 |
+| 右键点按，选“固定” | 留住它：它挂在绳结左边，用深空灰夹子夹着，新截图不会把它挤掉。 |
+| 右键点按，选“拿在手上” | 从绳上取下，工作时一直放在眼前。 |
+| 在“访达”中右键点按图片，选“挂到 Tendedero” | 把任何图片固定挂到绳上。 |
+| 指针停在菜单栏中间 | 在那一块屏幕上放下绳子。 |
 | 点击菜单栏任意处 | 把绳子收起来。 |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | 显示或隐藏绳子。可在菜单栏的「快捷键」中更改。 |
 
@@ -93,8 +100,8 @@ Tendedero 完全在你的 Mac 上运行，截图不会离开这台电脑。
 | | |
 |:--|:--|
 | **兼容性** | macOS 14 Sonoma 及以上，Apple 芯片与 Intel 均支持。已针对 macOS 27 设计。 |
-| **体积** | 1.7 MB |
-| **语言** | 英语、西班牙语、加利西亚语、法语、巴西葡萄牙语、日语、韩语、简体中文、土耳其语、阿塞拜疆语 |
+| **体积** | 3.5 MB |
+| **语言** | 英语、西班牙语、加利西亚语、法语、巴西葡萄牙语、意大利语、日语、韩语、简体中文、土耳其语、阿塞拜疆语、印地语 |
 | **技术栈** | Swift、AppKit 与 SwiftUI |
 | **网络访问** | 无 |
 | **价格** | 免费 |
@@ -107,7 +114,7 @@ Tendedero 完全在你的 Mac 上运行，截图不会离开这台电脑。
 从[最新发布](../../../../releases/latest)下载磁盘映像，打开后把 Tendedero 拖进「应用程序」。也可以用 Homebrew 安装：
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 Tendedero 已使用 Developer ID 签名并通过 Apple 公证，打开方式和其他 App 一样。

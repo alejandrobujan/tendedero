@@ -8,6 +8,7 @@
 "Hide line" = "İpi gizle";
 "Show line" = "İpi göster";
 "Take everything down" = "Hepsini indir";
+"Put back" = "Geri as";
 "Handle screenshots" = "Ekran görüntülerini yönet";
 "Screenshots hang instantly and skip the Desktop" = "Ekran görüntüleri anında asılır ve Masaüstünü atlar";
 "Open screenshots folder" = "Ekran görüntüleri klasörünü aç";
@@ -40,16 +41,23 @@
 "When the pointer rests in the menu bar" = "İşaretçi menü çubuğunda durduğunda";
 "When something new hangs" = "Yeni bir şey asıldığında";
 "Over full screen apps" = "Tam ekran uygulamaların üzerinde";
-"Hang copied images" = "Kopyalanan görselleri as";
+"Hang what you copy" = "Kopyaladıklarını as";
+"Images" = "Görseller";
+"Text" = "Metin";
+"Links" = "Bağlantılar";
 "Images you copy hang on the line too" = "Kopyaladığınız görseller de ipe asılır";
 "Tendedero, hanging copied images" = "Tendedero, kopyalanan görselleri asıyor";
+"The line is empty" = "İp boş";
+"%d on the line" = "İpte %d tane";
 
 /* GrabArea */
 "Copy" = "Kopyala";
 "Open" = "Aç";
+"Open Link" = "Bağlantıyı aç";
 "Quick Look" = "Hızlı Bakış";
 "Markup" = "İşaretle";
 "Show in Finder" = "Finder'da göster";
+"Share…" = "Paylaş…";
 "Save to Desktop" = "Masaüstüne kaydet";
 "Discard" = "Sil";
 "Take down" = "İndir";
@@ -63,16 +71,18 @@
 /* PeggedView */
 "Copied" = "Kopyalandı";
 
-/* Notes */
-"New Note…" = "Yeni Not…";
-"New Note" = "Yeni Not";
-"Edit Note" = "Notu Düzenle";
-"Hang" = "As";
-"Save" = "Kaydet";
-"Cancel" = "Vazgeç";
-"Write something…" = "Bir şeyler yazın…";
-"Color" = "Renk";
-"Yellow" = "Sarı";
-"Pink" = "Pembe";
-"Blue" = "Mavi";
-"Green" = "Yeşil";
+/* Pinning and holding photos */
+"Pin" = "Sabitle";
+"Unpin" = "Sabitlemeyi kaldır";
+"Hold" = "Elinde tut";
+"Hang back" = "İpe geri koy";
+"Hang everything back" = "Hepsini ipe geri koy";
+"Actual Size" = "Gerçek boyut";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Tendedero başlangıçta açılsın mı?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero oturum açtığınızda açılmıyor; bu yüzden yeniden başlattıktan sonra siz tekrar açana kadar ip görünmez.";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "Kopyaladığınız metin de ipe asılır";
+"Links you copy hang on the line too" = "Kopyaladığınız bağlantılar da ipe asılır";

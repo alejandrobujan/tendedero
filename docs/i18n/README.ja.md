@@ -12,7 +12,7 @@
   &nbsp;&nbsp;
   <a href="#ソースからビルド">ソースからビルド&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;日本語&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.it.md">Italiano</a>&nbsp;·&nbsp;日本語&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
   <br>
   <sub>このページは英語版READMEの翻訳です。内容に相違がある場合は英語版が優先されます。</sub>
 </p>
@@ -27,7 +27,7 @@
 ## 目には入らず、手は届く。
 
 撮ったスクリーンショットはすべて、画面のすぐ上のロープに吊るされます。
-メニューバーにポインタを置くと、するりと降りてきます。離れると消えます。
+メニューバーの中央にポインタを置くと、するりと降りてきます。離れると消えます。
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/ja/demo-dark.gif">
@@ -56,7 +56,14 @@
 | アプリにドラッグ | コピーを送る。ロープには残ります。 |
 | フォルダにドラッグ | そこに保存。ロープからは外れます。 |
 | ゴミ箱にドラッグ、または×をクリック | 手放す。 |
-| メニューバーにポインタを置く | その画面にロープを降ろす。 |
+| ポインタをロープに置いて <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | 手放したばかりのものを掛け直す。 |
+| ポインタを写真に置いて <kbd>Space</kbd> | クイックルックで見る。 |
+| ポインタを写真に置いて <kbd>⌫</kbd> | 角のボタンと同じように手放す。 |
+| 右クリックして「共有」 | AirDrop、メッセージ、メールなどで送る。ロープには残ります。 |
+| 右クリックして「ピン留め」 | 残しておく。結び目の左にスペースグレイのクリップで吊るされ、新しいスクリーンショットに押し出されない。 |
+| 右クリックして「手に取る」 | ロープから外して、作業中も目の前に置いておく。 |
+| Finderで画像を右クリックして「Tendederoに吊るす」 | どんな画像もピン留めしてロープに吊るす。 |
+| メニューバーの中央にポインタを置く | その画面にロープを降ろす。 |
 | メニューバーのどこかをクリック | ロープをしまう。 |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | ロープを表示または非表示。メニューバーの「ショートカット」で変更できます。 |
 
@@ -94,8 +101,8 @@ Tendederoは完全にMac上で動作し、スクリーンショットがMacの�
 | | |
 |:--|:--|
 | **互換性** | macOS 14 Sonoma以降、Appleシリコン搭載MacとIntel搭載Macに対応。macOS 27向けにデザイン。 |
-| **サイズ** | 1.7MB |
-| **言語** | 英語、スペイン語、ガリシア語、フランス語、ポルトガル語（ブラジル）、日本語、韓国語、中国語（簡体字）、トルコ語、アゼルバイジャン語 |
+| **サイズ** | 3.5MB |
+| **言語** | 英語、スペイン語、ガリシア語、フランス語、ポルトガル語（ブラジル）、イタリア語、日本語、韓国語、中国語（簡体字）、トルコ語、アゼルバイジャン語、ヒンディー語 |
 | **開発環境** | Swift、AppKit、SwiftUI |
 | **ネットワークアクセス** | なし |
 | **価格** | 無料 |
@@ -108,7 +115,7 @@ Tendederoは完全にMac上で動作し、スクリーンショットがMacの�
 [最新リリース](../../../../releases/latest)からディスクイメージをダウンロードして開き、Tendederoを「アプリケーション」フォルダにドラッグします。Homebrewでもインストールできます：
 
 ```sh
-brew install --cask alejandrobujan/tap/tendedero
+brew install tendedero
 ```
 
 TendederoはDeveloper IDで署名され、Appleによる公証を受けているため、ほかのアプリと同じように開けます。
