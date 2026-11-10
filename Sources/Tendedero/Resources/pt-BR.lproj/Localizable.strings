@@ -86,3 +86,7 @@
 /* Copied text */
 "Text you copy hangs on the line too" = "O texto que você copia também vai para o varal";
 "Links you copy hang on the line too" = "Os links que você copia também vão para o varal";
+
+/* Searching the line */
+"Search the line" = "Buscar no varal";
+"%d of %d" = "%d de %d";

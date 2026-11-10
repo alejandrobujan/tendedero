@@ -88,3 +88,7 @@
 /* Copied text */
 "Text you copy hangs on the line too" = "Text you copy hangs on the line too";
 "Links you copy hang on the line too" = "Links you copy hang on the line too";
+
+/* Searching the line */
+"Search the line" = "Search the line";
+"%d of %d" = "%d of %d";

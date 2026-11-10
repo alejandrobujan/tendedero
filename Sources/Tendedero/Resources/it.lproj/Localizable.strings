@@ -86,3 +86,7 @@
 /* Copied text */
 "Text you copy hangs on the line too" = "Anche il testo che copi si appende al filo";
 "Links you copy hang on the line too" = "Anche i link che copi si appendono al filo";
+
+/* Searching the line */
+"Search the line" = "Cerca sul filo";
+"%d of %d" = "%d di %d";

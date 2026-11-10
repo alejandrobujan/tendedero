@@ -86,3 +86,7 @@
 /* Copied text */
 "Text you copy hangs on the line too" = "复制的文字也会挂在绳子上";
 "Links you copy hang on the line too" = "复制的链接也会挂上绳";
+
+/* Searching the line */
+"Search the line" = "在晾衣绳上搜索";
+"%d of %d" = "%d / %d";

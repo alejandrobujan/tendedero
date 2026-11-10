@@ -86,3 +86,7 @@
 /* Copied text */
 "Text you copy hangs on the line too" = "O texto que copias tamén se pendura";
 "Links you copy hang on the line too" = "As ligazóns que copias tamén se penduran";
+
+/* Searching the line */
+"Search the line" = "Buscar na corda";
+"%d of %d" = "%d de %d";

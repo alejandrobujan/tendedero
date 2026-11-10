@@ -86,3 +86,7 @@
 /* Copied text */
 "Text you copy hangs on the line too" = "コピーしたテキストもロープに吊るされます";
 "Links you copy hang on the line too" = "コピーしたリンクもロープに吊るされます";
+
+/* Searching the line */
+"Search the line" = "ロープを検索";
+"%d of %d" = "%d / %d";

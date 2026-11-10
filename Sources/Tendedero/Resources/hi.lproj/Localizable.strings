@@ -88,3 +88,7 @@
 /* Copied text */
 "Text you copy hangs on the line too" = "आप जो टेक्स्ट कॉपी करते हैं, वह भी रस्सी पर टँगता है";
 "Links you copy hang on the line too" = "आप जो लिंक कॉपी करते हैं, वे भी रस्सी पर टँगते हैं";
+
+/* Searching the line */
+"Search the line" = "रस्सी पर खोजें";
+"%d of %d" = "%2$d में से %1$d";

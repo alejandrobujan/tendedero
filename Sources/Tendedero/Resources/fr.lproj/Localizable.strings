@@ -86,3 +86,7 @@
 /* Copied text */
 "Text you copy hangs on the line too" = "Le texte copié s’accroche aussi à la corde";
 "Links you copy hang on the line too" = "Les liens copiés s’accrochent aussi à la corde";
+
+/* Searching the line */
+"Search the line" = "Rechercher sur la corde";
+"%d of %d" = "%d sur %d";

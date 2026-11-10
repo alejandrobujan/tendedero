@@ -88,3 +88,7 @@
 /* Copied text */
 "Text you copy hangs on the line too" = "Kopyaladığınız mətn də ipdən asılır";
 "Links you copy hang on the line too" = "Kopyaladığınız keçidlər də ipdən asılır";
+
+/* Searching the line */
+"Search the line" = "İpdə axtar";
+"%d of %d" = "%d / %d";

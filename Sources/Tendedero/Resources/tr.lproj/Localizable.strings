@@ -86,3 +86,7 @@
 /* Copied text */
 "Text you copy hangs on the line too" = "Kopyaladığınız metin de ipe asılır";
 "Links you copy hang on the line too" = "Kopyaladığınız bağlantılar da ipe asılır";
+
+/* Searching the line */
+"Search the line" = "İpte ara";
+"%d of %d" = "%d / %d";

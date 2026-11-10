@@ -22,6 +22,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var noteWatcher: NoteWatcher!
     private var signalSources: [DispatchSourceSignal] = []
     private var hotKey: HotKey?
+    /// ⌃⌥F searches the line. Fixed, apart from the shortcut that shows it.
+    private var searchHotKey: HotKey?
+    private var searchBar: SearchBar!
     private var cancellables = Set<AnyCancellable>()
     private var mouseTimer: Timer?
 
@@ -83,6 +86,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         noteWatcher.start()
 
         registerShortcut()
+        searchBar = SearchBar(line: line)
+        searchBar.onReturn = { [weak self] in self?.copyFirstMatch() }
+        searchBar.onEnd = { [weak self] in self?.endSearch(tuckAway: true) }
+        searchHotKey = HotKey(Self.searchShortcut) { [weak self] in self?.startSearch() }
 
         setUpStatusItem()
         watchMenuBarClicks()
@@ -505,6 +512,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
         }
         if !on {
+            // Tucked away by any means, a search under way ends with it.
+            if searchBar?.isShown == true { endSearch(tuckAway: false) }
             pinned = false
             peekUntil = .distantPast
             panel.ignoresMouseEvents = true
@@ -518,6 +527,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 refresh()
             }
         }
+    }
+
+    // MARK: Searching the line
+
+    static let searchShortcut = Shortcut(keyCode: kVK_ANSI_F, modifiers: [.control, .option], key: "f")
+
+    /// Brings the line down and opens the search field under it.
+    private func startSearch() {
+        if !isRevealed { toggle() }
+        keepOpen = true
+        pinned = true
+        searchBar.show(below: panel.frame)
+    }
+
+    /// Return copies the newest photo, note or link that matches, and the
+    /// line goes back up, as after picking a result in Spotlight.
+    private func copyFirstMatch() {
+        guard line.isSearching, let item = line.shown.last(where: { !$0.falling }) else { return }
+        line.copy(item.id)
+        endSearch(tuckAway: true)
+    }
+
+    /// The whole line comes back. With Escape it also tucks away; after a
+    /// click elsewhere it stays as it is.
+    private func endSearch(tuckAway: Bool) {
+        line.query = ""
+        searchBar.hide()
+        if tuckAway, isRevealed { setRevealed(false) }
     }
 
     @objc private func toggle() {
@@ -642,13 +679,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         var zone = panel.frame
         if let screen = panel.screen { zone.size.height = screen.frame.maxY - zone.minY }
         let inside = NSMouseInRect(mouse, zone, false)
-        if inside && pinned { pinned = false }
-        holdPutBackKey(inside)
-        holdPhotoKeys(over: inside ? photo(under: mouse) : nil)
+        // While searching, the keys belong to the search field: Space and
+        // Delete type, and ⌘Z undoes typing.
+        let searching = searchBar?.isShown == true
+        if inside && pinned && !searching { pinned = false }
+        holdPutBackKey(inside && !searching)
+        holdPhotoKeys(over: inside && !searching ? photo(under: mouse) : nil)
         // Gaps left by discarded photos close once the pointer moves away.
         if !inside { line.closeGaps() }
 
-        let busy = pinned || GrabView.isDragging || GrabView.isShowingMenu || Share.shared.isOpen
+        // A search keeps the line down until Escape or a click elsewhere.
+        let busy = pinned || searching || GrabView.isDragging || GrabView.isShowingMenu || Share.shared.isOpen
             || line.pressedID != nil || now < peekUntil
         if inside || busy {
             awaySince = nil
@@ -886,6 +927,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             toggleItem.keyEquivalentModifierMask = shortcut.modifiers
         }
         menu.addItem(toggleItem)
+
+        let searchItem = ClosureMenuItem(L("Search the line")) { [weak self] in self?.startSearch() }
+        searchItem.keyEquivalent = Self.searchShortcut.key
+        searchItem.keyEquivalentModifierMask = Self.searchShortcut.modifiers
+        searchItem.isEnabled = line.liveCount > 0
+        menu.addItem(searchItem)
 
         let clearItem = ClosureMenuItem(L("Take everything down")) { [weak self] in
             self?.line.clear()

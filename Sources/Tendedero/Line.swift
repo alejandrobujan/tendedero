@@ -81,6 +81,24 @@ final class Line: ObservableObject {
 
     var liveCount: Int { items.filter { !$0.falling }.count }
 
+    // MARK: Searching
+
+    /// The words of what hangs, read once per item.
+    let search = SearchIndex()
+    /// What is typed in the search field under the line.
+    @Published var query = ""
+    var isSearching: Bool { !SearchIndex.words(query).isEmpty }
+
+    /// What hangs, narrowed by the search. A photo that is falling stays,
+    /// so its fall is not cut short.
+    var shown: [Pegged] {
+        let words = SearchIndex.words(query)
+        guard !words.isEmpty else { return items }
+        return items.filter { $0.falling || search.matches($0.url, words) }
+    }
+
+    var shownCount: Int { shown.filter { !$0.falling }.count }
+
     /// Photos hung by hand. They hang together at the left end of the line,
     /// before the knot, and never fall to make room.
     var keptCount: Int { items.filter { !$0.falling && $0.kept }.count }
@@ -96,6 +114,13 @@ final class Line: ObservableObject {
 
     init() {
         restore()
+        search.onChange = { [weak self] in self?.objectWillChange.send() }
+        // What already hangs is read once, a moment after launch.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in self?.indexForSearch() }
+    }
+
+    private func indexForSearch() {
+        search.update(items.filter { !$0.falling }.map(\.url))
     }
 
     // MARK: Hanging and dropping
@@ -425,6 +450,7 @@ final class Line: ObservableObject {
         guard let i = items.firstIndex(where: { $0.url == url && !$0.falling }),
               let thumb = makeThumbnail(url) else { return }
         items[i].thumb = thumb
+        indexForSearch()
     }
 
     /// Quick Look on this photo, with the rest of the line a key press away.
@@ -632,6 +658,7 @@ final class Line: ObservableObject {
 
     private func save() {
         let live = items.filter { !$0.falling }
+        search.update(live.map(\.url))
         UserDefaults.standard.set(live.map(\.url.path), forKey: storeKey)
         UserDefaults.standard.set(live.filter(\.kept).map(\.url.path), forKey: keptKey)
         UserDefaults.standard.set(live.filter(\.byHand).map(\.url.path), forKey: byHandKey)
