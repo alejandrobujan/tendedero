@@ -41,7 +41,10 @@
 "When the pointer rests in the menu bar" = "ポインタがメニューバーにとどまったとき";
 "When something new hangs" = "新しいものが吊るされたとき";
 "Over full screen apps" = "フルスクリーンのアプリの上にも";
-"Hang copied images" = "コピーした画像を吊るす";
+"Hang what you copy" = "コピーしたものを吊るす";
+"Images" = "画像";
+"Text" = "テキスト";
+"Links" = "リンク";
 "Images you copy hang on the line too" = "コピーした画像もロープに吊るされます";
 "Tendedero, hanging copied images" = "Tendedero、コピーした画像を吊るしています";
 "The line is empty" = "ロープは空です";
@@ -50,6 +53,7 @@
 /* GrabArea */
 "Copy" = "コピー";
 "Open" = "開く";
+"Open Link" = "リンクを開く";
 "Quick Look" = "クイックルック";
 "Markup" = "マークアップ";
 "Show in Finder" = "Finderで表示";
@@ -80,5 +84,5 @@
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendederoはログイン時に開かないため、再起動するともう一度開くまでロープは表示されません。";
 
 /* Copied text */
-"Hang copied text" = "コピーしたテキストを吊るす";
 "Text you copy hangs on the line too" = "コピーしたテキストもロープに吊るされます";
+"Links you copy hang on the line too" = "コピーしたリンクもロープに吊るされます";

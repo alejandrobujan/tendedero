@@ -41,7 +41,10 @@
 "When the pointer rests in the menu bar" = "Quando il puntatore si ferma nella barra dei menu";
 "When something new hangs" = "Quando si appende qualcosa di nuovo";
 "Over full screen apps" = "Sopra le app a tutto schermo";
-"Hang copied images" = "Appendi le immagini copiate";
+"Hang what you copy" = "Appendi ciò che copi";
+"Images" = "Immagini";
+"Text" = "Testo";
+"Links" = "Link";
 "Images you copy hang on the line too" = "Anche le immagini che copi si appendono al filo";
 "Tendedero, hanging copied images" = "Tendedero, appende le immagini copiate";
 "The line is empty" = "Il filo è vuoto";
@@ -50,6 +53,7 @@
 /* GrabArea */
 "Copy" = "Copia";
 "Open" = "Apri";
+"Open Link" = "Apri link";
 "Quick Look" = "Visualizzazione rapida";
 "Markup" = "Annota";
 "Show in Finder" = "Mostra nel Finder";
@@ -80,5 +84,5 @@
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero non si apre quando accedi, quindi dopo un riavvio il filo sparisce finché non lo riapri.";
 
 /* Copied text */
-"Hang copied text" = "Appendi il testo copiato";
 "Text you copy hangs on the line too" = "Anche il testo che copi si appende al filo";
+"Links you copy hang on the line too" = "Anche i link che copi si appendono al filo";

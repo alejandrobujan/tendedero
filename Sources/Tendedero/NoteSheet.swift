@@ -21,6 +21,8 @@ struct Note {
     var body: String
     var code: Bool
     var date: Date
+    /// A copy that is just a web address hangs as a link: its site and path.
+    var link: URL? = nil
 
     /// Read once per thumbnail and kept, so drawing the line never touches
     /// the disk.
@@ -56,6 +58,10 @@ struct Note {
         text = String(text.prefix(4000))
         let date = (try? url.resourceValues(forKeys: [.creationDateKey]).creationDate) ?? Date()
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let link = webAddress(trimmed), let host = link.host {
+            let site = host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
+            return Note(title: site, body: trimmed, code: false, date: date, link: link)
+        }
         if monospaced || looksLikeCode(trimmed) {
             return Note(title: "", body: trimmed, code: true, date: date)
         }
@@ -72,6 +78,23 @@ struct Note {
 
     /// About two lines of a card in bold.
     private static let titleLimit = 60
+
+    /// The whole copy is one web address, and nothing else.
+    static func webAddress(_ text: String) -> URL? {
+        guard !text.contains(where: \.isWhitespace),
+              let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue),
+              let match = detector.firstMatch(in: text, range: NSRange(location: 0, length: (text as NSString).length)),
+              match.range.length == (text as NSString).length,
+              let url = match.url, ["http", "https"].contains(url.scheme?.lowercased() ?? "") else { return nil }
+        return url
+    }
+
+    /// What follows the site, for the line under it: "/reel/DfhgD7X". The
+    /// query is left out: it is mostly tracking. Copying and opening keep it.
+    var linkPath: String {
+        guard let path = link?.path, path != "/" else { return "" }
+        return path
+    }
 
     /// Several lines that are indented, end like code or are full of the
     /// symbols prose rarely uses.
@@ -124,7 +147,25 @@ struct NoteSheet: View {
                 .padding(.horizontal, 6 * u)
                 .padding(.top, 2.5 * u)
             VStack(alignment: .leading, spacing: 3 * u) {
-                if note.code {
+                if note.link != nil {
+                    HStack(spacing: 4 * u) {
+                        Image(systemName: "link")
+                            .font(.system(size: 9.5 * u, weight: .semibold))
+                            .foregroundStyle(dark ? Color(red: 0.9, green: 0.706, blue: 0.133) : Color(red: 0.788, green: 0.604, blue: 0))
+                        Text(note.title)
+                            .font(.system(size: 11.5 * u, weight: .bold))
+                            .foregroundStyle(dark ? Color(white: 0.96) : Color(white: 0.11))
+                            .lineLimit(1)
+                    }
+                    .layoutPriority(1)
+                    if !note.linkPath.isEmpty {
+                        Text(note.linkPath)
+                            .font(.system(size: 8.5 * u))
+                            .foregroundStyle(dark ? Color.white.opacity(0.6) : Color(white: 0.45))
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                    }
+                } else if note.code {
                     Text(note.body)
                         .font(.system(size: 7.5 * u, design: .monospaced))
                         .foregroundStyle(dark ? Color(white: 0.96) : Color(white: 0.11))

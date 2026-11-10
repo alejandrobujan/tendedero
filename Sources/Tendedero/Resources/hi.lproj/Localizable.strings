@@ -43,7 +43,10 @@
 "When the pointer rests in the menu bar" = "जब पॉइंटर मेनू बार में रुके";
 "When something new hangs" = "जब कुछ नया टँगे";
 "Over full screen apps" = "फ़ुल स्क्रीन ऐप्स के ऊपर";
-"Hang copied images" = "कॉपी की गई तस्वीरें टाँगें";
+"Hang what you copy" = "जो कॉपी करें, उसे टाँगें";
+"Images" = "तस्वीरें";
+"Text" = "टेक्स्ट";
+"Links" = "लिंक";
 "Images you copy hang on the line too" = "आप जो तस्वीरें कॉपी करते हैं, वे भी रस्सी पर टँगती हैं";
 "Tendedero, hanging copied images" = "Tendedero, कॉपी की गई तस्वीरें टाँग रहा है";
 "The line is empty" = "रस्सी खाली है";
@@ -52,6 +55,7 @@
 /* GrabArea */
 "Copy" = "कॉपी करें";
 "Open" = "खोलें";
+"Open Link" = "लिंक खोलें";
 "Quick Look" = "क्विक लुक";
 "Markup" = "मार्कअप";
 "Show in Finder" = "Finder में दिखाएँ";
@@ -82,5 +86,5 @@
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero लॉगिन करने पर नहीं खुलता, इसलिए रीस्टार्ट के बाद रस्सी तब तक नहीं दिखती जब तक आप इसे फिर से नहीं खोलते।";
 
 /* Copied text */
-"Hang copied text" = "कॉपी किया गया टेक्स्ट टाँगें";
 "Text you copy hangs on the line too" = "आप जो टेक्स्ट कॉपी करते हैं, वह भी रस्सी पर टँगता है";
+"Links you copy hang on the line too" = "आप जो लिंक कॉपी करते हैं, वे भी रस्सी पर टँगते हैं";

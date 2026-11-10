@@ -52,6 +52,9 @@ struct GrabArea: NSViewRepresentable {
             menu.autoenablesItems = false
             menu.addItem(ClosureMenuItem(L("Copy")) { line.copy(id) })
             menu.addItem(ClosureMenuItem(L("Open")) { line.open(id) })
+            if isText(item.url), Note.cached(item.url)?.link != nil {
+                menu.addItem(ClosureMenuItem(L("Open Link")) { line.openLink(id) })
+            }
             menu.addItem(ClosureMenuItem(L("Quick Look")) { line.quickLook(id) })
             if !isRecording {
                 menu.addItem(ClosureMenuItem(L("Hold")) { line.onHold?(id) })
@@ -212,13 +215,29 @@ final class GrabView: NSView, NSDraggingSource {
         startedDrag = true
         endPress()
 
-        let item = NSDraggingItem(pasteboardWriter: url as NSURL)
+        let item = NSDraggingItem(pasteboardWriter: Self.dragWriter(for: url))
         item.setDraggingFrame(imageFrame(), contents: dragImage)
         let session = beginDraggingSession(with: [item], event: event, source: self)
         // Released where nothing accepts it: it flies back to the line.
         session.animatesToStartingPositionsOnCancelOrFail = true
         GrabView.isDragging = true
         onDragStart()
+    }
+
+    /// A photo drags as its file. A note drags as its words for apps, styled
+    /// when it has a style, and as its file for Finder.
+    private static func dragWriter(for url: URL) -> NSPasteboardWriting {
+        guard isText(url) else { return url as NSURL }
+        let item = NSPasteboardItem()
+        if url.pathExtension.lowercased() == "rtf", let data = try? Data(contentsOf: url),
+           let rich = NSAttributedString(rtf: data, documentAttributes: nil) {
+            item.setString(rich.string, forType: .string)
+            item.setData(data, forType: .rtf)
+        } else if let data = try? Data(contentsOf: url) {
+            item.setString(String(decoding: data, as: UTF8.self), forType: .string)
+        }
+        item.setString(url.absoluteString, forType: .fileURL)
+        return item
     }
 
     override func mouseUp(with event: NSEvent) {

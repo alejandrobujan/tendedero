@@ -43,7 +43,10 @@
 "When the pointer rests in the menu bar" = "Göstərici menyu panelində dayananda";
 "When something new hangs" = "Yeni bir şey asılanda";
 "Over full screen apps" = "Tam ekran proqramların üzərində";
-"Hang copied images" = "Kopyalanmış şəkilləri as";
+"Hang what you copy" = "Kopyaladıqlarını as";
+"Images" = "Şəkillər";
+"Text" = "Mətn";
+"Links" = "Keçidlər";
 "Images you copy hang on the line too" = "Kopyaladığınız şəkillər də ipdən asılır";
 "Tendedero, hanging copied images" = "Tendedero, kopyalanmış şəkilləri asır";
 "The line is empty" = "İp boşdur";
@@ -52,6 +55,7 @@
 /* GrabArea */
 "Copy" = "Kopyala";
 "Open" = "Aç";
+"Open Link" = "Keçidi aç";
 "Quick Look" = "Tez baxış";
 "Markup" = "İşarələmə";
 "Show in Finder" = "Finder-də göstər";
@@ -82,5 +86,5 @@
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero sistemə girəndə açılmır, ona görə də yenidən başladandan sonra siz onu yenidən açana qədər ip görünmür.";
 
 /* Copied text */
-"Hang copied text" = "Kopyalanmış mətni as";
 "Text you copy hangs on the line too" = "Kopyaladığınız mətn də ipdən asılır";
+"Links you copy hang on the line too" = "Kopyaladığınız keçidlər də ipdən asılır";

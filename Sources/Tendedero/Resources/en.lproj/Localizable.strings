@@ -43,7 +43,10 @@
 "When the pointer rests in the menu bar" = "When the pointer rests in the menu bar";
 "When something new hangs" = "When something new hangs";
 "Over full screen apps" = "Over full screen apps";
-"Hang copied images" = "Hang copied images";
+"Hang what you copy" = "Hang what you copy";
+"Images" = "Images";
+"Text" = "Text";
+"Links" = "Links";
 "Images you copy hang on the line too" = "Images you copy hang on the line too";
 "Tendedero, hanging copied images" = "Tendedero, hanging copied images";
 "The line is empty" = "The line is empty";
@@ -52,6 +55,7 @@
 /* GrabArea */
 "Copy" = "Copy";
 "Open" = "Open";
+"Open Link" = "Open Link";
 "Quick Look" = "Quick Look";
 "Markup" = "Markup";
 "Show in Finder" = "Show in Finder";
@@ -82,5 +86,5 @@
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero does not open when you log in, so after a restart the line is gone until you open it again.";
 
 /* Copied text */
-"Hang copied text" = "Hang copied text";
 "Text you copy hangs on the line too" = "Text you copy hangs on the line too";
+"Links you copy hang on the line too" = "Links you copy hang on the line too";

@@ -20,6 +20,7 @@ final class ClipboardWatcher {
     private static let enabledKey = "clipboardEnabled"
 
     private static let textKey = "clipboardTextEnabled"
+    private static let linksKey = "clipboardLinksEnabled"
 
     /// Hang copied images.
     static var imagesEnabled: Bool {
@@ -34,8 +35,15 @@ final class ClipboardWatcher {
         set { UserDefaults.standard.set(newValue, forKey: textKey) }
     }
 
-    /// The clipboard is watched while either kind is on.
-    static var isEnabled: Bool { imagesEnabled || textEnabled }
+    /// Hang copied links: a copy that is one web address and nothing else.
+    /// Off until chosen, apart from text.
+    static var linksEnabled: Bool {
+        get { UserDefaults.standard.bool(forKey: linksKey) }
+        set { UserDefaults.standard.set(newValue, forKey: linksKey) }
+    }
+
+    /// The clipboard is watched while any kind is on.
+    static var isEnabled: Bool { imagesEnabled || textEnabled || linksEnabled }
 
     /// Copies that carry a picture but are not one. Text from a spreadsheet
     /// or a document also comes as an image of itself. A file copied in
@@ -79,8 +87,13 @@ final class ClipboardWatcher {
         let count = pb.changeCount
         guard count != lastCount else { return }
         lastCount = count
-        if Self.textEnabled, let (text, rtf) = Self.copiedText(pb) {
-            save(text: text, rtf: rtf)
+        if Self.textEnabled || Self.linksEnabled, let (text, rtf) = Self.copiedText(pb) {
+            let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            if Note.webAddress(trimmed) != nil {
+                if Self.linksEnabled { save(text: trimmed, rtf: nil, link: true) }
+            } else if Self.textEnabled {
+                save(text: text, rtf: rtf, link: false)
+            }
             return
         }
         guard Self.imagesEnabled, let items = pb.pasteboardItems, !items.isEmpty,
@@ -142,11 +155,11 @@ final class ClipboardWatcher {
 
     private var lastText: String?
 
-    /// Notes go to their own folder, apart from the screenshots.
-    private func save(text: String, rtf: Data?) {
+    /// Notes and links go to their own folder, apart from the screenshots.
+    private func save(text: String, rtf: Data?, link: Bool) {
         if let last, FileManager.default.fileExists(atPath: last.url.path), lastText == text { return }
         let ext = rtf == nil ? "txt" : "rtf"
-        let name = "Text"
+        let name = link ? "Link" : "Text"
         let fm = FileManager.default
         let folder = NoteFolder.url
         var url = folder.appendingPathComponent("\(name) \(Self.stamp()).\(ext)")

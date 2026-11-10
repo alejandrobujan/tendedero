@@ -257,9 +257,21 @@ final class Line: ObservableObject {
         putOnClipboard(moved)
     }
 
+    /// A double click: a copied link opens in the browser, anything else in
+    /// its app.
     func open(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
-        NSWorkspace.shared.open(item.url)
+        if isText(item.url), let link = Note.cached(item.url)?.link {
+            NSWorkspace.shared.open(link)
+        } else {
+            NSWorkspace.shared.open(item.url)
+        }
+    }
+
+    func openLink(_ id: UUID) {
+        guard let item = items.first(where: { $0.id == id }), isText(item.url),
+              let link = Note.cached(item.url)?.link else { return }
+        NSWorkspace.shared.open(link)
     }
 
     /// Moves the file to the Trash and takes the photo off the line. When a

@@ -903,21 +903,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         inbox.toolTip = L("Screenshots hang instantly and skip the Desktop")
         menu.addItem(inbox)
 
-        let clipboardImages = ClosureMenuItem(L("Hang copied images")) { [weak self] in
-            ClipboardWatcher.imagesEnabled.toggle()
-            self?.refreshClipboardWatcher()
+        // What you copy, in a section of its own: each kind is its own choice.
+        menu.addItem(.separator())
+        menu.addItem(.sectionHeader(title: L("Hang what you copy")))
+        let kinds: [(String, String, ReferenceWritableKeyPath<ClipboardWatcher.Type, Bool>)] = [
+            (L("Images"), L("Images you copy hang on the line too"), \.imagesEnabled),
+            (L("Text"), L("Text you copy hangs on the line too"), \.textEnabled),
+            (L("Links"), L("Links you copy hang on the line too"), \.linksEnabled),
+        ]
+        for (title, tip, key) in kinds {
+            let item = ClosureMenuItem(title) { [weak self] in
+                ClipboardWatcher.self[keyPath: key].toggle()
+                self?.refreshClipboardWatcher()
+            }
+            item.state = ClipboardWatcher.self[keyPath: key] ? .on : .off
+            item.toolTip = tip
+            menu.addItem(item)
         }
-        clipboardImages.state = ClipboardWatcher.imagesEnabled ? .on : .off
-        clipboardImages.toolTip = L("Images you copy hang on the line too")
-        menu.addItem(clipboardImages)
-
-        let clipboardText = ClosureMenuItem(L("Hang copied text")) { [weak self] in
-            ClipboardWatcher.textEnabled.toggle()
-            self?.refreshClipboardWatcher()
-        }
-        clipboardText.state = ClipboardWatcher.textEnabled ? .on : .off
-        clipboardText.toolTip = L("Text you copy hangs on the line too")
-        menu.addItem(clipboardText)
+        menu.addItem(.separator())
 
         let bringDown = NSMenuItem(title: L("Bring the line down"), action: nil, keyEquivalent: "")
         let options = NSMenu()
