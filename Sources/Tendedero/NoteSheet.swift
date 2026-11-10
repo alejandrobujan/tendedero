@@ -21,6 +21,8 @@ struct Note {
     var body: String
     var code: Bool
     var date: Date
+    /// When its file last changed, to notice an edit made in another app.
+    var modified: Date? = nil
     /// A copy that is just a web address hangs as a link: its site and path.
     var link: URL? = nil
 
@@ -33,8 +35,17 @@ struct Note {
         return reload(url)
     }
 
+    /// What is cached, without reading the file.
+    @MainActor static func peek(_ url: URL) -> Note? { cache[url] }
+
+    /// Read from the file system each time: URL resource values are cached.
+    static func modificationDate(_ url: URL) -> Date? {
+        (try? FileManager.default.attributesOfItem(atPath: url.path))?[.modificationDate] as? Date
+    }
+
     @MainActor @discardableResult static func reload(_ url: URL) -> Note? {
-        guard let note = read(url) else { return nil }
+        guard var note = read(url) else { return nil }
+        note.modified = modificationDate(url)
         cache[url] = note
         return note
     }
@@ -235,19 +246,193 @@ struct NoteSheet: View {
     }
 }
 
-/// The note as a picture, measured in pixels like a photo's thumbnail, with
-/// the card's shape, for the line and the flight.
-@MainActor func noteCard(_ url: URL, maxPixels: Int) -> NSImage? {
+/// The note as a picture, measured in pixels like a photo's thumbnail. For
+/// the line and the flight it has the card's shape; held in front of you it
+/// is a bigger sheet with the whole text.
+@MainActor func noteCard(_ url: URL, maxPixels: Int, full: Bool = false) -> NSImage? {
     guard let note = Note.reload(url) else { return nil }
-    let width = Layout.cardWidth - 14
-    let cap = Layout.photoMaxHeight
+    let width: CGFloat = full ? 260 : Layout.cardWidth - 14
+    let cap: CGFloat = full ? 700 : Layout.photoMaxHeight
     let dark = NSApp.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
     let scheme: ColorScheme = dark ? .dark : .light
     let natural = ImageRenderer(content: NoteSheet(note: note, width: width).environment(\.colorScheme, scheme))
     natural.proposedSize = ProposedViewSize(width: width, height: nil)
     let height = min(cap, max(width * 0.42, natural.nsImage?.size.height ?? cap))
     let renderer = ImageRenderer(content: NoteSheet(note: note, width: width, height: height).environment(\.colorScheme, scheme))
-    renderer.scale = max(1, CGFloat(maxPixels) / width)
+    renderer.scale = full ? 2 : max(1, CGFloat(maxPixels) / width)
     guard let cg = renderer.cgImage else { return nil }
     return NSImage(cgImage: cg, size: NSSize(width: cg.width, height: cg.height))
+}
+
+// MARK: Held in front of you
+
+/// How big a held note's words are. Stretching the window reflows the
+/// text at this size; zooming changes it.
+final class NoteScale: ObservableObject {
+    /// The sheet is drawn for 260 points wide when held.
+    static let natural: CGFloat = 260 / 136
+    @Published var u: CGFloat = NoteScale.natural
+}
+
+/// A note held in front of you: the same sheet, with real text you can
+/// select, copy and scroll, and links you can click. Stretch it to any
+/// shape and the text reflows; zoom it and everything grows.
+struct HeldNote: View {
+    let note: Note
+    @ObservedObject var scale: NoteScale
+    @Environment(\.colorScheme) private var scheme
+
+    var body: some View {
+        GeometryReader { geo in
+            let u = scale.u
+            let dark = scheme == .dark
+            VStack(alignment: .leading, spacing: 0) {
+                LinearGradient(colors: [Color(red: 1, green: 0.886, blue: 0.49), Color(red: 0.973, green: 0.788, blue: 0.235)],
+                               startPoint: .top, endPoint: .bottom)
+                    .frame(height: 9 * u)
+                Path { p in
+                    p.move(to: CGPoint(x: 0, y: 0.65 * u))
+                    p.addLine(to: CGPoint(x: geo.size.width - 12 * u, y: 0.65 * u))
+                }
+                .stroke(dark ? Color(white: 0.42) : Color(red: 0.78, green: 0.76, blue: 0.71),
+                        style: StrokeStyle(lineWidth: 1.3 * u, lineCap: .round, dash: [0, 3.4 * u]))
+                .frame(height: 1.3 * u)
+                .padding(.horizontal, 6 * u)
+                .padding(.top, 2.5 * u)
+                Group {
+                    if note.code {
+                        NoteText(note: note, u: u, dark: dark)
+                            .padding(5 * u)
+                            .background(RoundedRectangle(cornerRadius: 4 * u, style: .continuous)
+                                .fill(dark ? Color(white: 0.17) : Color(red: 0.95, green: 0.95, blue: 0.97)))
+                    } else {
+                        NoteText(note: note, u: u, dark: dark)
+                    }
+                }
+                .padding(.top, 5 * u)
+                .padding(.horizontal, 9 * u)
+                Text(note.dateText)
+                    .font(.system(size: 7.5 * u))
+                    .foregroundStyle(Color(red: 0.557, green: 0.557, blue: 0.576))
+                    .lineLimit(1)
+                    .padding(.horizontal, 9 * u)
+                    .padding(.vertical, 5 * u)
+            }
+            .frame(width: geo.size.width, height: geo.size.height, alignment: .top)
+            .background(dark ? Color(white: 0.118) : Color.white)
+        }
+    }
+}
+
+/// The note's words in a read-only text view: selectable, scrollable when
+/// long, code kept on whole lines and scrolled sideways.
+private struct NoteText: NSViewRepresentable {
+    let note: Note
+    let u: CGFloat
+    let dark: Bool
+
+    final class Coordinator {
+        var drawn: (CGFloat, Bool, String)?
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
+    func makeNSView(context: Context) -> NSScrollView {
+        let scroll = NSTextView.scrollableTextView()
+        scroll.drawsBackground = false
+        scroll.hasVerticalScroller = true
+        scroll.autohidesScrollers = true
+        scroll.scrollerStyle = .overlay
+        guard let text = scroll.documentView as? NSTextView else { return scroll }
+        text.isEditable = false
+        text.isSelectable = true
+        text.drawsBackground = false
+        text.textContainerInset = .zero
+        text.textContainer?.lineFragmentPadding = 0
+        if note.code {
+            scroll.hasHorizontalScroller = true
+            text.isHorizontallyResizable = true
+            text.textContainer?.widthTracksTextView = false
+            text.textContainer?.containerSize = NSSize(width: CGFloat.greatestFiniteMagnitude,
+                                                       height: CGFloat.greatestFiniteMagnitude)
+        }
+        return scroll
+    }
+
+    func updateNSView(_ scroll: NSScrollView, context: Context) {
+        guard let text = scroll.documentView as? NSTextView else { return }
+        let words = note.title + "\n" + note.body
+        if let drawn = context.coordinator.drawn, abs(drawn.0 - u) < 0.01, drawn.1 == dark, drawn.2 == words { return }
+        context.coordinator.drawn = (u, dark, words)
+        let link = dark ? NSColor(red: 0.9, green: 0.706, blue: 0.133, alpha: 1) : NSColor(red: 0.788, green: 0.604, blue: 0, alpha: 1)
+        text.linkTextAttributes = [.foregroundColor: link, .underlineStyle: NSUnderlineStyle.single.rawValue,
+                                   .cursor: NSCursor.pointingHand]
+        text.textStorage?.setAttributedString(attributed(link: link))
+    }
+
+    private func attributed(link: NSColor) -> NSAttributedString {
+        let ink = dark ? NSColor(white: 0.96, alpha: 1) : NSColor(white: 0.11, alpha: 1)
+        if note.code {
+            let style = NSMutableParagraphStyle()
+            style.lineSpacing = 1.2 * u
+            return NSAttributedString(string: note.body, attributes: [
+                .font: NSFont.monospacedSystemFont(ofSize: 7.5 * u, weight: .regular),
+                .foregroundColor: ink, .paragraphStyle: style])
+        }
+        let result = NSMutableAttributedString(string: note.title, attributes: [
+            .font: NSFont.systemFont(ofSize: (note.body.isEmpty ? 12.5 : 11) * u, weight: .bold),
+            .foregroundColor: ink])
+        guard !note.body.isEmpty else { return result }
+        let style = NSMutableParagraphStyle()
+        style.lineSpacing = 1 * u
+        style.paragraphSpacingBefore = note.title.isEmpty ? 0 : 3 * u
+        let lead = note.title.isEmpty ? "" : "\n"
+        let start = result.length + lead.utf16.count
+        result.append(NSAttributedString(string: lead + note.body, attributes: [
+            .font: NSFont.systemFont(ofSize: (note.title.isEmpty ? 9.5 : 8.5) * u),
+            .foregroundColor: dark ? NSColor(white: 1, alpha: 0.75) : NSColor(white: 0.24, alpha: 1),
+            .paragraphStyle: style]))
+        if let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) {
+            let body = note.body as NSString
+            for match in detector.matches(in: note.body, range: NSRange(location: 0, length: body.length)) {
+                guard let url = match.url else { continue }
+                result.addAttribute(.link, value: url, range: NSRange(location: start + match.range.location, length: match.range.length))
+            }
+        }
+        return result
+    }
+}
+
+// MARK: Edited elsewhere
+
+/// Notices when a note's file is saved by another app, such as TextEdit
+/// after a double click. Editors that save by replacing the file change the
+/// folder, which is what this watches; the line also checks when it comes
+/// down, for editors that write in place.
+@MainActor final class NoteWatcher {
+    private var source: DispatchSourceFileSystemObject?
+    private var pending: DispatchWorkItem?
+    private let onChange: () -> Void
+
+    init(onChange: @escaping () -> Void) { self.onChange = onChange }
+
+    func start() {
+        guard source == nil else { return }
+        try? FileManager.default.createDirectory(at: NoteFolder.url, withIntermediateDirectories: true)
+        let fd = open(NoteFolder.url.path, O_EVTONLY)
+        guard fd >= 0 else { return }
+        let src = DispatchSource.makeFileSystemObjectSource(fileDescriptor: fd, eventMask: [.write, .rename, .delete], queue: .main)
+        src.setEventHandler { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                self.pending?.cancel()
+                let work = DispatchWorkItem { [weak self] in self?.onChange() }
+                self.pending = work
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: work)
+            }
+        }
+        src.setCancelHandler { close(fd) }
+        src.resume()
+        source = src
+    }
 }

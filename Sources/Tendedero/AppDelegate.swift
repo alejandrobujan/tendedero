@@ -19,6 +19,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// screenshot app saves to.
     private var folderWatchers: [ScreenshotWatcher] = []
     private var clipboardWatcher: ClipboardWatcher!
+    private var noteWatcher: NoteWatcher!
     private var signalSources: [DispatchSourceSignal] = []
     private var hotKey: HotKey?
     private var cancellables = Set<AnyCancellable>()
@@ -78,6 +79,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         startWatcher()
         clipboardWatcher = ClipboardWatcher { [weak self] url in self?.hangCapture(url) }
         if ClipboardWatcher.isEnabled { clipboardWatcher.start() }
+        noteWatcher = NoteWatcher { [weak self] in self?.line.refreshNotes() }
+        noteWatcher.start()
 
         registerShortcut()
 

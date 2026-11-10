@@ -46,7 +46,7 @@ final class Line: ObservableObject {
             guard revealed != oldValue else { return }
             gustWork?.cancel()
             gustWork = nil
-            if revealed { scheduleGust() }
+            if revealed { scheduleGust(); refreshNotes() }
         }
     }
 
@@ -268,6 +268,13 @@ final class Line: ObservableObject {
         }
     }
 
+    /// The file itself, in its app. This is how a note is edited, a link
+    /// included, so one turned into a link by an edit can be edited back.
+    func openFile(_ id: UUID) {
+        guard let item = items.first(where: { $0.id == id }) else { return }
+        NSWorkspace.shared.open(item.url)
+    }
+
     func openLink(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }), isText(item.url),
               let link = Note.cached(item.url)?.link else { return }
@@ -425,6 +432,17 @@ final class Line: ObservableObject {
         let live = items.filter { !$0.falling }
         guard let index = live.firstIndex(where: { $0.id == id }) else { return }
         QuickLook.shared.show(live.map(\.url), at: index)
+    }
+
+    /// A note edited in another app shows its new words, on the line and
+    /// held in front of you.
+    func refreshNotes() {
+        for item in items where !item.falling && isText(item.url) {
+            guard let cached = Note.peek(item.url),
+                  let modified = Note.modificationDate(item.url), modified != cached.modified else { continue }
+            reloadThumbnail(for: item.url)
+            Held.reload(item.url)
+        }
     }
 
     /// After a change of size, every photo is redrawn sharp at the new one.
@@ -707,9 +725,9 @@ let selfCopyType = NSPasteboard.PasteboardType("app.tendedero.SelfCopy")
 
 /// The default size covers a card at twice its size in points, as on a
 /// Retina screen, and no more: every photo on the line keeps one in memory.
-func makeThumbnail(_ url: URL, maxPixels: Int = Int(320 * Layout.size.scale)) -> NSImage? {
+func makeThumbnail(_ url: URL, maxPixels: Int = Int(320 * Layout.size.scale), full: Bool = false) -> NSImage? {
     if isRecording(url) { return firstFrame(url, maxPixels: maxPixels) }
-    if isText(url) { return MainActor.assumeIsolated { noteCard(url, maxPixels: maxPixels) } }
+    if isText(url) { return MainActor.assumeIsolated { noteCard(url, maxPixels: maxPixels, full: full) } }
     guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
     let options: [CFString: Any] = [
         kCGImageSourceCreateThumbnailFromImageAlways: true,
