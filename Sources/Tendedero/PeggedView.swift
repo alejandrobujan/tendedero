@@ -174,11 +174,13 @@ struct PeggedView: View {
     private func breeze() {
         let delay = Double.random(in: 0...0.35)
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            guard line.revealed else { return }
             nudge(Double.random(in: 1.6...3.4))
         }
     }
 
     private func nudge(_ degrees: Double) {
+        guard line.revealed else { return }
         withAnimation(.easeOut(duration: 0.3)) { swing = degrees }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             withAnimation(.interpolatingSpring(stiffness: 38, damping: 2.4)) { swing = 0 }

@@ -80,3 +80,7 @@
 "Shift-click to select photos" = "Maiús-clic para seleccionar fotos";
 // Save availability
 "Save to Desktop (inbox or Desktop only)" = "Gardar no escritorio (só cartafol de Tendedero ou escritorio)";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Abrir Tendedero ao iniciar sesión?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero non se abre ao iniciar sesión, así que despois de reiniciar a corda non está ata que o volvas abrir.";

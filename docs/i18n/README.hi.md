@@ -12,7 +12,7 @@
   &nbsp;&nbsp;
   <a href="#सोर्स-से-बनाएँ">सोर्स से बनाएँ&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;हिन्दी
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.it.md">Italiano</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;हिन्दी
   <br>
   <sub>अंग्रेज़ी README का अनुवाद। कहीं फ़र्क़ हो तो अंग्रेज़ी वाला ही मान्य है।</sub>
 </p>
@@ -107,7 +107,7 @@ Tendedero पूरी तरह आपके Mac पर चलता है, �
 |:--|:--|
 | **संगतता** | macOS 14 Sonoma या उसके बाद, Apple silicon और Intel दोनों पर। macOS 27 के लिए बनाया गया। |
 | **आकार** | 3.5 MB |
-| **भाषाएँ** | अंग्रेज़ी, स्पेनिश, गैलिशियन, फ़्रेंच, पुर्तगाली (ब्राज़ील), जापानी, कोरियाई, चीनी (सरलीकृत), तुर्की, अज़रबैजानी और हिन्दी |
+| **भाषाएँ** | अंग्रेज़ी, स्पेनिश, गैलिशियन, फ़्रेंच, पुर्तगाली (ब्राज़ील), इतालवी, जापानी, कोरियाई, चीनी (सरलीकृत), तुर्की, अज़रबैजानी और हिन्दी |
 | **किससे बना** | Swift, AppKit और SwiftUI |
 | **इंटरनेट** | ज़रूरत नहीं |
 | **क़ीमत** | मुफ़्त |

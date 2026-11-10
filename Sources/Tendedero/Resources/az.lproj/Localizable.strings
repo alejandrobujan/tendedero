@@ -82,3 +82,7 @@
 "Shift-click to select photos" = "Fotoları seçmək üçün Shift düyməsini basılı saxlayıb klikləyin";
 // Save availability
 "Save to Desktop (inbox or Desktop only)" = "İş masasına saxla (yalnız Tendedero qovluğu və ya iş masası)";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Tendedero sistemə girişdə açılsın?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero sistemə girəndə açılmır, ona görə də yenidən başladandan sonra siz onu yenidən açana qədər ip görünmür.";
