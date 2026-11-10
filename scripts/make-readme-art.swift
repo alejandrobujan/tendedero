@@ -77,6 +77,18 @@ let translations: [String: [String: String]] = [
         "Let it go.": "जाने दें।",
         "The cross or the Trash. That\u{2019}s it.": "क्रॉस या ट्रैश। बस इतना ही।",
     ],
+    "it": [
+        "Screenshots, hung out to dry.": "I tuoi screenshot, stesi ad asciugare.",
+        "Copied": "Copiato",
+        "Click to copy.": "Clic per copiare.",
+        "Paste it anywhere, instantly.": "Incollala dove vuoi, all\u{2019}istante.",
+        "Hold to mark up.": "Tieni premuto per annotare.",
+        "Annotate, crop or sign in place.": "Annota, ritaglia o firma sul posto.",
+        "Drag to share.": "Trascina per condividere.",
+        "Apps get a copy. Folders keep it.": "Le app ricevono una copia. Le cartelle, l\u{2019}originale.",
+        "Let it go.": "E non pensarci pi\u{F9}.",
+        "The cross or the Trash. That\u{2019}s it.": "La crocetta o il Cestino. Tutto qui.",
+    ],
     "fr": [
         "Screenshots, hung out to dry.": "Vos captures, mises à sécher.",
         "Copied": "Copié",
