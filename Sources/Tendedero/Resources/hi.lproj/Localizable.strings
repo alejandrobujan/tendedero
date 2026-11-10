@@ -76,3 +76,7 @@
 "Hang back" = "रस्सी पर लौटाएँ";
 "Hang everything back" = "सब रस्सी पर लौटाएँ";
 "Actual Size" = "असली आकार";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "क्या Tendedero लॉगिन पर खुले?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero लॉगिन करने पर नहीं खुलता, इसलिए रीस्टार्ट के बाद रस्सी तब तक नहीं दिखती जब तक आप इसे फिर से नहीं खोलते।";

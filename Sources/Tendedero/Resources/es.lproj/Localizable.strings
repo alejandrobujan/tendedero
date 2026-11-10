@@ -74,3 +74,7 @@
 "Hang back" = "Devolver a la cuerda";
 "Hang everything back" = "Devolver todo a la cuerda";
 "Actual Size" = "Tamaño real";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "¿Abrir Tendedero al iniciar sesión?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero no se abre al iniciar sesión, así que tras reiniciar la cuerda no está hasta que vuelvas a abrirlo.";

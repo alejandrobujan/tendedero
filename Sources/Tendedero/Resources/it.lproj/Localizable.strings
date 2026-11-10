@@ -74,3 +74,7 @@
 "Hang back" = "Riappendi";
 "Hang everything back" = "Riappendi tutto";
 "Actual Size" = "Dimensioni reali";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Aprire Tendedero al login?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero non si apre quando accedi, quindi dopo un riavvio il filo sparisce finché non lo riapri.";

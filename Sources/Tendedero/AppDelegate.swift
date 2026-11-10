@@ -136,6 +136,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         if !Inbox.wasOffered {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in self?.offerInbox() }
+        } else if Self.shouldOfferLogin {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { Self.offerLogin() }
         }
 
         if !UserDefaults.standard.bool(forKey: "welcomed") {
@@ -241,8 +243,54 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         alert.addButton(withTitle: L("Turn on"))
         alert.addButton(withTitle: L("Not now"))
         if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
+        // A menu bar app that does not open at login is gone after the first
+        // restart, so the first launch offers it too, ticked.
+        let login = Self.shouldOfferLogin ? NSButton(checkboxWithTitle: L("Open at login"), target: nil, action: nil) : nil
+        if let login {
+            login.state = .on
+            alert.accessoryView = login
+            Self.loginOffered()
+        }
         NSApp.activate(ignoringOtherApps: true)
         if alert.runModal() == .alertFirstButtonReturn { setInbox(true) }
+        if login?.state == .on { Self.openAtLogin() }
+    }
+
+    // MARK: Open at login
+
+    private static let loginOfferedKey = "loginOfferedVersion"
+    private static var version: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+    }
+
+    /// Each install or update asks once whether Tendedero should open at
+    /// login, unless it already does.
+    private static var shouldOfferLogin: Bool {
+        SMAppService.mainApp.status != .enabled
+            && UserDefaults.standard.string(forKey: loginOfferedKey) != version
+    }
+
+    private static func loginOffered() {
+        UserDefaults.standard.set(version, forKey: loginOfferedKey)
+    }
+
+    private static func offerLogin() {
+        loginOffered()
+        let alert = NSAlert()
+        alert.messageText = L("Open Tendedero at login?")
+        alert.informativeText = L("Tendedero does not open when you log in, so after a restart the line is gone until you open it again.")
+        alert.addButton(withTitle: L("Open at login"))
+        alert.addButton(withTitle: L("Not now"))
+        if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
+        NSApp.activate(ignoringOtherApps: true)
+        if alert.runModal() == .alertFirstButtonReturn { openAtLogin() }
+    }
+
+    /// Turned off in System Settings, macOS asks for approval there.
+    private static func openAtLogin() {
+        guard SMAppService.mainApp.status != .enabled else { return }
+        toggleLaunchAtLogin()
+        if SMAppService.mainApp.status == .requiresApproval { SMAppService.openSystemSettingsLoginItems() }
     }
 
     /// Watching the clipboard is opt in, from the menu bar only.
