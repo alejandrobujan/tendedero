@@ -250,7 +250,9 @@ final class Line: ObservableObject {
     /// picture. When the file moves after a copy, to the Trash or the Desktop,
     /// the clipboard follows it, or those apps would find nothing to paste.
     private func clipboardFollows(_ url: URL, to moved: URL) {
-        guard let onClipboard, onClipboard.url == url,
+        // A copied note is its words, which do not depend on the file: once
+        // moved out of the notes folder it would go back as a bare file.
+        guard !isText(url), let onClipboard, onClipboard.url == url,
               onClipboard.change == NSPasteboard.general.changeCount else { return }
         putOnClipboard(moved)
     }
