@@ -194,7 +194,7 @@ let translations: [String: [String: String]] = [
         "\u{2303}\u{2325}F finds words, even in screenshots.": "⌃⌥F 连截图里的文字也能找到。",
     ],
     "vi": [
-        "Screenshots, hung out to dry.": "Ảnh chụp màn hình, phơi ngay trên dây.",
+        "Capture it. Copy it. Hang it all out to dry.": "Chụp. Sao chép. Phơi hết lên dây.",
         "Copied": "Đã sao chép",
         "Click to copy.": "Nhấp để sao chép.",
         "Paste it anywhere, instantly.": "Dán vào mọi nơi, tức thì.",
@@ -204,6 +204,10 @@ let translations: [String: [String: String]] = [
         "Apps get a copy. Folders keep it.": "App nhận bản sao. Thư mục giữ bản gốc.",
         "Let it go.": "Bỏ đi thôi.",
         "The cross or the Trash. That\u{2019}s it.": "Dấu chéo hoặc Thùng rác. Thế là xong.",
+        "Copy any text.": "Sao chép mọi văn bản.",
+        "It hangs as a note, links too.": "Treo thành ghi chú, cả liên kết nữa.",
+        "Search the line.": "Tìm trên dây phơi.",
+        "\u{2303}\u{2325}F finds words, even in screenshots.": "⌃⌥F tìm chữ, cả trong ảnh chụp.",
     ],
 ]
 

@@ -1,6 +1,6 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/hero-dark.png">
-  <img src="../images/hero-light.png" alt="Tendedero. Ảnh chụp màn hình, phơi ngay trên dây. Ba ảnh chụp màn hình trong khung kính được treo trên một sợi dây mảnh ngay dưới thanh menu macOS.">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/vi/hero-dark.png">
+  <img src="../images/vi/hero-light.png" alt="Tendedero. Chụp. Sao chép. Phơi hết lên dây. Một ghi chú và hai ảnh chụp màn hình trong khung kính được treo trên một sợi dây mảnh ngay dưới thanh menu macOS.">
 </picture>
 
 <h3 align="center"><a href="https://tendedero.app">Dùng thử ngay trên trình duyệt tại tendedero.app&nbsp;&rsaquo;</a></h3>
@@ -26,12 +26,12 @@
 
 ## Khuất tầm mắt. Ngay tầm tay.
 
-Mỗi ảnh chụp màn hình bạn tạo ra đều được treo trên một sợi dây ngay phía trên màn hình.
+Mỗi ảnh chụp màn hình bạn tạo ra, và mọi thứ bạn sao chép, đều được treo trên một sợi dây ngay phía trên màn hình.
 Đặt con trỏ ở giữa thanh menu, dây phơi sẽ trượt xuống. Di chuột ra ngoài, dây phơi tự ẩn đi.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/demo-dark.gif">
-  <img src="../images/demo-light.gif" alt="Con trỏ dừng ở cạnh trên màn hình, dây phơi trượt xuống cùng ba ảnh chụp màn hình đung đưa nhẹ, nhấp chuột để sao chép một ảnh, và dây phơi thu gọn lại khi con trỏ rời đi.">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/vi/demo-dark.gif">
+  <img src="../images/vi/demo-light.gif" alt="Con trỏ dừng ở cạnh trên màn hình, dây phơi trượt xuống cùng một ghi chú và hai ảnh chụp màn hình đung đưa nhẹ, nhấp chuột để sao chép một ảnh chụp, và dây phơi thu gọn lại khi con trỏ rời đi.">
 </picture>
 
 <br>
@@ -40,8 +40,8 @@ Mỗi ảnh chụp màn hình bạn tạo ra đều được treo trên một s�
 ## Mỗi thao tác một cử chỉ.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/bento-dark.png">
-  <img src="../images/bento-light.png" alt="Nhấp để sao chép. Nhấn giữ để đánh dấu. Kéo để chia sẻ. Bỏ đi gọn nhẹ.">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/vi/bento-dark.png">
+  <img src="../images/vi/bento-light.png" alt="Nhấp để sao chép. Giữ để đánh dấu. Kéo để chia sẻ. Bỏ đi thôi. Sao chép mọi văn bản. Tìm trên dây phơi.">
 </picture>
 
 <br>
@@ -49,26 +49,26 @@ Mỗi ảnh chụp màn hình bạn tạo ra đều được treo trên một s�
 
 | | |
 |:--|:--|
-| Shift + nhấp chuột | Thêm hoặc bỏ ảnh khỏi vùng chọn. Nhả phím Shift vẫn giữ nguyên lựa chọn. |
-| Nhấp chuột phải vào ảnh đang chọn | Sao chép, mở, hiển thị trong Finder, chia sẻ, ghim/bỏ ghim, lưu vào Màn hình nền hoặc gỡ hết các ảnh đã chọn. Menu hiển thị số lượng ảnh; từng thao tác vẫn giữ nguyên quy tắc tệp và ghim hiện có. |
-| Khi đang chọn và con trỏ ở trên dây | ⌘C sao chép vùng chọn; ⌫ trên ảnh sẽ gỡ toàn bộ vùng chọn trong một bước hoàn tác; Esc bỏ chọn. Nhấp chuột thường hoặc ẩn dây phơi cũng bỏ chọn. |
-| Nhấp chuột | Sao chép hình ảnh. |
-| Nhấn và giữ | Mở ảnh trong công cụ Đánh dấu (Markup). |
-| Nhấp đúp | Mở ảnh trong Preview (Xem trước). |
+| Nhấp chuột | Sao chép. Ghi chú thì sao chép văn bản, giữ nguyên định dạng. |
+| Nhấn và giữ | Mở trong công cụ Đánh dấu (Markup). Ghi chú thì mở ra để chỉnh sửa. |
+| Nhấp đúp | Mở trong Preview (Xem trước). Liên kết thì mở trong trình duyệt. |
 | Nhấn mạnh (Force click) | Mở bằng Xem nhanh (Quick Look). |
-| Kéo vào một ứng dụng | Gửi một bản sao. Ảnh gốc vẫn ở trên dây. |
-| Kéo vào một thư mục | Lưu ảnh tại đó. Ảnh rời khỏi dây. |
+| Kéo vào một ứng dụng | Gửi một bản sao. Mục đó vẫn ở trên dây. |
+| Kéo vào một thư mục | Lưu tại đó. Mục đó rời khỏi dây. |
 | Kéo vào Thùng rác, hoặc nhấp dấu chéo | Bỏ đi. |
-| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> trên dây hoặc tại nơi menu vừa đóng | Hoàn tác lần bỏ đi, ghim/bỏ ghim hoặc Lưu vào Màn hình nền gần nhất, bao gồm cả một vùng chọn. Di chuột ra ngoài hoặc nhấp nơi khác để trả lệnh hoàn tác về cho ứng dụng kia. |
+| Shift + nhấp chuột | Chọn nhiều mục. Menu của chúng, <kbd>⌘</kbd>&thinsp;<kbd>C</kbd>, <kbd>⌫</kbd> và thao tác kéo áp dụng cho tất cả. <kbd>Esc</kbd> hoặc một cú nhấp thường sẽ bỏ chọn. |
+| <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> khi đặt con trỏ trên dây | Hoàn tác thao tác vừa làm: bỏ đi, ghim hoặc lưu vào Màn hình nền, kể cả một vùng chọn. |
 | <kbd>Space</kbd> khi đặt con trỏ trên ảnh | Xem nhanh. |
 | <kbd>⌫</kbd> khi đặt con trỏ trên ảnh | Bỏ đi, tương tự nút ở góc ảnh. |
 | Nhấp chuột phải, chọn Chia sẻ | Gửi qua AirDrop, Tin nhắn, Mail và nhiều ứng dụng khác. Ảnh vẫn ở trên dây. |
 | Nhấp chuột phải, chọn Ghim | Giữ ảnh lại: ảnh được treo bên trái nút thắt bằng kẹp màu xám không gian và không bị ảnh mới đẩy ra khỏi dây. |
-| Nhấp chuột phải, chọn Giữ trên tay | Nhấc ảnh khỏi dây và giữ nổi ngay trước mặt trong lúc bạn làm việc. |
-| Trong Finder, nhấp chuột phải vào ảnh, chọn Treo lên Tendedero | Treo bất kỳ hình ảnh nào lên dây ở trạng thái đã ghim. |
+| Nhấp chuột phải, chọn Giữ trên tay | Nhấc ảnh khỏi dây và giữ nổi ngay trước mặt trong lúc bạn làm việc. Ghi chú đang giữ là văn bản bạn có thể chọn. |
+| Trong Finder, nhấp chuột phải vào ảnh hoặc tệp văn bản, chọn Treo lên Tendedero | Treo lên dây ở trạng thái đã ghim. |
+| Đặt con trỏ lên một ảnh khi đã bật Phóng to khi di chuột | Xem ảnh lớn hơn ở giữa màn hình. |
 | Đặt con trỏ ở giữa thanh menu | Kéo dây phơi xuống trên màn hình đó. |
 | Nhấp vào bất kỳ đâu trên thanh menu | Thu gọn dây phơi. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Hiện hoặc ẩn dây phơi. Đổi phím tắt tại mục Phím tắt trên thanh menu. |
+| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | Tìm trên dây phơi. |
 
 <br>
 
@@ -85,20 +85,34 @@ Vẫn những phím tắt quen thuộc. Vẫn thói quen cũ. Chỉ ít bừa b�
 
 <br>
 
-## Cả hình ảnh đã sao chép nữa.
+## Cả văn bản, liên kết và hình ảnh đã sao chép.
 
-Chụp màn hình khi giữ phím <kbd>⌃</kbd>, hoặc sao chép một hình ảnh trong Preview, ảnh đó
-cũng được treo lên dây như bình thường. Bật mục Hình ảnh dưới phần Treo nội dung đã sao chép
-trên thanh menu, biểu tượng chiếc áo sẽ được tô đậm khi tính năng đang bật. Chỉ nhận hình ảnh:
-mọi thứ được sao chép kèm văn bản hoặc tệp, hay dữ liệu được trình quản lý mật khẩu đánh dấu riêng tư,
-đều sẽ được bỏ qua.
+Bật từng loại tại mục Treo nội dung đã sao chép trên thanh menu; khi có loại nào đang bật,
+biểu tượng chiếc áo sẽ được tô đậm.
+
+Văn bản đã sao chép được treo thành một ghi chú, như một trang Ghi chú trong cùng khung kính:
+dòng đầu tiên là tiêu đề, Markdown hiển thị có định dạng và mã nguồn giữ nguyên từng dòng.
+Một địa chỉ web được treo thành liên kết, kèm tên trang và đường dẫn. Chụp màn hình khi giữ
+phím <kbd>⌃</kbd>, hoặc sao chép một hình ảnh trong Preview, ảnh đó cũng được treo như bình thường.
+
+Không lưu lại bất cứ thứ gì từ ô nhập mật khẩu, từ dữ liệu được trình quản lý mật khẩu đánh dấu
+riêng tư, hay từ thiết bị khác qua Bảng nhớ tạm chung (Universal Clipboard).
+
+<br>
+
+## Tìm mọi thứ trên dây phơi.
+
+Nhấn <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> và gõ. Chỉ những mục khớp mới ở lại
+trên dây: chữ trong ảnh chụp màn hình, được đọc ngay trên máy Mac lúc ảnh được treo, và chữ
+của mọi ghi chú và liên kết. <kbd>Return</kbd> sao chép kết quả khớp mới nhất.
 
 <br>
 
 ## Riêng tư ngay từ thiết kế.
 
 Không tài khoản. Không kết nối mạng. Không thu thập dữ liệu.
-Tendedero chạy hoàn toàn trên máy Mac của bạn và ảnh chụp không bao giờ rời khỏi máy.
+Tendedero chạy hoàn toàn trên máy Mac của bạn, kể cả việc đọc chữ trong ảnh chụp,
+và không gì bạn treo lên dây rời khỏi máy.
 
 <br>
 
@@ -154,16 +168,22 @@ Bạn muốn đóng góp? Hãy đọc [CONTRIBUTING.md](../../CONTRIBUTING.md) t
 | `AppDelegate.swift` | Thanh menu, phím tắt, hiện và thu gọn dây phơi |
 | `LinePanel.swift` | Dải cửa sổ trong suốt dọc theo cạnh trên màn hình |
 | `LineView.swift` | Sợi dây phơi và vị trí treo từng ảnh |
-| `PeggedView.swift` | Từng bức ảnh: khung kính, kẹp gỗ, độ đung đưa và làn gió |
+| `PeggedView.swift` | Từng bức ảnh hoặc ghi chú: khung kính, kẹp nhôm, độ đung đưa và làn gió |
 | `GrabArea.swift` | Nhấp chuột, nhấn giữ, kéo và thả |
 | `ScreenshotWatcher.swift` | Phát hiện ảnh chụp màn hình mới |
-| `ClipboardWatcher.swift` | Phát hiện hình ảnh được sao chép vào bảng nhớ tạm |
+| `ClipboardWatcher.swift` | Phát hiện hình ảnh, văn bản và liên kết được sao chép vào bảng nhớ tạm |
+| `NoteSheet.swift` | Vẽ văn bản đã sao chép thành một trang Ghi chú |
+| `Markdown.swift` | Markdown trong ghi chú |
 | `Inbox.swift` | Tiếp quản cài đặt ảnh chụp màn hình và khôi phục lại |
 | `Markup.swift` | Mở trình chỉnh sửa Đánh dấu của hệ thống và lưu kết quả |
 | `Trim.swift` | Cắt bản ghi màn hình và lưu kết quả |
 | `FullScreen.swift` | Nhận biết khi nào cần giữ dây phơi ở trạng thái ẩn |
 | `Line.swift` | Quản lý những gì đang treo trên dây và các thao tác tương ứng |
 | `Held.swift` | Giữ một bức ảnh ngay trước mặt, tách khỏi dây phơi |
+| `SearchIndex.swift` | Đọc chữ trong ảnh chụp, ngay trên máy Mac này, để tìm kiếm |
+| `SearchBar.swift` | Ô tìm kiếm bên dưới dây phơi |
+| `Zoom.swift` | Bản phóng to của một ảnh khi di chuột |
+| `Share.swift` | Chia sẻ, từ menu của một ảnh |
 
 Mọi hình ảnh minh họa tại đây, kể cả biểu tượng ứng dụng, đều được vẽ bằng mã nguồn qua
 `scripts/make-icon.swift` và `scripts/make-readme-art.swift`.

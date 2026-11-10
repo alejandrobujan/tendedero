@@ -100,3 +100,7 @@
 
 /* Zoom on hover */
 "Zoom on hover" = "Phóng to khi di chuột";
+
+/* Offered once: hang what you copy */
+"Hang what you copy too?" = "Treo cả nội dung bạn sao chép?";
+"Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "Hình ảnh, văn bản và liên kết bạn sao chép cũng có thể được treo lên dây phơi: văn bản thành một ghi chú, liên kết kèm tên trang web. Chúng chỉ nằm trên máy Mac này, và không bao giờ lưu lại nội dung từ ô nhập mật khẩu. Bạn có thể thay đổi bất cứ lúc nào tại mục Treo nội dung đã sao chép trên thanh menu.";
