@@ -12,6 +12,8 @@
 "Screenshots" = "Ekran görüntüleri";
 "Handle screenshots" = "Ekran görüntülerini yönet";
 "Screenshots hang instantly and skip the Desktop" = "Ekran görüntüleri anında asılır ve Masaüstünü atlar";
+"Copy each screenshot" = "Her ekran görüntüsünü kopyala";
+"Each new screenshot goes to the clipboard as it hangs" = "Her yeni ekran görüntüsü asılırken panoya kopyalanır";
 "Open screenshots folder" = "Ekran görüntüleri klasörünü aç";
 "Sounds" = "Sesler";
 "Open at login" = "Başlangıçta aç";

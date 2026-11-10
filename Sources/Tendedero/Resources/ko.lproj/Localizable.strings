@@ -12,6 +12,8 @@
 "Screenshots" = "스크린샷";
 "Handle screenshots" = "스크린샷 관리";
 "Screenshots hang instantly and skip the Desktop" = "스크린샷이 바로 걸리고 데스크탑을 거치지 않아요";
+"Copy each screenshot" = "스크린샷마다 복사";
+"Each new screenshot goes to the clipboard as it hangs" = "새 스크린샷이 걸리면 바로 클립보드에 복사돼요";
 "Open screenshots folder" = "스크린샷 폴더 열기";
 "Sounds" = "사운드";
 "Open at login" = "로그인 시 열기";
