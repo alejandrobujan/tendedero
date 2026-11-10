@@ -124,7 +124,7 @@ e nulla di ciò che appendi lo lascia mai.
 | | |
 |:--|:--|
 | **Compatibilità** | macOS 14 Sonoma o successivi, su Mac con Apple silicon o Intel. Pensata per macOS 27. |
-| **Dimensioni** | 3,5 MB |
+| **Dimensioni** | 5,1 MB |
 | **Lingue** | Inglese, spagnolo, galiziano, francese, portoghese (Brasile), italiano, giapponese, coreano, cinese semplificato, turco, azero, hindi e vietnamita |
 | **Realizzata con** | Swift, AppKit e SwiftUI |
 | **Accesso alla rete** | Nessuno |

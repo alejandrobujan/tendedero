@@ -124,7 +124,7 @@ et rien de ce que vous accrochez ne le quitte jamais.
 | | |
 |:--|:--|
 | **Compatibilité** | macOS 14 Sonoma ou version ultérieure, sur Mac Apple silicon et Intel. Conçu pour macOS 27. |
-| **Taille** | 3,5 Mo |
+| **Taille** | 5,1 Mo |
 | **Langues** | Anglais, espagnol, galicien, français, portugais du Brésil, italien, japonais, coréen, chinois simplifié, turc, azerbaïdjanais, hindi et vietnamien |
 | **Conçu avec** | Swift, AppKit et SwiftUI |
 | **Accès au réseau** | Aucun |

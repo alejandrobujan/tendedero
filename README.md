@@ -121,7 +121,7 @@ and nothing you hang ever leaves it.
 | | |
 |:--|:--|
 | **Compatibility** | macOS 14 Sonoma or later, on Apple silicon and Intel. Designed for macOS 27. |
-| **Size** | 3.5 MB |
+| **Size** | 5.1 MB |
 | **Languages** | English, Spanish, Galician, French, Portuguese (Brazil), Italian, Japanese, Korean, Chinese (Simplified), Turkish, Azerbaijani, Hindi, Vietnamese |
 | **Built with** | Swift, AppKit and SwiftUI |
 | **Network access** | None |

@@ -121,7 +121,7 @@ và không gì bạn treo lên dây rời khỏi máy.
 | | |
 |:--|:--|
 | **Tương thích** | macOS 14 Sonoma trở lên, hỗ trợ Apple silicon và Intel. Thiết kế cho macOS 27. |
-| **Dung lượng** | 3,5 MB |
+| **Dung lượng** | 5,1 MB |
 | **Ngôn ngữ** | Tiếng Anh, Tây Ban Nha, Galicia, Pháp, Bồ Đào Nha (Brazil), Ý, Nhật, Hàn, Trung giản thể, Thổ Nhĩ Kỳ, Azerbaijan, Hindi, Việt |
 | **Công nghệ** | Swift, AppKit và SwiftUI |
 | **Truy cập mạng** | Không |
