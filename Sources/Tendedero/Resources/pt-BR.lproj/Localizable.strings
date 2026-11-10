@@ -9,6 +9,7 @@
 "Show line" = "Mostrar varal";
 "Take everything down" = "Recolher tudo";
 "Put back" = "Pendurar de volta";
+"Screenshots" = "Capturas de tela";
 "Handle screenshots" = "Cuidar das capturas de tela";
 "Screenshots hang instantly and skip the Desktop" = "As capturas vão direto para o varal, sem passar pela Mesa";
 "Open screenshots folder" = "Abrir pasta de capturas";
@@ -23,8 +24,8 @@
 "%d photos" = "%d fotos";
 "Also watch folders" = "Monitorar também pastas";
 "Add Folder…" = "Adicionar Pasta…";
-"Stop Watching" = "Parar de Monitorar";
 "Watch" = "Monitorar";
+"Show “%@” in Finder" = "Mostrar “%@” no Finder";
 "New images saved to this folder will hang on the line." = "As novas imagens salvas nesta pasta irão para o varal.";
 "Shortcut" = "Atalho";
 "Change Shortcut…" = "Alterar Atalho…";
@@ -41,7 +42,12 @@
 "When the pointer rests in the menu bar" = "Quando o ponteiro para na barra de menus";
 "When something new hangs" = "Quando algo novo vai para o varal";
 "Over full screen apps" = "Sobre apps em tela cheia";
-"Hang copied images" = "Pendurar imagens copiadas";
+"Hang what you copy" = "Pendurar o que você copia";
+"Hang what you copy too?" = "Pendurar também o que você copia?";
+"Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "As imagens, o texto e os links que você copia também podem ir para o varal: o texto como uma nota, um link com o seu site. Eles ficam neste Mac, e nada de um campo de senha é guardado. Mude quando quiser em Pendurar o que você copia, na barra de menus.";
+"Images" = "Imagens";
+"Text" = "Texto";
+"Links" = "Links";
 "Images you copy hang on the line too" = "As imagens que você copia também vão para o varal";
 "Tendedero, hanging copied images" = "Tendedero, pendurando imagens copiadas";
 "The line is empty" = "O varal está vazio";
@@ -50,6 +56,7 @@
 /* GrabArea */
 "Copy" = "Copiar";
 "Open" = "Abrir";
+"Open Link" = "Abrir link";
 "Quick Look" = "Visualização Rápida";
 "Markup" = "Marcação";
 "Trim" = "Cortar";
@@ -84,6 +91,23 @@
 "Cancel" = "Cancelar";
 "trimmed" = "cortada";
 
+/* Selecting photos */
+"%d selected" = "Seleção: %d";
+"Shift-click to select photos" = "Clique com Shift para selecionar fotos";
+// Save availability
+"Save to Desktop (inbox or Desktop only)" = "Salvar na Mesa (somente pasta do Tendedero ou Mesa)";
+
 /* Open at login, offered on each install and update */
 "Open Tendedero at login?" = "Abrir o Tendedero ao iniciar sessão?";
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "O Tendedero não abre quando você inicia a sessão, então depois de reiniciar o varal some até você abri-lo de novo.";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "O texto que você copia também vai para o varal";
+"Links you copy hang on the line too" = "Os links que você copia também vão para o varal";
+
+/* Searching the line */
+"Search the line" = "Buscar no varal";
+"%d of %d" = "%d de %d";
+
+/* Zoom on hover */
+"Zoom on hover" = "Ampliar ao passar o ponteiro";

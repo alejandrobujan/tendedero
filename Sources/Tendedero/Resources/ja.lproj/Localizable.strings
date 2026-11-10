@@ -9,6 +9,7 @@
 "Show line" = "ロープを表示";
 "Take everything down" = "すべて外す";
 "Put back" = "掛け直す";
+"Screenshots" = "スクリーンショット";
 "Handle screenshots" = "スクリーンショットを任せる";
 "Screenshots hang instantly and skip the Desktop" = "撮った瞬間に吊るされ、デスクトップを経由しません";
 "Open screenshots folder" = "スクリーンショットのフォルダを開く";
@@ -23,8 +24,8 @@
 "%d photos" = "%d枚";
 "Also watch folders" = "フォルダも監視";
 "Add Folder…" = "フォルダを追加…";
-"Stop Watching" = "監視を停止";
 "Watch" = "監視";
+"Show “%@” in Finder" = "“%@”をFinderで表示";
 "New images saved to this folder will hang on the line." = "このフォルダに保存された新しい画像がロープに吊るされます。";
 "Shortcut" = "ショートカット";
 "Change Shortcut…" = "ショートカットを変更…";
@@ -41,7 +42,12 @@
 "When the pointer rests in the menu bar" = "ポインタがメニューバーにとどまったとき";
 "When something new hangs" = "新しいものが吊るされたとき";
 "Over full screen apps" = "フルスクリーンのアプリの上にも";
-"Hang copied images" = "コピーした画像を吊るす";
+"Hang what you copy" = "コピーしたものを吊るす";
+"Hang what you copy too?" = "コピーしたものも吊るしますか？";
+"Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "コピーした画像、テキスト、リンクもロープに吊るせます。テキストはメモとして、リンクはサイト名付きで。どれもこのMacの中だけに保存され、パスワード欄の内容が残ることはありません。メニューバーの「コピーしたものを吊るす」でいつでも変更できます。";
+"Images" = "画像";
+"Text" = "テキスト";
+"Links" = "リンク";
 "Images you copy hang on the line too" = "コピーした画像もロープに吊るされます";
 "Tendedero, hanging copied images" = "Tendedero、コピーした画像を吊るしています";
 "The line is empty" = "ロープは空です";
@@ -50,6 +56,7 @@
 /* GrabArea */
 "Copy" = "コピー";
 "Open" = "開く";
+"Open Link" = "リンクを開く";
 "Quick Look" = "クイックルック";
 "Markup" = "マークアップ";
 "Trim" = "トリミング";
@@ -84,6 +91,23 @@
 "Cancel" = "キャンセル";
 "trimmed" = "トリミング済み";
 
+/* Selecting photos */
+"%d selected" = "%d枚選択中";
+"Shift-click to select photos" = "Shiftキーを押しながらクリックして写真を選択";
+// Save availability
+"Save to Desktop (inbox or Desktop only)" = "デスクトップに保存（Tendederoフォルダまたはデスクトップのみ）";
+
 /* Open at login, offered on each install and update */
 "Open Tendedero at login?" = "ログイン時にTendederoを開きますか？";
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendederoはログイン時に開かないため、再起動するともう一度開くまでロープは表示されません。";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "コピーしたテキストもロープに吊るされます";
+"Links you copy hang on the line too" = "コピーしたリンクもロープに吊るされます";
+
+/* Searching the line */
+"Search the line" = "ロープを検索";
+"%d of %d" = "%d / %d";
+
+/* Zoom on hover */
+"Zoom on hover" = "ポインタを重ねて拡大";

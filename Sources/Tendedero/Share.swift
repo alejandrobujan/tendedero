@@ -46,6 +46,11 @@ final class Share: NSObject, NSSharingServicePickerDelegate, NSSharingServiceDel
     /// Shows the share panel for the photo at `url`, whose card is at
     /// `cardFrame` on screen.
     func show(_ url: URL, from cardFrame: NSRect) {
+        show([url], from: cardFrame)
+    }
+
+    func show(_ urls: [URL], from cardFrame: NSRect) {
+        guard !urls.isEmpty else { return }
         clear(olderThan: 3600)
         isOpen = true
         safety?.invalidate()
@@ -60,7 +65,7 @@ final class Share: NSObject, NSSharingServicePickerDelegate, NSSharingServiceDel
         // windows services open belong to Tendedero, and answer only if
         // Tendedero is in front.
         NSApp.activate(ignoringOtherApps: true)
-        let picker = NSSharingServicePicker(items: [snapshot(of: url)])
+        let picker = NSSharingServicePicker(items: urls.map { item(for: $0) })
         picker.delegate = self
         self.picker = picker
         guard let view = anchor.contentView else { return }
@@ -78,6 +83,13 @@ final class Share: NSObject, NSSharingServicePickerDelegate, NSSharingServiceDel
         isOpen = false
         safety?.invalidate()
         safety = nil
+    }
+
+    /// A copied link is shared as the web address, so AirDrop and Messages
+    /// send a link and not a text file. Everything else as its file.
+    private func item(for url: URL) -> Any {
+        if isText(url), let link = Note.cached(url)?.link { return link as NSURL }
+        return snapshot(of: url)
     }
 
     private func snapshot(of url: URL) -> URL {

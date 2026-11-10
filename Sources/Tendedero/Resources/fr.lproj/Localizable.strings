@@ -9,6 +9,7 @@
 "Show line" = "Afficher la corde";
 "Take everything down" = "Tout décrocher";
 "Put back" = "Raccrocher";
+"Screenshots" = "Captures d’écran";
 "Handle screenshots" = "Gérer les captures d’écran";
 "Screenshots hang instantly and skip the Desktop" = "Les captures s’accrochent aussitôt et évitent le bureau";
 "Open screenshots folder" = "Ouvrir le dossier des captures";
@@ -23,8 +24,8 @@
 "%d photos" = "%d photos";
 "Also watch folders" = "Surveiller aussi des dossiers";
 "Add Folder…" = "Ajouter un dossier…";
-"Stop Watching" = "Ne plus surveiller";
 "Watch" = "Surveiller";
+"Show “%@” in Finder" = "Afficher « %@ » dans le Finder";
 "New images saved to this folder will hang on the line." = "Les nouvelles images enregistrées dans ce dossier s’accrocheront à la corde.";
 "Shortcut" = "Raccourci";
 "Change Shortcut…" = "Modifier le raccourci…";
@@ -41,7 +42,12 @@
 "When the pointer rests in the menu bar" = "Quand le pointeur reste dans la barre des menus";
 "When something new hangs" = "Quand une nouvelle capture s’accroche";
 "Over full screen apps" = "Au-dessus des apps en plein écran";
-"Hang copied images" = "Accrocher les images copiées";
+"Hang what you copy" = "Accrocher ce que vous copiez";
+"Hang what you copy too?" = "Accrocher aussi ce que vous copiez ?";
+"Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "Les images, le texte et les liens que vous copiez peuvent aussi s’accrocher à la corde : le texte comme une note, un lien avec son site. Ils restent sur ce Mac, et rien n’est jamais gardé d’un champ de mot de passe. Modifiez-le quand vous voulez dans Accrocher ce que vous copiez, dans la barre des menus.";
+"Images" = "Images";
+"Text" = "Texte";
+"Links" = "Liens";
 "Images you copy hang on the line too" = "Les images copiées s’accrochent aussi à la corde";
 "Tendedero, hanging copied images" = "Tendedero, accroche les images copiées";
 "The line is empty" = "La corde est vide";
@@ -50,6 +56,7 @@
 /* GrabArea */
 "Copy" = "Copier";
 "Open" = "Ouvrir";
+"Open Link" = "Ouvrir le lien";
 "Quick Look" = "Coup d’œil";
 "Markup" = "Annotation";
 "Trim" = "Raccourcir";
@@ -84,6 +91,23 @@
 "Cancel" = "Annuler";
 "trimmed" = "raccourci";
 
+/* Selecting photos */
+"%d selected" = "Sélection : %d";
+"Shift-click to select photos" = "Maj-clic pour sélectionner des photos";
+// Save availability
+"Save to Desktop (inbox or Desktop only)" = "Enregistrer sur le bureau (dossier Tendedero ou bureau uniquement)";
+
 /* Open at login, offered on each install and update */
 "Open Tendedero at login?" = "Ouvrir Tendedero à l’ouverture de session ?";
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero ne s’ouvre pas quand vous ouvrez votre session : après un redémarrage, la corde n’est plus là tant que vous ne le rouvrez pas.";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "Le texte copié s’accroche aussi à la corde";
+"Links you copy hang on the line too" = "Les liens copiés s’accrochent aussi à la corde";
+
+/* Searching the line */
+"Search the line" = "Rechercher sur la corde";
+"%d of %d" = "%d sur %d";
+
+/* Zoom on hover */
+"Zoom on hover" = "Agrandir au survol";

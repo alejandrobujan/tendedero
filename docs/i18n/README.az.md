@@ -1,6 +1,6 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/az/hero-dark.png">
-  <img src="../images/az/hero-light.png" alt="Tendedero. Ekran şəkilləri, ipə sərilib. Şüşə çərçivədə üç ekran şəkli macOS menyu panelinin altındakı nazik ipdən asılıb.">
+  <img src="../images/az/hero-light.png" alt="Tendedero. Çək. Kopyala. Hamısını ipə sər. Şüşə çərçivədə bir qeyd və iki ekran şəkli macOS menyu panelinin altındakı nazik ipdən asılıb.">
 </picture>
 
 <h3 align="center"><a href="https://tendedero.app">Brauzerinizdə tendedero.app saytında sınayın&nbsp;&rsaquo;</a></h3>
@@ -12,7 +12,7 @@
   &nbsp;&nbsp;
   <a href="#mənbə-kodundan-yığmaq">Mənbə kodundan yığ&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.it.md">Italiano</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;Azərbaycanca&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.it.md">Italiano</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;Azərbaycanca&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>&nbsp;·&nbsp;<a href="README.vi.md">Tiếng Việt</a>
   <br>
   <sub>İngiliscə README-nin tərcüməsidir. Fərq olarsa, ingiliscə mətn əsasdır.</sub>
 </p>
@@ -26,12 +26,12 @@
 
 ## Gözdən uzaq. Əl altında.
 
-Çəkdiyiniz hər ekran şəkli ekranın düz üstündəki ipdən asılır.
+Çəkdiyiniz hər ekran şəkli və kopyaladığınız hər şey ekranın düz üstündəki ipdən asılır.
 Göstəricini menyu panelinin ortasında saxlayın, ip aşağı enir. Uzaqlaşdırın, yox olur.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/az/demo-dark.gif">
-  <img src="../images/az/demo-light.gif" alt="Göstərici yuxarı kənara toxunur, ip üç yüngülcə yellənən ekran şəkli ilə aşağı enir, bir klik birini kopyalayır və göstərici uzaqlaşanda ip yığılır.">
+  <img src="../images/az/demo-light.gif" alt="Göstərici yuxarı kənara toxunur, ip yüngülcə yellənən bir qeyd və iki ekran şəkli ilə aşağı enir, bir klik bir ekran şəklini kopyalayır və göstərici uzaqlaşanda ip yığılır.">
 </picture>
 
 <br>
@@ -41,7 +41,7 @@ Göstəricini menyu panelinin ortasında saxlayın, ip aşağı enir. Uzaqlaşd�
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/az/bento-dark.png">
-  <img src="../images/az/bento-light.png" alt="Klikləyin, kopyalayın. Basıb saxlayın, işarələyin. Sürükləyin, paylaşın. Burax getsin.">
+  <img src="../images/az/bento-light.png" alt="Klikləyin, kopyalayın. Basıb saxlayın, işarələyin. Sürükləyin, paylaşın. Burax getsin. Mətni də kopyala. İpdə axtar.">
 </picture>
 
 <br>
@@ -49,23 +49,26 @@ Göstəricini menyu panelinin ortasında saxlayın, ip aşağı enir. Uzaqlaşd�
 
 | | |
 |:--|:--|
-| Klik | Şəkli kopyalayır. |
-| Basıb saxlamaq | Markup-da açır. |
-| İki dəfə klik | Preview-da açır. |
+| Klik | Kopyalayır. Qeyd mətnini formatı ilə birlikdə kopyalayır. |
+| Basıb saxlamaq | Markup-da açır. Qeyd redaktə üçün açılır. |
+| İki dəfə klik | Preview-da açır. Keçid brauzerinizdə açılır. |
 | Güclü klik | Quick Look ilə tez baxış. |
 | Proqrama sürükləmək | Surətini göndərir. Şəkil ipdə qalır. |
 | Qovluğa sürükləmək | Orada saxlanır və ipdən çıxır. |
 | Zibil qutusuna sürükləmək və ya çarpaza klik | Ondan qurtulursunuz. |
-| Göstərici ipin üstündəykən <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | Atdığınızı ipə geri asır. |
+| Shift ilə klik | Bir neçəsini seçir. Onların menyusu, <kbd>⌘</kbd>&thinsp;<kbd>C</kbd>, <kbd>⌫</kbd> və sürükləmə hamısına birdən təsir edir. <kbd>Esc</kbd> və ya adi klik seçimi təmizləyir. |
+| Göstərici ipin üzərindəykən <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> | İndicə etdiyinizi geri qaytarır: buraxmaq, bərkitmək və ya İş masasında saxlamaq, bütöv seçim də daxil olmaqla. |
 | Göstərici şəklin üstündəykən <kbd>Boşluq</kbd> | Tez baxın. |
 | Göstərici şəklin üstündəykən <kbd>⌫</kbd> | Küncdəki düyməsi kimi buraxın. |
 | Sağ klik, Paylaş | AirDrop, Mesajlar, Mail və digərləri ilə göndərir. Şəkil ipdə qalır. |
 | Sağ klik, Bərkit | Saxlayın: düyünün solunda kosmik boz sancaqla asılır və yeni ekran şəkilləri onu itələmir. |
-| Sağ klik, Əldə saxla | İpdən götürün və işləyərkən qarşınızda saxlayın. |
-| Finder-də şəklə sağ klik, Tendedero-ya as | İstənilən şəkli ipə bərkidilmiş halda asın. |
+| Sağ klik, Əldə saxla | İpdən götürün və işləyərkən qarşınızda saxlayın. Əldə saxlanan qeydin mətnini seçmək olar. |
+| Finder-də şəklə və ya mətn faylına sağ klik, Tendedero-ya as | Onu ipə bərkidilmiş halda asın. |
+| Üzərinə gəldikdə böyüt aktiv olanda göstəricini şəklin üstündə saxlamaq | Şəkli ekranın ortasında daha böyük görürsünüz. |
 | Göstəricini menyu panelinin ortasında saxlamaq | İpi həmin ekranda endirir. |
 | Menyu panelində istənilən yerə klik | İpi yığır. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | İpi göstərir və ya gizlədir. Menyu panelində Qısayol bölməsindən dəyişdirmək olar. |
+| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | İpdə axtarır. |
 
 <br>
 
@@ -82,21 +85,36 @@ Eyni qısayollar. Eyni vərdişlər. Sadəcə daha az qarışıqlıq.
 
 <br>
 
-## Kopyalanmış şəkillər də.
+## Kopyalanmış mətn, keçidlər və şəkillər də.
 
+Menyu panelində Kopyaladıqlarını as bölməsindən onları bir-bir aktiv edin;
+hər hansı biri aktiv olduqca köynək ikonası dolu görünür.
+
+Kopyalanmış mətn qeyd kimi asılır, eyni şüşə çərçivədə Notes-dan bir vərəq:
+ilk sətir onun başlığıdır, Markdown formatlanmış görünür, kod isə sətirlərini
+saxlayır. Veb ünvanı keçid kimi asılır, saytı və yolu ilə birlikdə.
 <kbd>⌃</kbd> düyməsini basılı saxlayaraq ekran şəkli çəkin və ya Preview-da
-şəkli kopyalayın, o da digərləri kimi ipdən asılacaq. Menyu panelində
-Kopyalanmış şəkilləri as seçimini aktiv edin; aktiv olduğu müddətdə köynək
-ikonası dolu görünür. Yalnız şəkillər: mətn və ya fayl ilə birlikdə
-kopyalananlar, həmçinin parol menecerinin məxfi kimi işarələdikləri olduğu
-kimi qalır.
+şəkli kopyalayın, o da digərləri kimi asılacaq.
+
+Parol sahəsindən, parol menecerinin məxfi kimi işarələdiklərindən və ya
+Universal Clipboard ilə başqa cihazdan gələnlərdən heç nə saxlanmır.
+
+<br>
+
+## İpdə hər şeyi tapın.
+
+<kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> basın və yazın. İpdə yalnız
+uyğun gələnlər qalır: ekran şəkillərindəki, asıldıqları an Mac-inizdə oxunan
+sözlər, həmçinin hər qeydin və keçidin sözləri.
+<kbd>Return</kbd> ən yeni uyğunluğu kopyalayır.
 
 <br>
 
 ## Məxfilik əsasdan.
 
 Hesab yoxdur. İnternet yoxdur. Analitika yoxdur.
-Tendedero tamamilə Mac-inizdə işləyir və ekran şəkilləriniz oradan heç vaxt çıxmır.
+Tendedero, ekran şəkillərindəki mətnin oxunması da daxil olmaqla, tamamilə
+Mac-inizdə işləyir və asdığınız heç nə oradan heç vaxt çıxmır.
 
 <br>
 
@@ -105,8 +123,8 @@ Tendedero tamamilə Mac-inizdə işləyir və ekran şəkilləriniz oradan heç 
 | | |
 |:--|:--|
 | **Uyğunluq** | macOS 14 Sonoma və ya sonrakı, Apple silicon və Intel Mac-lərdə. macOS 27 üçün hazırlanıb. |
-| **Həcm** | 3,5 MB |
-| **Dillər** | İngilis, ispan, qalisiya, fransız, portuqal (Braziliya), italyan, yapon, koreya, sadələşdirilmiş Çin, türk, Azərbaycan və hind dili |
+| **Həcm** | 5,1 MB |
+| **Dillər** | İngilis, ispan, qalisiya, fransız, portuqal (Braziliya), italyan, yapon, koreya, sadələşdirilmiş Çin, türk, Azərbaycan, hind və Vyetnam dili |
 | **Nə ilə yazılıb** | Swift, AppKit və SwiftUI |
 | **İnternet bağlantısı** | İstifadə etmir |
 | **Qiymət** | Pulsuz |
@@ -152,15 +170,22 @@ Yerli yığımlar ad hoc imzalanır, ona görə də hər yenidən yığımdan so
 | `AppDelegate.swift` | Menyu paneli, qısayol, ipi endirmək və yığmaq |
 | `LinePanel.swift` | Ekranın yuxarı kənarı boyunca şəffaf zolaq |
 | `LineView.swift` | İp və hər şəklin harada asıldığı |
-| `PeggedView.swift` | Bir şəkil: şüşə çərçivə, sıxac, yellənmə və meh |
+| `PeggedView.swift` | Bir şəkil və ya qeyd: şüşə çərçivə, sıxac, yellənmə və meh |
 | `GrabArea.swift` | Klik, uzun basma, sürükləyib buraxma |
 | `ScreenshotWatcher.swift` | Yeni ekran şəkillərini görür |
-| `ClipboardWatcher.swift` | Mübadilə buferinə kopyalanmış şəkilləri görür |
+| `ClipboardWatcher.swift` | Mübadilə buferinə kopyalanmış şəkilləri, mətni və keçidləri görür |
+| `NoteSheet.swift` | Notes vərəqi kimi çəkilən kopyalanmış mətn |
+| `Markdown.swift` | Qeydlərdə Markdown |
 | `Inbox.swift` | Ekran şəkli ayarlarını öz üzərinə götürür və geri qaytarır |
 | `Markup.swift` | Sistemin Markup redaktorunu açır və nəticəni saxlayır |
 | `Trim.swift` | Ekran yazısını kəsir və nəticəni saxlayır |
 | `FullScreen.swift` | Nə vaxt gizli qalmalı olduğunu bilir |
 | `Line.swift` | Nəyin asıldığı və onunla nə edə biləcəyiniz |
+| `Held.swift` | İpdən kənarda, qarşınızda saxladığınız şəkil |
+| `SearchIndex.swift` | Axtarış üçün ekran şəkillərindəki mətni bu Mac-də oxuyur |
+| `SearchBar.swift` | İpin altındakı axtarış sahəsi |
+| `Zoom.swift` | Üzərinə gəldikdə şəklin böyük surəti |
+| `Share.swift` | Şəklin menyusundan paylaşma |
 
 Buradakı bütün şəkillər, ikona da daxil olmaqla, `scripts/make-icon.swift` və
 `scripts/make-readme-art.swift` ilə kodda çəkilir.

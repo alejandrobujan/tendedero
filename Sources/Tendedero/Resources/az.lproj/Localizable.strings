@@ -11,6 +11,7 @@
 "Show line" = "İpi göstər";
 "Take everything down" = "Hamısını ipdən yığ";
 "Put back" = "İpə geri as";
+"Screenshots" = "Ekran şəkilləri";
 "Handle screenshots" = "Ekran şəkillərini idarə et";
 "Screenshots hang instantly and skip the Desktop" = "Ekran şəkilləri dərhal asılır və İş masasına düşmür";
 "Open screenshots folder" = "Ekran şəkilləri qovluğunu aç";
@@ -25,8 +26,8 @@
 "%d photos" = "%d şəkil";
 "Also watch folders" = "Qovluqları da izlə";
 "Add Folder…" = "Qovluq əlavə et…";
-"Stop Watching" = "İzləməyi dayandır";
 "Watch" = "İzlə";
+"Show “%@” in Finder" = "“%@” qovluğunu Finder-də göstər";
 "New images saved to this folder will hang on the line." = "Bu qovluğa saxlanan yeni şəkillər ipdən asılacaq.";
 "Shortcut" = "Qısayol";
 "Change Shortcut…" = "Qısayolu dəyiş…";
@@ -43,7 +44,12 @@
 "When the pointer rests in the menu bar" = "Göstərici menyu panelində dayananda";
 "When something new hangs" = "Yeni bir şey asılanda";
 "Over full screen apps" = "Tam ekran proqramların üzərində";
-"Hang copied images" = "Kopyalanmış şəkilləri as";
+"Hang what you copy" = "Kopyaladıqlarını as";
+"Hang what you copy too?" = "Kopyaladıqlarını da as?";
+"Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "Kopyaladığınız şəkillər, mətnlər və keçidlər də ipdən asıla bilər: mətn qeyd kimi, keçid öz saytı ilə. Hamısı bu Mac-də qalır və parol sahəsindən heç nə saxlanmır. Menyu panelindəki Kopyaladıqlarını as bölməsindən istədiyiniz vaxt dəyişə bilərsiniz.";
+"Images" = "Şəkillər";
+"Text" = "Mətn";
+"Links" = "Keçidlər";
 "Images you copy hang on the line too" = "Kopyaladığınız şəkillər də ipdən asılır";
 "Tendedero, hanging copied images" = "Tendedero, kopyalanmış şəkilləri asır";
 "The line is empty" = "İp boşdur";
@@ -52,6 +58,7 @@
 /* GrabArea */
 "Copy" = "Kopyala";
 "Open" = "Aç";
+"Open Link" = "Keçidi aç";
 "Quick Look" = "Tez baxış";
 "Markup" = "İşarələmə";
 "Trim" = "Kəs";
@@ -86,6 +93,23 @@
 "Cancel" = "Ləğv et";
 "trimmed" = "kəsilmiş";
 
+/* Selecting photos */
+"%d selected" = "%d foto seçilib";
+"Shift-click to select photos" = "Fotoları seçmək üçün Shift düyməsini basılı saxlayıb klikləyin";
+// Save availability
+"Save to Desktop (inbox or Desktop only)" = "İş masasına saxla (yalnız Tendedero qovluğu və ya iş masası)";
+
 /* Open at login, offered on each install and update */
 "Open Tendedero at login?" = "Tendedero sistemə girişdə açılsın?";
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero sistemə girəndə açılmır, ona görə də yenidən başladandan sonra siz onu yenidən açana qədər ip görünmür.";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "Kopyaladığınız mətn də ipdən asılır";
+"Links you copy hang on the line too" = "Kopyaladığınız keçidlər də ipdən asılır";
+
+/* Searching the line */
+"Search the line" = "İpdə axtar";
+"%d of %d" = "%d / %d";
+
+/* Zoom on hover */
+"Zoom on hover" = "Üzərinə gəldikdə böyüt";

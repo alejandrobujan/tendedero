@@ -9,6 +9,7 @@
 "Show line" = "Mostra il filo";
 "Take everything down" = "Togli tutto";
 "Put back" = "Rimetti sul filo";
+"Screenshots" = "Screenshot";
 "Handle screenshots" = "Gestisci gli screenshot";
 "Screenshots hang instantly and skip the Desktop" = "Gli screenshot si appendono subito e saltano la Scrivania";
 "Open screenshots folder" = "Apri la cartella degli screenshot";
@@ -23,8 +24,8 @@
 "%d photos" = "%d foto";
 "Also watch folders" = "Osserva anche cartelle";
 "Add Folder…" = "Aggiungi cartella…";
-"Stop Watching" = "Smetti di osservare";
 "Watch" = "Osserva";
+"Show “%@” in Finder" = "Mostra “%@” nel Finder";
 "New images saved to this folder will hang on the line." = "Le nuove immagini salvate in questa cartella verranno appese al filo.";
 "Shortcut" = "Scorciatoia";
 "Change Shortcut…" = "Cambia scorciatoia…";
@@ -41,7 +42,12 @@
 "When the pointer rests in the menu bar" = "Quando il puntatore si ferma nella barra dei menu";
 "When something new hangs" = "Quando si appende qualcosa di nuovo";
 "Over full screen apps" = "Sopra le app a tutto schermo";
-"Hang copied images" = "Appendi le immagini copiate";
+"Hang what you copy" = "Appendi ciò che copi";
+"Hang what you copy too?" = "Appendere anche ciò che copi?";
+"Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "Anche le immagini, il testo e i link che copi possono finire sul filo: il testo come una nota, un link con il suo sito. Restano su questo Mac, e niente viene mai conservato da un campo password. Puoi cambiarlo quando vuoi in Appendi ciò che copi, nella barra dei menu.";
+"Images" = "Immagini";
+"Text" = "Testo";
+"Links" = "Link";
 "Images you copy hang on the line too" = "Anche le immagini che copi si appendono al filo";
 "Tendedero, hanging copied images" = "Tendedero, appende le immagini copiate";
 "The line is empty" = "Il filo è vuoto";
@@ -50,6 +56,7 @@
 /* GrabArea */
 "Copy" = "Copia";
 "Open" = "Apri";
+"Open Link" = "Apri link";
 "Quick Look" = "Visualizzazione rapida";
 "Markup" = "Annota";
 "Trim" = "Taglia";
@@ -84,6 +91,23 @@
 "Cancel" = "Annulla";
 "trimmed" = "tagliata";
 
+/* Selecting photos */
+"%d selected" = "Selezione: %d";
+"Shift-click to select photos" = "Fai clic tenendo premuto Maiusc per selezionare le foto";
+// Save availability
+"Save to Desktop (inbox or Desktop only)" = "Salva sulla Scrivania (solo da Tendedero o dalla Scrivania)";
+
 /* Open at login, offered on each install and update */
 "Open Tendedero at login?" = "Aprire Tendedero al login?";
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero non si apre quando accedi, quindi dopo un riavvio il filo sparisce finché non lo riapri.";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "Anche il testo che copi si appende al filo";
+"Links you copy hang on the line too" = "Anche i link che copi si appendono al filo";
+
+/* Searching the line */
+"Search the line" = "Cerca sul filo";
+"%d of %d" = "%d di %d";
+
+/* Zoom on hover */
+"Zoom on hover" = "Ingrandisci al passaggio";

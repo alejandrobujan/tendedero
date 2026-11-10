@@ -1,0 +1,115 @@
+/* Vietnamese. */
+
+/* AppDelegate */
+"Let Tendedero handle your screenshots?" = "Cho phép Tendedero quản lý ảnh chụp màn hình?";
+"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "Ảnh chụp màn hình sẽ được treo ngay lên dây phơi khi bạn chụp, không hiện hình thu nhỏ nổi và không chất đống trên Màn hình nền. Kéo ảnh vào thư mục để giữ lại, hoặc bấm dấu chéo để bỏ đi. Bạn có thể tắt tùy chọn này trên thanh menu, và cài đặt cũ sẽ được khôi phục khi thoát Tendedero.";
+"Turn on" = "Bật";
+"Not now" = "Để sau";
+"Hide line" = "Ẩn dây phơi";
+"Show line" = "Hiện dây phơi";
+"Take everything down" = "Gỡ hết xuống";
+"Put back" = "Treo lại";
+"Screenshots" = "Ảnh chụp màn hình";
+"Handle screenshots" = "Quản lý ảnh chụp màn hình";
+"Screenshots hang instantly and skip the Desktop" = "Ảnh chụp được treo ngay và không lưu ra Màn hình nền";
+"Open screenshots folder" = "Mở thư mục ảnh chụp";
+"Sounds" = "Âm thanh";
+"Open at login" = "Mở khi đăng nhập";
+"Check for Updates…" = "Kiểm tra bản cập nhật…";
+"Quit Tendedero" = "Thoát Tendedero";
+"Could not change the login setting" = "Không thể thay đổi cài đặt mở khi đăng nhập";
+"Move Tendedero to the Applications folder and try again." = "Hãy chuyển Tendedero vào thư mục Ứng dụng rồi thử lại.";
+"Keep on line" = "Giữ trên dây";
+"As many as fit" = "Vừa đủ chiều ngang";
+"%d photos" = "%d ảnh";
+"Also watch folders" = "Theo dõi thêm thư mục";
+"Add Folder…" = "Thêm thư mục…";
+"Watch" = "Theo dõi";
+"Show “%@” in Finder" = "Hiển thị “%@” trong Finder";
+"New images saved to this folder will hang on the line." = "Ảnh mới lưu vào thư mục này sẽ được treo lên dây phơi.";
+"Shortcut" = "Phím tắt";
+"Change Shortcut…" = "Đổi phím tắt…";
+"Change Shortcut" = "Đổi phím tắt";
+"None" = "Không có";
+"Space" = "Space";
+"Press the new shortcut" = "Nhấn tổ hợp phím tắt mới";
+"Escape cancels. Delete removes the shortcut." = "Nhấn Escape để hủy. Nhấn Delete để xóa phím tắt.";
+"Size" = "Kích thước";
+"Small" = "Nhỏ";
+"Medium" = "Trung bình";
+"Large" = "Lớn";
+"Bring the line down" = "Kéo dây phơi xuống";
+"When the pointer rests in the menu bar" = "Khi đặt con trỏ ở thanh menu";
+"When something new hangs" = "Khi có mục mới được treo";
+"Over full screen apps" = "Hiển thị đè lên ứng dụng toàn màn hình";
+"Hang what you copy" = "Treo nội dung đã sao chép";
+"Images" = "Hình ảnh";
+"Text" = "Văn bản";
+"Links" = "Liên kết";
+"Images you copy hang on the line too" = "Hình ảnh bạn sao chép cũng được treo lên dây";
+"Tendedero, hanging copied images" = "Tendedero, đang treo hình ảnh đã sao chép";
+"The line is empty" = "Dây phơi trống";
+"%d on the line" = "%d mục trên dây";
+
+/* GrabArea */
+"Copy" = "Sao chép";
+"Open" = "Mở";
+"Open Link" = "Mở liên kết";
+"Quick Look" = "Xem nhanh";
+"Markup" = "Đánh dấu";
+"Trim" = "Cắt";
+"Show in Finder" = "Hiển thị trong Finder";
+"Share…" = "Chia sẻ…";
+"Save to Desktop" = "Lưu vào Màn hình nền";
+"Discard" = "Bỏ đi";
+"Take down" = "Gỡ khỏi dây";
+"Move to Trash" = "Chuyển vào Thùng rác";
+"Take down everything to the left" = "Gỡ hết phía bên trái";
+"Take down everything to the right" = "Gỡ hết phía bên phải";
+
+/* LineView */
+"Take a screenshot and it will hang here" = "Chụp ảnh màn hình và ảnh sẽ treo tại đây";
+
+/* PeggedView */
+"Copied" = "Đã sao chép";
+
+/* Pinning and holding photos */
+"Pin" = "Ghim";
+"Unpin" = "Bỏ ghim";
+"Hold" = "Giữ trên tay";
+"Hang back" = "Treo lại lên dây";
+"Hang everything back" = "Treo lại tất cả lên dây";
+"Actual Size" = "Kích thước thực";
+
+/* Trim */
+"How should the trimmed recording be saved?" = "Bạn muốn lưu bản ghi đã cắt như thế nào?";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back." = "Lưu bản mới treo bản ghi đã cắt lên dây và giữ nguyên bản gốc. Thay thế đặt bản ghi đã cắt vào vị trí của bản gốc và chuyển bản gốc vào Thùng rác. Nhấn ⌘Z để khôi phục bản gốc.";
+"Save as New" = "Lưu bản mới";
+"Replace" = "Thay thế";
+"Cancel" = "Hủy";
+"trimmed" = "đã cắt";
+
+/* Selecting photos */
+"%d selected" = "Đã chọn %d";
+"Shift-click to select photos" = "Nhấn Shift + nhấp để chọn ảnh";
+// Save availability
+"Save to Desktop (inbox or Desktop only)" = "Lưu vào Màn hình nền (chỉ mục từ Tendedero hoặc Màn hình nền)";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Mở Tendedero khi đăng nhập?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero chưa được bật mở cùng lúc đăng nhập, nên sau khi khởi động lại, dây phơi sẽ chưa xuất hiện cho đến khi bạn mở lại ứng dụng.";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "Văn bản bạn sao chép cũng được treo lên dây";
+"Links you copy hang on the line too" = "Liên kết bạn sao chép cũng được treo lên dây";
+
+/* Searching the line */
+"Search the line" = "Tìm trên dây phơi";
+"%d of %d" = "%d / %d";
+
+/* Zoom on hover */
+"Zoom on hover" = "Phóng to khi di chuột";
+
+/* Offered once: hang what you copy */
+"Hang what you copy too?" = "Treo cả nội dung bạn sao chép?";
+"Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "Hình ảnh, văn bản và liên kết bạn sao chép cũng có thể được treo lên dây phơi: văn bản thành một ghi chú, liên kết kèm tên trang web. Chúng chỉ nằm trên máy Mac này, và không bao giờ lưu lại nội dung từ ô nhập mật khẩu. Bạn có thể thay đổi bất cứ lúc nào tại mục Treo nội dung đã sao chép trên thanh menu.";
