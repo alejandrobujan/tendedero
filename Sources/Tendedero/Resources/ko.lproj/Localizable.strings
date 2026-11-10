@@ -78,3 +78,7 @@
 /* Open at login, offered on each install and update */
 "Open Tendedero at login?" = "로그인 시 Tendedero를 열까요?";
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero는 로그인할 때 열리지 않아서, 재시동하면 다시 열 때까지 빨랫줄이 사라져요.";
+
+/* Copied text */
+"Hang copied text" = "복사한 텍스트 걸기";
+"Text you copy hangs on the line too" = "복사한 텍스트도 빨랫줄에 걸려요";

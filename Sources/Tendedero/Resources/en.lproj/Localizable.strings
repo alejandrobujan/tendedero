@@ -80,3 +80,7 @@
 /* Open at login, offered on each install and update */
 "Open Tendedero at login?" = "Open Tendedero at login?";
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero does not open when you log in, so after a restart the line is gone until you open it again.";
+
+/* Copied text */
+"Hang copied text" = "Hang copied text";
+"Text you copy hangs on the line too" = "Text you copy hangs on the line too";

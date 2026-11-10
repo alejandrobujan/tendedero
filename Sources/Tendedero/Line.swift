@@ -220,6 +220,23 @@ final class Line: ObservableObject {
 
     private func putOnClipboard(_ url: URL) {
         let entry = NSPasteboardItem()
+        if isText(url) {
+            if url.pathExtension.lowercased() == "rtf", let data = try? Data(contentsOf: url) {
+                let data = lightPageRTF(data)
+                entry.setData(data, forType: .rtf)
+                if let plain = NSAttributedString(rtf: data, documentAttributes: nil)?.string {
+                    entry.setString(plain, forType: .string)
+                }
+            } else if let text = try? String(contentsOf: url, encoding: .utf8) {
+                entry.setString(text, forType: .string)
+            }
+            entry.setData(Data(), forType: selfCopyType)
+            let pb = NSPasteboard.general
+            pb.clearContents()
+            pb.writeObjects([entry])
+            onClipboard = (url, pb.changeCount)
+            return
+        }
         // A recording is copied as the file, which apps paste as the video.
         if !isRecording(url), let png = pngData(url) { entry.setData(png, forType: .png) }
         entry.setString(url.absoluteString, forType: .fileURL)
@@ -280,7 +297,9 @@ final class Line: ObservableObject {
     /// Files anywhere else, like the Desktop, stay where they are.
     func isInInbox(_ id: UUID) -> Bool {
         guard let item = items.first(where: { $0.id == id }) else { return false }
+        // Copied text and links are Tendedero's own files too.
         return item.url.standardizedFileURL.path.hasPrefix(Inbox.folder.standardizedFileURL.path + "/")
+            || NoteFolder.contains(item.url)
     }
 
     /// What the button in a photo's corner does.
@@ -370,7 +389,10 @@ final class Line: ObservableObject {
     /// not edit video, so a recording opens in the trimming editor instead.
     func markup(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
-        if item.isRecording {
+        if isText(item.url) {
+            // Holding a note opens it to edit, as holding a photo marks it up.
+            NSWorkspace.shared.open(item.url)
+        } else if item.isRecording {
             Trim.shared.edit(item.url, size: item.thumb.size)
         } else {
             Markup.shared.edit(item.url)
@@ -622,10 +644,58 @@ func isRecording(_ url: URL) -> Bool {
     ["mov", "mp4"].contains(url.pathExtension.lowercased())
 }
 
+/// Copied text: plain text is saved as .txt, styled text as .rtf.
+func isText(_ url: URL) -> Bool {
+    ["txt", "rtf"].contains(url.pathExtension.lowercased()) && NoteFolder.contains(url)
+}
+
+/// Text copied in dark mode carries dark backgrounds and light ink, which look
+/// wrong on a white page. Dark backgrounds are dropped, light grey or white ink
+/// goes back to the default, and light coloured ink is darkened to stay
+/// readable. Bold, italic, fonts, links and light highlights are kept.
+func lightPageStyled(_ source: NSAttributedString) -> NSAttributedString {
+    let m = NSMutableAttributedString(attributedString: source)
+    let full = NSRange(location: 0, length: m.length)
+    var edits: [(NSRange, NSAttributedString.Key, NSColor?)] = []
+    m.enumerateAttribute(.backgroundColor, in: full) { v, r, _ in
+        guard let c = v as? NSColor else { return }
+        if let rgb = c.usingColorSpace(.deviceRGB), rgb.alphaComponent > 0.05, rgb.brightnessComponent >= 0.5 { return }
+        edits.append((r, .backgroundColor, nil))
+    }
+    m.enumerateAttribute(.foregroundColor, in: full) { v, r, _ in
+        guard let c = v as? NSColor else { return }
+        guard let rgb = c.usingColorSpace(.deviceRGB) else { edits.append((r, .foregroundColor, nil)); return }
+        if rgb.brightnessComponent <= 0.6 { return }
+        if rgb.saturationComponent < 0.25 {
+            edits.append((r, .foregroundColor, nil))
+        } else {
+            edits.append((r, .foregroundColor, NSColor(deviceHue: rgb.hueComponent, saturation: min(1, rgb.saturationComponent + 0.2),
+                                                       brightness: 0.55, alpha: 1)))
+        }
+    }
+    for (r, key, color) in edits {
+        if let color { m.addAttribute(key, value: color, range: r) } else { m.removeAttribute(key, range: r) }
+    }
+    return m
+}
+
+/// RTF bytes, cleaned as above.
+func lightPageRTF(_ data: Data) -> Data {
+    guard let a = NSAttributedString(rtf: data, documentAttributes: nil) else { return data }
+    let clean = lightPageStyled(a)
+    return (try? clean.data(from: NSRange(location: 0, length: clean.length),
+                            documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf])) ?? data
+}
+
+/// Marks a pasteboard written by the line itself, so copying a note off the
+/// line does not hang it again.
+let selfCopyType = NSPasteboard.PasteboardType("app.tendedero.SelfCopy")
+
 /// The default size covers a card at twice its size in points, as on a
 /// Retina screen, and no more: every photo on the line keeps one in memory.
 func makeThumbnail(_ url: URL, maxPixels: Int = Int(320 * Layout.size.scale)) -> NSImage? {
     if isRecording(url) { return firstFrame(url, maxPixels: maxPixels) }
+    if isText(url) { return MainActor.assumeIsolated { noteCard(url, maxPixels: maxPixels) } }
     guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
     let options: [CFString: Any] = [
         kCGImageSourceCreateThumbnailFromImageAlways: true,

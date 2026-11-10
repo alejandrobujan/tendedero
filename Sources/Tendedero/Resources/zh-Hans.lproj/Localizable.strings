@@ -78,3 +78,7 @@
 /* Open at login, offered on each install and update */
 "Open Tendedero at login?" = "登录时打开 Tendedero？";
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero 不会在登录时打开，所以重新启动后，晾衣绳会一直不见，直到你再次打开它。";
+
+/* Copied text */
+"Hang copied text" = "挂上复制的文字";
+"Text you copy hangs on the line too" = "复制的文字也会挂在绳子上";

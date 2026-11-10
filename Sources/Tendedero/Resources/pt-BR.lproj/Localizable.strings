@@ -78,3 +78,7 @@
 /* Open at login, offered on each install and update */
 "Open Tendedero at login?" = "Abrir o Tendedero ao iniciar sessão?";
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "O Tendedero não abre quando você inicia a sessão, então depois de reiniciar o varal some até você abri-lo de novo.";
+
+/* Copied text */
+"Hang copied text" = "Pendurar texto copiado";
+"Text you copy hangs on the line too" = "O texto que você copia também vai para o varal";

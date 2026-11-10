@@ -65,10 +65,20 @@ struct PeggedView: View {
 
     private var photoSize: CGSize { Self.photoSize(for: item.thumb.size) }
 
+    /// A photo shows its picture. Copied text is drawn live as a sheet from
+    /// Notes, so it follows the light or dark appearance.
+    @ViewBuilder private var content: some View {
+        if isText(item.url), let note = Note.cached(item.url) {
+            NoteSheet(note: note, width: photoSize.width, height: photoSize.height)
+        } else {
+            Image(nsImage: item.thumb)
+                .resizable()
+                .interpolation(.high)
+        }
+    }
+
     private var card: some View {
-        Image(nsImage: item.thumb)
-            .resizable()
-            .interpolation(.high)
+        content
             .frame(width: photoSize.width, height: photoSize.height)
             // Concentric corners: the photo's radius is the frame's minus the
             // inset, the way macOS rounds nested shapes.

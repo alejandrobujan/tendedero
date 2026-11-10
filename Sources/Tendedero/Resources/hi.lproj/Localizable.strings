@@ -80,3 +80,7 @@
 /* Open at login, offered on each install and update */
 "Open Tendedero at login?" = "क्या Tendedero लॉगिन पर खुले?";
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero लॉगिन करने पर नहीं खुलता, इसलिए रीस्टार्ट के बाद रस्सी तब तक नहीं दिखती जब तक आप इसे फिर से नहीं खोलते।";
+
+/* Copied text */
+"Hang copied text" = "कॉपी किया गया टेक्स्ट टाँगें";
+"Text you copy hangs on the line too" = "आप जो टेक्स्ट कॉपी करते हैं, वह भी रस्सी पर टँगता है";

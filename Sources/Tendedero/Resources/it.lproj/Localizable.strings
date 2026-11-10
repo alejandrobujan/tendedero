@@ -78,3 +78,7 @@
 /* Open at login, offered on each install and update */
 "Open Tendedero at login?" = "Aprire Tendedero al login?";
 "Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero non si apre quando accedi, quindi dopo un riavvio il filo sparisce finché non lo riapri.";
+
+/* Copied text */
+"Hang copied text" = "Appendi il testo copiato";
+"Text you copy hangs on the line too" = "Anche il testo che copi si appende al filo";
