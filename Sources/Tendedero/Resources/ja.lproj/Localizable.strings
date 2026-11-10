@@ -43,6 +43,8 @@
 "When something new hangs" = "新しいものが吊るされたとき";
 "Over full screen apps" = "フルスクリーンのアプリの上にも";
 "Hang what you copy" = "コピーしたものを吊るす";
+"Hang what you copy too?" = "コピーしたものも吊るしますか？";
+"Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "コピーした画像、テキスト、リンクもロープに吊るせます。テキストはメモとして、リンクはサイト名付きで。どれもこのMacの中だけに保存され、パスワード欄の内容が残ることはありません。メニューバーの「コピーしたものを吊るす」でいつでも変更できます。";
 "Images" = "画像";
 "Text" = "テキスト";
 "Links" = "リンク";

@@ -43,6 +43,8 @@
 "When something new hangs" = "Quand une nouvelle capture s’accroche";
 "Over full screen apps" = "Au-dessus des apps en plein écran";
 "Hang what you copy" = "Accrocher ce que vous copiez";
+"Hang what you copy too?" = "Accrocher aussi ce que vous copiez ?";
+"Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "Les images, le texte et les liens que vous copiez peuvent aussi s’accrocher à la corde : le texte comme une note, un lien avec son site. Ils restent sur ce Mac, et rien n’est jamais gardé d’un champ de mot de passe. Modifiez-le quand vous voulez dans Accrocher ce que vous copiez, dans la barre des menus.";
 "Images" = "Images";
 "Text" = "Texte";
 "Links" = "Liens";

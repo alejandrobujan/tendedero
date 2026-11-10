@@ -148,7 +148,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
 
         if !Inbox.wasOffered {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in self?.offerInbox() }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
+                self?.offerInbox()
+                self?.offerCopying()
+            }
+        } else if !Self.copyingOffered {
+            // Updated from a version that only hung screenshots: shown once.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in self?.offerCopying() }
         } else if Self.shouldOfferLogin {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { Self.offerLogin() }
         }
@@ -266,6 +272,53 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         NSApp.activate(ignoringOtherApps: true)
         if alert.runModal() == .alertFirstButtonReturn { setInbox(true) }
+        if login?.state == .on { Self.openAtLogin() }
+    }
+
+    // MARK: Hang what you copy
+
+    private static let copyingOfferedKey = "copyingOffered"
+    private static var copyingOffered: Bool {
+        get { UserDefaults.standard.bool(forKey: copyingOfferedKey) }
+        set { UserDefaults.standard.set(newValue, forKey: copyingOfferedKey) }
+    }
+
+    /// Asked once, on the first launch or the first after an update: what
+    /// you copy can hang too. Each kind is ticked and shown, but nothing is
+    /// kept until Turn on. Open at login rides along when it is due, so an
+    /// update asks one thing, not two.
+    private func offerCopying() {
+        Self.copyingOffered = true
+        let alert = NSAlert()
+        alert.messageText = L("Hang what you copy too?")
+        alert.informativeText = L("Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar.")
+        alert.addButton(withTitle: L("Turn on"))
+        alert.addButton(withTitle: L("Not now"))
+        if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
+        let kinds: [(String, ReferenceWritableKeyPath<ClipboardWatcher.Type, Bool>)] = [
+            (L("Images"), \.imagesEnabled), (L("Text"), \.textEnabled), (L("Links"), \.linksEnabled),
+        ]
+        let boxes = kinds.map { kind -> NSButton in
+            let box = NSButton(checkboxWithTitle: kind.0, target: nil, action: nil)
+            box.state = .on
+            return box
+        }
+        let login = Self.shouldOfferLogin ? NSButton(checkboxWithTitle: L("Open at login"), target: nil, action: nil) : nil
+        login?.state = .on
+        if login != nil { Self.loginOffered() }
+        let stack = NSStackView(views: boxes + (login.map { [$0] } ?? []))
+        stack.orientation = .vertical
+        stack.alignment = .leading
+        stack.spacing = 6
+        // Open at login is a separate question: a little apart.
+        if login != nil { stack.setCustomSpacing(14, after: boxes[boxes.count - 1]) }
+        stack.frame = NSRect(x: 0, y: 0, width: 240, height: stack.fittingSize.height)
+        alert.accessoryView = stack
+        NSApp.activate(ignoringOtherApps: true)
+        if alert.runModal() == .alertFirstButtonReturn {
+            for (kind, box) in zip(kinds, boxes) { ClipboardWatcher.self[keyPath: kind.1] = box.state == .on }
+            refreshClipboardWatcher()
+        }
         if login?.state == .on { Self.openAtLogin() }
     }
 

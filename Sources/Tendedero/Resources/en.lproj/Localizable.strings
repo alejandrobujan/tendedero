@@ -45,6 +45,8 @@
 "When something new hangs" = "When something new hangs";
 "Over full screen apps" = "Over full screen apps";
 "Hang what you copy" = "Hang what you copy";
+"Hang what you copy too?" = "Hang what you copy too?";
+"Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar.";
 "Images" = "Images";
 "Text" = "Text";
 "Links" = "Links";

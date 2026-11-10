@@ -43,6 +43,8 @@
 "When something new hangs" = "有新内容挂上时";
 "Over full screen apps" = "在全屏 App 上";
 "Hang what you copy" = "挂上复制的内容";
+"Hang what you copy too?" = "也挂上你复制的内容？";
+"Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "你复制的图片、文字和链接也可以挂到绳上：文字成为一张便签，链接显示所属网站。它们只留在这台 Mac 上，密码栏里的内容绝不会被保存。随时可在菜单栏的“挂上复制的内容”中更改。";
 "Images" = "图片";
 "Text" = "文字";
 "Links" = "链接";

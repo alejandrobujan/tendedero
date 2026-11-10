@@ -43,6 +43,8 @@
 "When something new hangs" = "Quando algo novo vai para o varal";
 "Over full screen apps" = "Sobre apps em tela cheia";
 "Hang what you copy" = "Pendurar o que você copia";
+"Hang what you copy too?" = "Pendurar também o que você copia?";
+"Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "As imagens, o texto e os links que você copia também podem ir para o varal: o texto como uma nota, um link com o seu site. Eles ficam neste Mac, e nada de um campo de senha é guardado. Mude quando quiser em Pendurar o que você copia, na barra de menus.";
 "Images" = "Imagens";
 "Text" = "Texto";
 "Links" = "Links";

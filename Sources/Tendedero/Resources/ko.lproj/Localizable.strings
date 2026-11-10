@@ -43,6 +43,8 @@
 "When something new hangs" = "새 항목이 걸릴 때";
 "Over full screen apps" = "전체 화면 앱 위에서도";
 "Hang what you copy" = "복사한 것 걸기";
+"Hang what you copy too?" = "복사한 것도 걸까요?";
+"Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "복사한 이미지, 텍스트, 링크도 빨랫줄에 걸 수 있어요. 텍스트는 메모로, 링크는 사이트와 함께요. 모두 이 Mac에만 남고, 암호 입력란의 내용은 절대 저장되지 않아요. 메뉴 막대의 ‘복사한 것 걸기’에서 언제든 바꿀 수 있어요.";
 "Images" = "이미지";
 "Text" = "텍스트";
 "Links" = "링크";

@@ -43,6 +43,8 @@
 "When something new hangs" = "Yeni bir şey asıldığında";
 "Over full screen apps" = "Tam ekran uygulamaların üzerinde";
 "Hang what you copy" = "Kopyaladıklarını as";
+"Hang what you copy too?" = "Kopyaladıklarını da as?";
+"Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "Kopyaladığınız görseller, metinler ve bağlantılar da ipe asılabilir: metin bir not olarak, bağlantı sitesiyle birlikte. Hepsi bu Mac’te kalır ve parola alanlarından hiçbir şey saklanmaz. Menü çubuğundaki Kopyaladıklarını as bölümünden istediğiniz zaman değiştirebilirsiniz.";
 "Images" = "Görseller";
 "Text" = "Metin";
 "Links" = "Bağlantılar";

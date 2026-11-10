@@ -45,6 +45,8 @@
 "When something new hangs" = "जब कुछ नया टँगे";
 "Over full screen apps" = "फ़ुल स्क्रीन ऐप्स के ऊपर";
 "Hang what you copy" = "जो कॉपी करें, उसे टाँगें";
+"Hang what you copy too?" = "जो कॉपी करें, उसे भी टाँगें?";
+"Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "आप जो तस्वीरें, टेक्स्ट और लिंक कॉपी करते हैं, वे भी रस्सी पर टँग सकते हैं: टेक्स्ट एक नोट की तरह, लिंक अपनी साइट के साथ। सब कुछ इसी Mac पर रहता है, और पासवर्ड फ़ील्ड से कभी कुछ नहीं रखा जाता। इसे मेनू बार में ‘जो कॉपी करें, उसे टाँगें’ में कभी भी बदलें।";
 "Images" = "तस्वीरें";
 "Text" = "टेक्स्ट";
 "Links" = "लिंक";
