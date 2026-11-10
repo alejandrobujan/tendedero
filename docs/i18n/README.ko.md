@@ -12,7 +12,7 @@
   &nbsp;&nbsp;
   <a href="#소스에서-빌드하기">소스에서 빌드하기&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.it.md">Italiano</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;한국어&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.it.md">Italiano</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;한국어&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>&nbsp;·&nbsp;<a href="README.vi.md">Tiếng Việt</a>
   <br>
   <sub>영어 README를 번역한 문서예요. 내용이 다를 경우 영어 원문이 우선해요.</sub>
 </p>
@@ -107,7 +107,7 @@ Tendedero는 전적으로 Mac에서만 실행되며, 스크린샷은 절대 Mac 
 |:--|:--|
 | **호환성** | Apple 실리콘 및 Intel 기반 Mac의 macOS 14 Sonoma 이상. macOS 27에 맞춰 디자인됨. |
 | **크기** | 3.5MB |
-| **언어** | 영어, 스페인어, 갈리시아어, 프랑스어, 포르투갈어(브라질), 이탈리아어, 일본어, 한국어, 중국어(간체), 튀르키예어, 아제르바이잔어, 힌디어 |
+| **언어** | 영어, 스페인어, 갈리시아어, 프랑스어, 포르투갈어(브라질), 이탈리아어, 일본어, 한국어, 중국어(간체), 튀르키예어, 아제르바이잔어, 힌디어, 베트남어 |
 | **개발 도구** | Swift, AppKit 및 SwiftUI |
 | **네트워크 접근** | 없음 |
 | **가격** | 무료 |
