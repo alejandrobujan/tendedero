@@ -91,3 +91,6 @@
 /* Searching the line */
 "Search the line" = "在晾衣绳上搜索";
 "%d of %d" = "%d / %d";
+
+/* Zoom on hover */
+"Zoom on hover" = "悬停时放大";

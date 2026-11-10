@@ -91,3 +91,6 @@
 /* Searching the line */
 "Search the line" = "빨랫줄에서 찾기";
 "%d of %d" = "%d / %d";
+
+/* Zoom on hover */
+"Zoom on hover" = "포인터를 올리면 확대";

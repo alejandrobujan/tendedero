@@ -93,3 +93,6 @@
 /* Searching the line */
 "Search the line" = "İpdə axtar";
 "%d of %d" = "%d / %d";
+
+/* Zoom on hover */
+"Zoom on hover" = "Üzərinə gəldikdə böyüt";

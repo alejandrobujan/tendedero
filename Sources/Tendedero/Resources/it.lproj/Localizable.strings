@@ -91,3 +91,6 @@
 /* Searching the line */
 "Search the line" = "Cerca sul filo";
 "%d of %d" = "%d di %d";
+
+/* Zoom on hover */
+"Zoom on hover" = "Ingrandisci al passaggio";

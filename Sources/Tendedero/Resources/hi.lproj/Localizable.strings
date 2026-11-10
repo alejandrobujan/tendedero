@@ -93,3 +93,6 @@
 /* Searching the line */
 "Search the line" = "रस्सी पर खोजें";
 "%d of %d" = "%2$d में से %1$d";
+
+/* Zoom on hover */
+"Zoom on hover" = "होवर पर बड़ा करें";

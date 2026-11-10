@@ -93,3 +93,6 @@
 /* Searching the line */
 "Search the line" = "Search the line";
 "%d of %d" = "%d of %d";
+
+/* Zoom on hover */
+"Zoom on hover" = "Zoom on hover";

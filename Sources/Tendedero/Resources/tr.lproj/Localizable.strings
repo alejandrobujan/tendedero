@@ -91,3 +91,6 @@
 /* Searching the line */
 "Search the line" = "İpte ara";
 "%d of %d" = "%d / %d";
+
+/* Zoom on hover */
+"Zoom on hover" = "Üzerine gelince büyüt";
