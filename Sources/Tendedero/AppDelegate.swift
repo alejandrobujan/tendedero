@@ -69,7 +69,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         let host = NSHostingView(rootView: LineView(line: line))
         host.sizingOptions = []
-        panel = LinePanel(content: host)
+        let drop = LineDropView(content: host)
+        drop.onDrop = { [weak self] urls in self?.hangByHand(urls) ?? false }
+        panel = LinePanel(content: drop)
         panel.placeOnScreen()
         updateCapacity()
 
@@ -674,6 +676,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             let band = line.hitRects.values.reduce(CGRect.null) { $0.union($1) }
             overPhoto = !band.isNull && flipped.y >= band.minY - 4 && flipped.y <= band.maxY + 4
         }
+        // Files dragged over the line from another app: all of it takes the
+        // mouse, so an image can be dropped anywhere along it.
+        if !overPhoto, NSEvent.pressedMouseButtons & 1 != 0, NSMouseInRect(mouse, panel.frame, false),
+           NSPasteboard(name: .drag).types?.contains(.fileURL) == true {
+            overPhoto = true
+        }
         if panel.ignoresMouseEvents == overPhoto {
             panel.ignoresMouseEvents = !overPhoto
         }
@@ -708,9 +716,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                                           options: [.urlReadingFileURLsOnly: true]) as? [URL] ?? []
         guard !urls.isEmpty else { return }
         comeDown(on: nil)
+        if !hangByHand(urls) { NSSound.beep() }
+    }
+
+    /// Images you hang yourself, from the service or dropped on the line:
+    /// pinned, and their files stay where they are. Says whether any hung.
+    private func hangByHand(_ urls: [URL]) -> Bool {
         var any = false
         for url in urls where line.hangKept(url) { any = true }
-        if !any { NSSound.beep() }
+        return any
     }
 
     // MARK: Keys over a photo

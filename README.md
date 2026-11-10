@@ -61,6 +61,7 @@ Rest the pointer in the middle of the menu bar and it glides down. Move away and
 | Right click, then Pin | Keep it: it hangs left of the knot on a space grey clip, and no new screenshot pushes it off. |
 | Right click, then Hold | Take it off the line and keep it in front of you while you work. |
 | In Finder, right click an image, then Hang on Tendedero | Hang any image on the line, pinned. |
+| Drag an image onto the line | Hang it there, pinned. |
 | Rest the pointer in the middle of the menu bar | Bring the line down on that screen. |
 | Click anything in the menu bar | Put it away. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Show or hide the line. Change it under Shortcut in the menu bar. |

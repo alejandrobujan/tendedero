@@ -63,6 +63,7 @@ Aldığınız her ekran görüntüsü, ekranınızın hemen üstündeki bir ipe 
 | Sağ tıkla, Sabitle | Sakla: düğümün solunda uzay grisi bir mandalla asılı kalır, yeni ekran görüntüleri onu itmez. |
 | Sağ tıkla, Elinde tut | İpten al ve çalışırken önünde tut. |
 | Finder’da bir görsele sağ tıkla, Tendedero’ya as | Herhangi bir görseli ipe sabitlenmiş olarak as. |
+| Bir görseli ipe sürükle | Oraya sabitlenmiş olarak asılır. |
 | İşaretçiyi menü çubuğunun ortasında bırak | O ekranda ipi aşağı indirir. |
 | Menü çubuğunda herhangi bir yere tıkla | İpi geri kaldırır. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | İpi gösterir ya da gizler. Menü çubuğundaki Kısayol bölümünden değiştirilebilir. |
