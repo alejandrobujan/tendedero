@@ -12,6 +12,8 @@
 "Screenshots" = "Capturas";
 "Handle screenshots" = "Encargarse de las capturas";
 "Screenshots hang instantly and skip the Desktop" = "Las capturas se cuelgan al instante y no pasan por el Escritorio";
+"Copy each screenshot" = "Copiar cada captura";
+"Each new screenshot goes to the clipboard as it hangs" = "Cada captura nueva se copia al portapapeles al colgarse";
 "Open screenshots folder" = "Abrir carpeta de capturas";
 "Sounds" = "Sonidos";
 "Open at login" = "Abrir al iniciar sesión";

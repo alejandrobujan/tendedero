@@ -186,7 +186,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         safetyWatcher?.stop()
         safetyWatcher = nil
         watcher = ScreenshotWatcher(
-            onNew: { [weak self] url in self?.hangCapture(url) },
+            onNew: { [weak self] url in self?.hangCapture(url, screenshot: true) },
             onChange: { [weak self] in self?.line.prune() })
         watcher.start()
         if Inbox.isEnabled, watcher.folder.standardizedFileURL != ScreenshotWatcher.desktop.standardizedFileURL {
@@ -194,7 +194,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 folder: ScreenshotWatcher.desktop,
                 onNew: { [weak self] url in
                     log.notice("Screenshot landed on the Desktop despite inbox mode: \(url.lastPathComponent, privacy: .public)")
-                    self?.hangCapture(url)
+                    self?.hangCapture(url, screenshot: true)
                 },
                 onChange: { [weak self] in self?.line.prune() })
             safety.start()
@@ -232,6 +232,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         set { UserDefaults.standard.set(newValue.map(\.path), forKey: "extraFolders") }
     }
 
+    /// Each new screenshot goes to the clipboard as it hangs.
+    static var copiesScreenshots: Bool {
+        get { UserDefaults.standard.bool(forKey: "copyScreenshots") }
+        set { UserDefaults.standard.set(newValue, forKey: "copyScreenshots") }
+    }
+
     private func chooseExtraFolder() {
         let panel = NSOpenPanel()
         panel.canChooseDirectories = true
@@ -262,16 +268,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         alert.addButton(withTitle: L("Turn on"))
         alert.addButton(withTitle: L("Not now"))
         if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
+        let copy = NSButton(checkboxWithTitle: L("Copy each screenshot"), target: nil, action: nil)
         // A menu bar app that does not open at login is gone after the first
         // restart, so the first launch offers it too, ticked.
         let login = Self.shouldOfferLogin ? NSButton(checkboxWithTitle: L("Open at login"), target: nil, action: nil) : nil
-        if let login {
-            login.state = .on
-            alert.accessoryView = login
-            Self.loginOffered()
-        }
+        login?.state = .on
+        if login != nil { Self.loginOffered() }
+        let stack = NSStackView(views: [copy] + (login.map { [$0] } ?? []))
+        stack.orientation = .vertical
+        stack.alignment = .leading
+        stack.spacing = 6
+        if login != nil { stack.setCustomSpacing(14, after: copy) }
+        stack.frame = NSRect(x: 0, y: 0, width: 240, height: stack.fittingSize.height)
+        alert.accessoryView = stack
         NSApp.activate(ignoringOtherApps: true)
         if alert.runModal() == .alertFirstButtonReturn { setInbox(true) }
+        Self.copiesScreenshots = copy.state == .on
         if login?.state == .on { Self.openAtLogin() }
     }
 
@@ -408,7 +420,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     /// A new screenshot lifts off from where it was taken and flies to its
     /// place on the line. Without a known capture area it simply drops in.
-    private func hangCapture(_ url: URL) {
+    private func hangCapture(_ url: URL, screenshot: Bool = false) {
         // Several watchers may report a file we just saved. Keep ignoring
         // that same file after either a move or a copy.
         guard !line.isDesktopSave(url) else { return }
@@ -433,6 +445,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             itemsChanged()
             return
         }
+        if screenshot, Self.copiesScreenshots { line.copy(id) }
         guard let from else { return }
         // Let the line come down and lay out before measuring the landing spot.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) { [weak self] in
@@ -1119,6 +1132,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         inbox.state = Inbox.isEnabled ? .on : .off
         inbox.toolTip = L("Screenshots hang instantly and skip the Desktop")
         menu.addItem(inbox)
+        let copyItem = ClosureMenuItem(L("Copy each screenshot")) {
+            AppDelegate.copiesScreenshots.toggle()
+        }
+        copyItem.state = Self.copiesScreenshots ? .on : .off
+        copyItem.toolTip = L("Each new screenshot goes to the clipboard as it hangs")
+        menu.addItem(copyItem)
 
         let folderItem = NSMenuItem(title: L("Also watch folders"), action: nil, keyEquivalent: "")
         let folderMenu = NSMenu()
