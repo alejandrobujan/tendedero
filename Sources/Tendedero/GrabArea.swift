@@ -211,6 +211,7 @@ final class GrabView: NSView, NSDraggingSource {
     private var startedDrag = false
     private var holdTimer: Timer?
     private var didLongPress = false
+    private var pressedCross = false
     /// A click copies only once it is clear it is not the first half of a
     /// double click, which opens the photo and must leave the clipboard alone.
     private static var clickTimer: Timer?
@@ -235,6 +236,7 @@ final class GrabView: NSView, NSDraggingSource {
     override func mouseDown(with event: NSEvent) {
         Self.clickTimer?.invalidate()
         Self.clickTimer = nil
+        pressedCross = false
         if event.modifierFlags.contains(.shift) {
             downPoint = nil
             endPress()
@@ -249,7 +251,7 @@ final class GrabView: NSView, NSDraggingSource {
         }
         if isInCross(event) {
             downPoint = nil
-            onDiscard()
+            pressedCross = true
             return
         }
         if event.clickCount == 2 {
@@ -335,6 +337,12 @@ final class GrabView: NSView, NSDraggingSource {
 
     override func mouseUp(with event: NSEvent) {
         endPress()
+        if pressedCross {
+            pressedCross = false
+            downPoint = nil
+            if isInCross(event) { onDiscard() }
+            return
+        }
         if downPoint != nil && !startedDrag && !didLongPress && event.clickCount == 1 {
             onPlainClick()
             // Waits as long as the system lets a second click count as a double click.

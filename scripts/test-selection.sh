@@ -19,7 +19,7 @@ cat > "$CHECK_APP/Contents/Info.plist" <<'PLIST'
 </dict></plist>
 PLIST
 SOURCES=()
-for name in Line LineView LinePanel PeggedView GrabArea Share Markup Trim QuickLook Localization ScreenshotWatcher Held NoteSheet Markdown SearchIndex; do
+for name in Line LineView LinePanel PeggedView GrabArea Share Markup Trim QuickLook Localization ScreenshotWatcher SearchIndex NoteSheet Held Markdown; do
     SOURCES+=("Sources/Tendedero/$name.swift")
 done
 swiftc -module-name Tendedero -target "$(uname -m)-apple-macosx14.0" -parse-as-library "${SOURCES[@]}" scripts/test-selection.swift \
