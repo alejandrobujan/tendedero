@@ -59,6 +59,7 @@
 "Open Link" = "Ouvrir le lien";
 "Quick Look" = "Coup d’œil";
 "Markup" = "Annotation";
+"Trim" = "Raccourcir";
 "Show in Finder" = "Afficher dans le Finder";
 "Share…" = "Partager…";
 "Save to Desktop" = "Enregistrer sur le bureau";
@@ -81,6 +82,14 @@
 "Hang back" = "Remettre sur la corde";
 "Hang everything back" = "Tout remettre sur la corde";
 "Actual Size" = "Taille réelle";
+
+/* Trim */
+"How should the trimmed recording be saved?" = "Comment garder l'enregistrement raccourci ?";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back." = "Enregistrer comme nouveau l'accroche à la corde et laisse l'original tel quel. Remplacer le met à la place de l'original et place l'original dans la corbeille. ⌘Z le récupère.";
+"Save as New" = "Enregistrer comme nouveau";
+"Replace" = "Remplacer";
+"Cancel" = "Annuler";
+"trimmed" = "raccourci";
 
 /* Selecting photos */
 "%d selected" = "Sélection : %d";

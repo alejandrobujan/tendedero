@@ -59,6 +59,7 @@
 "Open Link" = "Abrir enlace";
 "Quick Look" = "Vista Rápida";
 "Markup" = "Marcación";
+"Trim" = "Recortar";
 "Show in Finder" = "Mostrar en Finder";
 "Share…" = "Compartir…";
 "Save to Desktop" = "Guardar en el Escritorio";
@@ -81,6 +82,14 @@
 "Hang back" = "Devolver a la cuerda";
 "Hang everything back" = "Devolver todo a la cuerda";
 "Actual Size" = "Tamaño real";
+
+/* Trim */
+"How should the trimmed recording be saved?" = "¿Cómo quieres guardar la grabación recortada?";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back." = "Guardar como nueva la cuelga en la cuerda y deja la original como está. Reemplazar la pone en lugar de la original y mueve la original a la Papelera. ⌘Z la recupera.";
+"Save as New" = "Guardar como nueva";
+"Replace" = "Reemplazar";
+"Cancel" = "Cancelar";
+"trimmed" = "recortada";
 
 /* Selecting photos */
 "%d selected" = "Selección: %d";

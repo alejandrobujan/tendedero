@@ -21,11 +21,13 @@ final class SearchIndex {
     /// Called when new words arrive, so a search under way sees them.
     var onChange: () -> Void = {}
 
-    private static let file = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+    private static let defaultFile = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         .appendingPathComponent("Tendedero/SearchIndex.json")
+    private let file: URL
 
-    init() {
-        if let data = try? Data(contentsOf: Self.file),
+    init(file: URL? = nil) {
+        self.file = file ?? Self.defaultFile
+        if let data = try? Data(contentsOf: self.file),
            let saved = try? JSONDecoder().decode([String: Entry].self, from: data) {
             entries = saved
         }
@@ -106,9 +108,9 @@ final class SearchIndex {
         saveWork?.cancel()
         let work = DispatchWorkItem { [weak self] in
             guard let self, let data = try? JSONEncoder().encode(self.entries) else { return }
-            try? FileManager.default.createDirectory(at: Self.file.deletingLastPathComponent(), withIntermediateDirectories: true)
-            try? data.write(to: Self.file, options: .atomic)
-            try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: Self.file.path)
+            try? FileManager.default.createDirectory(at: self.file.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try? data.write(to: self.file, options: .atomic)
+            try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: self.file.path)
         }
         saveWork = work
         DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: work)

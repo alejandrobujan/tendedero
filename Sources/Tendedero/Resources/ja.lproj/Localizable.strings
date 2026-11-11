@@ -59,6 +59,7 @@
 "Open Link" = "リンクを開く";
 "Quick Look" = "クイックルック";
 "Markup" = "マークアップ";
+"Trim" = "トリミング";
 "Show in Finder" = "Finderで表示";
 "Share…" = "共有…";
 "Save to Desktop" = "デスクトップに保存";
@@ -81,6 +82,14 @@
 "Hang back" = "ロープに戻す";
 "Hang everything back" = "すべてロープに戻す";
 "Actual Size" = "実際のサイズ";
+
+/* Trim */
+"How should the trimmed recording be saved?" = "トリミングした画面収録をどのように保存しますか？";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back." = "「新規保存」はロープに掛け、元の画面収録はそのまま残します。「置き換え」は元の画面収録と入れ替え、元の画面収録をゴミ箱に入れます。⌘Zで元に戻せます。";
+"Save as New" = "新規保存";
+"Replace" = "置き換え";
+"Cancel" = "キャンセル";
+"trimmed" = "トリミング済み";
 
 /* Selecting photos */
 "%d selected" = "%d枚選択中";

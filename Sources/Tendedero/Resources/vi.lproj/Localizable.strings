@@ -57,6 +57,7 @@
 "Open Link" = "Mở liên kết";
 "Quick Look" = "Xem nhanh";
 "Markup" = "Đánh dấu";
+"Trim" = "Cắt";
 "Show in Finder" = "Hiển thị trong Finder";
 "Share…" = "Chia sẻ…";
 "Save to Desktop" = "Lưu vào Màn hình nền";
@@ -79,6 +80,14 @@
 "Hang back" = "Treo lại lên dây";
 "Hang everything back" = "Treo lại tất cả lên dây";
 "Actual Size" = "Kích thước thực";
+
+/* Trim */
+"How should the trimmed recording be saved?" = "Bạn muốn lưu bản ghi đã cắt như thế nào?";
+"Save as New hangs it on the line and leaves the original as it is. Replace puts it in the original's place and sends the original to the Trash. ⌘Z brings it back." = "Lưu bản mới treo bản ghi đã cắt lên dây và giữ nguyên bản gốc. Thay thế đặt bản ghi đã cắt vào vị trí của bản gốc và chuyển bản gốc vào Thùng rác. Nhấn ⌘Z để khôi phục bản gốc.";
+"Save as New" = "Lưu bản mới";
+"Replace" = "Thay thế";
+"Cancel" = "Hủy";
+"trimmed" = "đã cắt";
 
 /* Selecting photos */
 "%d selected" = "Đã chọn %d";
