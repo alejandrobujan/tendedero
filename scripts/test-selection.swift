@@ -514,8 +514,10 @@ struct CheckFailed: Error { let message: String }
         view.onDoubleClick = { opens += 1 }
         view.onLongPress = { holds += 1 }
         let interval = NSEvent.doubleClickInterval
+        let shortWait = min(0.20, interval)
         let press = min(0.30, interval * 0.6)
-        let margin = min(0.05, press / 4)
+        let remaining = min(0.20, interval - press)
+        let margin = min(0.04, remaining / 4)
         func event(_ type: NSEvent.EventType, at time: TimeInterval, count: Int = 1) -> NSEvent {
             NSEvent.mouseEvent(with: type, location: NSPoint(x: 50, y: 40), modifierFlags: [],
                                timestamp: time, windowNumber: 0, context: nil,
@@ -529,33 +531,45 @@ struct CheckFailed: Error { let message: String }
             view.mouseUp(with: event(.leftMouseUp, at: now))
         }
 
-        releaseSlowClick()
-        pump(interval - press - margin)
-        try check(copies == 0, "Copy still waits while a second click could open the photo")
+        click(view)
+        pump(shortWait - margin)
+        try check(copies == 0, "A quick click leaves a brief window for a second press")
         pump(margin * 2)
-        try check(copies == 1, "Time spent pressing is not added to the double-click wait again")
-        pump(interval)
-        try check(copies == 1, "An ordinary click copies exactly once")
+        try check(copies == 1, "A quick click copies after the short wait instead of the full system double-click interval")
 
         releaseSlowClick()
-        pump(interval - press - margin)
+        pump(remaining - margin)
+        try check(copies == 1, "Copy still waits for the remainder of the short double-click window")
+        pump(margin * 2)
+        try check(copies == 2, "Time spent pressing is not added to the double-click wait again")
+        pump(interval)
+        try check(copies == 2, "An ordinary click copies exactly once")
+
+        releaseSlowClick()
+        pump(remaining - margin)
         let secondDown = ProcessInfo.processInfo.systemUptime
         view.mouseDown(with: event(.leftMouseDown, at: secondDown, count: 2))
         pump(margin * 2)
         view.mouseUp(with: event(.leftMouseUp, at: ProcessInfo.processInfo.systemUptime, count: 2))
         pump(interval)
-        try check(opens == 1 && copies == 1, "A second press just before the deadline cancels copying, even if released afterwards")
+        try check(opens == 1 && copies == 2, "A second press just before the short deadline cancels copying, even if released afterwards")
 
         releaseSlowClick()
         click(view, shift: true)
         pump(interval)
-        try check(copies == 1, "Shift selection still cancels a pending copy after a slow click")
+        try check(copies == 2, "Shift selection still cancels a pending copy after a slow click")
 
         view.mouseDown(with: event(.leftMouseDown, at: ProcessInfo.processInfo.systemUptime))
         pump(0.5)
         view.mouseUp(with: event(.leftMouseUp, at: ProcessInfo.processInfo.systemUptime))
         pump(interval)
-        try check(holds == 1 && copies == 1, "A long press still marks up without copying on release")
+        try check(holds == 1 && copies == 2, "A long press still marks up without copying on release")
+
+        click(view)
+        pump(shortWait + margin)
+        click(view, count: 2)
+        pump(interval)
+        try check(opens == 2 && copies == 3, "A late double click opens after the first copy, without copying a second time")
     }
 
     func cleanUp() {

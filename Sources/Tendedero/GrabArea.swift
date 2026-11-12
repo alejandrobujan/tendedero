@@ -211,8 +211,8 @@ final class GrabView: NSView, NSDraggingSource {
     private var holdTimer: Timer?
     private var didLongPress = false
     private var pressedCross = false
-    /// A click copies only once it is clear it is not the first half of a
-    /// double click, which opens the photo and must leave the clipboard alone.
+    /// A brief wait lets a quick double click open without copying. A slower
+    /// double click may arrive after the first click has already copied.
     private static var clickTimer: Timer?
 
     /// How long you hold before Markup opens. Long enough not to fire on a
@@ -345,10 +345,10 @@ final class GrabView: NSView, NSDraggingSource {
         }
         if downPoint != nil && !startedDrag && !didLongPress && event.clickCount == 1 {
             onPlainClick()
-            // Double clicks are timed from mouse down. Count the time already
-            // spent pressing, instead of starting a full wait on release.
+            // Count time already spent pressing, but never make a single click
+            // wait more than 200 ms after release for a possible second click.
             let elapsed = max(0, event.timestamp - downTime)
-            let remaining = max(0, NSEvent.doubleClickInterval - elapsed)
+            let remaining = min(0.20, max(0, NSEvent.doubleClickInterval - elapsed))
             Self.clickTimer?.invalidate()
             // The copy goes ahead even if the line redraws this view meanwhile.
             let copy = onClick
