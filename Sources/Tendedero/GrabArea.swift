@@ -206,12 +206,13 @@ final class GrabView: NSView, NSDraggingSource {
     var menuProvider: () -> NSMenu = { NSMenu() }
 
     private var downPoint: NSPoint?
+    private var downTime: TimeInterval = 0
     private var startedDrag = false
     private var holdTimer: Timer?
     private var didLongPress = false
     private var pressedCross = false
-    /// A click copies only once it is clear it is not the first half of a
-    /// double click, which opens the photo and must leave the clipboard alone.
+    /// A brief wait lets a quick double click open without copying. A slower
+    /// double click may arrive after the first click has already copied.
     private static var clickTimer: Timer?
 
     /// How long you hold before Markup opens. Long enough not to fire on a
@@ -258,6 +259,7 @@ final class GrabView: NSView, NSDraggingSource {
             return
         }
         downPoint = event.locationInWindow
+        downTime = event.timestamp
         startedDrag = false
         didLongPress = false
         onPressChange(true)
@@ -343,11 +345,14 @@ final class GrabView: NSView, NSDraggingSource {
         }
         if downPoint != nil && !startedDrag && !didLongPress && event.clickCount == 1 {
             onPlainClick()
-            // Waits as long as the system lets a second click count as a double click.
+            // Count time already spent pressing, but never make a single click
+            // wait more than 200 ms after release for a possible second click.
+            let elapsed = max(0, event.timestamp - downTime)
+            let remaining = min(0.20, max(0, NSEvent.doubleClickInterval - elapsed))
             Self.clickTimer?.invalidate()
             // The copy goes ahead even if the line redraws this view meanwhile.
             let copy = onClick
-            let timer = Timer(timeInterval: NSEvent.doubleClickInterval, repeats: false) { _ in
+            let timer = Timer(timeInterval: remaining, repeats: false) { _ in
                 MainActor.assumeIsolated {
                     Self.clickTimer = nil
                     copy()
