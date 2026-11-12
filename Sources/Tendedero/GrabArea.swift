@@ -206,6 +206,7 @@ final class GrabView: NSView, NSDraggingSource {
     var menuProvider: () -> NSMenu = { NSMenu() }
 
     private var downPoint: NSPoint?
+    private var downTime: TimeInterval = 0
     private var startedDrag = false
     private var holdTimer: Timer?
     private var didLongPress = false
@@ -258,6 +259,7 @@ final class GrabView: NSView, NSDraggingSource {
             return
         }
         downPoint = event.locationInWindow
+        downTime = event.timestamp
         startedDrag = false
         didLongPress = false
         onPressChange(true)
@@ -343,11 +345,14 @@ final class GrabView: NSView, NSDraggingSource {
         }
         if downPoint != nil && !startedDrag && !didLongPress && event.clickCount == 1 {
             onPlainClick()
-            // Waits as long as the system lets a second click count as a double click.
+            // Double clicks are timed from mouse down. Count the time already
+            // spent pressing, instead of starting a full wait on release.
+            let elapsed = max(0, event.timestamp - downTime)
+            let remaining = max(0, NSEvent.doubleClickInterval - elapsed)
             Self.clickTimer?.invalidate()
             // The copy goes ahead even if the line redraws this view meanwhile.
             let copy = onClick
-            let timer = Timer(timeInterval: NSEvent.doubleClickInterval, repeats: false) { _ in
+            let timer = Timer(timeInterval: remaining, repeats: false) { _ in
                 MainActor.assumeIsolated {
                     Self.clickTimer = nil
                     copy()
