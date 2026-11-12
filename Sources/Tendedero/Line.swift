@@ -117,7 +117,7 @@ final class Line: ObservableObject {
     private let desktop: URL
 
     init(pasteboard: NSPasteboard = .general,
-         desktop: URL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")) {
+         desktop: URL = realHome.appendingPathComponent("Desktop")) {
         self.pasteboard = pasteboard
         self.desktop = desktop
         restore()

@@ -10,7 +10,7 @@ final class ScreenshotWatcher {
     private let onlyTaggedScreenshots: Bool
     /// Screen recordings carry no tag, so they are only picked up in
     /// Tendedero's own folder, where nothing else is saved.
-    private let acceptsRecordings: Bool
+    private var acceptsRecordings: Bool
     private var known: Set<String>?
     private var source: DispatchSourceFileSystemObject?
     private var pending: DispatchWorkItem?
@@ -35,7 +35,7 @@ final class ScreenshotWatcher {
 
     private static let imageExtensions: Set<String> = ["png", "jpg", "jpeg", "heic", "tif", "tiff", "gif", "webp"]
 
-    static let desktop = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
+    static let desktop = realHome.appendingPathComponent("Desktop", isDirectory: true)
 
     /// Watches the folder macOS saves screenshots to, or a given folder.
     /// `anyImage` takes every new image even on the Desktop, for a folder
@@ -47,9 +47,20 @@ final class ScreenshotWatcher {
         onlyTaggedScreenshots = !anyImage
             && self.folder.standardizedFileURL.path == Self.desktop.standardizedFileURL.path
         acceptsRecordings = self.folder.standardizedFileURL.path == Inbox.folder.standardizedFileURL.path
+        #if APP_STORE
+        // A screenshot folder of its own, picked by the user, gets recordings
+        // too: nothing else is saved there.
+        if folder == nil, self.folder.standardizedFileURL.path != Self.desktop.standardizedFileURL.path {
+            acceptsRecordings = true
+        }
+        #endif
     }
 
     static func screenshotFolder() -> URL {
+        #if APP_STORE
+        // The sandbox cannot read the screenshot settings: the user tells us.
+        return FolderAccess.screenshotFolder ?? desktop
+        #else
         let fm = FileManager.default
         // Read fresh through cfprefsd: inbox mode changes this value at runtime.
         CFPreferencesAppSynchronize("com.apple.screencapture" as CFString)
@@ -62,7 +73,8 @@ final class ScreenshotWatcher {
             var isDir: ObjCBool = false
             if fm.fileExists(atPath: url.path, isDirectory: &isDir), isDir.boolValue { return url }
         }
-        return fm.homeDirectoryForCurrentUser.appendingPathComponent("Desktop", isDirectory: true)
+        return desktop
+        #endif
     }
 
     /// Anything created after the app launched counts as new, even if it

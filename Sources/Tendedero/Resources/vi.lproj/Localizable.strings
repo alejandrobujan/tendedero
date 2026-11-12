@@ -104,3 +104,28 @@
 /* Offered once: hang what you copy */
 "Hang what you copy too?" = "Treo cả nội dung bạn sao chép?";
 "Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "Hình ảnh, văn bản và liên kết bạn sao chép cũng có thể được treo lên dây phơi: văn bản thành một ghi chú, liên kết kèm tên trang web. Chúng chỉ nằm trên máy Mac này, và không bao giờ lưu lại nội dung từ ô nhập mật khẩu. Bạn có thể thay đổi bất cứ lúc nào tại mục Treo nội dung đã sao chép trên thanh menu.";
+
+/* App Store build: access to the Desktop */
+"Let Tendedero see your Desktop?" = "Cho phép Tendedero xem Màn hình nền?";
+"macOS saves your screenshots to the Desktop. Allow Tendedero to see it, and each new one will hang on the line and leave the Desktop, so it stays clear. Drag one to a folder to keep it, or discard it with the cross." = "macOS lưu ảnh chụp màn hình vào Màn hình nền. Cho phép Tendedero xem nó, và mỗi ảnh mới sẽ được treo lên dây phơi rồi rời khỏi Màn hình nền, giữ cho nó gọn gàng. Kéo ảnh vào thư mục để giữ lại, hoặc bấm dấu chéo để bỏ đi.";
+"Allow…" = "Cho phép…";
+"Allow" = "Cho phép";
+"Click Allow to let Tendedero see your Desktop." = "Bấm Cho phép để Tendedero xem Màn hình nền của bạn.";
+"Choose the folder you picked under Other Location in Shift-Command-5, Options." = "Chọn thư mục bạn đã đặt trong ⇧⌘5, Tùy chọn, Vị trí khác.";
+"Use “%@” instead of the Desktop?" = "Dùng “%@” thay cho Màn hình nền?";
+"macOS only saves screenshots there if you chose it under Other Location in Shift-Command-5, Options. Otherwise they go to the Desktop, and Tendedero needs to see the Desktop." = "macOS chỉ lưu ảnh chụp vào đó nếu bạn đã chọn nó trong ⇧⌘5, Tùy chọn, Vị trí khác. Nếu không, ảnh sẽ vào Màn hình nền, và Tendedero cần xem Màn hình nền.";
+"Allow the Desktop…" = "Cho phép Màn hình nền…";
+"Use “%@”" = "Dùng “%@”";
+"Keep the Desktop clear" = "Giữ Màn hình nền gọn gàng";
+"New screenshots leave the Desktop as they hang" = "Ảnh chụp mới rời Màn hình nền khi được treo";
+"Screenshots from “%@”…" = "Ảnh chụp từ “%@”…";
+"Allow Access to the Desktop…" = "Cho phép truy cập Màn hình nền…";
+"Where does macOS save your screenshots?" = "macOS lưu ảnh chụp màn hình ở đâu?";
+"Press Shift-Command-5 and open Options: the folder under Save to is where they go. If it is not the Desktop, choose that same folder here." = "Nhấn ⇧⌘5 và mở Tùy chọn: thư mục trong mục Lưu vào là nơi ảnh được lưu. Nếu không phải Màn hình nền, hãy chọn chính thư mục đó ở đây.";
+"Choose Folder…" = "Chọn thư mục…";
+"Open Screenshot Toolbar" = "Mở thanh công cụ chụp màn hình";
+"Cancel" = "Hủy";
+"Screenshots arrive five seconds late" = "Ảnh chụp đến trễ năm giây";
+"macOS shows a floating thumbnail first and saves the screenshot when it goes away. To hang screenshots the instant you take them, open Options in the screenshot toolbar and turn off Show Floating Thumbnail." = "macOS hiển thị hình thu nhỏ nổi trước và chỉ lưu ảnh khi nó biến mất. Để treo ảnh ngay khi chụp, mở Tùy chọn trên thanh công cụ chụp màn hình và tắt Hiển thị hình thu nhỏ nổi.";
+"Screenshots Not Hanging?…" = "Ảnh chụp không được treo?…";
+"Screenshots Arrive 5 Seconds Late…" = "Ảnh chụp đến trễ 5 giây…";

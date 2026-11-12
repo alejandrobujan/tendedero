@@ -78,6 +78,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         panel.placeOnScreen()
         updateCapacity()
 
+        #if APP_STORE
+        FolderAccess.restoreAll()
+        #endif
         if Inbox.isEnabled { Inbox.apply() }
         restoreSettingsOnTermination()
         startWatcher()
@@ -149,7 +152,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         if !Inbox.wasOffered {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
+                #if APP_STORE
+                self?.offerFolder()
+                #else
                 self?.offerInbox()
+                #endif
                 self?.offerCopying()
             }
         } else if !Self.copyingOffered {
@@ -186,7 +193,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         safetyWatcher?.stop()
         safetyWatcher = nil
         watcher = ScreenshotWatcher(
-            onNew: { [weak self] url in self?.hangCapture(url) },
+            onNew: { [weak self] url in
+                self?.noteThumbnailDelay(url)
+                self?.hangCapture(Self.takeIn(url))
+            },
             onChange: { [weak self] in self?.line.prune() })
         watcher.start()
         if Inbox.isEnabled, watcher.folder.standardizedFileURL != ScreenshotWatcher.desktop.standardizedFileURL {
@@ -243,6 +253,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard panel.runModal() == .OK, let url = panel.url, Self.extraFolders.count < Self.maxExtraFolders,
               !Self.extraFolders.contains(where: { $0.standardizedFileURL == url.standardizedFileURL }) else { return }
         Self.extraFolders.append(url)
+        #if APP_STORE
+        FolderAccess.remember(url)
+        #endif
         startWatcher()
     }
 
@@ -251,6 +264,196 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if on { Inbox.apply() } else { Inbox.restore() }
         startWatcher()
     }
+
+    #if APP_STORE
+    /// Inbox mode in the sandbox. Tendedero cannot point macOS at its own
+    /// folder, so it does the next best thing: each new screenshot moves off
+    /// the Desktop into that folder the moment it lands, and hangs from there.
+    /// Dragging one out keeps it, the cross sends it to the Trash.
+    static func takeIn(_ url: URL) -> URL {
+        guard Inbox.isEnabled, FolderAccess.screenshotFolder != nil else { return url }
+        let fm = FileManager.default
+        try? fm.createDirectory(at: Inbox.folder, withIntermediateDirectories: true)
+        var target = Inbox.folder.appendingPathComponent(url.lastPathComponent)
+        var n = 2
+        while fm.fileExists(atPath: target.path) {
+            target = Inbox.folder.appendingPathComponent(
+                "\(url.deletingPathExtension().lastPathComponent) \(n).\(url.pathExtension)")
+            n += 1
+        }
+        do {
+            try fm.moveItem(at: url, to: target)
+            return target
+        } catch {
+            log.error("Could not take in \(url.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            return url
+        }
+    }
+
+    /// Asked once, on the first launch. Nothing to choose: the sandbox only
+    /// needs the user to let Tendedero see the Desktop, where macOS saves
+    /// screenshots unless told otherwise.
+    private func offerFolder() {
+        Inbox.wasOffered = true
+        let alert = NSAlert()
+        alert.messageText = L("Let Tendedero see your Desktop?")
+        alert.informativeText = L(
+            "macOS saves your screenshots to the Desktop. Allow Tendedero to see it, and each new one will hang on the line and leave the Desktop, so it stays clear. Drag one to a folder to keep it, or discard it with the cross.")
+        alert.addButton(withTitle: L("Allow…"))
+        alert.addButton(withTitle: L("Not now"))
+        if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
+        let login = Self.shouldOfferLogin ? NSButton(checkboxWithTitle: L("Open at login"), target: nil, action: nil) : nil
+        if let login {
+            login.state = .on
+            alert.accessoryView = login
+            Self.loginOffered()
+        }
+        NSApp.activate(ignoringOtherApps: true)
+        let allow = alert.runModal() == .alertFirstButtonReturn
+        if login?.state == .on { Self.openAtLogin() }
+        if allow { allowDesktop() }
+    }
+
+    /// The system's open panel is the only way a sandboxed app may see the
+    /// Desktop. It opens on the Desktop itself, so Allow is all it takes.
+    private func allowDesktop() {
+        let panel = NSOpenPanel()
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.allowsMultipleSelection = false
+        panel.canCreateDirectories = false
+        panel.directoryURL = ScreenshotWatcher.desktop
+        panel.prompt = L("Allow")
+        panel.message = L("Click Allow to let Tendedero see your Desktop.")
+        NSApp.activate(ignoringOtherApps: true)
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        // A folder on the Desktop picked by mistake: the Desktop is what was asked for.
+        let desktop = ScreenshotWatcher.desktop.standardizedFileURL
+        if url.standardizedFileURL != desktop {
+            confirmOtherFolder(url)
+            return
+        }
+        FolderAccess.screenshotFolder = url
+        afterAccess()
+    }
+
+    /// For those who sent their screenshots elsewhere in Shift-Command-5, or
+    /// whose screenshots never hang: where they go is shown in the toolbar.
+    private func helpWithFolder() {
+        let alert = NSAlert()
+        alert.messageText = L("Where does macOS save your screenshots?")
+        alert.informativeText = L(
+            "Press Shift-Command-5 and open Options: the folder under Save to is where they go. If it is not the Desktop, choose that same folder here.")
+        alert.addButton(withTitle: L("Choose Folder…"))
+        alert.addButton(withTitle: L("Open Screenshot Toolbar"))
+        alert.addButton(withTitle: L("Cancel"))
+        if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
+        NSApp.activate(ignoringOtherApps: true)
+        switch alert.runModal() {
+        case .alertFirstButtonReturn: chooseOtherFolder()
+        case .alertSecondButtonReturn: Self.openScreenshotToolbar()
+        default: break
+        }
+    }
+
+    private func chooseOtherFolder() {
+        let panel = NSOpenPanel()
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.allowsMultipleSelection = false
+        panel.canCreateDirectories = false
+        panel.directoryURL = FolderAccess.screenshotFolder ?? ScreenshotWatcher.desktop
+        panel.prompt = L("Allow")
+        panel.message = L("Choose the folder you picked under Other Location in Shift-Command-5, Options.")
+        NSApp.activate(ignoringOtherApps: true)
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        FolderAccess.screenshotFolder = url
+        afterAccess()
+    }
+
+    private func confirmOtherFolder(_ url: URL) {
+        let name = FileManager.default.displayName(atPath: url.path)
+        let alert = NSAlert()
+        alert.messageText = String(format: L("Use “%@” instead of the Desktop?"), name)
+        alert.informativeText = L(
+            "macOS only saves screenshots there if you chose it under Other Location in Shift-Command-5, Options. Otherwise they go to the Desktop, and Tendedero needs to see the Desktop.")
+        alert.addButton(withTitle: L("Allow the Desktop…"))
+        alert.addButton(withTitle: String(format: L("Use “%@”"), name))
+        NSApp.activate(ignoringOtherApps: true)
+        if alert.runModal() == .alertFirstButtonReturn {
+            allowDesktop()
+        } else {
+            FolderAccess.screenshotFolder = url
+            afterAccess()
+        }
+    }
+
+    private func afterAccess() {
+        startWatcher()
+    }
+
+    /// The Screenshot app is the Shift-Command-5 toolbar, Options included.
+    static func openScreenshotToolbar() {
+        NSWorkspace.shared.openApplication(at: URL(fileURLWithPath: "/System/Applications/Utilities/Screenshot.app"),
+                                           configuration: NSWorkspace.OpenConfiguration())
+    }
+
+    // MARK: The floating thumbnail
+
+    private static let thumbnailLateKey = "thumbnailLate"
+    private static let thumbnailExplainedKey = "thumbnailExplained"
+
+    /// Whether the last screenshot waited for the floating thumbnail.
+    static var thumbnailLate: Bool { UserDefaults.standard.bool(forKey: thumbnailLateKey) }
+
+    /// The sandbox cannot read whether the floating thumbnail is on, but a
+    /// screenshot tells: macOS names it after the moment it was taken, and
+    /// writes the file when the thumbnail goes away, about five seconds later.
+    static func thumbnailDelay(of url: URL) -> TimeInterval? {
+        guard let made = (try? url.resourceValues(forKeys: [.creationDateKey]))?.creationDate else { return nil }
+        let name = url.deletingPathExtension().lastPathComponent
+        guard let pattern = try? NSRegularExpression(pattern: #"(\d{1,2})[.:](\d{2})[.:](\d{2})"#),
+              let match = pattern.matches(in: name, range: NSRange(name.startIndex..., in: name)).last else { return nil }
+        func number(_ i: Int) -> Int { Range(match.range(at: i), in: name).flatMap { Int(name[$0]) } ?? 0 }
+        let named = number(1) * 3600 + number(2) * 60 + number(3)
+        // To the millisecond: the name keeps whole seconds only.
+        let actual = made.timeIntervalSince(Calendar.current.startOfDay(for: made))
+        // Names may use a 12-hour clock, so compare within half a day.
+        let half = 12.0 * 3600
+        var delay = (actual - Double(named)).truncatingRemainder(dividingBy: half)
+        if delay < 0 { delay += half }
+        return delay > 60 ? nil : delay
+    }
+
+    private func noteThumbnailDelay(_ url: URL) {
+        guard let delay = Self.thumbnailDelay(of: url) else { return }
+        // The name has the moment a capture began, so a Cmd-Shift-4 selection
+        // counts too: a few seconds of dragging is normal. The floating
+        // thumbnail adds five more, always.
+        let late = delay >= 5
+        UserDefaults.standard.set(late, forKey: Self.thumbnailLateKey)
+        guard late, !UserDefaults.standard.bool(forKey: Self.thumbnailExplainedKey) else { return }
+        // Told once, a moment after that screenshot hangs. The menu keeps
+        // saying so for as long as it is true.
+        UserDefaults.standard.set(true, forKey: Self.thumbnailExplainedKey)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in self?.explainThumbnail() }
+    }
+
+    private func explainThumbnail() {
+        let alert = NSAlert()
+        alert.messageText = L("Screenshots arrive five seconds late")
+        alert.informativeText = L(
+            "macOS shows a floating thumbnail first and saves the screenshot when it goes away. To hang screenshots the instant you take them, open Options in the screenshot toolbar and turn off Show Floating Thumbnail.")
+        alert.addButton(withTitle: L("Open Screenshot Toolbar"))
+        alert.addButton(withTitle: L("Not now"))
+        if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
+        NSApp.activate(ignoringOtherApps: true)
+        if alert.runModal() == .alertFirstButtonReturn { Self.openScreenshotToolbar() }
+    }
+    #else
+    static func takeIn(_ url: URL) -> URL { url }
+    private func noteThumbnailDelay(_ url: URL) {}
+    #endif
 
     /// Asked once. Changing system settings is the user's call, never ours.
     private func offerInbox() {
@@ -1113,12 +1316,36 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // Where screenshots and other images come from, together.
         menu.addItem(.separator())
         menu.addItem(.sectionHeader(title: L("Screenshots")))
+        #if APP_STORE
+        if let folder = FolderAccess.screenshotFolder {
+            let inbox = ClosureMenuItem(L("Keep the Desktop clear")) { [weak self] in
+                self?.setInbox(!Inbox.isEnabled)
+            }
+            inbox.state = Inbox.isEnabled ? .on : .off
+            inbox.toolTip = L("New screenshots leave the Desktop as they hang")
+            menu.addItem(inbox)
+            let isDesktop = folder.standardizedFileURL == ScreenshotWatcher.desktop.standardizedFileURL
+            let help = ClosureMenuItem(isDesktop ? L("Screenshots Not Hanging?…")
+                : String(format: L("Screenshots from “%@”…"), FileManager.default.displayName(atPath: folder.path))) { [weak self] in
+                self?.helpWithFolder()
+            }
+            menu.addItem(help)
+            if Self.thumbnailLate {
+                menu.addItem(ClosureMenuItem(L("Screenshots Arrive 5 Seconds Late…")) { [weak self] in
+                    self?.explainThumbnail()
+                })
+            }
+        } else {
+            menu.addItem(ClosureMenuItem(L("Allow Access to the Desktop…")) { [weak self] in self?.allowDesktop() })
+        }
+        #else
         let inbox = ClosureMenuItem(L("Handle screenshots")) { [weak self] in
             self?.setInbox(!Inbox.isEnabled)
         }
         inbox.state = Inbox.isEnabled ? .on : .off
         inbox.toolTip = L("Screenshots hang instantly and skip the Desktop")
         menu.addItem(inbox)
+        #endif
 
         let folderItem = NSMenuItem(title: L("Also watch folders"), action: nil, keyEquivalent: "")
         let folderMenu = NSMenu()
@@ -1130,6 +1357,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             let name = FileManager.default.displayName(atPath: folder.path)
             let item = ClosureMenuItem(name) { [weak self] in
                 AppDelegate.extraFolders.removeAll { $0.standardizedFileURL == folder.standardizedFileURL }
+                #if APP_STORE
+                if FolderAccess.screenshotFolder?.standardizedFileURL != folder.standardizedFileURL {
+                    FolderAccess.forget(folder)
+                }
+                #endif
                 self?.startWatcher()
             }
             item.state = .on
@@ -1250,9 +1482,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // The app never connects to anything, so it cannot tell when a new
         // version is out. The website can: it is opened with this version
         // and language, and says whether there is a newer one.
+        #if !APP_STORE
         menu.addItem(ClosureMenuItem(L("Check for Updates…")) {
             NSWorkspace.shared.open(AppDelegate.updatesURL)
         })
+        #endif
 
         menu.addItem(.separator())
         menu.addItem(ClosureMenuItem(L("Quit Tendedero"), key: "q") {

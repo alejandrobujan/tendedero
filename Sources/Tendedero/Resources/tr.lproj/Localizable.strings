@@ -102,3 +102,28 @@
 
 /* Zoom on hover */
 "Zoom on hover" = "Üzerine gelince büyüt";
+
+/* App Store build: access to the Desktop */
+"Let Tendedero see your Desktop?" = "Tendedero masaüstünüzü görebilsin mi?";
+"macOS saves your screenshots to the Desktop. Allow Tendedero to see it, and each new one will hang on the line and leave the Desktop, so it stays clear. Drag one to a folder to keep it, or discard it with the cross." = "macOS ekran görüntülerinizi Masaüstü'ne kaydeder. Tendedero'nun görmesine izin verin; her yeni görüntü ipe asılır ve Masaüstü'nden çıkar, böylece Masaüstü temiz kalır. Saklamak için bir klasöre sürükleyin ya da çarpı ile atın.";
+"Allow…" = "İzin ver…";
+"Allow" = "İzin ver";
+"Click Allow to let Tendedero see your Desktop." = "Tendedero'nun Masaüstü'nü görmesi için İzin ver'e tıklayın.";
+"Choose the folder you picked under Other Location in Shift-Command-5, Options." = "⇧⌘5, Seçenekler, Başka Konum altında seçtiğiniz klasörü seçin.";
+"Use “%@” instead of the Desktop?" = "Masaüstü yerine “%@” kullanılsın mı?";
+"macOS only saves screenshots there if you chose it under Other Location in Shift-Command-5, Options. Otherwise they go to the Desktop, and Tendedero needs to see the Desktop." = "macOS ekran görüntülerini oraya yalnızca ⇧⌘5, Seçenekler, Başka Konum altında seçtiyseniz kaydeder. Aksi halde Masaüstü'ne giderler ve Tendedero'nun Masaüstü'nü görmesi gerekir.";
+"Allow the Desktop…" = "Masaüstü'ne izin ver…";
+"Use “%@”" = "“%@” kullan";
+"Keep the Desktop clear" = "Masaüstünü temiz tut";
+"New screenshots leave the Desktop as they hang" = "Yeni ekran görüntüleri asılırken Masaüstü'nden çıkar";
+"Screenshots from “%@”…" = "“%@” klasöründen ekran görüntüleri…";
+"Allow Access to the Desktop…" = "Masaüstü'ne erişim izni ver…";
+"Where does macOS save your screenshots?" = "macOS ekran görüntülerinizi nereye kaydediyor?";
+"Press Shift-Command-5 and open Options: the folder under Save to is where they go. If it is not the Desktop, choose that same folder here." = "⇧⌘5'e basın ve Seçenekler'i açın: Kaydet altındaki klasör gittikleri yerdir. Masaüstü değilse aynı klasörü burada seçin.";
+"Choose Folder…" = "Klasör seç…";
+"Open Screenshot Toolbar" = "Ekran Görüntüsü Araç Çubuğunu Aç";
+"Cancel" = "Vazgeç";
+"Screenshots arrive five seconds late" = "Ekran görüntüleri beş saniye geç geliyor";
+"macOS shows a floating thumbnail first and saves the screenshot when it goes away. To hang screenshots the instant you take them, open Options in the screenshot toolbar and turn off Show Floating Thumbnail." = "macOS önce kayan bir küçük resim gösterir ve o kaybolunca ekran görüntüsünü kaydeder. Çektiğiniz an asılmaları için ekran görüntüsü araç çubuğunda Seçenekler'i açın ve Kayan Küçük Resmi Göster'i kapatın.";
+"Screenshots Not Hanging?…" = "Ekran Görüntüleri Asılmıyor mu?…";
+"Screenshots Arrive 5 Seconds Late…" = "Ekran Görüntüleri 5 Saniye Geç Geliyor…";

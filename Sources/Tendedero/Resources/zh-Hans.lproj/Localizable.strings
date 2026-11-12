@@ -102,3 +102,28 @@
 
 /* Zoom on hover */
 "Zoom on hover" = "悬停时放大";
+
+/* App Store build: access to the Desktop */
+"Let Tendedero see your Desktop?" = "允许 Tendedero 查看你的桌面？";
+"macOS saves your screenshots to the Desktop. Allow Tendedero to see it, and each new one will hang on the line and leave the Desktop, so it stays clear. Drag one to a folder to keep it, or discard it with the cross." = "macOS 会把截图保存到桌面。允许 Tendedero 查看桌面后，每张新截图都会挂到晾衣绳上并移出桌面，桌面始终保持整洁。拖进文件夹即保留，点叉即丢弃。";
+"Allow…" = "允许…";
+"Allow" = "允许";
+"Click Allow to let Tendedero see your Desktop." = "点按“允许”，让 Tendedero 查看你的桌面。";
+"Choose the folder you picked under Other Location in Shift-Command-5, Options." = "选择你在 ⇧⌘5 的“选项”中设为“其他位置”的文件夹。";
+"Use “%@” instead of the Desktop?" = "用“%@”代替桌面？";
+"macOS only saves screenshots there if you chose it under Other Location in Shift-Command-5, Options. Otherwise they go to the Desktop, and Tendedero needs to see the Desktop." = "只有在 ⇧⌘5 的“选项”中把它设为“其他位置”时，macOS 才会把截图存到那里。否则截图会存到桌面，Tendedero 需要查看桌面。";
+"Allow the Desktop…" = "允许桌面…";
+"Use “%@”" = "使用“%@”";
+"Keep the Desktop clear" = "保持桌面整洁";
+"New screenshots leave the Desktop as they hang" = "新截图挂上后即移出桌面";
+"Screenshots from “%@”…" = "来自“%@”的截图…";
+"Allow Access to the Desktop…" = "允许访问桌面…";
+"Where does macOS save your screenshots?" = "macOS 把截图保存在哪里？";
+"Press Shift-Command-5 and open Options: the folder under Save to is where they go. If it is not the Desktop, choose that same folder here." = "按 ⇧⌘5 并打开“选项”：“存储位置”下的文件夹就是截图的去处。如果不是桌面，请在这里选择同一个文件夹。";
+"Choose Folder…" = "选择文件夹…";
+"Open Screenshot Toolbar" = "打开截图工具栏";
+"Cancel" = "取消";
+"Screenshots arrive five seconds late" = "截图晚到五秒";
+"macOS shows a floating thumbnail first and saves the screenshot when it goes away. To hang screenshots the instant you take them, open Options in the screenshot toolbar and turn off Show Floating Thumbnail." = "macOS 会先显示浮动缩略图，等它消失后才保存截图。想让截图一拍就挂上，请在截图工具栏的“选项”中关闭“显示浮动缩略图”。";
+"Screenshots Not Hanging?…" = "截图没有挂上？…";
+"Screenshots Arrive 5 Seconds Late…" = "截图晚到 5 秒…";

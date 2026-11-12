@@ -102,3 +102,28 @@
 
 /* Zoom on hover */
 "Zoom on hover" = "Ingrandisci al passaggio";
+
+/* App Store build: access to the Desktop */
+"Let Tendedero see your Desktop?" = "Permetti a Tendedero di vedere la Scrivania?";
+"macOS saves your screenshots to the Desktop. Allow Tendedero to see it, and each new one will hang on the line and leave the Desktop, so it stays clear. Drag one to a folder to keep it, or discard it with the cross." = "macOS salva i tuoi screenshot sulla Scrivania. Permetti a Tendedero di vederla e ogni nuovo screenshot verrà appeso al filo e lascerà la Scrivania, che resta in ordine. Trascinane uno in una cartella per tenerlo, o scartalo con la crocetta.";
+"Allow…" = "Consenti…";
+"Allow" = "Consenti";
+"Click Allow to let Tendedero see your Desktop." = "Fai clic su Consenti per permettere a Tendedero di vedere la Scrivania.";
+"Choose the folder you picked under Other Location in Shift-Command-5, Options." = "Scegli la cartella impostata in ⇧⌘5, Opzioni, Altra posizione.";
+"Use “%@” instead of the Desktop?" = "Usare “%@” invece della Scrivania?";
+"macOS only saves screenshots there if you chose it under Other Location in Shift-Command-5, Options. Otherwise they go to the Desktop, and Tendedero needs to see the Desktop." = "macOS salva gli screenshot lì solo se l’hai scelta in ⇧⌘5, Opzioni, Altra posizione. Altrimenti finiscono sulla Scrivania, e Tendedero deve vedere la Scrivania.";
+"Allow the Desktop…" = "Consenti la Scrivania…";
+"Use “%@”" = "Usa “%@”";
+"Keep the Desktop clear" = "Mantieni la Scrivania in ordine";
+"New screenshots leave the Desktop as they hang" = "I nuovi screenshot lasciano la Scrivania quando vengono appesi";
+"Screenshots from “%@”…" = "Screenshot da “%@”…";
+"Allow Access to the Desktop…" = "Consenti l’accesso alla Scrivania…";
+"Where does macOS save your screenshots?" = "Dove salva macOS i tuoi screenshot?";
+"Press Shift-Command-5 and open Options: the folder under Save to is where they go. If it is not the Desktop, choose that same folder here." = "Premi ⇧⌘5 e apri Opzioni: la cartella sotto Salva in è dove finiscono. Se non è la Scrivania, scegli qui la stessa cartella.";
+"Choose Folder…" = "Scegli cartella…";
+"Open Screenshot Toolbar" = "Apri la barra degli screenshot";
+"Cancel" = "Annulla";
+"Screenshots arrive five seconds late" = "Gli screenshot arrivano con cinque secondi di ritardo";
+"macOS shows a floating thumbnail first and saves the screenshot when it goes away. To hang screenshots the instant you take them, open Options in the screenshot toolbar and turn off Show Floating Thumbnail." = "macOS mostra prima una miniatura mobile e salva lo screenshot quando scompare. Per appenderli appena li fai, apri Opzioni nella barra degli screenshot e disattiva Mostra miniatura mobile.";
+"Screenshots Not Hanging?…" = "Gli screenshot non vengono appesi?…";
+"Screenshots Arrive 5 Seconds Late…" = "Gli screenshot arrivano con 5 secondi di ritardo…";

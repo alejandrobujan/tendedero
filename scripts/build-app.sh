@@ -1,12 +1,18 @@
 #!/bin/bash
 # Builds Tendedero.app into ./build without needing Xcode.
 # Usage: scripts/build-app.sh [debug|release]
+# APP_STORE=1 builds the sandboxed Mac App Store variant, unsigned; then
+# scripts/make-app-store-pkg.sh signs and packages it.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 CONFIG="${1:-release}"
 APP="build/Tendedero.app"
 VERSION="2.0.0"
+EXTRA=()
+if [ "${APP_STORE:-0}" = 1 ]; then
+  EXTRA=(-Xswiftc -DAPP_STORE --scratch-path .build-appstore)
+fi
 
 # Builds one architecture and prints the binary's path.
 # The Command Line Tools for macOS 27 ship an SDK whose SwiftUI needs a macro
@@ -14,14 +20,14 @@ VERSION="2.0.0"
 # newest macOS 26 SDK installed alongside it.
 build_arch() {
   local triple="$1-apple-macosx14.0"
-  if [ -z "${SDKROOT:-}" ] && ! swift build -c "$CONFIG" --triple "$triple" >&2; then
+  if [ -z "${SDKROOT:-}" ] && ! swift build -c "$CONFIG" --triple "$triple" ${EXTRA[@]+"${EXTRA[@]}"} >&2; then
     FALLBACK="$(ls -d /Library/Developer/CommandLineTools/SDKs/MacOSX26*.sdk 2>/dev/null | sort -V | tail -1)"
     if [ -z "$FALLBACK" ]; then exit 1; fi
     echo "Retrying with $FALLBACK" >&2
     export SDKROOT="$FALLBACK"
   fi
-  if [ -n "${SDKROOT:-}" ]; then swift build -c "$CONFIG" --triple "$triple" >&2; fi
-  cp "$(swift build -c "$CONFIG" --triple "$triple" --show-bin-path)/Tendedero" "$OUT/Tendedero-$1"
+  if [ -n "${SDKROOT:-}" ]; then swift build -c "$CONFIG" --triple "$triple" ${EXTRA[@]+"${EXTRA[@]}"} >&2; fi
+  cp "$(swift build -c "$CONFIG" --triple "$triple" ${EXTRA[@]+"${EXTRA[@]}"} --show-bin-path)/Tendedero" "$OUT/Tendedero-$1"
 }
 
 # A universal binary, so it runs on Apple silicon and on Intel Macs, from
@@ -68,11 +74,13 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleIconFile</key><string>Tendedero</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>${VERSION}</string>
-  <key>CFBundleVersion</key><string>13</string>
+  <key>CFBundleVersion</key><string>${BUILD_NUMBER:-13}</string>
   <key>CFBundleDevelopmentRegion</key><string>en</string>
   <key>CFBundleLocalizations</key><array>${LANGUAGES}</array>
   <key>LSMinimumSystemVersion</key><string>14.0</string>
   <key>LSUIElement</key><true/>
+  <key>LSApplicationCategoryType</key><string>public.app-category.productivity</string>
+  <key>ITSAppUsesNonExemptEncryption</key><false/>
   <key>NSHighResolutionCapable</key><true/>
   <key>NSDesktopFolderUsageDescription</key>
   <string>Tendedero watches the folder where macOS saves your screenshots so it can hang them on the line.</string>
@@ -97,6 +105,10 @@ PLIST
 # Sign with a Developer ID when one is in the keychain (or SIGN_IDENTITY is
 # set), with the hardened runtime and a secure timestamp that notarization
 # requires. Without one, sign ad hoc so the app still runs locally.
+if [ "${APP_STORE:-0}" = 1 ]; then
+  echo "Built $APP for the App Store, unsigned: run scripts/make-app-store-pkg.sh"
+  exit 0
+fi
 IDENTITY="${SIGN_IDENTITY:-$(security find-identity -v -p codesigning 2>/dev/null | awk -F'"' '/Developer ID Application/{print $2; exit}')}"
 if [ -n "$IDENTITY" ]; then
   codesign --force --options runtime --timestamp --sign "$IDENTITY" "$APP"

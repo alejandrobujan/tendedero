@@ -102,3 +102,28 @@
 
 /* Zoom on hover */
 "Zoom on hover" = "Ampliar al pasar el puntero";
+
+/* App Store build: access to the Desktop */
+"Let Tendedero see your Desktop?" = "¿Dejas que Tendedero vea tu Escritorio?";
+"macOS saves your screenshots to the Desktop. Allow Tendedero to see it, and each new one will hang on the line and leave the Desktop, so it stays clear. Drag one to a folder to keep it, or discard it with the cross." = "macOS guarda tus capturas en el Escritorio. Deja que Tendedero lo vea y cada captura nueva se colgará en la cuerda y saldrá del Escritorio, que se queda despejado. Arrastra una a una carpeta para guardarla, o descártala con la cruz.";
+"Allow…" = "Permitir…";
+"Allow" = "Permitir";
+"Click Allow to let Tendedero see your Desktop." = "Pulsa Permitir para que Tendedero vea tu Escritorio.";
+"Choose the folder you picked under Other Location in Shift-Command-5, Options." = "Elige la carpeta que pusiste en ⇧⌘5, Opciones, Otra ubicación.";
+"Use “%@” instead of the Desktop?" = "¿Usar «%@» en vez del Escritorio?";
+"macOS only saves screenshots there if you chose it under Other Location in Shift-Command-5, Options. Otherwise they go to the Desktop, and Tendedero needs to see the Desktop." = "macOS solo guarda las capturas ahí si la elegiste en ⇧⌘5, Opciones, Otra ubicación. Si no, van al Escritorio, y Tendedero necesita ver el Escritorio.";
+"Allow the Desktop…" = "Permitir el Escritorio…";
+"Use “%@”" = "Usar «%@»";
+"Keep the Desktop clear" = "Mantener el Escritorio despejado";
+"New screenshots leave the Desktop as they hang" = "Las capturas nuevas salen del Escritorio al colgarse";
+"Screenshots from “%@”…" = "Capturas de «%@»…";
+"Allow Access to the Desktop…" = "Permitir acceso al Escritorio…";
+"Where does macOS save your screenshots?" = "¿Dónde guarda macOS tus capturas?";
+"Press Shift-Command-5 and open Options: the folder under Save to is where they go. If it is not the Desktop, choose that same folder here." = "Pulsa ⇧⌘5 y abre Opciones: la carpeta de Guardar en es donde van. Si no es el Escritorio, elige aquí esa misma carpeta.";
+"Choose Folder…" = "Elegir carpeta…";
+"Open Screenshot Toolbar" = "Abrir la barra de capturas";
+"Cancel" = "Cancelar";
+"Screenshots arrive five seconds late" = "Las capturas llegan cinco segundos tarde";
+"macOS shows a floating thumbnail first and saves the screenshot when it goes away. To hang screenshots the instant you take them, open Options in the screenshot toolbar and turn off Show Floating Thumbnail." = "macOS muestra primero una miniatura flotante y guarda la captura cuando desaparece. Para que se cuelguen al instante, abre Opciones en la barra de capturas y desactiva Mostrar miniatura flotante.";
+"Screenshots Not Hanging?…" = "¿No se cuelgan las capturas?…";
+"Screenshots Arrive 5 Seconds Late…" = "Las capturas llegan 5 segundos tarde…";

@@ -102,3 +102,28 @@
 
 /* Zoom on hover */
 "Zoom on hover" = "Ampliar ao pasar o punteiro";
+
+/* App Store build: access to the Desktop */
+"Let Tendedero see your Desktop?" = "Deixas que Tendedero vexa o teu Escritorio?";
+"macOS saves your screenshots to the Desktop. Allow Tendedero to see it, and each new one will hang on the line and leave the Desktop, so it stays clear. Drag one to a folder to keep it, or discard it with the cross." = "macOS garda as túas capturas no Escritorio. Deixa que Tendedero o vexa e cada captura nova penduraráse na corda e sairá do Escritorio, que queda despexado. Arrastra unha a un cartafol para gardala, ou descártaa coa cruz.";
+"Allow…" = "Permitir…";
+"Allow" = "Permitir";
+"Click Allow to let Tendedero see your Desktop." = "Preme Permitir para que Tendedero vexa o teu Escritorio.";
+"Choose the folder you picked under Other Location in Shift-Command-5, Options." = "Escolle o cartafol que puxeches en ⇧⌘5, Opcións, Outra localización.";
+"Use “%@” instead of the Desktop?" = "Usar «%@» en vez do Escritorio?";
+"macOS only saves screenshots there if you chose it under Other Location in Shift-Command-5, Options. Otherwise they go to the Desktop, and Tendedero needs to see the Desktop." = "macOS só garda as capturas aí se o escolliches en ⇧⌘5, Opcións, Outra localización. Se non, van ao Escritorio, e Tendedero precisa ver o Escritorio.";
+"Allow the Desktop…" = "Permitir o Escritorio…";
+"Use “%@”" = "Usar «%@»";
+"Keep the Desktop clear" = "Manter o Escritorio despexado";
+"New screenshots leave the Desktop as they hang" = "As capturas novas saen do Escritorio ao pendurarse";
+"Screenshots from “%@”…" = "Capturas de «%@»…";
+"Allow Access to the Desktop…" = "Permitir acceso ao Escritorio…";
+"Where does macOS save your screenshots?" = "Onde garda macOS as túas capturas?";
+"Press Shift-Command-5 and open Options: the folder under Save to is where they go. If it is not the Desktop, choose that same folder here." = "Preme ⇧⌘5 e abre Opcións: o cartafol de Gardar en é onde van. Se non é o Escritorio, escolle aquí ese mesmo cartafol.";
+"Choose Folder…" = "Escoller cartafol…";
+"Open Screenshot Toolbar" = "Abrir a barra de capturas";
+"Cancel" = "Cancelar";
+"Screenshots arrive five seconds late" = "As capturas chegan cinco segundos tarde";
+"macOS shows a floating thumbnail first and saves the screenshot when it goes away. To hang screenshots the instant you take them, open Options in the screenshot toolbar and turn off Show Floating Thumbnail." = "macOS amosa primeiro unha miniatura flotante e garda a captura cando desaparece. Para que se penduren no intre, abre Opcións na barra de capturas e desactiva Mostrar miniatura flotante.";
+"Screenshots Not Hanging?…" = "Non se penduran as capturas?…";
+"Screenshots Arrive 5 Seconds Late…" = "As capturas chegan 5 segundos tarde…";

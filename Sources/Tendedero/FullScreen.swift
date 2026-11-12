@@ -3,11 +3,13 @@ import AppKit
 // The window server knows the type of the Space each display is showing.
 // These calls are private but stable for a decade, need no permission, and
 // are what window managers like yabai rely on. A full screen Space is type 4.
+#if !APP_STORE
 @_silgen_name("CGSMainConnectionID")
 private func CGSMainConnectionID() -> Int32
 
 @_silgen_name("CGSCopyManagedDisplaySpaces")
 private func CGSCopyManagedDisplaySpaces(_ connection: Int32) -> CFArray
+#endif
 
 enum FullScreen {
     private static let fullScreenSpaceType = 4
@@ -28,6 +30,24 @@ enum FullScreen {
     /// True when the given screen is currently showing a full screen app,
     /// like a video or a presentation.
     static func isActive(on screen: NSScreen) -> Bool {
+        #if APP_STORE
+        // The App Store allows no private calls. A full screen app is the
+        // one whose window covers the whole display, menu bar included; the
+        // window list gives every window's frame without any permission.
+        guard let number = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID,
+              let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID)
+                as? [[String: Any]] else { return false }
+        let display = CGDisplayBounds(number)
+        let me = ProcessInfo.processInfo.processIdentifier
+        return windows.contains { window in
+            guard (window[kCGWindowLayer as String] as? Int) == 0,
+                  (window[kCGWindowOwnerPID as String] as? pid_t) != me,
+                  let bounds = window[kCGWindowBounds as String] as? NSDictionary,
+                  let frame = CGRect(dictionaryRepresentation: bounds as CFDictionary) else { return false }
+            return abs(frame.minX - display.minX) < 1 && abs(frame.minY - display.minY) < 1
+                && abs(frame.width - display.width) < 1 && abs(frame.height - display.height) < 1
+        }
+        #else
         guard let displays = CGSCopyManagedDisplaySpaces(CGSMainConnectionID()) as? [[String: Any]],
               !displays.isEmpty else { return false }
 
@@ -42,6 +62,7 @@ enum FullScreen {
         }
         let current = entry?["Current Space"] as? [String: Any]
         return (current?["type"] as? Int) == fullScreenSpaceType
+        #endif
     }
 
     private static func uuidString(for screen: NSScreen) -> String? {

@@ -102,3 +102,28 @@
 
 /* Zoom on hover */
 "Zoom on hover" = "Ampliar ao passar o ponteiro";
+
+/* App Store build: access to the Desktop */
+"Let Tendedero see your Desktop?" = "Deixar o Tendedero ver sua Mesa?";
+"macOS saves your screenshots to the Desktop. Allow Tendedero to see it, and each new one will hang on the line and leave the Desktop, so it stays clear. Drag one to a folder to keep it, or discard it with the cross." = "O macOS salva suas capturas na Mesa. Deixe o Tendedero vê-la, e cada captura nova vai para o varal e sai da Mesa, que fica sempre limpa. Arraste uma para uma pasta para guardá-la, ou descarte-a no X.";
+"Allow…" = "Permitir…";
+"Allow" = "Permitir";
+"Click Allow to let Tendedero see your Desktop." = "Clique em Permitir para o Tendedero ver sua Mesa.";
+"Choose the folder you picked under Other Location in Shift-Command-5, Options." = "Escolha a pasta que você definiu em ⇧⌘5, Opções, Outro Local.";
+"Use “%@” instead of the Desktop?" = "Usar “%@” em vez da Mesa?";
+"macOS only saves screenshots there if you chose it under Other Location in Shift-Command-5, Options. Otherwise they go to the Desktop, and Tendedero needs to see the Desktop." = "O macOS só salva capturas ali se você a escolheu em ⇧⌘5, Opções, Outro Local. Caso contrário, elas vão para a Mesa, e o Tendedero precisa ver a Mesa.";
+"Allow the Desktop…" = "Permitir a Mesa…";
+"Use “%@”" = "Usar “%@”";
+"Keep the Desktop clear" = "Manter a Mesa limpa";
+"New screenshots leave the Desktop as they hang" = "Capturas novas saem da Mesa ao ir para o varal";
+"Screenshots from “%@”…" = "Capturas de “%@”…";
+"Allow Access to the Desktop…" = "Permitir Acesso à Mesa…";
+"Where does macOS save your screenshots?" = "Onde o macOS salva suas capturas?";
+"Press Shift-Command-5 and open Options: the folder under Save to is where they go. If it is not the Desktop, choose that same folder here." = "Pressione ⇧⌘5 e abra Opções: a pasta em Salvar em é para onde elas vão. Se não for a Mesa, escolha aqui essa mesma pasta.";
+"Choose Folder…" = "Escolher Pasta…";
+"Open Screenshot Toolbar" = "Abrir a Barra de Captura";
+"Cancel" = "Cancelar";
+"Screenshots arrive five seconds late" = "As capturas chegam cinco segundos atrasadas";
+"macOS shows a floating thumbnail first and saves the screenshot when it goes away. To hang screenshots the instant you take them, open Options in the screenshot toolbar and turn off Show Floating Thumbnail." = "O macOS mostra primeiro uma miniatura flutuante e salva a captura quando ela some. Para as capturas irem ao varal na hora, abra Opções na barra de captura e desative Mostrar Miniatura Flutuante.";
+"Screenshots Not Hanging?…" = "As Capturas Não Vão para o Varal?…";
+"Screenshots Arrive 5 Seconds Late…" = "As Capturas Chegam 5 Segundos Atrasadas…";

@@ -102,3 +102,28 @@
 
 /* Zoom on hover */
 "Zoom on hover" = "포인터를 올리면 확대";
+
+/* App Store build: access to the Desktop */
+"Let Tendedero see your Desktop?" = "Tendedero가 데스크탑을 볼 수 있도록 허용할까요?";
+"macOS saves your screenshots to the Desktop. Allow Tendedero to see it, and each new one will hang on the line and leave the Desktop, so it stays clear. Drag one to a folder to keep it, or discard it with the cross." = "macOS는 스크린샷을 데스크탑에 저장해요. Tendedero가 볼 수 있게 허용하면 새 스크린샷이 빨랫줄에 걸리면서 데스크탑에서 빠져나가, 데스크탑이 깔끔하게 유지돼요. 보관하려면 폴더로 드래그하고, 버리려면 X 버튼을 클릭하세요.";
+"Allow…" = "허용…";
+"Allow" = "허용";
+"Click Allow to let Tendedero see your Desktop." = "허용을 클릭하면 Tendedero가 데스크탑을 볼 수 있어요.";
+"Choose the folder you picked under Other Location in Shift-Command-5, Options." = "⇧⌘5의 옵션에서 기타 위치로 선택한 폴더를 고르세요.";
+"Use “%@” instead of the Desktop?" = "데스크탑 대신 ‘%@’을(를) 사용할까요?";
+"macOS only saves screenshots there if you chose it under Other Location in Shift-Command-5, Options. Otherwise they go to the Desktop, and Tendedero needs to see the Desktop." = "macOS는 ⇧⌘5의 옵션에서 기타 위치로 선택한 경우에만 그곳에 스크린샷을 저장해요. 그렇지 않으면 데스크탑에 저장되므로 Tendedero가 데스크탑을 볼 수 있어야 해요.";
+"Allow the Desktop…" = "데스크탑 허용…";
+"Use “%@”" = "‘%@’ 사용";
+"Keep the Desktop clear" = "데스크탑 깔끔하게 유지";
+"New screenshots leave the Desktop as they hang" = "새 스크린샷은 걸리면서 데스크탑에서 빠져나가요";
+"Screenshots from “%@”…" = "‘%@’의 스크린샷…";
+"Allow Access to the Desktop…" = "데스크탑 접근 허용…";
+"Where does macOS save your screenshots?" = "macOS는 스크린샷을 어디에 저장하나요?";
+"Press Shift-Command-5 and open Options: the folder under Save to is where they go. If it is not the Desktop, choose that same folder here." = "⇧⌘5를 누르고 옵션을 열면, 저장 위치에 있는 폴더가 스크린샷이 저장되는 곳이에요. 데스크탑이 아니라면 여기서 같은 폴더를 선택하세요.";
+"Choose Folder…" = "폴더 선택…";
+"Open Screenshot Toolbar" = "스크린샷 도구 막대 열기";
+"Cancel" = "취소";
+"Screenshots arrive five seconds late" = "스크린샷이 5초 늦게 도착해요";
+"macOS shows a floating thumbnail first and saves the screenshot when it goes away. To hang screenshots the instant you take them, open Options in the screenshot toolbar and turn off Show Floating Thumbnail." = "macOS는 먼저 플로팅 썸네일을 보여주고, 그게 사라진 뒤에 스크린샷을 저장해요. 찍는 즉시 걸리게 하려면 스크린샷 도구 막대의 옵션에서 플로팅 썸네일 보기를 끄세요.";
+"Screenshots Not Hanging?…" = "스크린샷이 걸리지 않나요?…";
+"Screenshots Arrive 5 Seconds Late…" = "스크린샷이 5초 늦게 도착해요…";

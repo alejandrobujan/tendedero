@@ -104,3 +104,28 @@
 
 /* Zoom on hover */
 "Zoom on hover" = "Üzərinə gəldikdə böyüt";
+
+/* App Store build: access to the Desktop */
+"Let Tendedero see your Desktop?" = "Tendedero İş masanızı görə bilsin?";
+"macOS saves your screenshots to the Desktop. Allow Tendedero to see it, and each new one will hang on the line and leave the Desktop, so it stays clear. Drag one to a folder to keep it, or discard it with the cross." = "macOS ekran şəkillərinizi İş masasına saxlayır. Tendedero-ya onu görməyə icazə verin: hər yeni şəkil ipdən asılacaq və İş masasından çıxacaq, İş masası səliqəli qalacaq. Saxlamaq üçün qovluğa sürükləyin, ya da çarpazla atın.";
+"Allow…" = "İcazə ver…";
+"Allow" = "İcazə ver";
+"Click Allow to let Tendedero see your Desktop." = "Tendedero İş masanızı görsün deyə İcazə ver düyməsini basın.";
+"Choose the folder you picked under Other Location in Shift-Command-5, Options." = "⇧⌘5, Seçimlər, Başqa yer altında seçdiyiniz qovluğu seçin.";
+"Use “%@” instead of the Desktop?" = "İş masası əvəzinə “%@” istifadə edilsin?";
+"macOS only saves screenshots there if you chose it under Other Location in Shift-Command-5, Options. Otherwise they go to the Desktop, and Tendedero needs to see the Desktop." = "macOS ekran şəkillərini ora yalnız ⇧⌘5, Seçimlər, Başqa yer altında seçmisinizsə saxlayır. Əks halda onlar İş masasına gedir və Tendedero İş masasını görməlidir.";
+"Allow the Desktop…" = "İş masasına icazə ver…";
+"Use “%@”" = "“%@” istifadə et";
+"Keep the Desktop clear" = "İş masasını səliqəli saxla";
+"New screenshots leave the Desktop as they hang" = "Yeni ekran şəkilləri asılarkən İş masasından çıxır";
+"Screenshots from “%@”…" = "“%@” qovluğundan ekran şəkilləri…";
+"Allow Access to the Desktop…" = "İş masasına giriş icazəsi ver…";
+"Where does macOS save your screenshots?" = "macOS ekran şəkillərinizi hara saxlayır?";
+"Press Shift-Command-5 and open Options: the folder under Save to is where they go. If it is not the Desktop, choose that same folder here." = "⇧⌘5 düyməsini basın və Seçimlər menyusunu açın: Saxla bölməsindəki qovluq onların getdiyi yerdir. İş masası deyilsə, həmin qovluğu burada seçin.";
+"Choose Folder…" = "Qovluq seç…";
+"Open Screenshot Toolbar" = "Ekran şəkli alətlər panelini aç";
+"Cancel" = "Ləğv et";
+"Screenshots arrive five seconds late" = "Ekran şəkilləri beş saniyə gec gəlir";
+"macOS shows a floating thumbnail first and saves the screenshot when it goes away. To hang screenshots the instant you take them, open Options in the screenshot toolbar and turn off Show Floating Thumbnail." = "macOS əvvəlcə üzən miniatür göstərir və o yox olanda ekran şəklini saxlayır. Çəkdiyiniz an asılmaları üçün ekran şəkli alətlər panelində Seçimlər menyusunu açın və Üzən miniatürü göstər seçimini söndürün.";
+"Screenshots Not Hanging?…" = "Ekran şəkilləri asılmır?…";
+"Screenshots Arrive 5 Seconds Late…" = "Ekran şəkilləri 5 saniyə gec gəlir…";

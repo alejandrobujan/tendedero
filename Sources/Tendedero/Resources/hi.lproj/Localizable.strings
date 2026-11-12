@@ -104,3 +104,28 @@
 
 /* Zoom on hover */
 "Zoom on hover" = "होवर पर बड़ा करें";
+
+/* App Store build: access to the Desktop */
+"Let Tendedero see your Desktop?" = "क्या Tendedero को आपका डेस्कटॉप देखने दें?";
+"macOS saves your screenshots to the Desktop. Allow Tendedero to see it, and each new one will hang on the line and leave the Desktop, so it stays clear. Drag one to a folder to keep it, or discard it with the cross." = "macOS आपके स्क्रीनशॉट डेस्कटॉप पर सहेजता है। Tendedero को इसे देखने दें, और हर नया स्क्रीनशॉट रस्सी पर टँग जाएगा और डेस्कटॉप से हट जाएगा, ताकि डेस्कटॉप साफ़ रहे। रखना हो तो फ़ोल्डर में खींचें, या क्रॉस से हटा दें।";
+"Allow…" = "अनुमति दें…";
+"Allow" = "अनुमति दें";
+"Click Allow to let Tendedero see your Desktop." = "Tendedero को डेस्कटॉप देखने देने के लिए अनुमति दें पर क्लिक करें।";
+"Choose the folder you picked under Other Location in Shift-Command-5, Options." = "वह फ़ोल्डर चुनें जो आपने ⇧⌘5 में विकल्प, अन्य स्थान के तहत चुना था।";
+"Use “%@” instead of the Desktop?" = "डेस्कटॉप की जगह “%@” इस्तेमाल करें?";
+"macOS only saves screenshots there if you chose it under Other Location in Shift-Command-5, Options. Otherwise they go to the Desktop, and Tendedero needs to see the Desktop." = "macOS वहाँ स्क्रीनशॉट तभी सहेजता है जब आपने उसे ⇧⌘5 में विकल्प, अन्य स्थान के तहत चुना हो। वरना वे डेस्कटॉप पर जाते हैं, और Tendedero को डेस्कटॉप देखना होगा।";
+"Allow the Desktop…" = "डेस्कटॉप की अनुमति दें…";
+"Use “%@”" = "“%@” इस्तेमाल करें";
+"Keep the Desktop clear" = "डेस्कटॉप साफ़ रखें";
+"New screenshots leave the Desktop as they hang" = "नए स्क्रीनशॉट टँगते ही डेस्कटॉप से हट जाते हैं";
+"Screenshots from “%@”…" = "“%@” से स्क्रीनशॉट…";
+"Allow Access to the Desktop…" = "डेस्कटॉप तक पहुँच की अनुमति दें…";
+"Where does macOS save your screenshots?" = "macOS आपके स्क्रीनशॉट कहाँ सहेजता है?";
+"Press Shift-Command-5 and open Options: the folder under Save to is where they go. If it is not the Desktop, choose that same folder here." = "⇧⌘5 दबाएँ और विकल्प खोलें: यहाँ सहेजें के नीचे वाला फ़ोल्डर ही वह जगह है। अगर वह डेस्कटॉप नहीं है, तो यहाँ वही फ़ोल्डर चुनें।";
+"Choose Folder…" = "फ़ोल्डर चुनें…";
+"Open Screenshot Toolbar" = "स्क्रीनशॉट टूलबार खोलें";
+"Cancel" = "रद्द करें";
+"Screenshots arrive five seconds late" = "स्क्रीनशॉट पाँच सेकंड देर से आते हैं";
+"macOS shows a floating thumbnail first and saves the screenshot when it goes away. To hang screenshots the instant you take them, open Options in the screenshot toolbar and turn off Show Floating Thumbnail." = "macOS पहले एक फ़्लोटिंग थंबनेल दिखाता है और उसके हटने पर स्क्रीनशॉट सहेजता है। लेते ही टाँगने के लिए स्क्रीनशॉट टूलबार में विकल्प खोलें और फ़्लोटिंग थंबनेल दिखाएँ बंद करें।";
+"Screenshots Not Hanging?…" = "स्क्रीनशॉट नहीं टँग रहे?…";
+"Screenshots Arrive 5 Seconds Late…" = "स्क्रीनशॉट 5 सेकंड देर से आते हैं…";

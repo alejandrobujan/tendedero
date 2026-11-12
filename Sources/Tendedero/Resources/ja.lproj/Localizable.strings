@@ -102,3 +102,28 @@
 
 /* Zoom on hover */
 "Zoom on hover" = "ポインタを重ねて拡大";
+
+/* App Store build: access to the Desktop */
+"Let Tendedero see your Desktop?" = "Tendederoにデスクトップの表示を許可しますか？";
+"macOS saves your screenshots to the Desktop. Allow Tendedero to see it, and each new one will hang on the line and leave the Desktop, so it stays clear. Drag one to a folder to keep it, or discard it with the cross." = "macOSはスクリーンショットをデスクトップに保存します。Tendederoに表示を許可すると、新しいスクリーンショットはロープに吊るされてデスクトップから移動し、デスクトップはすっきりしたままです。残したいものはフォルダにドラッグし、いらないものは×で破棄します。";
+"Allow…" = "許可…";
+"Allow" = "許可";
+"Click Allow to let Tendedero see your Desktop." = "「許可」をクリックすると、Tendederoがデスクトップを表示できるようになります。";
+"Choose the folder you picked under Other Location in Shift-Command-5, Options." = "⇧⌘5の「オプション」で「その他の場所」に選んだフォルダを選択してください。";
+"Use “%@” instead of the Desktop?" = "デスクトップの代わりに“%@”を使いますか？";
+"macOS only saves screenshots there if you chose it under Other Location in Shift-Command-5, Options. Otherwise they go to the Desktop, and Tendedero needs to see the Desktop." = "macOSがそこにスクリーンショットを保存するのは、⇧⌘5の「オプション」で「その他の場所」に選んだ場合だけです。それ以外はデスクトップに保存されるため、Tendederoにはデスクトップの表示が必要です。";
+"Allow the Desktop…" = "デスクトップを許可…";
+"Use “%@”" = "“%@”を使用";
+"Keep the Desktop clear" = "デスクトップをすっきり保つ";
+"New screenshots leave the Desktop as they hang" = "新しいスクリーンショットは吊るされるとデスクトップから移動します";
+"Screenshots from “%@”…" = "“%@”のスクリーンショット…";
+"Allow Access to the Desktop…" = "デスクトップへのアクセスを許可…";
+"Where does macOS save your screenshots?" = "macOSはスクリーンショットをどこに保存していますか？";
+"Press Shift-Command-5 and open Options: the folder under Save to is where they go. If it is not the Desktop, choose that same folder here." = "⇧⌘5を押して「オプション」を開くと、「保存先」のフォルダが保存場所です。デスクトップでない場合は、ここで同じフォルダを選んでください。";
+"Choose Folder…" = "フォルダを選択…";
+"Open Screenshot Toolbar" = "スクリーンショットツールバーを開く";
+"Cancel" = "キャンセル";
+"Screenshots arrive five seconds late" = "スクリーンショットが5秒遅れて届きます";
+"macOS shows a floating thumbnail first and saves the screenshot when it goes away. To hang screenshots the instant you take them, open Options in the screenshot toolbar and turn off Show Floating Thumbnail." = "macOSは先にフローティングサムネールを表示し、それが消えてからスクリーンショットを保存します。撮った瞬間に吊るすには、スクリーンショットツールバーの「オプション」で「フローティングサムネールを表示」をオフにしてください。";
+"Screenshots Not Hanging?…" = "スクリーンショットが吊るされない？…";
+"Screenshots Arrive 5 Seconds Late…" = "スクリーンショットが5秒遅れて届きます…";

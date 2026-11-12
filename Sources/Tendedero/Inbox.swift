@@ -31,6 +31,11 @@ enum Inbox {
     private static let recordingTargetKey = "target-screenrecording" as CFString
 
     private static let enabledKey = "inboxEnabled"
+    #if APP_STORE
+    private static let isSandboxed = true
+    #else
+    private static let isSandboxed = false
+    #endif
     private static let offeredKey = "inboxOffered"
     private static let savedKey = "inboxSavedSettings"
 
@@ -41,7 +46,11 @@ enum Inbox {
 
     /// The user's choice, kept across launches.
     static var isEnabled: Bool {
-        get { UserDefaults.standard.bool(forKey: enabledKey) }
+        // The App Store's sandbox cannot change another app's settings.
+        // In the App Store's sandbox it only moves new screenshots off the
+        // Desktop, so it is on unless turned off.
+        get { isSandboxed ? (UserDefaults.standard.object(forKey: enabledKey) as? Bool ?? true)
+                          : UserDefaults.standard.bool(forKey: enabledKey) }
         set { UserDefaults.standard.set(newValue, forKey: enabledKey) }
     }
 
@@ -53,12 +62,18 @@ enum Inbox {
 
     /// Whether macOS is currently sending screenshots to our folder.
     static var isApplied: Bool {
+        #if APP_STORE
+        return false
+        #endif
         guard let current = CFPreferencesCopyAppValue(locationKey, domain) as? String else { return false }
         return URL(fileURLWithPath: (current as NSString).expandingTildeInPath).standardizedFileURL
             == folder.standardizedFileURL
     }
 
     static func apply() {
+        #if APP_STORE
+        return
+        #endif
         try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         // Never save our own values as the "previous" ones, for example after
         // a crash left them applied.
