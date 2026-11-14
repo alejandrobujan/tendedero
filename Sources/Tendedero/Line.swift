@@ -914,10 +914,14 @@ final class Line: ObservableObject {
 
     // MARK: Helpers
 
+    /// Starting a sound takes the audio system a frame or two, so it starts
+    /// off the main thread, where it would hold up the photo it goes with.
+    private static let sounds = DispatchQueue(label: "app.tendedero.sounds", qos: .userInitiated)
+
     private func play(_ name: String, volume: Float) {
         guard soundOn, let sound = NSSound(named: name)?.copy() as? NSSound else { return }
         sound.volume = volume
-        sound.play()
+        Self.sounds.async { sound.play() }
     }
 
     private func pngData(_ url: URL) -> Data? {
