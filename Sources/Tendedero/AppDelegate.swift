@@ -14,7 +14,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// In inbox mode, a second watcher on the Desktop. If a macOS version
     /// ignores the screenshot settings (macOS 27 renamed one), captures keep
     /// landing on the Desktop, and they still hang on the line.
-    private var safetyWatcher: ScreenshotWatcher?
     /// Folders chosen in "Also watch folders", like the one another
     /// screenshot app saves to.
     private var folderWatchers: [ScreenshotWatcher] = []
@@ -183,23 +182,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func startWatcher() {
         watcher?.stop()
-        safetyWatcher?.stop()
-        safetyWatcher = nil
         watcher = ScreenshotWatcher(
             onNew: { [weak self] url in self?.hangCapture(url, screenshot: true) },
             onChange: { [weak self] in self?.line.prune() })
         watcher.start()
-        if Inbox.isEnabled, watcher.folder.standardizedFileURL != ScreenshotWatcher.desktop.standardizedFileURL {
-            let safety = ScreenshotWatcher(
-                folder: ScreenshotWatcher.desktop,
-                onNew: { [weak self] url in
-                    log.notice("Screenshot landed on the Desktop despite inbox mode: \(url.lastPathComponent, privacy: .public)")
-                    self?.hangCapture(url, screenshot: true)
-                },
-                onChange: { [weak self] in self?.line.prune() })
-            safety.start()
-            safetyWatcher = safety
-        }
         folderWatchers.forEach { $0.stop() }
         folderWatchers = []
         // A folder may also be watched for screenshots, like the Desktop; an
