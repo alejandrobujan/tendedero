@@ -89,7 +89,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         searchBar = SearchBar(line: line)
         searchBar.onReturn = { [weak self] in self?.copyFirstMatch() }
         searchBar.onEnd = { [weak self] in self?.endSearch(tuckAway: true) }
-        searchHotKey = HotKey(Self.searchShortcut) { [weak self] in self?.startSearch() }
+        registerSearchShortcut()
 
         setUpStatusItem()
         watchMenuBarClicks()
@@ -589,7 +589,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     // MARK: Searching the line
 
-    static let searchShortcut = Shortcut(keyCode: kVK_ANSI_F, modifiers: [.control, .option], key: "f")
 
     /// Brings the line down and opens the search field under it.
     private func startSearch() {
@@ -998,23 +997,44 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         hotKey = HotKey(shortcut) { [weak self] in self?.toggle() }
     }
 
+    private func registerSearchShortcut() {
+        searchHotKey = nil
+        guard let shortcut = Shortcut.search else { return }
+        searchHotKey = HotKey(shortcut) { [weak self] in self?.startSearch() }
+    }
+
     private func changeShortcut() {
-        // Off while recording, so pressing the current one records it
-        // instead of showing the line.
+        record(\.current, register: registerShortcut, other: registerSearchShortcut,
+               registered: { [weak self] in self?.hotKey != nil })
+    }
+
+    private func changeSearchShortcut() {
+        record(\.search, register: registerSearchShortcut, other: registerShortcut,
+               registered: { [weak self] in self?.searchHotKey != nil })
+    }
+
+    /// Both shortcuts are off while recording, so pressing either one
+    /// records it instead of showing or searching the line.
+    private func record(_ setting: ReferenceWritableKeyPath<Shortcut.Type, Shortcut?>,
+                        register: @escaping () -> Void, other: @escaping () -> Void,
+                        registered: @escaping () -> Bool) {
         hotKey = nil
-        ShortcutRecorder.shared.record { [weak self] result in
-            guard let self else { return }
+        searchHotKey = nil
+        ShortcutRecorder.shared.record { result in
+            // The other one first, so taking its keys fails below.
+            other()
             if let result {
-                let previous = Shortcut.current
-                Shortcut.current = result
-                self.registerShortcut()
-                // Taken by another app: keep the one that worked.
-                if result != nil && self.hotKey == nil {
+                let previous = Shortcut.self[keyPath: setting]
+                Shortcut.self[keyPath: setting] = result
+                register()
+                // Taken by another app, or by the other shortcut: keep the
+                // one that worked.
+                if result != nil && !registered() {
                     NSSound.beep()
-                    Shortcut.current = previous
+                    Shortcut.self[keyPath: setting] = previous
                 }
             }
-            self.registerShortcut()
+            register()
         }
     }
 
@@ -1083,8 +1103,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(toggleItem)
 
         let searchItem = ClosureMenuItem(L("Search the line")) { [weak self] in self?.startSearch() }
-        searchItem.keyEquivalent = Self.searchShortcut.key
-        searchItem.keyEquivalentModifierMask = Self.searchShortcut.modifiers
+        if let shortcut = Shortcut.search, shortcut.key.count == 1 {
+            searchItem.keyEquivalent = shortcut.key
+            searchItem.keyEquivalentModifierMask = shortcut.modifiers
+        }
         searchItem.isEnabled = line.liveCount > 0
         menu.addItem(searchItem)
 
@@ -1225,10 +1247,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         let shortcutItem = NSMenuItem(title: L("Shortcut"), action: nil, keyEquivalent: "")
         let shortcuts = NSMenu()
-        let current = NSMenuItem(title: Shortcut.current?.display ?? L("None"), action: nil, keyEquivalent: "")
-        current.isEnabled = false
-        shortcuts.addItem(current)
-        shortcuts.addItem(ClosureMenuItem(L("Change Shortcut…")) { [weak self] in self?.changeShortcut() })
+        // One for showing the line, one for searching it, each with its
+        // own Change Shortcut….
+        let shortcutKinds: [(String, Shortcut?, () -> Void)] = [
+            (L("Show line"), Shortcut.current, { [weak self] in self?.changeShortcut() }),
+            (L("Search the line"), Shortcut.search, { [weak self] in self?.changeSearchShortcut() }),
+        ]
+        for (i, kind) in shortcutKinds.enumerated() {
+            if i > 0 { shortcuts.addItem(.separator()) }
+            shortcuts.addItem(.sectionHeader(title: kind.0))
+            let current = NSMenuItem(title: kind.1?.display ?? L("None"), action: nil, keyEquivalent: "")
+            current.isEnabled = false
+            shortcuts.addItem(current)
+            shortcuts.addItem(ClosureMenuItem(L("Change Shortcut…"), handler: kind.2))
+        }
         shortcutItem.submenu = shortcuts
         menu.addItem(shortcutItem)
 

@@ -68,7 +68,7 @@
 | 포인터를 메뉴 막대 가운데에 올려 두기 | 그 화면에 빨랫줄을 내려요. |
 | 메뉴 막대의 아무 곳이나 클릭 | 빨랫줄을 치워요. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | 빨랫줄을 보거나 가려요. 메뉴 막대의 단축키에서 바꿀 수 있어요. |
-| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | 빨랫줄에서 찾아요. |
+| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | 빨랫줄에서 찾아요. 메뉴 막대의 단축키에서 바꿀 수 있어요. |
 
 <br>
 
