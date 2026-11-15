@@ -12,6 +12,8 @@
 "Screenshots" = "Screenshot";
 "Handle screenshots" = "Gestisci gli screenshot";
 "Screenshots hang instantly and skip the Desktop" = "Gli screenshot si appendono subito e saltano la Scrivania";
+"Copy each screenshot" = "Copia ogni screenshot";
+"Each new screenshot goes to the clipboard as it hangs" = "Ogni nuovo screenshot va negli appunti appena si appende";
 "Open screenshots folder" = "Apri la cartella degli screenshot";
 "Sounds" = "Suoni";
 "Open at login" = "Apri al login";

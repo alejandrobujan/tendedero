@@ -12,6 +12,8 @@
 "Screenshots" = "Ảnh chụp màn hình";
 "Handle screenshots" = "Quản lý ảnh chụp màn hình";
 "Screenshots hang instantly and skip the Desktop" = "Ảnh chụp được treo ngay và không lưu ra Màn hình nền";
+"Copy each screenshot" = "Sao chép mỗi ảnh chụp";
+"Each new screenshot goes to the clipboard as it hangs" = "Mỗi ảnh chụp mới được sao chép vào bộ nhớ tạm khi được treo";
 "Open screenshots folder" = "Mở thư mục ảnh chụp";
 "Sounds" = "Âm thanh";
 "Open at login" = "Mở khi đăng nhập";

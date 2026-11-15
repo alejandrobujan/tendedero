@@ -12,6 +12,8 @@
 "Screenshots" = "Capturas de tela";
 "Handle screenshots" = "Cuidar das capturas de tela";
 "Screenshots hang instantly and skip the Desktop" = "As capturas vão direto para o varal, sem passar pela Mesa";
+"Copy each screenshot" = "Copiar cada captura";
+"Each new screenshot goes to the clipboard as it hangs" = "Cada nova captura é copiada para a área de transferência ao ir para o varal";
 "Open screenshots folder" = "Abrir pasta de capturas";
 "Sounds" = "Sons";
 "Open at login" = "Abrir ao iniciar sessão";
