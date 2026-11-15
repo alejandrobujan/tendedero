@@ -431,7 +431,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             itemsChanged()
             return
         }
-        if screenshot, Self.copiesScreenshots { line.copy(id) }
+        // Recordings hang from the same folder, but the option is for screenshots.
+        if screenshot, Self.copiesScreenshots, !isRecording(url) { line.copy(id) }
         guard let from else { return }
         // Let the line come down and lay out before measuring the landing spot.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) { [weak self] in
