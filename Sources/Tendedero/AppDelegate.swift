@@ -254,22 +254,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         alert.addButton(withTitle: L("Turn on"))
         alert.addButton(withTitle: L("Not now"))
         if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
-        let copy = NSButton(checkboxWithTitle: L("Copy each screenshot"), target: nil, action: nil)
         // A menu bar app that does not open at login is gone after the first
         // restart, so the first launch offers it too, ticked.
         let login = Self.shouldOfferLogin ? NSButton(checkboxWithTitle: L("Open at login"), target: nil, action: nil) : nil
-        login?.state = .on
-        if login != nil { Self.loginOffered() }
-        let stack = NSStackView(views: [copy] + (login.map { [$0] } ?? []))
-        stack.orientation = .vertical
-        stack.alignment = .leading
-        stack.spacing = 6
-        if login != nil { stack.setCustomSpacing(14, after: copy) }
-        stack.frame = NSRect(x: 0, y: 0, width: 240, height: stack.fittingSize.height)
-        alert.accessoryView = stack
+        if let login {
+            login.state = .on
+            alert.accessoryView = login
+            Self.loginOffered()
+        }
         NSApp.activate(ignoringOtherApps: true)
         if alert.runModal() == .alertFirstButtonReturn { setInbox(true) }
-        Self.copiesScreenshots = copy.state == .on
         if login?.state == .on { Self.openAtLogin() }
     }
 
