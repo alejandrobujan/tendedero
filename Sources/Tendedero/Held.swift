@@ -1,4 +1,5 @@
 import AppKit
+import Carbon
 
 /// A photo taken off the line to keep in front of you while you work: a
 /// design to copy, numbers to type in, steps to follow. It is the photo
@@ -9,9 +10,14 @@ import AppKit
 /// Drag it anywhere; stretch it from an edge or a corner, or pinch or scroll
 /// over it to zoom. Several can be held at
 /// once. It never takes the app you are working in out of the front.
+/// A pinned preview uses the same window and keeps its card on the line.
 @MainActor
 final class Held: NSObject {
     private static var open: [UUID: Held] = [:]
+    private static var previews: [UUID: Held] = [:]
+    private static var previewMouseTimer: Timer?
+    private static var previewEscape: HotKey?
+    private static var pointerOverPreview = false
 
     let id: UUID
     private let panel: HeldPanel
@@ -19,23 +25,69 @@ final class Held: NSObject {
     /// Its size at 100%, in points.
     private let natural: NSSize
     /// Called with where it was on screen, to fly back to its clip from there.
-    private let onHangBack: (UUID, CGRect) -> Void
+    private let onHangBack: ((UUID, CGRect) -> Void)?
 
     static var heldIDs: Set<UUID> { Set(open.keys) }
 
     static func show(_ id: UUID, url: URL, line: Line, onHangBack: @escaping (UUID, CGRect) -> Void) {
-        guard open[id] == nil,
-              let screen = LinePanel.screenUnderPointer() else { return }
-        // No sharper than the screen can show, so a huge image stays light.
-        let longest = max(screen.frame.width, screen.frame.height) * screen.backingScaleFactor
-        guard let image = makeThumbnail(url, maxPixels: Int(longest)), image.size.width > 0 else { return }
-        open[id] = Held(id: id, url: url, image: image, on: screen, line: line, onHangBack: onHangBack)
+        guard open[id] == nil else { return }
+        open[id] = make(id, url: url, line: line, onHangBack: onHangBack)
     }
 
-    static func hangBack(_ id: UUID) { open[id]?.hangBack() }
+    /// A separate preview leaves the original card on the line.
+    static func showPreview(_ id: UUID, url: URL, line: Line) {
+        if let preview = previews[id] {
+            preview.panel.orderFrontRegardless()
+            return
+        }
+        guard let preview = make(id, url: url, line: line, onHangBack: nil) else { return }
+        previews[id] = preview
+        if previewMouseTimer == nil {
+            let timer = Timer(timeInterval: 1.0 / 30.0, repeats: true) { _ in
+                MainActor.assumeIsolated { updatePreviewEscape() }
+            }
+            RunLoop.main.add(timer, forMode: .common)
+            previewMouseTimer = timer
+        }
+        updatePreviewEscape()
+    }
+
+    /// Borrow Escape only over the frontmost preview, without making it key.
+    private static func previewUnderPointer() -> Held? {
+        let mouse = NSEvent.mouseLocation
+        let candidates = previews.values.filter { $0.panel.isVisible && $0.panel.frame.contains(mouse) }
+        guard !candidates.isEmpty else { return nil }
+        let number = NSWindow.windowNumber(at: mouse, belowWindowWithWindowNumber: 0)
+        return candidates.first { $0.panel.windowNumber == number }
+    }
+
+    private static func updatePreviewEscape() {
+        let overPreview = previewUnderPointer() != nil
+        guard overPreview != pointerOverPreview else { return }
+        pointerOverPreview = overPreview
+        if overPreview {
+            previewEscape = HotKey(Shortcut(keyCode: kVK_Escape, modifiers: [], key: "\u{1b}")) {
+                previewUnderPointer()?.dismiss()
+            }
+        } else {
+            previewEscape = nil
+        }
+    }
+
+    private static func make(_ id: UUID, url: URL, line: Line,
+                             onHangBack: ((UUID, CGRect) -> Void)?) -> Held? {
+        guard let screen = LinePanel.screenUnderPointer() else { return nil }
+        // No sharper than the screen can show, so a huge image stays light.
+        let longest = max(screen.frame.width, screen.frame.height) * screen.backingScaleFactor
+        guard let image = makeThumbnail(url, maxPixels: Int(longest)),
+              image.size.width > 0, image.size.height > 0 else { return nil }
+        return Held(id: id, image: image, on: screen, line: line, onHangBack: onHangBack)
+    }
+
+    static func hangBack(_ id: UUID) { open[id]?.dismiss() }
 
     static func hangEverythingBack() {
-        for held in open.values { held.hangBack() }
+        for held in open.values { held.dismiss() }
     }
 
     /// Its photo left the line some other way: the file moved, for example.
@@ -46,25 +98,28 @@ final class Held: NSObject {
         }
     }
 
-    private init(id: UUID, url: URL, image: NSImage, on screen: NSScreen, line: Line,
-                 onHangBack: @escaping (UUID, CGRect) -> Void) {
+    private init(id: UUID, image: NSImage, on screen: NSScreen, line: Line,
+                 onHangBack: ((UUID, CGRect) -> Void)?) {
         self.id = id
         self.onHangBack = onHangBack
         let scale = screen.backingScaleFactor
         natural = NSSize(width: image.size.width / scale + HeldView.border * 2,
                          height: image.size.height / scale + HeldView.border * 2)
-        view = HeldView(image: image)
-        panel = HeldPanel(content: view)
+        let isPreview = onHangBack == nil
+        view = HeldView(image: image, isPreview: isPreview)
+        panel = HeldPanel(content: view, takesKeyboard: !isPreview)
         super.init()
-        view.onHangBack = { [weak self] in self?.hangBack() }
+        view.onDismiss = { [weak self] in self?.dismiss() }
         view.onZoom = { [weak self] factor, anchor in self?.zoom(by: factor, around: anchor) }
-        view.onActualSize = { [weak self] in self?.actualSize() }
-        view.onCopy = { line.copy(id) }
-        view.onMarkup = { line.markup(id) }
-        view.onQuickLook = { line.quickLook(id) }
-        // Stretched from an edge or a corner, it keeps the photo's shape.
-        panel.contentAspectRatio = natural
-        panel.minSize = NSSize(width: 80, height: 80)
+        if !isPreview {
+            view.onActualSize = { [weak self] in self?.actualSize() }
+            view.onCopy = { line.copy(id) }
+            view.onMarkup = { line.markup(id) }
+            view.onQuickLook = { line.quickLook(id) }
+            // Stretched from an edge or a corner, it keeps the photo's shape.
+            panel.contentAspectRatio = natural
+            panel.minSize = NSSize(width: 80, height: 80)
+        }
         panel.setFrame(startFrame(on: screen), display: false)
         panel.orderFrontRegardless()
     }
@@ -74,19 +129,40 @@ final class Held: NSObject {
     private func startFrame(on screen: NSScreen) -> NSRect {
         let area = screen.visibleFrame
         let fit = min(1, area.width * 0.7 / natural.width, area.height * 0.7 / natural.height)
-        let w = natural.width * fit, h = natural.height * fit
-        let step = CGFloat((Self.open.count) % 8) * 24
-        return NSRect(x: area.midX - w / 2 + step, y: area.midY - h / 2 - step, width: w, height: h)
+        let isPreview = onHangBack == nil
+        let minimum: CGFloat = isPreview ? Self.previewMinimumSide : 0
+        let w = max(minimum, natural.width * fit), h = max(minimum, natural.height * fit)
+        let count = isPreview ? Self.previews.count : Self.open.count
+        let step = CGFloat(count % 8) * 24
+        let frame = NSRect(x: area.midX - w / 2 + step, y: area.midY - h / 2 - step, width: w, height: h)
+        return isPreview ? frame.fittingOrigin(in: area) : frame
     }
+
+    /// Leaves room for the close button even on a very narrow screenshot.
+    private static let previewMinimumSide: CGFloat = 38
 
     /// Zooms keeping the point under the pointer where it is.
     private func zoom(by factor: CGFloat, around anchor: NSPoint) {
         let frame = panel.frame
-        let scale = min(max(frame.width * factor / natural.width, 0.1), 4)
-        let w = natural.width * scale, h = natural.height * scale
-        guard w >= 60, h >= 60 else { return }
+        let bounds = onHangBack == nil ? panel.screen?.visibleFrame : nil
+        let size: NSSize
+        if let bounds {
+            let longest = max(natural.width, natural.height)
+            let largest = min(bounds.width / natural.width, bounds.height / natural.height)
+            let smallest = min(largest, 1, 100 / longest)
+            let proposed = max(frame.width, frame.height) * factor / longest
+            let scale = min(max(proposed, smallest), largest)
+            size = NSSize(width: max(Self.previewMinimumSide, natural.width * scale),
+                          height: max(Self.previewMinimumSide, natural.height * scale))
+        } else {
+            let scale = min(max(frame.width * factor / natural.width, 0.1), 4)
+            size = NSSize(width: natural.width * scale, height: natural.height * scale)
+            guard size.width >= 60, size.height >= 60 else { return }
+        }
         let fx = (anchor.x - frame.minX) / frame.width, fy = (anchor.y - frame.minY) / frame.height
-        panel.setFrame(NSRect(x: anchor.x - w * fx, y: anchor.y - h * fy, width: w, height: h), display: true)
+        let target = NSRect(x: anchor.x - size.width * fx, y: anchor.y - size.height * fy,
+                            width: size.width, height: size.height)
+        panel.setFrame(bounds.map { target.fittingOrigin(in: $0) } ?? target, display: true)
     }
 
     private func actualSize() {
@@ -95,21 +171,38 @@ final class Held: NSObject {
                               width: natural.width, height: natural.height), display: true)
     }
 
-    private func hangBack() {
+    private func dismiss() {
         let frame = panel.frame
         panel.close()
-        Self.open[id] = nil
-        onHangBack(id, frame)
+        if let onHangBack {
+            Self.open[id] = nil
+            onHangBack(id, frame)
+        } else {
+            Self.previews[id] = nil
+            if Self.previews.isEmpty {
+                Self.previewMouseTimer?.invalidate()
+                Self.previewMouseTimer = nil
+                Self.previewEscape = nil
+                Self.pointerOverPreview = false
+            } else {
+                Self.updatePreviewEscape()
+            }
+        }
     }
 }
 
 /// Floats over every app and Space, under the line so it never covers it.
-/// A click makes it key without bringing Tendedero to the front, so the app
-/// you work in stays active; it then takes Escape and ⌘C.
+/// Held photos take Escape and ⌘C. Pinned previews leave the keyboard
+/// with the app you are working in.
 private final class HeldPanel: NSPanel {
-    init(content: NSView) {
+    private let takesKeyboard: Bool
+
+    init(content: NSView, takesKeyboard: Bool) {
+        self.takesKeyboard = takesKeyboard
         // Resizable from its edges and corners, like any window.
-        super.init(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel, .resizable],
+        let style: NSWindow.StyleMask = takesKeyboard
+            ? [.borderless, .nonactivatingPanel, .resizable] : [.borderless, .nonactivatingPanel]
+        super.init(contentRect: .zero, styleMask: style,
                    backing: .buffered, defer: false)
         isOpaque = false
         backgroundColor = .clear
@@ -119,11 +212,11 @@ private final class HeldPanel: NSPanel {
         hidesOnDeactivate = false
         isReleasedWhenClosed = false
         isMovableByWindowBackground = true
-        becomesKeyOnlyIfNeeded = false
+        becomesKeyOnlyIfNeeded = !takesKeyboard
         contentView = content
     }
 
-    override var canBecomeKey: Bool { true }
+    override var canBecomeKey: Bool { takesKeyboard }
     override var canBecomeMain: Bool { false }
 }
 
@@ -133,7 +226,7 @@ private final class HeldPanel: NSPanel {
 private final class HeldView: NSVisualEffectView {
     static let border: CGFloat = 6
 
-    var onHangBack: () -> Void = {}
+    var onDismiss: () -> Void = {}
     var onZoom: (CGFloat, NSPoint) -> Void = { _, _ in }
     var onActualSize: () -> Void = {}
     var onCopy: () -> Void = {}
@@ -141,9 +234,12 @@ private final class HeldView: NSVisualEffectView {
     var onQuickLook: () -> Void = {}
 
     private let photo = CALayer()
-    private let hangBackButton = CornerButton(symbol: "arrow.up.to.line")
+    private let dismissButton: CornerButton
+    private let isPreview: Bool
 
-    init(image: NSImage) {
+    init(image: NSImage, isPreview: Bool) {
+        self.isPreview = isPreview
+        dismissButton = CornerButton(symbol: isPreview ? "xmark" : "arrow.up.to.line")
         super.init(frame: .zero)
         material = .popover
         blendingMode = .behindWindow
@@ -158,10 +254,10 @@ private final class HeldView: NSVisualEffectView {
         photo.cornerRadius = 7
         photo.masksToBounds = true
         layer?.addSublayer(photo)
-        hangBackButton.alphaValue = 0
-        hangBackButton.onPress = { [weak self] in self?.onHangBack() }
-        hangBackButton.setAccessibilityLabel(L("Hang back"))
-        addSubview(hangBackButton)
+        dismissButton.alphaValue = isPreview ? 1 : 0
+        dismissButton.onPress = { [weak self] in self?.onDismiss() }
+        dismissButton.setAccessibilityLabel(isPreview ? L("Close preview") : L("Hang back"))
+        addSubview(dismissButton)
         setAccessibilityElement(true)
         setAccessibilityRole(.image)
     }
@@ -175,7 +271,7 @@ private final class HeldView: NSVisualEffectView {
         photo.frame = bounds.insetBy(dx: Self.border, dy: Self.border)
         photo.contentsScale = window?.backingScaleFactor ?? 2
         CATransaction.commit()
-        hangBackButton.frame = NSRect(x: 9, y: bounds.height - 29, width: 20, height: 20)
+        dismissButton.frame = NSRect(x: 9, y: bounds.height - 29, width: 20, height: 20)
     }
 
     override func updateTrackingAreas() {
@@ -189,9 +285,10 @@ private final class HeldView: NSVisualEffectView {
     override func mouseExited(with event: NSEvent) { showButton(false) }
 
     private func showButton(_ on: Bool) {
+        guard !isPreview else { return }
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.18
-            hangBackButton.animator().alphaValue = on ? 1 : 0
+            dismissButton.animator().alphaValue = on ? 1 : 0
         }
     }
 
@@ -200,8 +297,10 @@ private final class HeldView: NSVisualEffectView {
     override var mouseDownCanMoveWindow: Bool { true }
 
     override func mouseDown(with event: NSEvent) {
-        window?.makeKey()
-        window?.makeFirstResponder(self)
+        if !isPreview {
+            window?.makeKey()
+            window?.makeFirstResponder(self)
+        }
         window?.performDrag(with: event)
     }
 
@@ -219,7 +318,7 @@ private final class HeldView: NSVisualEffectView {
 
     override func keyDown(with event: NSEvent) {
         if event.keyCode == 53 {
-            onHangBack()
+            onDismiss()
         } else if event.modifierFlags.contains(.command), event.charactersIgnoringModifiers == "c" {
             onCopy()
         } else {
@@ -229,7 +328,12 @@ private final class HeldView: NSVisualEffectView {
 
     override func rightMouseDown(with event: NSEvent) {
         let menu = NSMenu()
-        menu.addItem(ClosureMenuItem(L("Hang back")) { [weak self] in self?.onHangBack() })
+        let title = isPreview ? L("Close preview") : L("Hang back")
+        menu.addItem(ClosureMenuItem(title) { [weak self] in self?.onDismiss() })
+        if isPreview {
+            NSMenu.popUpContextMenu(menu, with: event, for: self)
+            return
+        }
         menu.addItem(.separator())
         menu.addItem(ClosureMenuItem(L("Copy")) { [weak self] in self?.onCopy() })
         menu.addItem(ClosureMenuItem(L("Quick Look")) { [weak self] in self?.onQuickLook() })
@@ -281,5 +385,13 @@ private final class CornerButton: NSVisualEffectView {
 private extension NSPoint {
     func clamped(to rect: NSRect) -> NSPoint {
         NSPoint(x: min(max(x, rect.minX), rect.maxX), y: min(max(y, rect.minY), rect.maxY))
+    }
+}
+
+private extension NSRect {
+    func fittingOrigin(in area: NSRect) -> NSRect {
+        NSRect(x: min(max(minX, area.minX), area.maxX - width),
+               y: min(max(minY, area.minY), area.maxY - height),
+               width: width, height: height)
     }
 }

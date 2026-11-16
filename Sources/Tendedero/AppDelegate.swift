@@ -668,19 +668,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     // MARK: Keys over a photo
 
-    /// Delete and Space while the pointer rests on a photo: Delete does what
-    /// its corner button does, Space takes a quick look, as in Finder. Like
-    /// ⌘Z, they are borrowed as hot keys only then, so every other app keeps
-    /// them.
+    /// Delete, Space and ⌘T are borrowed as hot keys while the pointer is
+    /// over a card. ⌘T pins a preview of an image.
     private var photoKeys: [HotKey] = []
     private var photoKeysFor: UUID?
 
     private func holdPhotoKeys(over id: UUID?) {
-        let id = id.flatMap { id in line.items.first { $0.id == id && !$0.falling && !$0.held }?.id }
-        guard id != photoKeysFor else { return }
-        photoKeysFor = id
+        let item = id.flatMap { id in line.items.first { $0.id == id && !$0.falling && !$0.held } }
+        guard item?.id != photoKeysFor else { return }
+        photoKeysFor = item?.id
         photoKeys = []
-        guard let id else { return }
+        guard let item else { return }
+        let id = item.id
         photoKeys = [
             HotKey(Shortcut(keyCode: kVK_Delete, modifiers: [], key: "\u{8}")) { [weak self] in
                 self?.line.pressCorner(id)
@@ -689,6 +688,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 self?.quickLookToggle(id)
             },
         ].compactMap { $0 }
+        let shortcut = Shortcut.pinPreview
+        if !item.isRecording, hotKey == nil || !isPinPreviewShortcut(Shortcut.current, matching: shortcut),
+           let pinKey = HotKey(shortcut, action: { [weak self] in
+               guard let self, self.isRevealed, self.photo(under: NSEvent.mouseLocation) == id else { return }
+               self.line.pinPreview(id)
+           }) {
+            photoKeys.append(pinKey)
+        }
     }
 
     /// The photo whose card is under the pointer, if any.
@@ -745,9 +752,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     // MARK: Shortcut
 
     private func registerShortcut() {
+        holdPhotoKeys(over: nil)
         hotKey = nil
         guard let shortcut = Shortcut.current else { return }
-        hotKey = HotKey(shortcut) { [weak self] in self?.toggle() }
+        let sharesPinKey = isPinPreviewShortcut(shortcut, matching: .pinPreview)
+        hotKey = HotKey(shortcut) { [weak self] in
+            guard let self else { return }
+            if sharesPinKey, self.isRevealed, let id = self.photo(under: NSEvent.mouseLocation),
+               self.line.pinPreview(id) { return }
+            self.toggle()
+        }
+    }
+
+    private func isPinPreviewShortcut(_ shortcut: Shortcut?, matching pin: Shortcut) -> Bool {
+        shortcut?.keyCode == pin.keyCode && shortcut?.modifiers == pin.modifiers
     }
 
     private func changeShortcut() {

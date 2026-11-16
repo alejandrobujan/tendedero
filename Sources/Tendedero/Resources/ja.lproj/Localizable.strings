@@ -92,3 +92,6 @@
 "Fill" = "塗りつぶし";
 "Select" = "選択";
 "Number" = "番号";
+
+"Pin Preview" = "プレビューを最前面に固定";
+"Close preview" = "プレビューを閉じる";

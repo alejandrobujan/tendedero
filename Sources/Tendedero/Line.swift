@@ -388,6 +388,14 @@ final class Line: ObservableObject {
         QuickLook.shared.show(live.map(\.url), at: index)
     }
 
+    @discardableResult
+    func pinPreview(_ id: UUID) -> Bool {
+        guard let item = items.first(where: { $0.id == id && !$0.falling && !$0.held }),
+              !item.isRecording else { return false }
+        Held.showPreview(id, url: item.url, line: self)
+        return true
+    }
+
     /// After a change of size, every photo is redrawn sharp at the new one.
     func reloadThumbnails() {
         for i in items.indices where !items[i].falling {
