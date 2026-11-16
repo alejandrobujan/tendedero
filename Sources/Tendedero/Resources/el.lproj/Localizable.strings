@@ -1,0 +1,106 @@
+/* Ελληνικά. Τα κλειδιά αντιστοιχούν στα αγγλικά κείμενα του κώδικα. */
+
+/* AppDelegate */
+"Let Tendedero handle your screenshots?" = "Να αναλάβει το Tendedero τα στιγμιότυπα οθόνης σας;";
+"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "Τα στιγμιότυπα οθόνης θα κρεμιούνται στο σχοινί αμέσως μόλις τα τραβάτε, χωρίς την αιωρούμενη μικρογραφία, και δεν θα συσσωρεύονται στο Γραφείο εργασίας. Σύρετε κάποιο σε έναν φάκελο για να το κρατήσετε ή αφαιρέστε το με το ×. Μπορείτε να απενεργοποιήσετε αυτήν τη λειτουργία από τη γραμμή μενού. Οι ρυθμίσεις σας επανέρχονται όταν κλείνετε το Tendedero.";
+"Turn on" = "Ενεργοποίηση";
+"Not now" = "Όχι τώρα";
+"Hide line" = "Απόκρυψη σχοινιού";
+"Show line" = "Εμφάνιση σχοινιού";
+"Take everything down" = "Κατέβασμα όλων";
+"Put back" = "Επαναφορά";
+"Screenshots" = "Στιγμιότυπα οθόνης";
+"Handle screenshots" = "Διαχείριση στιγμιοτύπων οθόνης";
+"Screenshots hang instantly and skip the Desktop" = "Τα στιγμιότυπα κρεμιούνται αμέσως, χωρίς να αποθηκεύονται στο Γραφείο εργασίας";
+"Copy each screenshot" = "Αντιγραφή κάθε στιγμιοτύπου";
+"Each new screenshot goes to the clipboard as it hangs" = "Κάθε νέο στιγμιότυπο αντιγράφεται στο πρόχειρο μόλις κρεμαστεί";
+"Open screenshots folder" = "Άνοιγμα φακέλου στιγμιοτύπων οθόνης";
+"Sounds" = "Ήχοι";
+"Open at login" = "Άνοιγμα κατά τη σύνδεση";
+"Check for Updates…" = "Έλεγχος για ενημερώσεις…";
+"Quit Tendedero" = "Τερματισμός Tendedero";
+"Could not change the login setting" = "Δεν ήταν δυνατή η αλλαγή της ρύθμισης σύνδεσης";
+"Move Tendedero to the Applications folder and try again." = "Μετακινήστε το Tendedero στον φάκελο Εφαρμογές και δοκιμάστε ξανά.";
+"Keep on line" = "Διατήρηση στο σχοινί";
+"As many as fit" = "Όσες χωρούν";
+"%d photos" = "%d φωτογραφίες";
+"Also watch folders" = "Παρακολούθηση επιπλέον φακέλων";
+"Add Folder…" = "Προσθήκη φακέλου…";
+"Watch" = "Παρακολούθηση";
+"Show “%@” in Finder" = "Εμφάνιση του «%@» στο Finder";
+"New images saved to this folder will hang on the line." = "Οι νέες εικόνες που αποθηκεύονται σε αυτόν τον φάκελο θα κρεμιούνται στο σχοινί.";
+"Shortcut" = "Συντόμευση";
+"Change Shortcut…" = "Αλλαγή συντόμευσης…";
+"Change Shortcut" = "Αλλαγή συντόμευσης";
+"None" = "Καμία";
+"Space" = "Διάστημα";
+"Press the new shortcut" = "Πατήστε τη νέα συντόμευση";
+"Escape cancels. Delete removes the shortcut." = "Το Escape ακυρώνει. Το Delete αφαιρεί τη συντόμευση.";
+"Size" = "Μέγεθος";
+"Small" = "Μικρό";
+"Medium" = "Μεσαίο";
+"Large" = "Μεγάλο";
+"Bring the line down" = "Κατέβασμα του σχοινιού";
+"When the pointer rests in the menu bar" = "Όταν ο δείκτης παραμένει στη γραμμή μενού";
+"When something new hangs" = "Όταν κρεμιέται κάτι νέο";
+"Over full screen apps" = "Πάνω από εφαρμογές πλήρους οθόνης";
+"Hang what you copy" = "Κρέμασμα όσων αντιγράφετε";
+"Hang what you copy too?" = "Να κρεμιούνται και όσα αντιγράφετε;";
+"Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "Οι εικόνες, τα κείμενα και οι σύνδεσμοι που αντιγράφετε μπορούν επίσης να κρεμιούνται στο σχοινί: το κείμενο ως σημείωση και ο σύνδεσμος με τον ιστότοπό του. Παραμένουν σε αυτό το Mac και δεν αποθηκεύεται ποτέ τίποτα από πεδίο συνθηματικού. Μπορείτε να το αλλάξετε όποτε θέλετε από την επιλογή «Κρέμασμα όσων αντιγράφετε» στη γραμμή μενού.";
+"Images" = "Εικόνες";
+"Text" = "Κείμενο";
+"Links" = "Σύνδεσμοι";
+"Images you copy hang on the line too" = "Οι εικόνες που αντιγράφετε κρεμιούνται και αυτές στο σχοινί";
+"Tendedero, hanging copied images" = "Tendedero, κρέμασμα αντιγραμμένων εικόνων";
+"The line is empty" = "Το σχοινί είναι άδειο";
+"%d on the line" = "%d στο σχοινί";
+
+/* GrabArea */
+"Copy" = "Αντιγραφή";
+"Open" = "Άνοιγμα";
+"Open Link" = "Άνοιγμα συνδέσμου";
+"Quick Look" = "Γρήγορη προβολή";
+"Markup" = "Σήμανση";
+"Show in Finder" = "Εμφάνιση στο Finder";
+"Share…" = "Κοινή χρήση…";
+"Save to Desktop" = "Αποθήκευση στο Γραφείο εργασίας";
+"Discard" = "Αφαίρεση";
+"Take down" = "Κατέβασμα";
+"Move to Trash" = "Μετακίνηση στον Κάδο";
+"Take down everything to the left" = "Κατέβασμα όλων στα αριστερά";
+"Take down everything to the right" = "Κατέβασμα όλων στα δεξιά";
+
+/* LineView */
+"Take a screenshot and it will hang here" = "Τραβήξτε ένα στιγμιότυπο οθόνης και θα κρεμαστεί εδώ";
+
+/* PeggedView */
+"Copied" = "Αντιγράφηκε";
+
+/* Pinning and holding photos */
+"Pin" = "Καρφίτσωμα";
+"Unpin" = "Ξεκαρφίτσωμα";
+"Hold" = "Διατήρηση στο προσκήνιο";
+"Hang back" = "Κρέμασμα ξανά";
+"Hang everything back" = "Κρέμασμα όλων ξανά";
+"Actual Size" = "Πραγματικό μέγεθος";
+
+/* Selecting photos */
+"%d selected" = "%d επιλεγμένα";
+"Shift-click to select photos" = "Κάντε κλικ με πατημένο το Shift για να επιλέξετε φωτογραφίες";
+// Save availability
+"Save to Desktop (inbox or Desktop only)" = "Αποθήκευση στο Γραφείο εργασίας (μόνο από τα εισερχόμενα ή το Γραφείο εργασίας)";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Να ανοίγει το Tendedero κατά τη σύνδεση;";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Το Tendedero δεν ανοίγει κατά τη σύνδεσή σας, οπότε μετά από επανεκκίνηση το σχοινί δεν εμφανίζεται μέχρι να ανοίξετε ξανά την εφαρμογή.";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "Τα κείμενα που αντιγράφετε κρεμιούνται και αυτά στο σχοινί";
+"Links you copy hang on the line too" = "Οι σύνδεσμοι που αντιγράφετε κρεμιούνται και αυτοί στο σχοινί";
+
+/* Searching the line */
+"Search the line" = "Αναζήτηση στο σχοινί";
+"%d of %d" = "%d από %d";
+
+/* Zoom on hover */
+"Zoom on hover" = "Μεγέθυνση κατά την κατάδειξη";
