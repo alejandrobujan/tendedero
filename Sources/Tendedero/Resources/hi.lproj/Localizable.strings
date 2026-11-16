@@ -14,6 +14,8 @@
 "Screenshots" = "स्क्रीनशॉट";
 "Handle screenshots" = "स्क्रीनशॉट संभालें";
 "Screenshots hang instantly and skip the Desktop" = "स्क्रीनशॉट तुरंत टँगते हैं और डेस्कटॉप पर नहीं जाते";
+"Copy each screenshot" = "हर स्क्रीनशॉट कॉपी करें";
+"Each new screenshot goes to the clipboard as it hangs" = "हर नया स्क्रीनशॉट टँगते ही क्लिपबोर्ड पर कॉपी हो जाता है";
 "Open screenshots folder" = "स्क्रीनशॉट फ़ोल्डर खोलें";
 "Sounds" = "आवाज़ें";
 "Open at login" = "लॉगिन पर खोलें";

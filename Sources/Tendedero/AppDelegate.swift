@@ -14,7 +14,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// In inbox mode, a second watcher on the Desktop. If a macOS version
     /// ignores the screenshot settings (macOS 27 renamed one), captures keep
     /// landing on the Desktop, and they still hang on the line.
-    private var safetyWatcher: ScreenshotWatcher?
     /// Folders chosen in "Also watch folders", like the one another
     /// screenshot app saves to.
     private var folderWatchers: [ScreenshotWatcher] = []
@@ -90,7 +89,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         searchBar = SearchBar(line: line)
         searchBar.onReturn = { [weak self] in self?.copyFirstMatch() }
         searchBar.onEnd = { [weak self] in self?.endSearch(tuckAway: true) }
-        searchHotKey = HotKey(Self.searchShortcut) { [weak self] in self?.startSearch() }
+        registerSearchShortcut()
 
         setUpStatusItem()
         watchMenuBarClicks()
@@ -191,23 +190,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func startWatcher() {
         watcher?.stop()
-        safetyWatcher?.stop()
-        safetyWatcher = nil
         watcher = ScreenshotWatcher(
-            onNew: { [weak self] url in self?.hangCapture(url) },
+            onNew: { [weak self] url in self?.hangCapture(url, screenshot: true) },
             onChange: { [weak self] in self?.line.prune() })
         watcher.start()
-        if Inbox.isEnabled, watcher.folder.standardizedFileURL != ScreenshotWatcher.desktop.standardizedFileURL {
-            let safety = ScreenshotWatcher(
-                folder: ScreenshotWatcher.desktop,
-                onNew: { [weak self] url in
-                    log.notice("Screenshot landed on the Desktop despite inbox mode: \(url.lastPathComponent, privacy: .public)")
-                    self?.hangCapture(url)
-                },
-                onChange: { [weak self] in self?.line.prune() })
-            safety.start()
-            safetyWatcher = safety
-        }
         folderWatchers.forEach { $0.stop() }
         folderWatchers = []
         // A folder may also be watched for screenshots, like the Desktop; an
@@ -238,6 +224,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
         }
         set { UserDefaults.standard.set(newValue.map(\.path), forKey: "extraFolders") }
+    }
+
+    /// Each new screenshot goes to the clipboard as it hangs.
+    static var copiesScreenshots: Bool {
+        get { UserDefaults.standard.bool(forKey: "copyScreenshots") }
+        set { UserDefaults.standard.set(newValue, forKey: "copyScreenshots") }
     }
 
     private func chooseExtraFolder() {
@@ -416,7 +408,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     /// A new screenshot lifts off from where it was taken and flies to its
     /// place on the line. Without a known capture area it simply drops in.
-    private func hangCapture(_ url: URL, squeezing: Bool = false, trimmedFrom: CGRect? = nil, after: URL? = nil) {
+    private func hangCapture(_ url: URL, screenshot: Bool = false, squeezing: Bool = false,
+                             trimmedFrom: CGRect? = nil, after: URL? = nil) {
         // Several watchers may report a file we just saved. Keep ignoring
         // that same file after either a move or a copy.
         guard !line.isDesktopSave(url) else { return }
@@ -440,6 +433,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             itemsChanged()
             return
         }
+        // Recordings hang from the same folder, but the option is for screenshots.
+        if screenshot, Self.copiesScreenshots, !isRecording(url) { line.copy(id) }
         guard let from else { return }
         // Let the line come down and lay out before measuring the landing spot.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) { [weak self] in
@@ -662,7 +657,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     // MARK: Searching the line
 
-    static let searchShortcut = Shortcut(keyCode: kVK_ANSI_F, modifiers: [.control, .option], key: "f")
 
     /// Brings the line down and opens the search field under it.
     private func startSearch() {
@@ -1071,23 +1065,44 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         hotKey = HotKey(shortcut) { [weak self] in self?.toggle() }
     }
 
+    private func registerSearchShortcut() {
+        searchHotKey = nil
+        guard let shortcut = Shortcut.search else { return }
+        searchHotKey = HotKey(shortcut) { [weak self] in self?.startSearch() }
+    }
+
     private func changeShortcut() {
-        // Off while recording, so pressing the current one records it
-        // instead of showing the line.
+        record(\.current, register: registerShortcut, other: registerSearchShortcut,
+               registered: { [weak self] in self?.hotKey != nil })
+    }
+
+    private func changeSearchShortcut() {
+        record(\.search, register: registerSearchShortcut, other: registerShortcut,
+               registered: { [weak self] in self?.searchHotKey != nil })
+    }
+
+    /// Both shortcuts are off while recording, so pressing either one
+    /// records it instead of showing or searching the line.
+    private func record(_ setting: ReferenceWritableKeyPath<Shortcut.Type, Shortcut?>,
+                        register: @escaping () -> Void, other: @escaping () -> Void,
+                        registered: @escaping () -> Bool) {
         hotKey = nil
-        ShortcutRecorder.shared.record { [weak self] result in
-            guard let self else { return }
+        searchHotKey = nil
+        ShortcutRecorder.shared.record { result in
+            // The other one first, so taking its keys fails below.
+            other()
             if let result {
-                let previous = Shortcut.current
-                Shortcut.current = result
-                self.registerShortcut()
-                // Taken by another app: keep the one that worked.
-                if result != nil && self.hotKey == nil {
+                let previous = Shortcut.self[keyPath: setting]
+                Shortcut.self[keyPath: setting] = result
+                register()
+                // Taken by another app, or by the other shortcut: keep the
+                // one that worked.
+                if result != nil && !registered() {
                     NSSound.beep()
-                    Shortcut.current = previous
+                    Shortcut.self[keyPath: setting] = previous
                 }
             }
-            self.registerShortcut()
+            register()
         }
     }
 
@@ -1156,8 +1171,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(toggleItem)
 
         let searchItem = ClosureMenuItem(L("Search the line")) { [weak self] in self?.startSearch() }
-        searchItem.keyEquivalent = Self.searchShortcut.key
-        searchItem.keyEquivalentModifierMask = Self.searchShortcut.modifiers
+        if let shortcut = Shortcut.search, shortcut.key.count == 1 {
+            searchItem.keyEquivalent = shortcut.key
+            searchItem.keyEquivalentModifierMask = shortcut.modifiers
+        }
         searchItem.isEnabled = line.liveCount > 0
         menu.addItem(searchItem)
 
@@ -1186,6 +1203,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         inbox.state = Inbox.isEnabled ? .on : .off
         inbox.toolTip = L("Screenshots hang instantly and skip the Desktop")
         menu.addItem(inbox)
+        let copyItem = ClosureMenuItem(L("Copy each screenshot")) {
+            AppDelegate.copiesScreenshots.toggle()
+        }
+        copyItem.state = Self.copiesScreenshots ? .on : .off
+        copyItem.toolTip = L("Each new screenshot goes to the clipboard as it hangs")
+        menu.addItem(copyItem)
 
         let folderItem = NSMenuItem(title: L("Also watch folders"), action: nil, keyEquivalent: "")
         let folderMenu = NSMenu()
@@ -1292,10 +1315,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         let shortcutItem = NSMenuItem(title: L("Shortcut"), action: nil, keyEquivalent: "")
         let shortcuts = NSMenu()
-        let current = NSMenuItem(title: Shortcut.current?.display ?? L("None"), action: nil, keyEquivalent: "")
-        current.isEnabled = false
-        shortcuts.addItem(current)
-        shortcuts.addItem(ClosureMenuItem(L("Change Shortcut…")) { [weak self] in self?.changeShortcut() })
+        // One for showing the line, one for searching it, each with its
+        // own Change Shortcut….
+        let shortcutKinds: [(String, Shortcut?, () -> Void)] = [
+            (L("Show line"), Shortcut.current, { [weak self] in self?.changeShortcut() }),
+            (L("Search the line"), Shortcut.search, { [weak self] in self?.changeSearchShortcut() }),
+        ]
+        for (i, kind) in shortcutKinds.enumerated() {
+            if i > 0 { shortcuts.addItem(.separator()) }
+            shortcuts.addItem(.sectionHeader(title: kind.0))
+            let current = NSMenuItem(title: kind.1?.display ?? L("None"), action: nil, keyEquivalent: "")
+            current.isEnabled = false
+            shortcuts.addItem(current)
+            shortcuts.addItem(ClosureMenuItem(L("Change Shortcut…"), handler: kind.2))
+        }
         shortcutItem.submenu = shortcuts
         menu.addItem(shortcutItem)
 

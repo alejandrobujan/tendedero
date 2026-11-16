@@ -68,7 +68,7 @@ Posez le pointeur au milieu de la barre des menus et la corde descend. Éloignez
 | Poser le pointeur au milieu de la barre des menus | Fait descendre la corde sur cet écran. |
 | Cliquer n’importe où dans la barre des menus | La range. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Affiche ou masque la corde. Modifiable dans Raccourci, dans la barre des menus. |
-| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | Recherche sur la corde. |
+| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | Recherche sur la corde. Modifiable dans Raccourci, dans la barre des menus. |
 
 <br>
 

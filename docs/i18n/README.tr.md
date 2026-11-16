@@ -68,7 +68,7 @@ Aldığınız her ekran görüntüsü ve kopyaladığınız her şey, ekranını
 | İşaretçiyi menü çubuğunun ortasında bırak | O ekranda ipi aşağı indirir. |
 | Menü çubuğunda herhangi bir yere tıkla | İpi geri kaldırır. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | İpi gösterir ya da gizler. Menü çubuğundaki Kısayol bölümünden değiştirilebilir. |
-| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | İpte ara. |
+| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | İpte ara. Menü çubuğundaki Kısayol bölümünden değiştirilebilir. |
 
 <br>
 

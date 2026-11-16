@@ -14,6 +14,8 @@
 "Screenshots" = "Screenshots";
 "Handle screenshots" = "Handle screenshots";
 "Screenshots hang instantly and skip the Desktop" = "Screenshots hang instantly and skip the Desktop";
+"Copy each screenshot" = "Copy each screenshot";
+"Each new screenshot goes to the clipboard as it hangs" = "Each new screenshot goes to the clipboard as it hangs";
 "Open screenshots folder" = "Open screenshots folder";
 "Sounds" = "Sounds";
 "Open at login" = "Open at login";

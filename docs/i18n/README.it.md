@@ -68,7 +68,7 @@ Porta il puntatore al centro della barra dei menu e il filo scende. Allontanalo 
 | Fermare il puntatore al centro della barra dei menu | Fa scendere il filo su quello schermo. |
 | Fare clic in un punto qualsiasi della barra dei menu | Ritira il filo. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Mostra o nasconde il filo. Si cambia in Scorciatoia, nella barra dei menu. |
-| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | Cerca sul filo. |
+| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | Cerca sul filo. Si cambia in Scorciatoia, nella barra dei menu. |
 
 <br>
 

@@ -14,6 +14,8 @@
 "Screenshots" = "Ekran şəkilləri";
 "Handle screenshots" = "Ekran şəkillərini idarə et";
 "Screenshots hang instantly and skip the Desktop" = "Ekran şəkilləri dərhal asılır və İş masasına düşmür";
+"Copy each screenshot" = "Hər ekran şəklini kopyala";
+"Each new screenshot goes to the clipboard as it hangs" = "Hər yeni ekran şəkli asılarkən mübadilə buferinə kopyalanır";
 "Open screenshots folder" = "Ekran şəkilləri qovluğunu aç";
 "Sounds" = "Səslər";
 "Open at login" = "Sistemə girişdə aç";

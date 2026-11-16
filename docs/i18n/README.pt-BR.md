@@ -68,7 +68,7 @@ Pare o ponteiro no meio da barra de menus e o varal desce. Afaste-o e ele some.
 | Parar o ponteiro no meio da barra de menus | Baixa o varal naquela tela. |
 | Clicar em qualquer lugar da barra de menus | Recolhe o varal. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Mostra ou oculta o varal. Altere em Atalho, na barra de menus. |
-| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | Busca no varal. |
+| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | Busca no varal. Altere em Atalho, na barra de menus. |
 
 <br>
 

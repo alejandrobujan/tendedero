@@ -12,6 +12,8 @@
 "Screenshots" = "截图";
 "Handle screenshots" = "接管截图";
 "Screenshots hang instantly and skip the Desktop" = "截图即刻挂上，不再经过桌面";
+"Copy each screenshot" = "自动复制每张截图";
+"Each new screenshot goes to the clipboard as it hangs" = "新截图挂上时即复制到剪贴板";
 "Open screenshots folder" = "打开截图文件夹";
 "Sounds" = "声音";
 "Open at login" = "登录时打开";

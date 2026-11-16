@@ -68,7 +68,7 @@ Leva o punteiro ao centro da barra de menús e a corda baixa. Apártao e desapar
 | Deixar o punteiro no centro da barra de menús | Baixa a corda nesa pantalla. |
 | Facer clic en calquera sitio da barra de menús | Recolle a corda. |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | Amosa ou oculta a corda. Cámbiase en Atallo, na barra de menús. |
-| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | Busca na corda. |
+| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | Busca na corda. Cámbiase en Atallo, na barra de menús. |
 
 <br>
 

@@ -68,7 +68,7 @@
 | 指针停在菜单栏中间 | 在那一块屏幕上放下绳子。 |
 | 点击菜单栏任意处 | 把绳子收起来。 |
 | <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>T</kbd> | 显示或隐藏绳子。可在菜单栏的「快捷键」中更改。 |
-| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | 在晾衣绳上搜索。 |
+| <kbd>⌃</kbd>&thinsp;<kbd>⌥</kbd>&thinsp;<kbd>F</kbd> | 在晾衣绳上搜索。可在菜单栏的「快捷键」中更改。 |
 
 <br>
 
