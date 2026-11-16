@@ -42,7 +42,8 @@ final class HotKey {
     }
 }
 
-/// The shortcut that shows and hides the line: ⌃⌥T unless changed, or none.
+/// A global shortcut: ⌃⌥T shows and hides the line, ⌃⌥F searches it. Either
+/// can be changed or removed.
 struct Shortcut: Equatable {
     var keyCode: Int
     var modifiers: NSEvent.ModifierFlags
@@ -50,6 +51,7 @@ struct Shortcut: Equatable {
     var key: String
 
     static let standard = Shortcut(keyCode: kVK_ANSI_T, modifiers: [.control, .option], key: "t")
+    static let standardSearch = Shortcut(keyCode: kVK_ANSI_F, modifiers: [.control, .option], key: "f")
 
     /// ⌘Z, for Put back while the pointer is on the line. A hot key is a key
     /// on the keyboard, not a letter, so it is the key that types Z with
@@ -84,21 +86,31 @@ struct Shortcut: Equatable {
         }
     }
 
-    private static let defaultsKey = "shortcut"
-
-    /// The user's choice. Nil means no shortcut at all.
+    /// The user's choice for showing the line. Nil means no shortcut at all.
     static var current: Shortcut? {
-        get {
-            guard let saved = UserDefaults.standard.dictionary(forKey: defaultsKey) else { return standard }
-            guard let code = saved["keyCode"] as? Int, let flags = saved["modifiers"] as? UInt,
-                  let key = saved["key"] as? String else { return nil }
-            return Shortcut(keyCode: code, modifiers: NSEvent.ModifierFlags(rawValue: flags), key: key)
-        }
-        set {
-            UserDefaults.standard.set(newValue.map {
-                ["keyCode": $0.keyCode, "modifiers": $0.modifiers.rawValue, "key": $0.key] as [String: Any]
-            } ?? [:], forKey: defaultsKey)
-        }
+        get { saved("shortcut") ?? standard }
+        set { save(newValue, "shortcut") }
+    }
+
+    /// The user's choice for searching the line. Nil means no shortcut at all.
+    static var search: Shortcut? {
+        get { saved("searchShortcut") ?? standardSearch }
+        set { save(newValue, "searchShortcut") }
+    }
+
+    /// Nil when never changed, so the standard one applies; `.some(nil)`
+    /// when removed.
+    private static func saved(_ defaultsKey: String) -> Shortcut?? {
+        guard let saved = UserDefaults.standard.dictionary(forKey: defaultsKey) else { return nil }
+        guard let code = saved["keyCode"] as? Int, let flags = saved["modifiers"] as? UInt,
+              let key = saved["key"] as? String else { return .some(nil) }
+        return Shortcut(keyCode: code, modifiers: NSEvent.ModifierFlags(rawValue: flags), key: key)
+    }
+
+    private static func save(_ shortcut: Shortcut?, _ defaultsKey: String) {
+        UserDefaults.standard.set(shortcut.map {
+            ["keyCode": $0.keyCode, "modifiers": $0.modifiers.rawValue, "key": $0.key] as [String: Any]
+        } ?? [:], forKey: defaultsKey)
     }
 
     /// From a key press, if it makes a usable global shortcut: it needs

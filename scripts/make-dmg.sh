@@ -84,6 +84,14 @@ if [ -n "$IDENTITY" ]; then
   fi
 fi
 
+# The same image under a name without the version, uploaded to every release
+# beside the versioned one, so this link always downloads the newest:
+#   https://github.com/alejandrobujan/tendedero/releases/latest/download/Tendedero.dmg
+LATEST="$(dirname "$DMG")/Tendedero.dmg"
+cp -f "$DMG" "$LATEST"
+echo "Copied to $LATEST. Publish both:"
+echo "  gh release create v$VERSION \"$DMG\" \"$LATEST\" ..."
+
 # Keep the Homebrew cask in step: new version and the checksum of this image.
 # Set TAP_DIR to the tap checkout; nothing is committed or pushed here, so the
 # cask never points at a release that is not on GitHub yet.

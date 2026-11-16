@@ -14,13 +14,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// In inbox mode, a second watcher on the Desktop. If a macOS version
     /// ignores the screenshot settings (macOS 27 renamed one), captures keep
     /// landing on the Desktop, and they still hang on the line.
-    private var safetyWatcher: ScreenshotWatcher?
     /// Folders chosen in "Also watch folders", like the one another
     /// screenshot app saves to.
     private var folderWatchers: [ScreenshotWatcher] = []
     private var clipboardWatcher: ClipboardWatcher!
+    private var noteWatcher: NoteWatcher!
     private var signalSources: [DispatchSourceSignal] = []
     private var hotKey: HotKey?
+    /// ⌃⌥F searches the line. Fixed, apart from the shortcut that shows it.
+    private var searchHotKey: HotKey?
+    private var searchBar: SearchBar!
+    private let zoom = Zoom()
     private var cancellables = Set<AnyCancellable>()
     private var mouseTimer: Timer?
 
@@ -78,11 +82,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         startWatcher()
         clipboardWatcher = ClipboardWatcher { [weak self] url in self?.hangCapture(url) }
         if ClipboardWatcher.isEnabled { clipboardWatcher.start() }
+        noteWatcher = NoteWatcher { [weak self] in self?.line.refreshNotes() }
+        noteWatcher.start()
 
         registerShortcut()
+        searchBar = SearchBar(line: line)
+        searchBar.onReturn = { [weak self] in self?.copyFirstMatch() }
+        searchBar.onEnd = { [weak self] in self?.endSearch(tuckAway: true) }
+        registerSearchShortcut()
 
         setUpStatusItem()
         watchMenuBarClicks()
+        watchPutBackKey()
 
         // Hang on Tendedero, in the menu of images in Finder and other apps.
         NSApp.servicesProvider = self
@@ -90,6 +101,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         Markup.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         Annotate.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
+        Share.shared.clearAll()
         Trim.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         panel.onScroll = { [weak self] event in
             // Sideways on a trackpad, or the wheel of a mouse.
@@ -100,6 +112,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         line.onFall = { [weak self] item in self?.fall(item) }
         line.onHold = { [weak self] id in self?.hold(id) }
         line.onHangBack = { id in Held.hangBack(id) }
+        line.onUndoableAction = { [weak self] in self?.keepUndoAtPointer() }
 
         line.$items
             .receive(on: RunLoop.main)
@@ -135,7 +148,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
 
         if !Inbox.wasOffered {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in self?.offerInbox() }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
+                self?.offerInbox()
+                self?.offerCopying()
+            }
+        } else if !Self.copyingOffered {
+            // Updated from a version that only hung screenshots: shown once.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in self?.offerCopying() }
+        } else if Self.shouldOfferLogin {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { Self.offerLogin() }
         }
 
         if !UserDefaults.standard.bool(forKey: "welcomed") {
@@ -157,29 +178,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // An editor still open saves its marks.
         Annotate.shared.finish()
         if Inbox.isEnabled { Inbox.restore() }
+        Share.shared.clearAll()
     }
 
     // MARK: Inbox mode
 
     private func startWatcher() {
         watcher?.stop()
-        safetyWatcher?.stop()
-        safetyWatcher = nil
         watcher = ScreenshotWatcher(
-            onNew: { [weak self] url in self?.hangCapture(url) },
+            onNew: { [weak self] url in self?.hangCapture(url, screenshot: true) },
             onChange: { [weak self] in self?.line.prune() })
         watcher.start()
-        if Inbox.isEnabled, watcher.folder.standardizedFileURL != ScreenshotWatcher.desktop.standardizedFileURL {
-            let safety = ScreenshotWatcher(
-                folder: ScreenshotWatcher.desktop,
-                onNew: { [weak self] url in
-                    log.notice("Screenshot landed on the Desktop despite inbox mode: \(url.lastPathComponent, privacy: .public)")
-                    self?.hangCapture(url)
-                },
-                onChange: { [weak self] in self?.line.prune() })
-            safety.start()
-            safetyWatcher = safety
-        }
         folderWatchers.forEach { $0.stop() }
         folderWatchers = []
         // A folder may also be watched for screenshots, like the Desktop; an
@@ -212,6 +221,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         set { UserDefaults.standard.set(newValue.map(\.path), forKey: "extraFolders") }
     }
 
+    /// Each new screenshot goes to the clipboard as it hangs.
+    static var copiesScreenshots: Bool {
+        get { UserDefaults.standard.bool(forKey: "copyScreenshots") }
+        set { UserDefaults.standard.set(newValue, forKey: "copyScreenshots") }
+    }
+
     private func chooseExtraFolder() {
         let panel = NSOpenPanel()
         panel.canChooseDirectories = true
@@ -242,14 +257,106 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         alert.addButton(withTitle: L("Turn on"))
         alert.addButton(withTitle: L("Not now"))
         if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
+        // A menu bar app that does not open at login is gone after the first
+        // restart, so the first launch offers it too, ticked.
+        let login = Self.shouldOfferLogin ? NSButton(checkboxWithTitle: L("Open at login"), target: nil, action: nil) : nil
+        if let login {
+            login.state = .on
+            alert.accessoryView = login
+            Self.loginOffered()
+        }
         NSApp.activate(ignoringOtherApps: true)
         if alert.runModal() == .alertFirstButtonReturn { setInbox(true) }
+        if login?.state == .on { Self.openAtLogin() }
+    }
+
+    // MARK: Hang what you copy
+
+    private static let copyingOfferedKey = "copyingOffered"
+    private static var copyingOffered: Bool {
+        get { UserDefaults.standard.bool(forKey: copyingOfferedKey) }
+        set { UserDefaults.standard.set(newValue, forKey: copyingOfferedKey) }
+    }
+
+    /// Asked once, on the first launch or the first after an update: what
+    /// you copy can hang too. Each kind is ticked and shown, but nothing is
+    /// kept until Turn on. Open at login rides along when it is due, so an
+    /// update asks one thing, not two.
+    private func offerCopying() {
+        Self.copyingOffered = true
+        let alert = NSAlert()
+        alert.messageText = L("Hang what you copy too?")
+        alert.informativeText = L("Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar.")
+        alert.addButton(withTitle: L("Turn on"))
+        alert.addButton(withTitle: L("Not now"))
+        if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
+        let kinds: [(String, ReferenceWritableKeyPath<ClipboardWatcher.Type, Bool>)] = [
+            (L("Images"), \.imagesEnabled), (L("Text"), \.textEnabled), (L("Links"), \.linksEnabled),
+        ]
+        let boxes = kinds.map { kind -> NSButton in
+            let box = NSButton(checkboxWithTitle: kind.0, target: nil, action: nil)
+            box.state = .on
+            return box
+        }
+        let login = Self.shouldOfferLogin ? NSButton(checkboxWithTitle: L("Open at login"), target: nil, action: nil) : nil
+        login?.state = .on
+        if login != nil { Self.loginOffered() }
+        let stack = NSStackView(views: boxes + (login.map { [$0] } ?? []))
+        stack.orientation = .vertical
+        stack.alignment = .leading
+        stack.spacing = 6
+        // Open at login is a separate question: a little apart.
+        if login != nil { stack.setCustomSpacing(14, after: boxes[boxes.count - 1]) }
+        stack.frame = NSRect(x: 0, y: 0, width: 240, height: stack.fittingSize.height)
+        alert.accessoryView = stack
+        NSApp.activate(ignoringOtherApps: true)
+        if alert.runModal() == .alertFirstButtonReturn {
+            for (kind, box) in zip(kinds, boxes) { ClipboardWatcher.self[keyPath: kind.1] = box.state == .on }
+            refreshClipboardWatcher()
+        }
+        if login?.state == .on { Self.openAtLogin() }
+    }
+
+    // MARK: Open at login
+
+    private static let loginOfferedKey = "loginOfferedVersion"
+    private static var version: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+    }
+
+    /// Each install or update asks once whether Tendedero should open at
+    /// login, unless it already does.
+    private static var shouldOfferLogin: Bool {
+        SMAppService.mainApp.status != .enabled
+            && UserDefaults.standard.string(forKey: loginOfferedKey) != version
+    }
+
+    private static func loginOffered() {
+        UserDefaults.standard.set(version, forKey: loginOfferedKey)
+    }
+
+    private static func offerLogin() {
+        loginOffered()
+        let alert = NSAlert()
+        alert.messageText = L("Open Tendedero at login?")
+        alert.informativeText = L("Tendedero does not open when you log in, so after a restart the line is gone until you open it again.")
+        alert.addButton(withTitle: L("Open at login"))
+        alert.addButton(withTitle: L("Not now"))
+        if let icon = NSImage(named: "Tendedero") ?? NSApp.applicationIconImage { alert.icon = icon }
+        NSApp.activate(ignoringOtherApps: true)
+        if alert.runModal() == .alertFirstButtonReturn { openAtLogin() }
+    }
+
+    /// Turned off in System Settings, macOS asks for approval there.
+    private static func openAtLogin() {
+        guard SMAppService.mainApp.status != .enabled else { return }
+        toggleLaunchAtLogin()
+        if SMAppService.mainApp.status == .requiresApproval { SMAppService.openSystemSettingsLoginItems() }
     }
 
     /// Watching the clipboard is opt in, from the menu bar only.
-    private func setClipboard(_ on: Bool) {
-        ClipboardWatcher.isEnabled = on
-        if on { clipboardWatcher.start() } else { clipboardWatcher.stop() }
+    private func refreshClipboardWatcher() {
+        if ClipboardWatcher.isEnabled { clipboardWatcher.start() } else { clipboardWatcher.stop() }
         updateStatusIcon()
     }
 
@@ -274,9 +381,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func itemsChanged() {
         updateStatusIcon()
         Held.forget(except: Set(line.items.filter { !$0.falling && $0.held }.map(\.id)))
-        guard line.liveCount == 0, !keepOpen else { return }
+        guard line.liveCount == 0, !keepOpen, undoAnchor == nil else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [weak self] in
-            guard let self, self.line.liveCount == 0, !self.keepOpen else { return }
+            guard let self, self.line.liveCount == 0, !self.keepOpen, self.undoAnchor == nil else { return }
             self.wanted = false
             self.refresh()
         }
@@ -296,7 +403,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     /// A new screenshot lifts off from where it was taken and flies to its
     /// place on the line. Without a known capture area it simply drops in.
-    private func hangCapture(_ url: URL) {
+    private func hangCapture(_ url: URL, screenshot: Bool = false) {
+        // Several watchers may report a file we just saved. Keep ignoring
+        // that same file after either a move or a copy.
+        guard !line.isDesktopSave(url) else { return }
         // Already hanging: a photo put back with ⌘Z comes out of the Trash
         // into the folder, and the watcher sees it arrive. It must not pull
         // the line over to the screen it was first taken on.
@@ -318,6 +428,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             itemsChanged()
             return
         }
+        // Recordings hang from the same folder, but the option is for screenshots.
+        if screenshot, Self.copiesScreenshots, !isRecording(url) { line.copy(id) }
         guard let from else { return }
         // Let the line come down and lay out before measuring the landing spot.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) { [weak self] in
@@ -456,6 +568,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
         }
         if !on {
+            // Tucked away by any means, a search under way ends with it.
+            if searchBar?.isShown == true { endSearch(tuckAway: false) }
+            zoom.hide()
+            undoAnchor = nil
+            holdPutBackKey(false)
+            line.clearSelection()
+            holdSelectionKeys(false)
             pinned = false
             peekUntil = .distantPast
             panel.ignoresMouseEvents = true
@@ -469,6 +588,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 refresh()
             }
         }
+    }
+
+    // MARK: Searching the line
+
+
+    /// Brings the line down and opens the search field under it.
+    private func startSearch() {
+        if !isRevealed { toggle() }
+        keepOpen = true
+        pinned = true
+        searchBar.show(below: panel.frame)
+    }
+
+    /// Return copies the newest photo, note or link that matches, and the
+    /// line goes back up, as after picking a result in Spotlight.
+    private func copyFirstMatch() {
+        guard line.isSearching, let item = line.shown.last(where: { !$0.falling }) else { return }
+        line.copy(item.id)
+        endSearch(tuckAway: true)
+    }
+
+    /// The whole line comes back. With Escape it also tucks away; after a
+    /// click elsewhere it stays as it is.
+    private func endSearch(tuckAway: Bool) {
+        line.query = ""
+        searchBar.hide()
+        if tuckAway, isRevealed { setRevealed(false) }
     }
 
     @objc private func toggle() {
@@ -500,6 +646,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         panel.ignoresMouseEvents = true
         holdPutBackKey(false)
         holdPhotoKeys(over: nil)
+        holdSelectionKeys(false)
     }
 
     /// How long the cursor rests against the top edge before the line comes
@@ -528,6 +675,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let handler: (NSEvent?) -> Void = { [weak self] _ in
             MainActor.assumeIsolated {
                 guard let self else { return }
+                // A new click ends the previous menu interaction. If this
+                // click performs another undoable action it gets a new anchor.
+                self.releaseUndoAnchor()
                 let p = NSEvent.mouseLocation
                 guard NSScreen.screens.contains(where: { NSMouseInRect(p, Self.menuBarBand(of: $0), false) }) else { return }
                 self.menuBarSuppressed = true
@@ -560,6 +710,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard isRevealed else {
             holdPutBackKey(false)
             holdPhotoKeys(over: nil)
+            holdSelectionKeys(false)
             line.closeGaps()
             // Resting in the middle of the menu bar brings the line down on
             // that screen. Pushing against the top edge is part of it, and it
@@ -587,19 +738,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
 
         updateMousePassThrough(mouse)
+        updateZoom(mouse)
 
         // The line's zone runs from its lowest point up to the top of the
         // screen, menu bar included, so moving up never hides it.
         var zone = panel.frame
         if let screen = panel.screen { zone.size.height = screen.frame.maxY - zone.minY }
         let inside = NSMouseInRect(mouse, zone, false)
-        if inside && pinned { pinned = false }
-        holdPutBackKey(inside)
-        holdPhotoKeys(over: inside ? photo(under: mouse) : nil)
+        // While searching, the keys belong to the search field: Space and
+        // Delete type, and ⌘Z undoes typing.
+        let searching = searchBar?.isShown == true
+        let atUndoAnchor = isAtUndoAnchor(mouse)
+        if inside && pinned && !searching { pinned = false }
+        holdPutBackKey((inside || atUndoAnchor) && !searching && !GrabView.isShowingMenu && !Share.shared.isOpen)
+        holdPhotoKeys(over: inside && !searching ? photo(under: mouse) : nil)
+        holdSelectionKeys(inside && !searching && !GrabView.isShowingMenu && !Share.shared.isOpen)
         // Gaps left by discarded photos close once the pointer moves away.
         if !inside { line.closeGaps() }
 
-        let busy = pinned || GrabView.isDragging || GrabView.isShowingMenu
+        // A search keeps the line down until Escape or a click elsewhere.
+        let busy = pinned || searching || atUndoAnchor || GrabView.isDragging || GrabView.isShowingMenu || Share.shared.isOpen
             || line.pressedID != nil || now < peekUntil
         if inside || busy {
             awaySince = nil
@@ -611,6 +769,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 setRevealed(false)
             }
         }
+    }
+
+    /// The card under the pointer opens larger below the line. Not while
+    /// dragging, in a card's menu, or while one of our windows is in front,
+    /// like Quick Look.
+    private func updateZoom(_ mouse: NSPoint) {
+        guard Zoom.isEnabled, !GrabView.isDragging, !GrabView.isShowingMenu, NSApp.keyWindow == nil,
+              let screen = panel.screen else {
+            zoom.hide()
+            return
+        }
+        let local = panel.convertPoint(fromScreen: mouse)
+        let flipped = CGPoint(x: local.x, y: panel.frame.height - local.y)
+        let hit = line.hitRects.first { $0.value.contains(flipped) }
+        let item = hit.flatMap { hit in line.items.first { $0.id == hit.key && !$0.falling && !$0.flying } }
+        let card = hit.map {
+            CGRect(x: panel.frame.minX + $0.value.minX, y: panel.frame.maxY - $0.value.maxY,
+                   width: $0.value.width, height: $0.value.height)
+        }
+        zoom.update(item, card: card, on: screen)
     }
 
     /// The panel spans the whole width of the screen, so it only accepts the
@@ -653,8 +831,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     // MARK: Hang on Tendedero
 
-    /// The service macOS lists for images in Finder and elsewhere. What
-    /// you hang yourself is pinned, and the line comes down to show it.
+    /// The service macOS lists for images and text files in Finder and
+    /// elsewhere. What you hang yourself is pinned, and the line comes down
+    /// to show it. A text file is copied in as a note.
     @objc func hangOnLine(_ pasteboard: NSPasteboard, userData: String?,
                           error: AutoreleasingUnsafeMutablePointer<NSString?>) {
         let urls = pasteboard.readObjects(forClasses: [NSURL.self],
@@ -662,7 +841,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard !urls.isEmpty else { return }
         comeDown(on: nil)
         var any = false
-        for url in urls where line.hangKept(url) { any = true }
+        for url in urls {
+            let hung = NoteFolder.isTextFile(url) ? NoteFolder.adopt(url) : url
+            if let hung, line.hangKept(hung) { any = true }
+        }
         if !any { NSSound.beep() }
     }
 
@@ -682,20 +864,44 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let id = item.id
         photoKeys = [
             HotKey(Shortcut(keyCode: kVK_Delete, modifiers: [], key: "\u{8}")) { [weak self] in
-                self?.line.pressCorner(id)
+                guard let line = self?.line else { return }
+                let ids = line.selectedItems.map(\.id)
+                if ids.isEmpty { line.pressCorner(id) } else { line.discard(ids) }
             },
             HotKey(Shortcut(keyCode: kVK_Space, modifiers: [], key: " ")) { [weak self] in
                 self?.quickLookToggle(id)
             },
         ].compactMap { $0 }
         let shortcut = Shortcut.pinPreview
-        if !item.isRecording, hotKey == nil || !isPinPreviewShortcut(Shortcut.current, matching: shortcut),
+        if !item.isRecording, !isText(item.url),
+           hotKey == nil || !isPinPreviewShortcut(Shortcut.current, matching: shortcut),
+           searchHotKey == nil || !isPinPreviewShortcut(Shortcut.search, matching: shortcut),
            let pinKey = HotKey(shortcut, action: { [weak self] in
                guard let self, self.isRevealed, self.photo(under: NSEvent.mouseLocation) == id else { return }
                self.line.pinPreview(id)
            }) {
             photoKeys.append(pinKey)
         }
+    }
+
+    /// Like Delete and undo, these belong to the line only while the
+    /// pointer is over it. Selection never takes focus from another app.
+    private var selectionKeys: [HotKey] = []
+    private var selectionKeysHeld = false
+
+    private func holdSelectionKeys(_ hold: Bool) {
+        let hold = hold && !line.selectedIDs.isEmpty
+        guard hold != selectionKeysHeld else { return }
+        selectionKeysHeld = hold
+        selectionKeys = []
+        Held.setSelectionEscape(hold ? { [weak self] in self?.line.clearSelection() } : nil)
+        guard hold else { return }
+        selectionKeys = [
+            HotKey(Shortcut(keyCode: kVK_ANSI_C, modifiers: [.command], key: "c")) { [weak self] in
+                guard let line = self?.line else { return }
+                line.copy(line.selectedItems.map(\.id))
+            },
+        ].compactMap { $0 }
     }
 
     /// The photo whose card is under the pointer, if any.
@@ -716,10 +922,54 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     // MARK: Putting back
 
-    /// ⌘Z while the pointer is on the line. The line never takes the
-    /// keyboard, so it only borrows ⌘Z then, as a hot key. Everywhere else
+    /// ⌘Z while the pointer is on the line or where its menu just closed.
+    /// The line never takes the keyboard, so it only borrows ⌘Z then as a
+    /// hot key. Everywhere else
     /// ⌘Z stays the undo of the app you are in.
     private var putBackKey: HotKey?
+    private var putBackMonitor: Any?
+    private var undoAnchor: (point: NSPoint, application: pid_t?)?
+
+    /// Key events delivered to Tendedero itself also need a route to undo,
+    /// such as after a menu activates it. The global hot key covers other
+    /// apps; this consumes only a local key in the same narrow undo scope.
+    private func watchPutBackKey() {
+        putBackMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self, self.putBackKey != nil,
+                  !GrabView.isShowingMenu, !Share.shared.isOpen,
+                  Int(event.keyCode) == Shortcut.putBack.keyCode,
+                  event.modifierFlags.intersection([.command, .control, .option, .shift]) == .command else { return event }
+            self.putBack()
+            return nil
+        }
+    }
+
+    private func keepUndoAtPointer() {
+        guard isRevealed else { return }
+        undoAnchor = (NSEvent.mouseLocation, NSWorkspace.shared.frontmostApplication?.processIdentifier)
+        holdPutBackKey(true)
+    }
+
+    /// A context menu can end below the photo band. Keep that spot part of
+    /// the undo interaction until the pointer moves, another app is chosen,
+    /// or a new click starts something else. Other apps keep their own undo.
+    private func isAtUndoAnchor(_ point: NSPoint) -> Bool {
+        guard let anchor = undoAnchor else { return false }
+        guard line.canPutBack,
+              abs(point.x - anchor.point.x) <= 12, abs(point.y - anchor.point.y) <= 12,
+              NSWorkspace.shared.frontmostApplication?.processIdentifier == anchor.application else {
+            releaseUndoAnchor()
+            return false
+        }
+        return true
+    }
+
+    private func releaseUndoAnchor() {
+        guard undoAnchor != nil else { return }
+        undoAnchor = nil
+        holdPutBackKey(false)
+        itemsChanged()
+    }
 
     /// Set when another app holds ⌘Z, so it is not asked for again on every
     /// tick, only the next time the pointer comes to the line.
@@ -758,7 +1008,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let sharesPinKey = isPinPreviewShortcut(shortcut, matching: .pinPreview)
         hotKey = HotKey(shortcut) { [weak self] in
             guard let self else { return }
-            if sharesPinKey, self.isRevealed, let id = self.photo(under: NSEvent.mouseLocation),
+            if sharesPinKey, self.isRevealed, self.searchBar?.isShown != true,
+               let id = self.photo(under: NSEvent.mouseLocation),
                self.line.pinPreview(id) { return }
             self.toggle()
         }
@@ -768,23 +1019,51 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         shortcut?.keyCode == pin.keyCode && shortcut?.modifiers == pin.modifiers
     }
 
-    private func changeShortcut() {
-        // Off while recording, so pressing the current one records it
-        // instead of showing the line.
-        hotKey = nil
-        ShortcutRecorder.shared.record { [weak self] result in
+    private func registerSearchShortcut() {
+        holdPhotoKeys(over: nil)
+        searchHotKey = nil
+        guard let shortcut = Shortcut.search else { return }
+        let sharesPinKey = isPinPreviewShortcut(shortcut, matching: .pinPreview)
+        searchHotKey = HotKey(shortcut) { [weak self] in
             guard let self else { return }
+            if sharesPinKey, self.isRevealed, self.searchBar?.isShown != true,
+               let id = self.photo(under: NSEvent.mouseLocation), self.line.pinPreview(id) { return }
+            self.startSearch()
+        }
+    }
+
+    private func changeShortcut() {
+        record(\.current, register: registerShortcut, other: registerSearchShortcut,
+               registered: { [weak self] in self?.hotKey != nil })
+    }
+
+    private func changeSearchShortcut() {
+        record(\.search, register: registerSearchShortcut, other: registerShortcut,
+               registered: { [weak self] in self?.searchHotKey != nil })
+    }
+
+    /// Both shortcuts are off while recording, so pressing either one
+    /// records it instead of showing or searching the line.
+    private func record(_ setting: ReferenceWritableKeyPath<Shortcut.Type, Shortcut?>,
+                        register: @escaping () -> Void, other: @escaping () -> Void,
+                        registered: @escaping () -> Bool) {
+        hotKey = nil
+        searchHotKey = nil
+        ShortcutRecorder.shared.record { result in
+            // The other one first, so taking its keys fails below.
+            other()
             if let result {
-                let previous = Shortcut.current
-                Shortcut.current = result
-                self.registerShortcut()
-                // Taken by another app: keep the one that worked.
-                if result != nil && self.hotKey == nil {
+                let previous = Shortcut.self[keyPath: setting]
+                Shortcut.self[keyPath: setting] = result
+                register()
+                // Taken by another app, or by the other shortcut: keep the
+                // one that worked.
+                if result != nil && !registered() {
                     NSSound.beep()
-                    Shortcut.current = previous
+                    Shortcut.self[keyPath: setting] = previous
                 }
             }
-            self.registerShortcut()
+            register()
         }
     }
 
@@ -852,11 +1131,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         menu.addItem(toggleItem)
 
-        let clearItem = ClosureMenuItem(L("Take everything down")) { [weak self] in
-            self?.line.clear()
+        let searchItem = ClosureMenuItem(L("Search the line")) { [weak self] in self?.startSearch() }
+        if let shortcut = Shortcut.search, shortcut.key.count == 1 {
+            searchItem.keyEquivalent = shortcut.key
+            searchItem.keyEquivalentModifierMask = shortcut.modifiers
         }
-        clearItem.isEnabled = line.liveCount > 0
-        menu.addItem(clearItem)
+        searchItem.isEnabled = line.liveCount > 0
+        menu.addItem(searchItem)
 
         let putBackItem = ClosureMenuItem(L("Put back"), key: "z") { [weak self] in
             self?.putBack()
@@ -864,23 +1145,83 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         putBackItem.isEnabled = line.canPutBack
         menu.addItem(putBackItem)
 
+        let clearItem = ClosureMenuItem(L("Take everything down")) { [weak self] in
+            self?.line.clear()
+        }
+        clearItem.isEnabled = line.liveCount > 0
+        menu.addItem(clearItem)
+
         if !Held.heldIDs.isEmpty {
             menu.addItem(ClosureMenuItem(L("Hang everything back")) { Held.hangEverythingBack() })
         }
 
+        // Where screenshots and other images come from, together.
+        menu.addItem(.separator())
+        menu.addItem(.sectionHeader(title: L("Screenshots")))
         let inbox = ClosureMenuItem(L("Handle screenshots")) { [weak self] in
             self?.setInbox(!Inbox.isEnabled)
         }
         inbox.state = Inbox.isEnabled ? .on : .off
         inbox.toolTip = L("Screenshots hang instantly and skip the Desktop")
         menu.addItem(inbox)
-
-        let clipboard = ClosureMenuItem(L("Hang copied images")) { [weak self] in
-            self?.setClipboard(!ClipboardWatcher.isEnabled)
+        let copyItem = ClosureMenuItem(L("Copy each screenshot")) {
+            AppDelegate.copiesScreenshots.toggle()
         }
-        clipboard.state = ClipboardWatcher.isEnabled ? .on : .off
-        clipboard.toolTip = L("Images you copy hang on the line too")
-        menu.addItem(clipboard)
+        copyItem.state = Self.copiesScreenshots ? .on : .off
+        copyItem.toolTip = L("Each new screenshot goes to the clipboard as it hangs")
+        menu.addItem(copyItem)
+
+        let folderItem = NSMenuItem(title: L("Also watch folders"), action: nil, keyEquivalent: "")
+        let folderMenu = NSMenu()
+        folderMenu.autoenablesItems = false
+        let folders = Self.extraFolders
+        // Each folder is ticked: a click stops watching it, as with any
+        // ticked item. Holding Option turns it into Show in Finder.
+        for folder in folders {
+            let name = FileManager.default.displayName(atPath: folder.path)
+            let item = ClosureMenuItem(name) { [weak self] in
+                AppDelegate.extraFolders.removeAll { $0.standardizedFileURL == folder.standardizedFileURL }
+                self?.startWatcher()
+            }
+            item.state = .on
+            folderMenu.addItem(item)
+            let reveal = ClosureMenuItem(String(format: L("Show “%@” in Finder"), name)) {
+                NSWorkspace.shared.open(folder)
+            }
+            reveal.isAlternate = true
+            reveal.keyEquivalentModifierMask = .option
+            folderMenu.addItem(reveal)
+        }
+        if !folders.isEmpty { folderMenu.addItem(.separator()) }
+        let add = ClosureMenuItem(L("Add Folder…")) { [weak self] in self?.chooseExtraFolder() }
+        add.isEnabled = folders.count < Self.maxExtraFolders
+        folderMenu.addItem(add)
+        folderItem.submenu = folderMenu
+        menu.addItem(folderItem)
+
+        menu.addItem(ClosureMenuItem(L("Open screenshots folder")) { [weak self] in
+            guard let self else { return }
+            NSWorkspace.shared.open(self.watcher.folder)
+        })
+
+        // What you copy, in a section of its own: each kind is its own choice.
+        menu.addItem(.separator())
+        menu.addItem(.sectionHeader(title: L("Hang what you copy")))
+        let kinds: [(String, String, ReferenceWritableKeyPath<ClipboardWatcher.Type, Bool>)] = [
+            (L("Images"), L("Images you copy hang on the line too"), \.imagesEnabled),
+            (L("Text"), L("Text you copy hangs on the line too"), \.textEnabled),
+            (L("Links"), L("Links you copy hang on the line too"), \.linksEnabled),
+        ]
+        for (title, tip, key) in kinds {
+            let item = ClosureMenuItem(title) { [weak self] in
+                ClipboardWatcher.self[keyPath: key].toggle()
+                self?.refreshClipboardWatcher()
+            }
+            item.state = ClipboardWatcher.self[keyPath: key] ? .on : .off
+            item.toolTip = tip
+            menu.addItem(item)
+        }
+        menu.addItem(.separator())
 
         let editor = ClosureMenuItem(L("Built-in markup editor")) {
             Annotate.isEnabled.toggle()
@@ -910,36 +1251,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         bringDown.submenu = options
         menu.addItem(bringDown)
 
-        let folderItem = NSMenuItem(title: L("Also watch folders"), action: nil, keyEquivalent: "")
-        let folderMenu = NSMenu()
-        folderMenu.autoenablesItems = false
-        let folders = Self.extraFolders
-        for folder in folders {
-            let item = ClosureMenuItem(FileManager.default.displayName(atPath: folder.path)) {
-                NSWorkspace.shared.open(folder)
-            }
-            item.state = .on
-            folderMenu.addItem(item)
-        }
-        if !folders.isEmpty { folderMenu.addItem(.separator()) }
-        let add = ClosureMenuItem(L("Add Folder…")) { [weak self] in self?.chooseExtraFolder() }
-        add.isEnabled = folders.count < Self.maxExtraFolders
-        folderMenu.addItem(add)
-        if !folders.isEmpty {
-            let stop = NSMenuItem(title: L("Stop Watching"), action: nil, keyEquivalent: "")
-            let stopMenu = NSMenu()
-            for folder in folders {
-                stopMenu.addItem(ClosureMenuItem(FileManager.default.displayName(atPath: folder.path)) { [weak self] in
-                    AppDelegate.extraFolders.removeAll { $0.standardizedFileURL == folder.standardizedFileURL }
-                    self?.startWatcher()
-                })
-            }
-            stop.submenu = stopMenu
-            folderMenu.addItem(stop)
-        }
-        folderItem.submenu = folderMenu
-        menu.addItem(folderItem)
-
         let keepItem = NSMenuItem(title: L("Keep on line"), action: nil, keyEquivalent: "")
         let keeps = NSMenu()
         let fit = ClosureMenuItem(L("As many as fit")) { [weak self] in self?.setKeep(nil) }
@@ -963,19 +1274,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         sizeItem.submenu = sizes
         menu.addItem(sizeItem)
 
+        let zoomItem = ClosureMenuItem(L("Zoom on hover")) { [weak self] in
+            Zoom.isEnabled.toggle()
+            if !Zoom.isEnabled { self?.zoom.hide() }
+        }
+        zoomItem.state = Zoom.isEnabled ? .on : .off
+        menu.addItem(zoomItem)
+
         let shortcutItem = NSMenuItem(title: L("Shortcut"), action: nil, keyEquivalent: "")
         let shortcuts = NSMenu()
-        let current = NSMenuItem(title: Shortcut.current?.display ?? L("None"), action: nil, keyEquivalent: "")
-        current.isEnabled = false
-        shortcuts.addItem(current)
-        shortcuts.addItem(ClosureMenuItem(L("Change Shortcut…")) { [weak self] in self?.changeShortcut() })
+        // One for showing the line, one for searching it, each with its
+        // own Change Shortcut….
+        let shortcutKinds: [(String, Shortcut?, () -> Void)] = [
+            (L("Show line"), Shortcut.current, { [weak self] in self?.changeShortcut() }),
+            (L("Search the line"), Shortcut.search, { [weak self] in self?.changeSearchShortcut() }),
+        ]
+        for (i, kind) in shortcutKinds.enumerated() {
+            if i > 0 { shortcuts.addItem(.separator()) }
+            shortcuts.addItem(.sectionHeader(title: kind.0))
+            let current = NSMenuItem(title: kind.1?.display ?? L("None"), action: nil, keyEquivalent: "")
+            current.isEnabled = false
+            shortcuts.addItem(current)
+            shortcuts.addItem(ClosureMenuItem(L("Change Shortcut…"), handler: kind.2))
+        }
         shortcutItem.submenu = shortcuts
         menu.addItem(shortcutItem)
-
-        menu.addItem(ClosureMenuItem(L("Open screenshots folder")) { [weak self] in
-            guard let self else { return }
-            NSWorkspace.shared.open(self.watcher.folder)
-        })
 
         menu.addItem(.separator())
 

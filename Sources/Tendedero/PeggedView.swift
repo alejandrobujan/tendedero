@@ -10,7 +10,8 @@ struct PeggedView: View {
     @State private var arrived = false
     @State private var hovering = false
 
-    private var copied: Bool { line.copiedID == item.id }
+    private var copied: Bool { line.copiedIDs.contains(item.id) }
+    private var selected: Bool { line.selectedIDs.contains(item.id) }
     private var dragging: Bool { line.draggingID == item.id }
 
     private var cornerSymbol: String {
@@ -65,10 +66,20 @@ struct PeggedView: View {
 
     private var photoSize: CGSize { Self.photoSize(for: item.thumb.size) }
 
+    /// A photo shows its picture. Copied text is drawn live as a sheet from
+    /// Notes, so it follows the light or dark appearance.
+    @ViewBuilder private var content: some View {
+        if isText(item.url), let note = Note.cached(item.url) {
+            NoteSheet(note: note, width: photoSize.width, height: photoSize.height)
+        } else {
+            Image(nsImage: item.thumb)
+                .resizable()
+                .interpolation(.high)
+        }
+    }
+
     private var card: some View {
-        Image(nsImage: item.thumb)
-            .resizable()
-            .interpolation(.high)
+        content
             .frame(width: photoSize.width, height: photoSize.height)
             // Concentric corners: the photo's radius is the frame's minus the
             // inset, the way macOS rounds nested shapes.
@@ -90,6 +101,23 @@ struct PeggedView: View {
             }
             .padding(Frame.inset)
             .glassFrame(cornerRadius: Frame.radius)
+            .overlay {
+                if selected {
+                    RoundedRectangle(cornerRadius: Frame.radius, style: .continuous)
+                        .strokeBorder(Color.accentColor, lineWidth: 3)
+                        .allowsHitTesting(false)
+                }
+            }
+            .overlay(alignment: .topTrailing) {
+                if selected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(.white, Color.accentColor)
+                        .font(.system(size: 17, weight: .semibold))
+                        .padding(5)
+                        .allowsHitTesting(false)
+                }
+            }
             .shadow(color: .black.opacity(hovering ? 0.26 : 0.18), radius: hovering ? 14 : 10, y: hovering ? 8 : 5)
             // Holding presses the photo in slowly, so a long press feels like
             // it is building up to something.
@@ -156,11 +184,13 @@ struct PeggedView: View {
     private func breeze() {
         let delay = Double.random(in: 0...0.35)
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            guard line.revealed else { return }
             nudge(Double.random(in: 1.6...3.4))
         }
     }
 
     private func nudge(_ degrees: Double) {
+        guard line.revealed else { return }
         withAnimation(.easeOut(duration: 0.3)) { swing = degrees }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             withAnimation(.interpolatingSpring(stiffness: 38, damping: 2.4)) { swing = 0 }

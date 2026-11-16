@@ -1,5 +1,6 @@
 import AppKit
 import Carbon
+import SwiftUI
 
 /// A photo taken off the line to keep in front of you while you work: a
 /// design to copy, numbers to type in, steps to follow. It is the photo
@@ -16,14 +17,18 @@ final class Held: NSObject {
     private static var open: [UUID: Held] = [:]
     private static var previews: [UUID: Held] = [:]
     private static var previewMouseTimer: Timer?
-    private static var previewEscape: HotKey?
-    private static var pointerOverPreview = false
+    private static var escapeKey: HotKey?
+    private static var escapeWanted = false
+    private static var selectionEscape: (() -> Void)?
 
     let id: UUID
+    let url: URL
     private let panel: HeldPanel
     private let view: HeldView
     /// Its size at 100%, in points.
     private let natural: NSSize
+    /// Set for copied text, which reflows instead of keeping a shape.
+    private let noteScale: NoteScale?
     /// Called with where it was on screen, to fly back to its clip from there.
     private let onHangBack: ((UUID, CGRect) -> Void)?
 
@@ -44,12 +49,12 @@ final class Held: NSObject {
         previews[id] = preview
         if previewMouseTimer == nil {
             let timer = Timer(timeInterval: 1.0 / 30.0, repeats: true) { _ in
-                MainActor.assumeIsolated { updatePreviewEscape() }
+                MainActor.assumeIsolated { updateEscapeKey() }
             }
             RunLoop.main.add(timer, forMode: .common)
             previewMouseTimer = timer
         }
-        updatePreviewEscape()
+        updateEscapeKey()
     }
 
     /// Borrow Escape only over the frontmost preview, without making it key.
@@ -61,16 +66,22 @@ final class Held: NSObject {
         return candidates.first { $0.panel.windowNumber == number }
     }
 
-    private static func updatePreviewEscape() {
-        let overPreview = previewUnderPointer() != nil
-        guard overPreview != pointerOverPreview else { return }
-        pointerOverPreview = overPreview
-        if overPreview {
-            previewEscape = HotKey(Shortcut(keyCode: kVK_Escape, modifiers: [], key: "\u{1b}")) {
-                previewUnderPointer()?.dismiss()
+    static func setSelectionEscape(_ action: (() -> Void)?) {
+        selectionEscape = action
+        updateEscapeKey()
+    }
+
+    private static func updateEscapeKey() {
+        let wanted = selectionEscape != nil || previewUnderPointer() != nil
+        guard wanted != escapeWanted else { return }
+        escapeWanted = wanted
+        if wanted {
+            escapeKey = HotKey(Shortcut(keyCode: kVK_Escape, modifiers: [], key: "\u{1b}")) {
+                if let preview = previewUnderPointer() { preview.dismiss() }
+                else { selectionEscape?() }
             }
         } else {
-            previewEscape = nil
+            escapeKey = nil
         }
     }
 
@@ -79,12 +90,18 @@ final class Held: NSObject {
         guard let screen = LinePanel.screenUnderPointer() else { return nil }
         // No sharper than the screen can show, so a huge image stays light.
         let longest = max(screen.frame.width, screen.frame.height) * screen.backingScaleFactor
-        guard let image = makeThumbnail(url, maxPixels: Int(longest)),
+        guard let image = makeThumbnail(url, maxPixels: Int(longest), full: true),
               image.size.width > 0, image.size.height > 0 else { return nil }
-        return Held(id: id, image: image, on: screen, line: line, onHangBack: onHangBack)
+        return Held(id: id, url: url, image: image, on: screen, line: line, onHangBack: onHangBack)
     }
 
     static func hangBack(_ id: UUID) { open[id]?.dismiss() }
+
+    /// A held note whose file was edited shows the new words.
+    static func reload(_ url: URL) {
+        guard let note = Note.peek(url) else { return }
+        for held in open.values where held.url == url { held.view.show(note) }
+    }
 
     static func hangEverythingBack() {
         for held in open.values { held.dismiss() }
@@ -98,15 +115,18 @@ final class Held: NSObject {
         }
     }
 
-    private init(id: UUID, image: NSImage, on screen: NSScreen, line: Line,
+    private init(id: UUID, url: URL, image: NSImage, on screen: NSScreen, line: Line,
                  onHangBack: ((UUID, CGRect) -> Void)?) {
         self.id = id
+        self.url = url
         self.onHangBack = onHangBack
         let scale = screen.backingScaleFactor
         natural = NSSize(width: image.size.width / scale + HeldView.border * 2,
                          height: image.size.height / scale + HeldView.border * 2)
         let isPreview = onHangBack == nil
-        view = HeldView(image: image, isPreview: isPreview)
+        let note = isText(url) ? Note.cached(url) : nil
+        noteScale = note == nil ? nil : NoteScale()
+        view = HeldView(image: image, note: note, scale: noteScale, isPreview: isPreview)
         panel = HeldPanel(content: view, takesKeyboard: !isPreview)
         super.init()
         view.onDismiss = { [weak self] in self?.dismiss() }
@@ -114,11 +134,13 @@ final class Held: NSObject {
         if !isPreview {
             view.onActualSize = { [weak self] in self?.actualSize() }
             view.onCopy = { line.copy(id) }
+            panel.onCopy = { line.copy(id) }
+            panel.onEscape = { [weak self] in self?.dismiss() }
             view.onMarkup = { line.markup(id) }
             view.onQuickLook = { line.quickLook(id) }
-            // Stretched from an edge or a corner, it keeps the photo's shape.
-            panel.contentAspectRatio = natural
-            panel.minSize = NSSize(width: 80, height: 80)
+            // A photo keeps its shape when resized. A note reflows.
+            if noteScale == nil { panel.contentAspectRatio = natural }
+            panel.minSize = NSSize(width: noteScale == nil ? 80 : 120, height: 80)
         }
         panel.setFrame(startFrame(on: screen), display: false)
         panel.orderFrontRegardless()
@@ -144,6 +166,17 @@ final class Held: NSObject {
     /// Zooms keeping the point under the pointer where it is.
     private func zoom(by factor: CGFloat, around anchor: NSPoint) {
         let frame = panel.frame
+        if let noteScale {
+            // A note grows from the shape it has, words included.
+            let u = min(max(noteScale.u * factor, 0.9), 8)
+            let f = u / noteScale.u
+            let w = frame.width * f, h = frame.height * f
+            guard w >= 120, h >= 80 else { return }
+            noteScale.u = u
+            let fx = (anchor.x - frame.minX) / frame.width, fy = (anchor.y - frame.minY) / frame.height
+            panel.setFrame(NSRect(x: anchor.x - w * fx, y: anchor.y - h * fy, width: w, height: h), display: true)
+            return
+        }
         let bounds = onHangBack == nil ? panel.screen?.visibleFrame : nil
         let size: NSSize
         if let bounds {
@@ -166,6 +199,7 @@ final class Held: NSObject {
     }
 
     private func actualSize() {
+        noteScale?.u = NoteScale.natural
         let frame = panel.frame
         panel.setFrame(NSRect(x: frame.midX - natural.width / 2, y: frame.midY - natural.height / 2,
                               width: natural.width, height: natural.height), display: true)
@@ -182,11 +216,8 @@ final class Held: NSObject {
             if Self.previews.isEmpty {
                 Self.previewMouseTimer?.invalidate()
                 Self.previewMouseTimer = nil
-                Self.previewEscape = nil
-                Self.pointerOverPreview = false
-            } else {
-                Self.updatePreviewEscape()
             }
+            Self.updateEscapeKey()
         }
     }
 }
@@ -196,6 +227,30 @@ final class Held: NSObject {
 /// with the app you are working in.
 private final class HeldPanel: NSPanel {
     private let takesKeyboard: Bool
+    /// ⌘C copies what is selected in a held note, else the whole item.
+    var onCopy: () -> Void = {}
+    var onEscape: () -> Void = {}
+
+    override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        guard event.modifierFlags.contains(.command), let key = event.charactersIgnoringModifiers else {
+            return super.performKeyEquivalent(with: event)
+        }
+        let text = firstResponder as? NSTextView
+        switch key {
+        case "c":
+            if let text, text.selectedRange().length > 0 { text.copy(nil) } else { onCopy() }
+            return true
+        case "a":
+            guard let text else { return super.performKeyEquivalent(with: event) }
+            text.selectAll(nil)
+            return true
+        default:
+            return super.performKeyEquivalent(with: event)
+        }
+    }
+
+    /// Escape hangs it back, even while its text has the focus.
+    override func cancelOperation(_ sender: Any?) { onEscape() }
 
     init(content: NSView, takesKeyboard: Bool) {
         self.takesKeyboard = takesKeyboard
@@ -213,6 +268,10 @@ private final class HeldPanel: NSPanel {
         isReleasedWhenClosed = false
         isMovableByWindowBackground = true
         becomesKeyOnlyIfNeeded = !takesKeyboard
+        // Set on purpose: by default clicks fall through the transparent
+        // pixels outside the rounded corners, so the corners could not be
+        // grabbed to resize.
+        if takesKeyboard { ignoresMouseEvents = false }
         contentView = content
     }
 
@@ -236,8 +295,11 @@ private final class HeldView: NSVisualEffectView {
     private let photo = CALayer()
     private let dismissButton: CornerButton
     private let isPreview: Bool
+    /// Copied text is held as real, selectable text instead of a picture.
+    private var sheet: NSView?
+    private var noteScale: NoteScale?
 
-    init(image: NSImage, isPreview: Bool) {
+    init(image: NSImage, note: Note?, scale: NoteScale?, isPreview: Bool) {
         self.isPreview = isPreview
         dismissButton = CornerButton(symbol: isPreview ? "xmark" : "arrow.up.to.line")
         super.init(frame: .zero)
@@ -249,11 +311,22 @@ private final class HeldView: NSVisualEffectView {
         layer?.masksToBounds = true
         layer?.borderWidth = 0.5
         layer?.borderColor = NSColor.white.withAlphaComponent(0.45).cgColor
-        photo.contents = image
-        photo.contentsGravity = .resizeAspect
-        photo.cornerRadius = 7
-        photo.masksToBounds = true
-        layer?.addSublayer(photo)
+        if let note {
+            let scale = scale ?? NoteScale()
+            noteScale = scale
+            let host = NSHostingView(rootView: HeldNote(note: note, scale: scale))
+            host.wantsLayer = true
+            host.layer?.cornerRadius = 7
+            host.layer?.masksToBounds = true
+            addSubview(host)
+            sheet = host
+        } else {
+            photo.contents = image
+            photo.contentsGravity = .resizeAspect
+            photo.cornerRadius = 7
+            photo.masksToBounds = true
+            layer?.addSublayer(photo)
+        }
         dismissButton.alphaValue = isPreview ? 1 : 0
         dismissButton.onPress = { [weak self] in self?.onDismiss() }
         dismissButton.setAccessibilityLabel(isPreview ? L("Close preview") : L("Hang back"))
@@ -264,11 +337,17 @@ private final class HeldView: NSVisualEffectView {
 
     required init?(coder: NSCoder) { fatalError() }
 
+    func show(_ note: Note) {
+        guard let host = sheet as? NSHostingView<HeldNote>, let noteScale else { return }
+        host.rootView = HeldNote(note: note, scale: noteScale)
+    }
+
     override func layout() {
         super.layout()
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         photo.frame = bounds.insetBy(dx: Self.border, dy: Self.border)
+        sheet?.frame = bounds.insetBy(dx: Self.border, dy: Self.border)
         photo.contentsScale = window?.backingScaleFactor ?? 2
         CATransaction.commit()
         dismissButton.frame = NSRect(x: 9, y: bounds.height - 29, width: 20, height: 20)
@@ -337,7 +416,9 @@ private final class HeldView: NSVisualEffectView {
         menu.addItem(.separator())
         menu.addItem(ClosureMenuItem(L("Copy")) { [weak self] in self?.onCopy() })
         menu.addItem(ClosureMenuItem(L("Quick Look")) { [weak self] in self?.onQuickLook() })
-        menu.addItem(ClosureMenuItem(L("Markup")) { [weak self] in self?.onMarkup() })
+        if sheet == nil {
+            menu.addItem(ClosureMenuItem(L("Markup")) { [weak self] in self?.onMarkup() })
+        }
         menu.addItem(ClosureMenuItem(L("Actual Size")) { [weak self] in self?.onActualSize() })
         NSMenu.popUpContextMenu(menu, with: event, for: self)
     }
