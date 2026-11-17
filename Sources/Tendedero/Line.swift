@@ -947,9 +947,15 @@ func isText(_ url: URL) -> Bool {
 /// goes back to the default, and light coloured ink is darkened to stay
 /// readable. Bold, italic, fonts, links and light highlights are kept.
 func lightPageStyled(_ source: NSAttributedString) -> NSAttributedString {
-    let m = NSMutableAttributedString(attributedString: source)
+    lightPageEdits(source).map { lightPage(source, $0) } ?? source
+}
+
+private typealias LightPageEdit = (NSRange, NSAttributedString.Key, NSColor?)
+
+/// The colours to change for a white page, or nil when there are none.
+private func lightPageEdits(_ m: NSAttributedString) -> [LightPageEdit]? {
     let full = NSRange(location: 0, length: m.length)
-    var edits: [(NSRange, NSAttributedString.Key, NSColor?)] = []
+    var edits: [LightPageEdit] = []
     m.enumerateAttribute(.backgroundColor, in: full) { v, r, _ in
         guard let c = v as? NSColor else { return }
         if let rgb = c.usingColorSpace(.deviceRGB), rgb.alphaComponent > 0.05, rgb.brightnessComponent >= 0.5 { return }
@@ -966,16 +972,24 @@ func lightPageStyled(_ source: NSAttributedString) -> NSAttributedString {
                                                        brightness: 0.55, alpha: 1)))
         }
     }
+    return edits.isEmpty ? nil : edits
+}
+
+private func lightPage(_ source: NSAttributedString, _ edits: [LightPageEdit]) -> NSAttributedString {
+    let m = NSMutableAttributedString(attributedString: source)
     for (r, key, color) in edits {
         if let color { m.addAttribute(key, value: color, range: r) } else { m.removeAttribute(key, range: r) }
     }
     return m
 }
 
-/// RTF bytes, cleaned as above.
+/// RTF bytes, cleaned as above. Bytes with nothing to clean are kept as they
+/// came: reading RTF into the text system drops what it does not know, such
+/// as footnotes from InDesign or Word.
 func lightPageRTF(_ data: Data) -> Data {
-    guard let a = NSAttributedString(rtf: data, documentAttributes: nil) else { return data }
-    let clean = lightPageStyled(a)
+    guard let a = NSAttributedString(rtf: data, documentAttributes: nil),
+          let edits = lightPageEdits(a) else { return data }
+    let clean = lightPage(a, edits)
     return (try? clean.data(from: NSRange(location: 0, length: clean.length),
                             documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf])) ?? data
 }
