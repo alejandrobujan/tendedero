@@ -17,6 +17,10 @@ struct CheckFailed: Error { let message: String }
 
     init(root: URL) { self.root = root }
 
+    func searchIndex() -> SearchIndex {
+        SearchIndex(file: root.appendingPathComponent("search-\(UUID().uuidString).json"))
+    }
+
     func check(_ condition: @autoclosure () throws -> Bool, _ message: String) throws {
         guard try condition() else { throw CheckFailed(message: message) }
         passed += 1
@@ -27,13 +31,21 @@ struct CheckFailed: Error { let message: String }
         RunLoop.main.run(until: Date().addingTimeInterval(seconds))
     }
 
-    func png(_ name: String, in folder: URL? = nil, red: CGFloat = 0.3) throws -> URL {
+    func png(_ name: String, in folder: URL? = nil, red: CGFloat = 0.3, word: String? = nil) throws -> URL {
         let url = (folder ?? root).appendingPathComponent(name)
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
         let context = CGContext(data: nil, width: 240, height: 140, bitsPerComponent: 8, bytesPerRow: 0,
                                 space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
         context.setFillColor(CGColor(red: red, green: 0.5, blue: 0.8, alpha: 1))
         context.fill(CGRect(x: 0, y: 0, width: 240, height: 140))
+        if let word {
+            NSGraphicsContext.saveGraphicsState()
+            NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: false)
+            (word as NSString).draw(at: NSPoint(x: 12, y: 50), withAttributes: [
+                .font: NSFont.boldSystemFont(ofSize: 34), .foregroundColor: NSColor.white
+            ])
+            NSGraphicsContext.restoreGraphicsState()
+        }
         let output = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil)!
         CGImageDestinationAddImage(output, context.makeImage()!, nil)
         guard CGImageDestinationFinalize(output) else { throw CheckFailed(message: "Could not write fixture") }
@@ -45,7 +57,7 @@ struct CheckFailed: Error { let message: String }
         UserDefaults.standard.set(true, forKey: "soundOff")
         let desktop = root.appendingPathComponent("desktop", isDirectory: true)
         try! FileManager.default.createDirectory(at: desktop, withIntermediateDirectories: true)
-        let line = Line(pasteboard: pasteboard, desktop: desktop)
+        let line = Line(pasteboard: pasteboard, desktop: desktop, search: searchIndex())
         line.maxItems = 100
         line.visibleCount = 8
         line.revealed = true
@@ -176,7 +188,7 @@ struct CheckFailed: Error { let message: String }
         try check(line.items.filter { !$0.falling }.map(\.url) == [a, c, b, d], "One undo restores the whole batch in its original order")
         try check(line.canPutBack, "Undoing removal leaves the earlier pin actions available")
 
-        let restored = Line(pasteboard: pasteboard)
+        let restored = Line(pasteboard: pasteboard, search: searchIndex())
         try check(restored.selectedIDs.isEmpty && restored.items.map(\.url) == [a, c, b, d], "Order persists but transient selection does not")
         line.putBack()
         try check(line.items.filter(\.kept).map(\.url) == [a, c], "One undo restores the whole batch's pinned state")
@@ -341,6 +353,163 @@ struct CheckFailed: Error { let message: String }
         _ = eviction.hang(c, quietly: true)
         try check(eviction.selectedIDs.isEmpty && FileManager.default.fileExists(atPath: a.path), "Capacity eviction clears stale selection without deleting an external file")
         try checkDesktopCopies()
+        try checkTrimMerge()
+        try checkTrimDesktopHistory()
+    }
+
+    /// The trim undo steps share history and capacity with batch actions.
+    /// Image fixtures exercise that model without opening the AVKit editor.
+    func checkTrimMerge() throws {
+        let fm = FileManager.default
+        let line = self.line()
+        line.maxItems = 2
+        let original = try png("Trim original.png")
+        let held = try png("Trim held.png")
+        let originalBytes = try Data(contentsOf: original)
+        let originalID = line.hang(original, quietly: true)!
+        let heldID = line.hang(held, quietly: true)!
+        line.setHeld(heldID, true)
+        line.pin(originalID)
+        var undoActions = 0
+        line.onUndoableAction = { undoActions += 1 }
+        let copy = try png("Trim new.png", red: 0.8)
+        let copyID = line.hang(copy, quietly: true, squeezing: true, after: original)!
+        line.rememberSavedAsNew(copy)
+        try check(undoActions == 1, "Saving a trimmed copy makes the new undo interaction available")
+        try check(line.items.filter { !$0.falling }.map(\.url) == [original, copy, held],
+                  "A trimmed copy fits beside its original on a full line without dropping a held photo")
+        line.toggleSelection(copyID)
+        line.putBack()
+        try check(try !fm.fileExists(atPath: copy.path) && Data(contentsOf: original) == originalBytes
+                  && line.liveCount == 2 && line.selectedIDs.isEmpty,
+                  "Undo removes only the trimmed copy, clears its selection and preserves the original bytes")
+        line.putBack()
+        try check(!line.canPutBack && line.keptCount == 0 && line.items.contains { $0.id == heldID && $0.held },
+                  "Undo continues to the earlier pin and preserves the held photo")
+
+        let anotherCopy = try png("Trim batch copy.png", red: 0.7)
+        let anotherID = line.hang(anotherCopy, quietly: true, squeezing: true, after: original)!
+        line.rememberSavedAsNew(anotherCopy)
+        line.discard([originalID, anotherID])
+        line.putBack()
+        try check(line.items.filter { !$0.falling }.map(\.url) == [original, anotherCopy, held],
+                  "Batch undo restores both cards without consuming the trimmed copy's extra capacity")
+        line.putBack()
+        try check(!fm.fileExists(atPath: anotherCopy.path) && line.liveCount == 2 && !line.canPutBack,
+                  "Undoing a batch leaves the earlier trim as the next undo step")
+
+        let replacement = self.line()
+        let before = try png("Replace original.png")
+        let after = try png("Replace new.png", red: 0.9)
+        let beforeBytes = try Data(contentsOf: before), afterBytes = try Data(contentsOf: after)
+        let id = replacement.hang(before, quietly: true)!
+        replacement.pin(id)
+        replacement.toggleSelection(id)
+        var replacements = 0
+        replacement.onUndoableAction = { replacements += 1 }
+        let trashed = try swapIn(after, at: before)
+        replacement.rememberReplaced(before, original: trashed)
+        replacement.takeClip(id, thumb: makeThumbnail(before)!)
+        try check(try replacements == 1 && Data(contentsOf: before) == afterBytes && replacement.selectedIDs == [id],
+                  "Replace records an undo action and keeps the selected card's identity")
+        replacement.putBack()
+        try check(try Data(contentsOf: before) == beforeBytes && replacement.selectedIDs == [id]
+                  && replacement.items.first?.kept == true,
+                  "Undo Replace restores the original bytes while keeping selection and pin state")
+        replacement.putBack()
+        try check(!replacement.canPutBack && replacement.keptCount == 0,
+                  "Undo Replace preserves the pin action beneath it")
+
+        show(replacement)
+        func menu(_ item: Pegged) throws -> [String] {
+            window.contentView = NSHostingView(rootView: GrabArea(item: item, line: replacement))
+            window.contentView?.layoutSubtreeIfNeeded()
+            pump()
+            return try grab(item.url).menuProvider().items.map(\.title)
+        }
+        let thumb = makeThumbnail(before)!
+        let recording = try menu(Pegged(url: root.appendingPathComponent("menu.mov"), thumb: thumb))
+        try check(recording.contains("Trim") && !recording.contains("Markup"), "A recording's native menu offers Trim")
+        let photo = try menu(Pegged(url: before, thumb: thumb))
+        try check(photo.contains("Markup") && !photo.contains("Trim"), "A photo's native menu keeps Markup")
+        // An absent, uniquely named note is enough to check menu routing;
+        // no file is created in the user's notes folder.
+        let note = try menu(Pegged(url: NoteFolder.url.appendingPathComponent("check-\(UUID()).txt"), thumb: thumb))
+        try check(!note.contains("Markup") && !note.contains("Trim"), "A note's native menu offers neither image nor video editing")
+    }
+
+    func checkTrimDesktopHistory() throws {
+        let fm = FileManager.default
+        for replacing in [false, true] {
+            let line = self.line()
+            let stem = replacing ? "Replacement history" : "New trim history"
+            let original = try png(stem + ".png", in: Inbox.folder)
+            let originalBytes = try Data(contentsOf: original)
+            let originalID = line.hang(original, quietly: true)!
+            let trimmed = try png(stem + " trimmed.png", in: Inbox.folder, red: 0.8)
+            let trimmedBytes = try Data(contentsOf: trimmed)
+            let trimmedURL: URL
+            let trimmedID: UUID
+            if replacing {
+                let trashed = try swapIn(trimmed, at: original)
+                line.rememberReplaced(original, original: trashed)
+                line.takeClip(originalID, thumb: makeThumbnail(original)!)
+                trimmedURL = original
+                trimmedID = originalID
+            } else {
+                trimmedID = line.hang(trimmed, quietly: true, squeezing: true, after: original)!
+                line.rememberSavedAsNew(trimmed)
+                trimmedURL = trimmed
+            }
+            line.copy(trimmedID)
+            line.saveToDesktop(trimmedID)
+            let exported = root.appendingPathComponent("desktop").appendingPathComponent(trimmedURL.lastPathComponent)
+            try check(try Data(contentsOf: exported) == trimmedBytes && !fm.fileExists(atPath: trimmedURL.path)
+                      && copiedURLs == [exported], "\(stem): Desktop save moves the trimmed bytes and updates the copied URL")
+            let namesake = try png(trimmedURL.lastPathComponent, in: Inbox.folder, red: 0.1)
+            let namesakeBytes = try Data(contentsOf: namesake)
+            line.putBack()
+            let restored = line.items.first { $0.url != namesake && !$0.falling && (replacing || $0.url != original) }!
+            try check(try restored.url != trimmedURL && Data(contentsOf: restored.url) == trimmedBytes
+                      && Data(contentsOf: namesake) == namesakeBytes && copiedURLs == [restored.url],
+                      "\(stem): undo save uses a free name and preserves the later namesake")
+            line.putBack()
+            try check(try Data(contentsOf: namesake) == namesakeBytes && !line.canPutBack,
+                      "\(stem): the earlier trim undo follows the restored name and preserves unrelated files")
+            if replacing {
+                try check(try Data(contentsOf: restored.url) == originalBytes && line.liveCount == 1,
+                          "Replace then save: two undos restore the original bytes at the collision-safe path")
+            } else {
+                try check(try !fm.fileExists(atPath: restored.url.path) && Data(contentsOf: original) == originalBytes
+                          && line.liveCount == 1 && copiedURLs.allSatisfy { fm.fileExists(atPath: $0.path) },
+                          "Save as New then save: two undos remove only the trimmed copy and leave valid copied URLs")
+            }
+        }
+    }
+
+    func checkTrimSearch() async throws {
+        let line = self.line()
+        let original = try png("Search original.png", word: "ORCHARD")
+        let replacement = try png("Search replacement.png", word: "MEADOW")
+        let id = line.hang(original, quietly: true)!
+        func waitFor(_ word: String) async {
+            let deadline = Date().addingTimeInterval(10)
+            while !line.search.matches(original, SearchIndex.words(word)) && Date() < deadline {
+                try? await Task.sleep(nanoseconds: 100_000_000)
+            }
+        }
+        await waitFor("orchard")
+        try check(line.search.matches(original, ["orchard"]), "The isolated production search index reads the original image")
+        let trashed = try swapIn(replacement, at: original)
+        line.rememberReplaced(original, original: trashed)
+        line.takeClip(id, thumb: makeThumbnail(original)!)
+        await waitFor("meadow")
+        try check(line.search.matches(original, ["meadow"]) && !line.search.matches(original, ["orchard"]),
+                  "Replacing a card refreshes searchable text instead of leaving the original words")
+        line.putBack()
+        await waitFor("orchard")
+        try check(line.search.matches(original, ["orchard"]) && !line.search.matches(original, ["meadow"]),
+                  "Undo Replace refreshes searchable text back to the original words")
     }
 
     func checkDesktopCopies() throws {
@@ -419,7 +588,7 @@ struct CheckFailed: Error { let message: String }
         let desktop = root.appendingPathComponent("watched-desktop", isDirectory: true)
         try fm.createDirectory(at: desktop, withIntermediateDirectories: true)
         UserDefaults.standard.removeObject(forKey: "pegged")
-        let line = Line(pasteboard: pasteboard, desktop: desktop)
+        let line = Line(pasteboard: pasteboard, desktop: desktop, search: searchIndex())
         line.maxItems = 100
         let first = try png("Watched 1.png", in: Inbox.folder)
         let second = try png("Watched 2.png", in: Inbox.folder)
@@ -534,6 +703,7 @@ struct CheckFailed: Error { let message: String }
         Task { @MainActor in
             do {
                 try await checks.checkDesktopWatchers()
+                try await checks.checkTrimSearch()
                 print("\(checks.passed) selection checks passed")
                 checks.cleanUp()
                 exit(0)
