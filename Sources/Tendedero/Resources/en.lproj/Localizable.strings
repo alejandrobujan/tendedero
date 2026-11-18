@@ -59,6 +59,8 @@
 
 /* GrabArea */
 "Copy" = "Copy";
+"Copy Path" = "Copy Path";
+"Copy Paths" = "Copy Paths";
 "Open" = "Open";
 "Open Link" = "Open Link";
 "Quick Look" = "Quick Look";

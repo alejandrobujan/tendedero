@@ -57,6 +57,8 @@
 
 /* GrabArea */
 "Copy" = "복사하기";
+"Copy Path" = "경로 복사하기";
+"Copy Paths" = "경로 복사하기";
 "Open" = "열기";
 "Open Link" = "링크 열기";
 "Quick Look" = "훑어보기";

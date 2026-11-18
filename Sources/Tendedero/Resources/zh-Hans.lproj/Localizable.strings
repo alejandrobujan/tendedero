@@ -57,6 +57,8 @@
 
 /* GrabArea */
 "Copy" = "复制";
+"Copy Path" = "复制路径";
+"Copy Paths" = "复制路径";
 "Open" = "打开";
 "Open Link" = "打开链接";
 "Quick Look" = "快速查看";

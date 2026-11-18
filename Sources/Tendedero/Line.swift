@@ -266,12 +266,39 @@ final class Line: ObservableObject {
     private func copyPhotos(_ photos: [Pegged]) {
         guard !photos.isEmpty else { return }
         putOnClipboard(photos.map(\.url))
+        flashCopied(photos)
+    }
 
+    private func flashCopied(_ photos: [Pegged]) {
         copiedIDs = Set(photos.map(\.id))
         copyGeneration += 1
         let generation = copyGeneration
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
             if self?.copyGeneration == generation { self?.copiedIDs = [] }
+        }
+    }
+
+    /// The path, written as a terminal writes a file dropped on it, so it
+    /// pastes whole into a shell or a coding agent. Several go one after
+    /// another, a space apart.
+    func copyPath(_ ids: [UUID]) {
+        let photos = actionItems(ids)
+        guard !photos.isEmpty else { return }
+        let entry = NSPasteboardItem()
+        entry.setString(photos.map { shellEscaped($0.url.path) }.joined(separator: " "), forType: .string)
+        // Tendedero's own, so the text is not hung as a note.
+        entry.setData(Data(), forType: selfCopyType)
+        let pb = pasteboard
+        pb.clearContents()
+        pb.writeObjects([entry])
+        flashCopied(photos)
+    }
+
+    private func shellEscaped(_ path: String) -> String {
+        let special = Set(" \t\n\\'\"`$&|;<>()[]{}*?!#~")
+        return path.reduce(into: "") { out, c in
+            if special.contains(c) { out.append("\\") }
+            out.append(c)
         }
     }
 

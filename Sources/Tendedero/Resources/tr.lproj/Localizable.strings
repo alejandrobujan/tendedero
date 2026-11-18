@@ -57,6 +57,8 @@
 
 /* GrabArea */
 "Copy" = "Kopyala";
+"Copy Path" = "Yolu kopyala";
+"Copy Paths" = "Yolları kopyala";
 "Open" = "Aç";
 "Open Link" = "Bağlantıyı aç";
 "Quick Look" = "Hızlı Bakış";
