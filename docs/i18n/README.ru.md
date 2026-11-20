@@ -163,7 +163,7 @@ open build/Tendedero.app
 который есть только в Xcode. Локальные сборки подписываются по мере необходимости, 
 поэтому после каждой перекомпиляции macOS снова запрашивает доступ к Рабочему столу.
 
-Хотите помочь? Прочтите [CONTRIBUTING.md](CONTRIBUTING.md)
+Хотите помочь? Прочтите [CONTRIBUTING.md](../../CONTRIBUTING.md)
 
 <details>
 <summary>Внутри приложения</summary>
@@ -214,7 +214,7 @@ open build/Tendedero.app
 <p align="center">
   <img src="../images/icon.png" width="64" height="64" alt="">
   <br>
-  <sub>Код по лицензии MIT. Название и иконка Tendedero не лицензированы, поэтому для форков нужны собственные лицензии. См.<a href="LICENSE">LICENSE</a>.</sub>
+  <sub>Код по лицензии MIT. Название и иконка Tendedero не лицензированы, поэтому для форков нужны собственные лицензии. См.<a href="../../LICENSE">LICENSE</a>.</sub>
   <br>
   <sub>Разработано и создано <a href="https://alejandrobujan.com">Alejandro Buján</a>.</sub>
 </p>
