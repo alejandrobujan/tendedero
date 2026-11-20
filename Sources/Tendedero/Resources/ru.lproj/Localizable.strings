@@ -1,0 +1,108 @@
+/* English. Each key is the English text exactly as written in L("...") in
+   the code. Every language has the same keys; run
+   swift scripts/check-strings.swift to check. */
+
+/* AppDelegate */
+"Let Tendedero handle your screenshots?" = "Позволить Tendedero обрабатывать ваши скриншоты?";
+"Screenshots will hang on the line the instant you take them, without the floating thumbnail, and will not pile up on your Desktop. Drag one to a folder to keep it, or discard it with the cross. You can turn this off from the menu bar, and your settings come back when Tendedero quits." = "Скриншоты будут подвешиваться на верёвку сразу после того, как вы их сделаете, без всплывающих миниатюр, и не будут скапливаться на Рабочем столе. Перетащите скриншот в папку, чтобы сохранить его, или удалите с помощью крестика. Эту функцию можно отключить в строке меню, и ваши настройки вернутся после закрытия Tendedero.";
+"Turn on" = "Включить";
+"Not now" = "Не сейчас";
+"Hide line" = "Спрятать верёвку";
+"Show line" = "Показать верёвку";
+"Take everything down" = "Освободить верёвку";
+"Put back" = "Вернуть обратно";
+"Screenshots" = "Скриншоты";
+"Handle screenshots" = "Вывешивать скриншоты";
+"Screenshots hang instantly and skip the Desktop" = "Скриншоты мгновенно подвешиваются на прищепку минуя Рабочий стол";
+"Copy each screenshot" = "Копировать каждый скриншот";
+"Each new screenshot goes to the clipboard as it hangs" = "Каждый новый скриншот на прищепке копируется в буфер обмена";
+"Open screenshots folder" = "Открыть папку скриншотов";
+"Sounds" = "Звуки";
+"Open at login" = "Открывать при входе";
+"Check for Updates…" = "Проверить обновления…";
+"Quit Tendedero" = "Закрыть Tendedero";
+"Could not change the login setting" = "Не удалось изменить настройки входа";
+"Move Tendedero to the Applications folder and try again." = "Переместите Tendedero в папку Приложений и попробуйте ещё раз.";
+"Keep on line" = "Оставлять на верёвке";
+"As many as fit" = "Столько, сколько вместится";
+"%d photos" = "%d фотографий";
+"Also watch folders" = "Также следить в папках";
+"Add Folder…" = "Добавить папку…";
+"Watch" = "Следить";
+"Show “%@” in Finder" = "Показать “%@” в Finder";
+"New images saved to this folder will hang on the line." = "Новые изображения, сохранённые в эту папку, будут подвешены на верёвку.";
+"Shortcut" = "Комбинация клавиш";
+"Change Shortcut…" = "Изменить комбинацию…";
+"Change Shortcut" = "Замена комбинации клавиш";
+"None" = "Ничего";
+"Space" = "Пробел";
+"Press the new shortcut" = "Нажмите новую комбинацию";
+"Escape cancels. Delete removes the shortcut." = "Escape отменяет. Delete удаляет комбинацию.";
+"Size" = "Размер";
+"Small" = "Маленький";
+"Medium" = "Средний";
+"Large" = "Большой";
+"Bring the line down" = "Опускать верёвку вниз";
+"When the pointer rests in the menu bar" = "Когда курсор в строке меню";
+"When something new hangs" = "Когда подвешивается что-то новое";
+"Over full screen apps" = "Поверх полноэкранных приложений";
+"Hang what you copy" = "Что копируемое подвесить";
+"Hang what you copy too?" = "Что копируемое подвешивать ещё?";
+"Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "Изображения, текст и ссылки, которые вы копируете, также можете подвесить на верёвку: текст — в виде заметки, ссылка — как заметка с этой ссылкой. Всё копируемое остаётся на этом Mac, и ничто не копируется из поля ввода пароля. Вы в любое время можете изменить эти настройки в разделе «Что копируемое подвесить» в строке меню.";
+"Images" = "Изображения";
+"Text" = "Текст";
+"Links" = "Ссылки";
+"Images you copy hang on the line too" = "Копируемые изображения также подвешиваются на верёвку";
+"Tendedero, hanging copied images" = "Tendedero, подвешивай скопированные изображения";
+"The line is empty" = "На верёвке ничего нет";
+"%d on the line" = "%d на верёвке";
+
+/* GrabArea */
+"Copy" = "Копировать";
+"Open" = "Открыть";
+"Open Link" = "Открыть ссылку";
+"Quick Look" = "Быстрый просмотр";
+"Markup" = "Разметить";
+"Show in Finder" = "Показать в Finder";
+"Share…" = "Поделиться…";
+"Save to Desktop" = "Сохранить на Рабочий стол";
+"Discard" = "Удалить";
+"Take down" = "Отцепить";
+"Move to Trash" = "Переместить в Корзину";
+"Take down everything to the left" = "Отцепить всё слева";
+"Take down everything to the right" = "Отцепить всё справа";
+
+/* LineView */
+"Take a screenshot and it will hang here" = "Сделайте скриншот и он будет висеть здесь";
+
+/* PeggedView */
+"Copied" = "Скопировано";
+
+/* Pinning and holding photos */
+"Pin" = "Закрепить";
+"Unpin" = "Открепить";
+"Hold" = "Удержать";
+"Hang back" = "Повесить обратно";
+"Hang everything back" = "Повесить всё обратно";
+"Actual Size" = "Актуальный размер";
+
+/* Selecting photos */
+"%d selected" = "%d выбрано";
+"Shift-click to select photos" = "Зажмите Shift и выберите фотографии";
+// Save availability
+"Save to Desktop (inbox or Desktop only)" = "Сохранить на Рабочий стол (только входящие или с Рабочего стола)";
+
+/* Open at login, offered on each install and update */
+"Open Tendedero at login?" = "Открывать Tendedero при входе?";
+"Tendedero does not open when you log in, so after a restart the line is gone until you open it again." = "Tendedero не открывается при входе в систему, поэтому после перезагрузки верёвка пропадает, пока вы не откроете приложение снова.";
+
+/* Copied text */
+"Text you copy hangs on the line too" = "Копируемый текст также подвешивается на верёвку";
+"Links you copy hang on the line too" = "Копируемые ссылки также подвешиваются на верёвку";
+
+/* Searching the line */
+"Search the line" = "Поиск на верёвке";
+"%d of %d" = "%d из %d";
+
+/* Zoom on hover */
+"Zoom on hover" = "Увеличить при наведении";
