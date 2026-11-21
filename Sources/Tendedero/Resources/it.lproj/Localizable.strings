@@ -106,3 +106,24 @@
 
 /* Zoom on hover */
 "Zoom on hover" = "Ingrandisci al passaggio";
+
+/* Annotate */
+"Built-in markup editor" = "Editor di annotazioni integrato";
+"Off uses the system Markup" = "Se disattivato, usa Modifica del sistema";
+"Rectangle" = "Rettangolo";
+"Ellipse" = "Ellisse";
+"Line" = "Linea";
+"Arrow" = "Freccia";
+"Pen" = "Penna";
+"Highlighter" = "Evidenziatore";
+"Mosaic" = "Mosaico";
+"Text" = "Testo";
+"Eraser" = "Gomma";
+"Undo" = "Annulla";
+"Redo" = "Ripristina";
+"Width" = "Spessore";
+"Fill" = "Riempimento";
+"Select" = "Seleziona";
+"Number" = "Numero";
+"Pin Preview" = "Fissa anteprima";
+"Close preview" = "Chiudi anteprima";

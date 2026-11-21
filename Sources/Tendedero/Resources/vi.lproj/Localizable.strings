@@ -108,3 +108,24 @@
 /* Offered once: hang what you copy */
 "Hang what you copy too?" = "Treo cả nội dung bạn sao chép?";
 "Images, text and links you copy can hang on the line as well: text as a note, a link with its site. They stay on this Mac, and nothing is ever kept from a password field. Change it anytime under Hang what you copy in the menu bar." = "Hình ảnh, văn bản và liên kết bạn sao chép cũng có thể được treo lên dây phơi: văn bản thành một ghi chú, liên kết kèm tên trang web. Chúng chỉ nằm trên máy Mac này, và không bao giờ lưu lại nội dung từ ô nhập mật khẩu. Bạn có thể thay đổi bất cứ lúc nào tại mục Treo nội dung đã sao chép trên thanh menu.";
+
+/* Annotate */
+"Built-in markup editor" = "Trình chỉnh sửa chú thích tích hợp";
+"Off uses the system Markup" = "Khi tắt, dùng công cụ Đánh dấu của hệ thống";
+"Rectangle" = "Hình chữ nhật";
+"Ellipse" = "Hình elip";
+"Line" = "Đường thẳng";
+"Arrow" = "Mũi tên";
+"Pen" = "Bút";
+"Highlighter" = "Bút tô sáng";
+"Mosaic" = "Làm mờ dạng khảm";
+"Text" = "Văn bản";
+"Eraser" = "Tẩy";
+"Undo" = "Hoàn tác";
+"Redo" = "Làm lại";
+"Width" = "Độ dày";
+"Fill" = "Tô màu";
+"Select" = "Chọn";
+"Number" = "Số";
+"Pin Preview" = "Ghim bản xem trước";
+"Close preview" = "Đóng bản xem trước";

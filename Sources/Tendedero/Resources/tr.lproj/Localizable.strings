@@ -106,3 +106,25 @@
 
 /* Zoom on hover */
 "Zoom on hover" = "Üzerine gelince büyüt";
+
+/* Annotate */
+"Built-in markup editor" = "Yerleşik işaretleme düzenleyicisi";
+"Off uses the system Markup" = "Kapalıyken sistemin Markup aracı kullanılır";
+"Rectangle" = "Dikdörtgen";
+"Ellipse" = "Elips";
+"Line" = "Çizgi";
+"Arrow" = "Ok";
+"Pen" = "Kalem";
+"Highlighter" = "Fosforlu kalem";
+"Mosaic" = "Mozaik";
+"Text" = "Metin";
+"Eraser" = "Silgi";
+"Undo" = "Geri al";
+"Redo" = "Yinele";
+"Width" = "Kalınlık";
+"Fill" = "Dolgu";
+"Select" = "Seç";
+"Number" = "Numara";
+
+"Pin Preview" = "Önizlemeyi sabitle";
+"Close preview" = "Önizlemeyi kapat";
