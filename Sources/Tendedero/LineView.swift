@@ -162,7 +162,9 @@ struct LineView: View {
         let pinnedStay = Layout.pinnedEdge(count: shown.count, width: width,
                                            visible: line.visibleCount, pinned: pinned) != nil
         let start = pinnedStay ? knotX(width: width) ?? 0 : 0
-        return start...width
+        // Reattaching to a Space window briefly gives the view zero width.
+        // Collapse the visible range while the knot is past the right edge.
+        return min(start, width)...width
     }
 
     /// Halfway between the last pinned photo and the next one, or half a

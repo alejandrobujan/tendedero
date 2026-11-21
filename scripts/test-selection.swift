@@ -97,6 +97,7 @@ struct CheckFailed: Error { let message: String }
 
     func run() throws {
         Inbox.folder = root.appendingPathComponent("inbox", isDirectory: true)
+        try checkWindowReattachment()
         let a = try png("A.png"), b = try png("B.png", red: 0.7), c = try png("C.png", red: 0.9)
         let line = line()
         let aID = line.hang(a, quietly: true)!, bID = line.hang(b, quietly: true)!, cID = line.hang(c, quietly: true)!
@@ -504,6 +505,28 @@ struct CheckFailed: Error { let message: String }
         try check(try Data(contentsOf: newCapture) == originalBytes && !fm.fileExists(atPath: desktopCopy.path)
                   && line.items.filter { canonical($0.url) == canonical(newCapture) && !$0.falling }.count == 1,
                   "Undo after copy watcher callbacks preserves the original and restores exactly one card")
+    }
+
+    /// A replacement Space window attaches the hosting view before restoring
+    /// its width. A pinned knot may then sit beyond the temporary right edge.
+    func checkWindowReattachment() throws {
+        let line = line()
+        Line.keepOnLine = 100
+        for i in 0..<9 {
+            let id = line.hang(try png("Reattach-\(i).png"), quietly: true)!
+            if i < 6 { line.pin(id, quietly: true) }
+        }
+        show(line)
+        let content = window.contentView!
+        window.contentView = NSView()
+        let replacement = LinePanel(content: content)
+        replacement.setFrame(window.frame, display: false)
+        replacement.orderFrontRegardless()
+        pump(0.3)
+        try check(line.items.count == 9 && line.pinnedLead == 6,
+                  "Reattaching a scrolling line preserves all photos and pins without crashing")
+        try check(line.hitRects.count == 9, "Cards regain hit regions after the window width is restored")
+        replacement.orderOut(nil)
     }
 
     func cleanUp() {
