@@ -26,11 +26,11 @@
 
 - 本地修复提交：`b4a2dbf`，分支 `codex/fix-line-window-crash-local`。
 - 上游 PR 用修复提交：`c6ddc90`，分支 `codex/fix-line-window-crash`，已推送至 `channingkuo/tendedero`。仅包含修复和回归测试两个文件，无 fork 其他功能。
-- GitHub 连接器向 `alejandrobujan/tendedero` 创建 PR 时返回 403 `Resource not accessible by integration`；浏览器连接也连续超时。因此 PR 尚未创建。
-- 比较页面：https://github.com/alejandrobujan/tendedero/compare/main...channingkuo:codex/fix-line-window-crash?expand=1
+- 最初 GitHub 连接器返回 403 `Resource not accessible by integration`，浏览器连接也连续超时；用户安装并授权 `gh` 后，成功创建上游 PR。
+- 上游 PR：https://github.com/alejandrobujan/tendedero/pull/159 ，目标为 `main`，允许维护者编辑。
 
 ## 复盘与后续
 
 窗口挂载期间的几何尺寸不是稳定的屏幕尺寸。依赖这些尺寸构造范围时必须处理空的可见区域；回归测试应覆盖重新挂载，而不仅是正常显示时的交互。
 
-后续：恢复 GitHub 写入连接或浏览器连接后创建上游 PR；观察实际桌面切换和长期运行。
+后续：等待上游审阅；观察实际桌面切换和长期运行。
