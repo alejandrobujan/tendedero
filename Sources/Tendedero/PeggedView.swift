@@ -7,6 +7,8 @@ struct PeggedView: View {
     @ObservedObject var line: Line
 
     @State private var swing: Double = 0
+    @State private var dip: Double = 0
+    @State private var note: String?
     @State private var arrived = false
     @State private var hovering = false
 
@@ -29,12 +31,30 @@ struct PeggedView: View {
                 .zIndex(1)
             // Held in your hand: a faded trace of it waits on its clip.
             card
+                .overlay(alignment: .bottom) {
+                    if let note {
+                        HStack(spacing: 4) {
+                            Image(systemName: "scissors")
+                            Text(note).monospacedDigit()
+                        }
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(.black.opacity(0.75), in: Capsule())
+                        .fixedSize()
+                        // Clear of the play button in the middle of a recording.
+                        .padding(.bottom, 7)
+                        .allowsHitTesting(false)
+                        .transition(.scale(scale: 0.7).combined(with: .opacity))
+                    }
+                }
                 .saturation(item.held ? 0 : 1)
                 .opacity(item.held ? 0.3 : 1)
                 .animation(.easeOut(duration: 0.25), value: item.held)
         }
         .rotationEffect(.degrees(swing + item.tilt), anchor: .top)
-        .offset(y: arrived ? 0 : -46)
+        .offset(y: (arrived ? 0 : -46) + dip)
         // The fall itself is drawn over the whole screen by CaptureFlight, so
         // the card here just steps aside at once.
         .opacity(item.falling || item.flying ? 0 : (arrived ? 1 : 0))
@@ -44,6 +64,7 @@ struct PeggedView: View {
         .onChange(of: item.flying) { was, now in if was && !now { land() } }
         .onChange(of: line.gust) { _, _ in breeze() }
         .onChange(of: copied) { _, isCopied in if isCopied { nudge(3) } }
+        .onChange(of: line.struck) { _, struck in if let struck { feel(struck) } }
     }
 
     /// The photo fits inside the card area keeping its proportions, so the
@@ -179,6 +200,47 @@ struct PeggedView: View {
     /// Landing after the flight: no jump, just a small sway from rest.
     private func land() {
         nudge(2.2)
+    }
+
+    /// A blow to the line. The photo that took it swings like one just hung;
+    /// the jolt then runs along the rope, weaker and later with each photo,
+    /// each side rocking its own way and no two at the same pace.
+    private func feel(_ struck: Line.Struck) {
+        guard let me = line.items.firstIndex(where: { $0.id == item.id }),
+              let hit = line.items.firstIndex(where: { $0.id == struck.id }) else { return }
+        let distance = abs(me - hit)
+        guard distance > 0 else {
+            rock(struck.degrees, dipping: 4, stiffness: 46, damping: 2.6)
+            if let text = struck.note { show(text) }
+            return
+        }
+        // Pushed away from the blow: on the right the bottom swings right, which
+        // SwiftUI counts as turning anticlockwise, and on the left the other way.
+        let away: Double = me > hit ? -1 : 1
+        let strength = 5 / Double(distance) * Double.random(in: 0.75...1.25)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05 * Double(distance)) {
+            rock(away * strength, dipping: 2.5 / Double(distance),
+                 stiffness: Double.random(in: 36...58), damping: Double.random(in: 2.0...2.8))
+        }
+    }
+
+    /// A pair of durations and an icon, so no language needs its own words.
+    private func show(_ text: String) {
+        withAnimation(.spring(response: 0.25, dampingFraction: 0.7)) { note = text }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            if note == text { withAnimation(.easeOut(duration: 0.25)) { note = nil } }
+        }
+    }
+
+    private func rock(_ degrees: Double, dipping: Double, stiffness: Double, damping: Double) {
+        withAnimation(.easeOut(duration: 0.07)) {
+            swing = degrees
+            dip = dipping
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.07) {
+            withAnimation(.interpolatingSpring(stiffness: stiffness, damping: damping)) { swing = 0 }
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.55)) { dip = 0 }
+        }
     }
 
     private func breeze() {

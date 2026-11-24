@@ -44,6 +44,14 @@ final class CaptureFlight {
     private let to: CGRect
     private let tilt: CGFloat
     private var falling = false
+    /// Which way a card knocked off its clip flies, or nil for a plain fall.
+    private var knockDirection: CGFloat?
+    /// Speeding up all the way, to strike what is already on the clip.
+    private var strikes = false
+    /// The turn a returning card starts from, in degrees, as it left the line.
+    private var startAngle: CGFloat = 0
+    /// Coming back into view from where it fell, rather than lifting off.
+    private var returning = false
     private var duration: CFTimeInterval = CaptureFlight.duration
     private var start: CFTimeInterval = 0
     private var timer: Timer?
@@ -59,9 +67,13 @@ final class CaptureFlight {
     ///   - from: the captured area, in screen coordinates.
     ///   - to: the card's frame on the line, in screen coordinates, unrotated.
     ///   - tilt: the card's resting tilt in degrees, clockwise, as SwiftUI uses.
-    static func fly(image: CGImage, from: CGRect, to: CGRect, tilt: CGFloat, on screen: NSScreen,
+    ///   - strikes: speed up all the way instead of settling in, for a card
+    ///     that knocks another off its clip as it lands.
+    static func fly(image: CGImage, from: CGRect, to: CGRect, tilt: CGFloat, strikes: Bool = false, on screen: NSScreen,
                     completion: @escaping () -> Void) {
         let flight = CaptureFlight(image: image, from: from, to: to, tilt: tilt, screen: screen)
+        flight.strikes = strikes
+        if strikes { flight.duration = 0.5 }
         current.append(flight)
         flight.completion = { [weak flight] in
             completion()
@@ -86,6 +98,59 @@ final class CaptureFlight {
         current.append(flight)
         flight.completion = { [weak flight] in current.removeAll { $0 === flight } }
         flight.run()
+    }
+
+    /// A card coming back the way it fell, to strike what took its place.
+    /// - Parameter direction: which way it fell, 1 to the right, -1 the left.
+    static func comeBack(image: CGImage, to card: CGRect, tilt: CGFloat, direction: CGFloat, on screen: NSScreen,
+                         completion: @escaping () -> Void) {
+        let start = card.offsetBy(dx: direction * Self.knockAlong, dy: -Self.knockDrop)
+        let flight = CaptureFlight(image: image, from: start, to: card, tilt: tilt, screen: screen)
+        flight.strikes = true
+        flight.returning = true
+        flight.startAngle = tilt + direction * Self.knockTurn
+        flight.duration = 0.5
+        current.append(flight)
+        flight.completion = { [weak flight] in
+            completion()
+            current.removeAll { $0 === flight }
+        }
+        flight.run()
+    }
+
+    /// How far a knocked card travels: the path `comeBack` retraces.
+    private static let knockAlong: CGFloat = 110
+    private static let knockDrop: CGFloat = 570
+    private static let knockTurn: CGFloat = 46
+
+    /// A card struck by the one replacing it: it leaves its clip behind, flies
+    /// on the way it was hit and drops, passing behind the line's cards, so
+    /// the one that took its place is never covered.
+    /// - Parameters:
+    ///   - direction: 1 if it was hit towards the right, -1 the left.
+    ///   - line: the window the line's cards are in.
+    ///   - greyed: drained of colour, to tell it from a replacement that may
+    ///     look just the same.
+    static func knock(image: CGImage, card: CGRect, tilt: CGFloat, direction: CGFloat, greyed: Bool = false,
+                      behind line: NSWindow, on screen: NSScreen) {
+        let shown = greyed ? Self.grey(image) ?? image : image
+        let flight = CaptureFlight(image: shown, from: card, to: card, tilt: tilt, screen: screen)
+        flight.falling = true
+        flight.knockDirection = direction
+        flight.clip.isHidden = true
+        flight.duration = 0.6
+        flight.window.level = line.level
+        current.append(flight)
+        flight.completion = { [weak flight] in current.removeAll { $0 === flight } }
+        flight.run(below: line.windowNumber)
+    }
+
+    private static func grey(_ image: CGImage) -> CGImage? {
+        guard let context = CGContext(data: nil, width: image.width, height: image.height, bitsPerComponent: 8,
+                                      bytesPerRow: 0, space: CGColorSpaceCreateDeviceGray(),
+                                      bitmapInfo: CGImageAlphaInfo.none.rawValue) else { return nil }
+        context.draw(image, in: CGRect(x: 0, y: 0, width: image.width, height: image.height))
+        return context.makeImage()
     }
 
     private init(image: CGImage, from: CGRect, to: CGRect, tilt: CGFloat, screen: NSScreen) {
@@ -141,9 +206,13 @@ final class CaptureFlight {
         host.layer?.addSublayer(container)
     }
 
-    private func run() {
+    private func run(below other: Int? = nil) {
         if falling { update(1); updateFall(0) } else { update(0) }
-        window.orderFrontRegardless()
+        if let other {
+            window.order(.below, relativeTo: other)
+        } else {
+            window.orderFrontRegardless()
+        }
         start = CACurrentMediaTime()
         let timer = Timer(timeInterval: 1.0 / 120.0, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.tick() }
@@ -163,16 +232,37 @@ final class CaptureFlight {
             window.orderOut(nil)
             return
         }
-        // The real card fades in underneath; this one fades out over it.
+        // The real card fades in underneath; this one fades out over it. A card
+        // that struck goes at once, so it never hides the real one swinging.
         NSAnimationContext.runAnimationGroup({ ctx in
-            ctx.duration = 0.16
+            ctx.duration = strikes ? 0.04 : 0.16
             window.animator().alphaValue = 0
         }, completionHandler: { [window] in
             MainActor.assumeIsolated { window.orderOut(nil) }
         })
     }
 
+    private func updateKnock(_ raw: Double, direction: CGFloat) {
+        let t = CGFloat(raw)
+        let origin = window.frame.origin
+        // Moving from the first frame: thrown along, up a touch, then gravity.
+        let along = direction * Self.knockAlong * (1 - (1 - t) * (1 - t))
+        let height = 130 * t - (Self.knockDrop + 130) * t * t
+        // Thrown to the right, it turns clockwise; Core Animation counts the other way.
+        let angle = tilt + direction * Self.knockTurn * t
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        container.position = CGPoint(x: to.midX - origin.x + along, y: to.maxY - origin.y + height)
+        container.setAffineTransform(CGAffineTransform(rotationAngle: -angle * .pi / 180))
+        container.opacity = Float(1 - Self.smooth(raw, 0.55, 1))
+        CATransaction.commit()
+    }
+
     private func updateFall(_ raw: Double) {
+        if let knockDirection {
+            updateKnock(raw, direction: knockDirection)
+            return
+        }
         let e = CGFloat(raw * raw * raw)
         let origin = window.frame.origin
         let angle = tilt + (tilt * 7 + 20) * e
@@ -194,23 +284,25 @@ final class CaptureFlight {
     }
 
     private func update(_ raw: Double) {
-        let k = CGFloat(Self.easeInOutCubic(raw))
-        let chrome = Float(Self.smooth(Double(k), 0.35, 1))
+        let k = CGFloat(strikes ? pow(raw, 2.6) : Self.easeInOutCubic(raw))
+        let chrome = returning ? 1 : Float(Self.smooth(Double(k), 0.35, 1))
         let origin = window.frame.origin
         func lerp(_ a: CGFloat, _ b: CGFloat) -> CGFloat { a + (b - a) * k }
 
         let w = lerp(from.width, to.width), h = lerp(from.height, to.height)
         let topX = lerp(from.midX, to.midX) - origin.x
         let topY = lerp(from.maxY, to.maxY) - origin.y + sin(.pi * k) * Self.arc
-        let inset = 4 * k
-        let radius = lerp(0, 16)
+        let inset = returning ? 4 : 4 * k
+        let radius = returning ? 16 : lerp(0, 16)
 
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         container.bounds = CGRect(x: 0, y: 0, width: w, height: h)
         container.position = CGPoint(x: topX, y: topY)
         // SwiftUI tilts clockwise for positive angles; Core Animation the other way.
-        container.setAffineTransform(CGAffineTransform(rotationAngle: -tilt * .pi / 180 * k))
+        let angle = returning ? startAngle + (tilt - startAngle) * k : tilt * k
+        container.setAffineTransform(CGAffineTransform(rotationAngle: -angle * .pi / 180))
+        if returning { container.opacity = Float(Self.smooth(raw, 0, 0.3)) }
         container.shadowPath = CGPath(roundedRect: container.bounds, cornerWidth: radius, cornerHeight: radius, transform: nil)
 
         glass.frame = container.bounds
