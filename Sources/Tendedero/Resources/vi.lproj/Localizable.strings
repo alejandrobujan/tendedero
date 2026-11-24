@@ -55,6 +55,8 @@
 
 /* GrabArea */
 "Copy" = "Sao chép";
+"Copy Path" = "Sao chép đường dẫn";
+"Copy Paths" = "Sao chép các đường dẫn";
 "Open" = "Mở";
 "Open Link" = "Mở liên kết";
 "Quick Look" = "Xem nhanh";

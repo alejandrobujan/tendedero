@@ -67,6 +67,7 @@ struct GrabArea: NSViewRepresentable {
             // Items say themselves whether they can be used.
             menu.autoenablesItems = false
             menu.addItem(ClosureMenuItem(L("Copy")) { line.copy(id) })
+            menu.addItem(ClosureMenuItem(L("Copy Path")) { line.copyPath([id]) })
             menu.addItem(ClosureMenuItem(L("Open")) { line.openFile(id) })
             if isText(item.url), Note.cached(item.url)?.link != nil {
                 menu.addItem(ClosureMenuItem(L("Open Link")) { line.openLink(id) })
@@ -135,6 +136,7 @@ struct GrabArea: NSViewRepresentable {
         menu.addItem(count)
         menu.addItem(.separator())
         menu.addItem(ClosureMenuItem(L("Copy")) { line.copy(ids) })
+        menu.addItem(ClosureMenuItem(L("Copy Paths")) { line.copyPath(ids) })
         menu.addItem(ClosureMenuItem(L("Open")) { line.open(ids) })
         menu.addItem(ClosureMenuItem(L("Show in Finder")) { line.reveal(ids) })
         if let view, let window = view.window {
