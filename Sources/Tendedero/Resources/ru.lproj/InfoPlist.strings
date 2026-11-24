@@ -1,0 +1,4 @@
+/* Описания доступа к папкам в окнах разрешений macOS. */
+"NSDesktopFolderUsageDescription" = "Tendedero следит за папкой, в которую macOS сохраняет ваши скриншоты, чтобы подвешивать их на верёвку.";
+"NSDocumentsFolderUsageDescription" = "Tendedero следит за выбранной вами папкой, чтобы подвешивать новые изображения на верёвку.";
+"NSDownloadsFolderUsageDescription" = "Tendedero следит за выбранной вами папкой, чтобы подвешивать новые изображения на верёвку.";

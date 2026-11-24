@@ -1,6 +1,6 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/hero-dark.png">
-  <img src="../images/hero-light.png" alt="Tendedero. Захватите. Скопируйте. Повесьте всё это сушиться. Заметки и пару скриншотов в стеклянных рамочках висят на тонкой верёвке под строкой меню macOS.">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/ru/hero-dark.png">
+  <img src="../images/ru/hero-light.png" alt="Tendedero. Захватите. Скопируйте. Повесьте всё это сушиться. Заметки и пару скриншотов в стеклянных рамочках висят на тонкой верёвке под строкой меню macOS.">
 </picture>
 
 <h3 align="center"><a href="https://tendedero.app/?lang=ru">Попробуй в своём браузере на tendedero.app&nbsp;&rsaquo;</a></h3>
@@ -12,7 +12,7 @@
   &nbsp;&nbsp;
   <a href="#сборка-из-исходников">Собрать из исходников&nbsp;&rsaquo;</a>
   <br><br>
-  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.it.md">Italiano</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>&nbsp;·&nbsp;<a href="README.vi.md">Tiếng Việt</a>&nbsp;·&nbsp;Русский<!-- &nbsp;·&nbsp;<a href="README.ru.md">Русский</a> <= ДОБАВИТЬ ВО ВСЕ ПЕРЕВОДЫ !!! -->
+  <a href="../../README.md">English</a>&nbsp;·&nbsp;<a href="README.es.md">Español</a>&nbsp;·&nbsp;<a href="README.gl.md">Galego</a>&nbsp;·&nbsp;<a href="README.fr.md">Français</a>&nbsp;·&nbsp;<a href="README.pt-BR.md">Português (Brasil)</a>&nbsp;·&nbsp;<a href="README.it.md">Italiano</a>&nbsp;·&nbsp;<a href="README.ja.md">日本語</a>&nbsp;·&nbsp;<a href="README.ko.md">한국어</a>&nbsp;·&nbsp;<a href="README.zh-Hans.md">简体中文</a>&nbsp;·&nbsp;<a href="README.tr.md">Türkçe</a>&nbsp;·&nbsp;<a href="README.az.md">Azərbaycanca</a>&nbsp;·&nbsp;<a href="README.hi.md">हिन्दी</a>&nbsp;·&nbsp;<a href="README.vi.md">Tiếng Việt</a>&nbsp;·&nbsp;<a href="README.el.md">Ελληνικά</a>&nbsp;·&nbsp;Русский
   <br>
   <sub>Это перевод английского README. При разночтениях преимущественную силу имеет текст на английском языке.</sub>
 </p>
@@ -30,8 +30,8 @@
 Наведите курсор мыши на строку меню, и верёвка опустится вниз. Отодвиньте курсор, и она исчезнет.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/demo-dark.gif">
-  <img src="../images/demo-light.gif" alt="Курсор упирается в верхний край, верёвка скользит вниз вместе со слегка покачивающимися заметками и парой скриншотов, щелчок копирует снимок на верёвке, и она исчезает вверх, когда курсор уходит.">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/ru/demo-dark.gif">
+  <img src="../images/ru/demo-light.gif" alt="Курсор упирается в верхний край, верёвка скользит вниз вместе со слегка покачивающимися заметками и парой скриншотов, щелчок копирует снимок на верёвке, и она исчезает вверх, когда курсор уходит.">
 </picture>
 
 <br>
@@ -40,8 +40,8 @@
 ## Значения действий.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/bento-dark.png">
-  <img src="../images/bento-light.png" alt="Нажми, чтобы скопировать. Удерживай, чтобы разметить. Перетащи, чтобы поделиться. Выкинь. Скопируй любой текст. Выполни поиск.">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/ru/bento-dark.png">
+  <img src="../images/ru/bento-light.png" alt="Нажми и скопируй. Удерживай и размечай. Перетащи и поделись. Выкинь. Скопируй любой текст. Ищи на верёвке.">
 </picture>
 
 <br>
@@ -126,7 +126,7 @@ Tendedero полностью работает на вашем Mac, включа�
 |:--|:--|
 | **Совместимость** | macOS 14 Sonoma или выше, на Apple silicon и Intel. Разработано для macOS 27. |
 | **Размер** | 5.1 Mб |
-| **Языки** | Азербайджанский, Английский, Вьетнамский, Галисийский, Испанский, Итальянский, Китайский (упрощенный), Корейский, Португальский (Бразилия), Русский, Турецкий, Французский, Хинди, Японский |
+| **Языки** | Азербайджанский, Английский, Вьетнамский, Галисийский, Греческий, Испанский, Итальянский, Китайский (упрощенный), Корейский, Португальский (Бразилия), Русский, Турецкий, Французский, Хинди, Японский |
 | **Создано на** | Swift, AppKit и SwiftUI |
 | **Доступ к сети** | Не требуется |
 | **Цена** | Бесплатно |
