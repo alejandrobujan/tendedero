@@ -209,6 +209,22 @@ let translations: [String: [String: String]] = [
         "Search the line.": "Tìm trên dây phơi.",
         "\u{2303}\u{2325}F finds words, even in screenshots.": "⌃⌥F tìm chữ, cả trong ảnh chụp.",
     ],
+    "ru": [
+        "Capture it. Copy it. Hang it all out to dry.": "Захватите. Скопируйте. Повесьте всё это сушиться.",
+        "Copied": "Скопировано",
+        "Click to copy.": "Нажми и скопируй.",
+        "Paste it anywhere, instantly.": "Вставь куда угодно, сразу.",
+        "Hold to mark up.": "Удерживай и размечай.",
+        "Annotate, crop or sign in place.": "Пометь, обрежь или подпиши на месте.",
+        "Drag to share.": "Перетащи и поделись.",
+        "Apps get a copy. Folders keep it.": "Приложениям копия. Папкам оригинал.",
+        "Let it go.": "Выкинь.",
+        "The cross or the Trash. That\u{2019}s it.": "Крестик или Корзина. Вот и всё.",
+        "Copy any text.": "Скопируй любой текст.",
+        "It hangs as a note, links too.": "Он повиснет заметкой, ссылки тоже.",
+        "Search the line.": "Ищи на верёвке.",
+        "\u{2303}\u{2325}F finds words, even in screenshots.": "⌃⌥F находит слова, даже на скриншотах.",
+    ],
 ]
 
 func T(_ english: String) -> String {
