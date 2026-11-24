@@ -1,0 +1,10 @@
+# Cross-building from Linux uses the mingw-w64 GNU toolchain. Building on
+# Windows with the default MSVC toolchain needs no linker setting at all.
+# Both link the C runtime statically, so the exe runs on a clean Windows install.
+
+[target.x86_64-pc-windows-gnu]
+linker = "x86_64-w64-mingw32-gcc"
+rustflags = ["-C", "target-feature=+crt-static"]
+
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]
