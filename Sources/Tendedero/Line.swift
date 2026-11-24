@@ -614,7 +614,8 @@ final class Line: ObservableObject {
         return candidate
     }
 
-    /// Long press: open the photo in the system Markup editor. Markup does
+    /// Long press: open the photo in the marking editor, Tendedero's own or
+    /// the system Markup, as chosen in the menu. Markup does
     /// not edit video, so a recording opens in the trimming editor instead.
     func markup(_ id: UUID) {
         guard let item = items.first(where: { $0.id == id }) else { return }
@@ -623,6 +624,8 @@ final class Line: ObservableObject {
             NSWorkspace.shared.open(item.url)
         } else if item.isRecording {
             Trim.shared.edit(item.url, size: item.thumb.size)
+        } else if Annotate.isEnabled {
+            Annotate.shared.edit(item.url)
         } else {
             Markup.shared.edit(item.url)
         }
@@ -641,6 +644,14 @@ final class Line: ObservableObject {
         let live = items.filter { !$0.falling }
         guard let index = live.firstIndex(where: { $0.id == id }) else { return }
         QuickLook.shared.show(live.map(\.url), at: index)
+    }
+
+    @discardableResult
+    func pinPreview(_ id: UUID) -> Bool {
+        guard let item = items.first(where: { $0.id == id && !$0.falling && !$0.held }),
+              !item.isRecording, !isText(item.url) else { return false }
+        Held.showPreview(id, url: item.url, line: self)
+        return true
     }
 
     /// A note edited in another app shows its new words, on the line and

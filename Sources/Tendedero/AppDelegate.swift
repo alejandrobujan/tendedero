@@ -100,6 +100,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NSUpdateDynamicServices()
 
         Markup.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
+        Annotate.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         Share.shared.clearAll()
         Trim.shared.onSaved = { [weak self] url in self?.line.reloadThumbnail(for: url) }
         panel.onScroll = { [weak self] event in
@@ -174,6 +175,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        // An editor still open saves its marks.
+        Annotate.shared.finish()
         if Inbox.isEnabled { Inbox.restore() }
         Share.shared.clearAll()
     }
@@ -847,19 +850,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     // MARK: Keys over a photo
 
-    /// Delete and Space while the pointer rests on a photo: Delete does what
-    /// its corner button does, Space takes a quick look, as in Finder. Like
-    /// ⌘Z, they are borrowed as hot keys only then, so every other app keeps
-    /// them.
+    /// Delete, Space and ⌘T are borrowed as hot keys while the pointer is
+    /// over a card. ⌘T pins a preview of an image.
     private var photoKeys: [HotKey] = []
     private var photoKeysFor: UUID?
 
     private func holdPhotoKeys(over id: UUID?) {
-        let id = id.flatMap { id in line.items.first { $0.id == id && !$0.falling && !$0.held }?.id }
-        guard id != photoKeysFor else { return }
-        photoKeysFor = id
+        let item = id.flatMap { id in line.items.first { $0.id == id && !$0.falling && !$0.held } }
+        guard item?.id != photoKeysFor else { return }
+        photoKeysFor = item?.id
         photoKeys = []
-        guard let id else { return }
+        guard let item else { return }
+        let id = item.id
         photoKeys = [
             HotKey(Shortcut(keyCode: kVK_Delete, modifiers: [], key: "\u{8}")) { [weak self] in
                 guard let line = self?.line else { return }
@@ -870,6 +872,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 self?.quickLookToggle(id)
             },
         ].compactMap { $0 }
+        let shortcut = Shortcut.pinPreview
+        if !item.isRecording, !isText(item.url),
+           hotKey == nil || !isPinPreviewShortcut(Shortcut.current, matching: shortcut),
+           searchHotKey == nil || !isPinPreviewShortcut(Shortcut.search, matching: shortcut),
+           let pinKey = HotKey(shortcut, action: { [weak self] in
+               guard let self, self.isRevealed, self.photo(under: NSEvent.mouseLocation) == id else { return }
+               self.line.pinPreview(id)
+           }) {
+            photoKeys.append(pinKey)
+        }
     }
 
     /// Like Delete and undo, these belong to the line only while the
@@ -882,11 +894,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard hold != selectionKeysHeld else { return }
         selectionKeysHeld = hold
         selectionKeys = []
+        Held.setSelectionEscape(hold ? { [weak self] in self?.line.clearSelection() } : nil)
         guard hold else { return }
         selectionKeys = [
-            HotKey(Shortcut(keyCode: kVK_Escape, modifiers: [], key: "\u{1b}")) { [weak self] in
-                self?.line.clearSelection()
-            },
             HotKey(Shortcut(keyCode: kVK_ANSI_C, modifiers: [.command], key: "c")) { [weak self] in
                 guard let line = self?.line else { return }
                 line.copy(line.selectedItems.map(\.id))
@@ -992,15 +1002,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     // MARK: Shortcut
 
     private func registerShortcut() {
+        holdPhotoKeys(over: nil)
         hotKey = nil
         guard let shortcut = Shortcut.current else { return }
-        hotKey = HotKey(shortcut) { [weak self] in self?.toggle() }
+        let sharesPinKey = isPinPreviewShortcut(shortcut, matching: .pinPreview)
+        hotKey = HotKey(shortcut) { [weak self] in
+            guard let self else { return }
+            if sharesPinKey, self.isRevealed, self.searchBar?.isShown != true,
+               let id = self.photo(under: NSEvent.mouseLocation),
+               self.line.pinPreview(id) { return }
+            self.toggle()
+        }
+    }
+
+    private func isPinPreviewShortcut(_ shortcut: Shortcut?, matching pin: Shortcut) -> Bool {
+        shortcut?.keyCode == pin.keyCode && shortcut?.modifiers == pin.modifiers
     }
 
     private func registerSearchShortcut() {
+        holdPhotoKeys(over: nil)
         searchHotKey = nil
         guard let shortcut = Shortcut.search else { return }
-        searchHotKey = HotKey(shortcut) { [weak self] in self?.startSearch() }
+        let sharesPinKey = isPinPreviewShortcut(shortcut, matching: .pinPreview)
+        searchHotKey = HotKey(shortcut) { [weak self] in
+            guard let self else { return }
+            if sharesPinKey, self.isRevealed, self.searchBar?.isShown != true,
+               let id = self.photo(under: NSEvent.mouseLocation), self.line.pinPreview(id) { return }
+            self.startSearch()
+        }
     }
 
     private func changeShortcut() {
@@ -1193,6 +1222,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             menu.addItem(item)
         }
         menu.addItem(.separator())
+
+        let editor = ClosureMenuItem(L("Built-in markup editor")) {
+            Annotate.isEnabled.toggle()
+        }
+        editor.state = Annotate.isEnabled ? .on : .off
+        editor.toolTip = L("Off uses the system Markup")
+        menu.addItem(editor)
 
         let bringDown = NSMenuItem(title: L("Bring the line down"), action: nil, keyEquivalent: "")
         let options = NSMenu()

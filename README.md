@@ -48,7 +48,7 @@ Rest the pointer in the middle of the menu bar and it glides down. Move away and
 | | |
 |:--|:--|
 | Click | Copy it. A note copies its text, styled as it was. |
-| Press and hold | Open it in Markup. A note opens to edit. |
+| Press and hold | Mark it up in the built-in editor or switch to system Markup from the menu bar. Click a mark to select, move or reshape it, and press Delete to remove it. Closing the window or pressing Escape saves it. A note opens to edit. |
 | Double click | Open it in Preview. A link opens in your browser. |
 | Force click | Take a quick look. |
 | Drag into an app | Send a copy. It stays on the line. |
@@ -57,6 +57,7 @@ Rest the pointer in the middle of the menu bar and it glides down. Move away and
 | Shift-click | Select several. Their menu, <kbd>⌘</kbd>&thinsp;<kbd>C</kbd>, <kbd>⌫</kbd> and a drag act on them all. <kbd>Esc</kbd> or a plain click clears it. |
 | <kbd>⌘</kbd>&thinsp;<kbd>Z</kbd> with the pointer on the line | Undo what you just did: let go, pin or save to the Desktop, a whole selection included. |
 | <kbd>Space</kbd> with the pointer on a photo | Take a quick look. |
+| <kbd>⌘T</kbd> with the pointer on a photo, or **Pin Preview** in its menu | Open a floating preview while you work in another app. Drag it to move it, scroll over it to zoom, and press <kbd>Esc</kbd> over it or click × to close it. You can pin several photos. |
 | <kbd>⌫</kbd> with the pointer on a photo | Let it go, as its corner button does. |
 | Right click, then Share | Send it with AirDrop, Messages, Mail and more. It stays on the line. |
 | Right click, then Pin | Keep it: it hangs left of the knot on a space grey clip, and no new screenshot pushes it off. |
@@ -175,6 +176,10 @@ Want to help? Read [CONTRIBUTING.md](CONTRIBUTING.md) first.
 | `Markdown.swift` | Markdown in notes |
 | `Inbox.swift` | Takes over screenshot settings and puts them back |
 | `Markup.swift` | Opens the system Markup editor and saves the result |
+| `Annotate.swift` | The built-in markup editor: window, saving |
+| `AnnotationModel.swift` | The marks, their history and how they are drawn and flattened |
+| `AnnotationCanvas.swift` | The picture and the pointer: drawing, eraser, text |
+| `AnnotationToolbar.swift` | The tools, widths and colours |
 | `Trim.swift` | Trims a screen recording and saves the result |
 | `FullScreen.swift` | Knows when to stay hidden |
 | `Line.swift` | What is hanging, and what you can do with it |

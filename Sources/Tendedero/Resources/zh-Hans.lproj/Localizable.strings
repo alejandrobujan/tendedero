@@ -106,3 +106,25 @@
 
 /* Zoom on hover */
 "Zoom on hover" = "悬停时放大";
+
+/* Annotate */
+"Built-in markup editor" = "内置标记编辑器";
+"Off uses the system Markup" = "关闭后使用系统“标记”";
+"Rectangle" = "矩形";
+"Ellipse" = "椭圆";
+"Line" = "直线";
+"Arrow" = "箭头";
+"Pen" = "画笔";
+"Highlighter" = "荧光笔";
+"Mosaic" = "马赛克";
+"Text" = "文字";
+"Eraser" = "橡皮擦";
+"Undo" = "撤销";
+"Redo" = "重做";
+"Width" = "粗细";
+"Fill" = "填充";
+"Select" = "选择";
+"Number" = "序号";
+
+"Pin Preview" = "置顶预览";
+"Close preview" = "关闭预览";

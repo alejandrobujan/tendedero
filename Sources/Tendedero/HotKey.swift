@@ -60,6 +60,10 @@ struct Shortcut: Equatable {
         Shortcut(keyCode: keyCode(typing: "z") ?? kVK_ANSI_Z, modifiers: .command, key: "z")
     }
 
+    static var pinPreview: Shortcut {
+        Shortcut(keyCode: keyCode(typing: "t") ?? kVK_ANSI_T, modifiers: .command, key: "t")
+    }
+
     /// The key that types this letter with Command held, in a keyboard
     /// layout, by default the one in use.
     static func keyCode(typing letter: String,

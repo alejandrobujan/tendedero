@@ -108,3 +108,25 @@
 
 /* Zoom on hover */
 "Zoom on hover" = "Üzərinə gəldikdə böyüt";
+
+/* Annotate */
+"Built-in markup editor" = "Daxili işarələmə redaktoru";
+"Off uses the system Markup" = "Söndürüldükdə sistemin Markup aləti istifadə olunur";
+"Rectangle" = "Düzbucaqlı";
+"Ellipse" = "Ellips";
+"Line" = "Xətt";
+"Arrow" = "Ox";
+"Pen" = "Qələm";
+"Highlighter" = "Marker";
+"Mosaic" = "Mozaika";
+"Text" = "Mətn";
+"Eraser" = "Pozan";
+"Undo" = "Geri al";
+"Redo" = "Yenidən et";
+"Width" = "Qalınlıq";
+"Fill" = "Doldurma";
+"Select" = "Seç";
+"Number" = "Nömrə";
+
+"Pin Preview" = "Önizləməni bərkit";
+"Close preview" = "Önizləməni bağla";

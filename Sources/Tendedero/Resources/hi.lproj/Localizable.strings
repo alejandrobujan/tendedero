@@ -108,3 +108,25 @@
 
 /* Zoom on hover */
 "Zoom on hover" = "होवर पर बड़ा करें";
+
+/* Annotate */
+"Built-in markup editor" = "इनबिल्ट मार्कअप एडिटर";
+"Off uses the system Markup" = "बंद करने पर सिस्टम Markup इस्तेमाल होता है";
+"Rectangle" = "आयत";
+"Ellipse" = "दीर्घवृत्त";
+"Line" = "रेखा";
+"Arrow" = "तीर";
+"Pen" = "कलम";
+"Highlighter" = "हाइलाइटर";
+"Mosaic" = "मोज़ेक";
+"Text" = "टेक्स्ट";
+"Eraser" = "रबर";
+"Undo" = "पूर्ववत करें";
+"Redo" = "फिर से करें";
+"Width" = "मोटाई";
+"Fill" = "भरें";
+"Select" = "चुनें";
+"Number" = "संख्या";
+
+"Pin Preview" = "पूर्वावलोकन पिन करें";
+"Close preview" = "पूर्वावलोकन बंद करें";
