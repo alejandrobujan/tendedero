@@ -124,7 +124,7 @@ y nada de lo que cuelgas sale nunca de él.
 |:--|:--|
 | **Compatibilidad** | macOS 14 Sonoma o posterior, en Mac con Apple silicon o Intel. Pensado para macOS 27. |
 | **Tamaño** | 5,1 MB |
-| **Idiomas** | Inglés, español, gallego, francés, portugués de Brasil, italiano, japonés, coreano, chino simplificado, turco, azerbaiyano, hindi y vietnamita |
+| **Idiomas** | Inglés, español, gallego, francés, portugués de Brasil, italiano, japonés, coreano, chino simplificado, turco, azerbaiyano, hindi, vietnamita, griego y ruso |
 | **Hecho con** | Swift, AppKit y SwiftUI |
 | **Conexión a internet** | No la usa |
 | **Precio** | Gratis |

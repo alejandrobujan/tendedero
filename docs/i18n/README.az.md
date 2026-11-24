@@ -124,7 +124,7 @@ Mac-inizdə işləyir və asdığınız heç nə oradan heç vaxt çıxmır.
 |:--|:--|
 | **Uyğunluq** | macOS 14 Sonoma və ya sonrakı, Apple silicon və Intel Mac-lərdə. macOS 27 üçün hazırlanıb. |
 | **Həcm** | 5,1 MB |
-| **Dillər** | İngilis, ispan, qalisiya, fransız, portuqal (Braziliya), italyan, yapon, koreya, sadələşdirilmiş Çin, türk, Azərbaycan, hind və Vyetnam dili |
+| **Dillər** | İngilis, ispan, qalisiya, fransız, portuqal (Braziliya), italyan, yapon, koreya, sadələşdirilmiş Çin, türk, Azərbaycan, hind, Vyetnam, yunan və rus dili |
 | **Nə ilə yazılıb** | Swift, AppKit və SwiftUI |
 | **İnternet bağlantısı** | İstifadə etmir |
 | **Qiymət** | Pulsuz |

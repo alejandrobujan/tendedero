@@ -124,7 +124,7 @@ capturas, e nada do que você pendura sai dele.
 |:--|:--|
 | **Compatibilidade** | macOS 14 Sonoma ou posterior, em Macs com Apple silicon e Intel. Projetado para o macOS 27. |
 | **Tamanho** | 5,1 MB |
-| **Idiomas** | Inglês, espanhol, galego, francês, português (Brasil), italiano, japonês, coreano, chinês simplificado, turco, azerbaijano, híndi e vietnamita |
+| **Idiomas** | Inglês, espanhol, galego, francês, português (Brasil), italiano, japonês, coreano, chinês simplificado, turco, azerbaijano, híndi, vietnamita, grego e russo |
 | **Feito com** | Swift, AppKit e SwiftUI |
 | **Acesso à rede** | Nenhum |
 | **Preço** | Gratuito |

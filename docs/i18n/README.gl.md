@@ -124,7 +124,7 @@ e nada do que penduras sae nunca del.
 |:--|:--|
 | **Compatibilidade** | macOS 14 Sonoma ou posterior, en Mac con Apple silicon ou Intel. Pensado para macOS 27. |
 | **Tamaño** | 5,1 MB |
-| **Idiomas** | Inglés, español, galego, francés, portugués do Brasil, italiano, xaponés, coreano, chinés simplificado, turco, acerbaixano, hindi e vietnamita |
+| **Idiomas** | Inglés, español, galego, francés, portugués do Brasil, italiano, xaponés, coreano, chinés simplificado, turco, acerbaixano, hindi, vietnamita, grego e ruso |
 | **Feito con** | Swift, AppKit e SwiftUI |
 | **Conexión a internet** | Non a usa |
 | **Prezo** | De balde |

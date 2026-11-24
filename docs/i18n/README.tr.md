@@ -124,7 +124,7 @@ ve astığınız hiçbir şey oradan ayrılmaz.
 |:--|:--|
 | **Uyumluluk** | macOS 14 Sonoma veya sonrası, Apple silicon ve Intel. macOS 27 için tasarlandı. |
 | **Boyut** | 5,1 MB |
-| **Diller** | İngilizce, İspanyolca, Galiçyaca, Fransızca, Portekizce (Brezilya), İtalyanca, Japonca, Korece, Basitleştirilmiş Çince, Türkçe, Azerice, Hintçe, Vietnamca |
+| **Diller** | İngilizce, İspanyolca, Galiçyaca, Fransızca, Portekizce (Brezilya), İtalyanca, Japonca, Korece, Basitleştirilmiş Çince, Türkçe, Azerice, Hintçe, Vietnamca, Yunanca, Rusça |
 | **Yapıldığı teknolojiler** | Swift, AppKit ve SwiftUI |
 | **Ağ erişimi** | Yok |
 | **Fiyat** | Ücretsiz |
